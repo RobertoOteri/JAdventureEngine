@@ -2,6 +2,7 @@ package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.auth.AuthRequest;
 import com.jadventure.backend.dto.auth.AuthResponse;
+import com.jadventure.backend.dto.auth.LogoutResponse;
 import com.jadventure.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout() {
+    public ResponseEntity<LogoutResponse> logout() {
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(Map.of("message", "Logout effettuato con successo"));
+        return ResponseEntity.ok(new LogoutResponse("Logout effettuato con successo"));
     }
 }

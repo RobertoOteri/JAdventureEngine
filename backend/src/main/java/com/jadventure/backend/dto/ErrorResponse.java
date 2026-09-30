@@ -1,6 +1,5 @@
 package com.jadventure.backend.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -19,9 +18,8 @@ public class ErrorResponse {
     private String error;
     private String message;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    private Map<String, String> validationErrors;
+    private Map<String, String> errors;
 }
