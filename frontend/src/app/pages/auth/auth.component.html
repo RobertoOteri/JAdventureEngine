@@ -1,0 +1,68 @@
+<div class="auth-viewport">
+  <div class="auth-box">
+
+    <header class="auth-header">
+      <span class="brand-tag">JADVENTURE</span>
+      <h1>{{ isLoginMode() ? 'Accedi' : 'Registrati' }}</h1>
+      <p>{{ isLoginMode() ? 'Inserisci le credenziali del tuo account.' : 'Crea un account per iniziare a creare.' }}</p>
+    </header>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+      <div class="field-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          [ngModel]="username()"
+          (ngModelChange)="username.set($event)"
+          placeholder="es. guybrush"
+          autocomplete="username"
+          required
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="status-msg error">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="status-msg success">
+          {{ successMessage() }}
+        </div>
+      }
+
+      <button type="submit" class="btn-primary" [disabled]="authService.isLoading()">
+        @if (authService.isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          {{ isLoginMode() ? 'Continua' : 'Crea account' }}
+        }
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <span>{{ isLoginMode() ? 'Non hai ancora un profilo?' : 'Hai già un account?' }}</span>
+      <button type="button" class="btn-link" (click)="toggleMode()">
+        {{ isLoginMode() ? 'Registrati' : 'Accedi' }}
+      </button>
+    </footer>
+
+  </div>
+</div>

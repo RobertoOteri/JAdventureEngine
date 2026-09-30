@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+.angular/
+frontend/.angular/
+.vscode/
+frontend/.vscode/
+
