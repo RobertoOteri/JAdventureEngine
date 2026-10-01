@@ -1,0 +1,72 @@
+<div class="workspace-screen">
+  <header class="workspace-topbar">
+    <div class="topbar-left">
+      <button type="button" class="btn-back" (click)="onCancel()">
+        <span class="icon">‹</span>
+        <span>Annulla</span>
+      </button>
+      <div class="crumb-separator">/</div>
+      <span class="badge-title">Nuova Avventura</span>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        type="button"
+        class="btn-primary-action"
+        [disabled]="form.invalid || isSubmitting()"
+        (click)="onSubmit()"
+      >
+        <span>{{ isSubmitting() ? 'Creazione...' : 'Crea ed entra in Editor →' }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace-body">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span>⚠️ {{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">
+      <section class="meta-column">
+        <div class="column-header">
+          <h1>Nuova Storia</h1>
+          <p class="subtitle">Definisci l'identità del gioco. Potrai creare le scene nell'editor subito dopo.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="title">Titolo dell'Avventura *</label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            class="studio-input"
+            placeholder="es. Il Segreto del Faro Abbandonato"
+            [class.input-error]="form.get('title')?.touched && form.get('title')?.invalid"
+          />
+          @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
+            <span class="error-hint">Il titolo è obbligatorio.</span>
+          }
+        </div>
+
+        <div class="field-group flex-fill">
+          <label for="description">Sinossi / Ambientazione</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="studio-textarea"
+            placeholder="Descrivi l'atmosfera, l'incipit della storia e i suoi misteri..."
+          ></textarea>
+        </div>
+      </section>
+
+      <section class="preview-column">
+        <app-file-dropzone
+          label="Locandina / Copertina (16:9)"
+          (fileChange)="onFileChange($event)"
+        />
+      </section>
+    </form>
+  </main>
+</div>

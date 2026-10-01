@@ -1,0 +1,58 @@
+<div class="shell-layout">
+  <app-sidebar />
+
+  <main class="content-body">
+    <header class="masthead">
+      <div class="masthead-text">
+        <h1>Le Mie Avventure</h1>
+        <span class="counter">{{ adventures().length }} progetti personali</span>
+      </div>
+
+      <button
+        type="button"
+        class="fab-add"
+        (click)="goToCreate()"
+        title="Crea nuova avventura"
+      >
+        <span class="fab-cross">+</span>
+      </button>
+    </header>
+
+    <div class="divider"></div>
+
+    @if (errorMessage()) {
+      <div class="empty-wrap">
+        <p class="error-text">{{ errorMessage() }}</p>
+      </div>
+    } @else if (isLoading()) {
+      <div class="empty-wrap">
+        <div class="loader"></div>
+      </div>
+    } @else {
+      <div class="catalog-grid">
+        @for (adv of adventures(); track adv.code) {
+          <app-adventure-card
+            [adventure]="adv"
+            [isAuthor]="true"
+            (play)="playAdventure($event)"
+            (edit)="onEditAdventure($event)"
+            (delete)="onDeleteAdventure($event)"
+            (info)="selectedAdventure.set($event)"
+          />
+        } @empty {
+          <div class="empty-wrap">
+            <p>Non hai ancora creato nessuna avventura. Usa il tasto <strong>+</strong> in alto per cominciare.</p>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  @if (selectedAdventure()) {
+    <app-adventure-detail-modal
+      [adventure]="selectedAdventure()!"
+      (close)="selectedAdventure.set(null)"
+      (play)="playAdventure($event)"
+    />
+  }
+</div>

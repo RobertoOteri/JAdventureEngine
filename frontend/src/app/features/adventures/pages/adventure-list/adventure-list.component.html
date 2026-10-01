@@ -1,0 +1,51 @@
+<div class="shell-layout">
+  <app-sidebar />
+
+  <main class="content-body">
+    <header class="masthead">
+      <div class="masthead-text">
+        <h1>Libreria Avventure</h1>
+        <span class="counter">{{ adventures().length }} titoli registrati</span>
+      </div>
+
+      <button
+        type="button"
+        class="fab-add"
+        (click)="goToCreate()"
+        title="Crea nuova avventura"
+      >
+        <span class="fab-cross">+</span>
+      </button>
+    </header>
+
+    <div class="divider"></div>
+
+    @if (loading()) {
+      <div class="empty-wrap">
+        <div class="loader"></div>
+      </div>
+    } @else {
+      <div class="catalog-grid">
+        @for (adv of adventures(); track adv.code) {
+          <app-adventure-card
+            [adventure]="adv"
+            (play)="onPlayAdventure($event)"
+            (info)="selectedAdventure.set($event)"
+          />
+        } @empty {
+          <div class="empty-wrap">
+            <p>Nessun'avventura creata. Usa il tasto <strong>+</strong> in alto per iniziare.</p>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  @if (selectedAdventure()) {
+    <app-adventure-detail-modal
+      [adventure]="selectedAdventure()!"
+      (close)="selectedAdventure.set(null)"
+      (play)="onPlayAdventure($event)"
+    />
+  }
+</div>

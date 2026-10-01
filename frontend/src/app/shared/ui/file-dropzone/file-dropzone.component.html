@@ -1,0 +1,45 @@
+<div class="dropzone-container">
+  <label class="section-label">{{ label() }}</label>
+
+  @if (error()) {
+    <span class="error-hint">⚠️ {{ error() }}</span>
+  }
+
+  @if (!previewUrl()) {
+    <div
+      class="cinema-dropzone"
+      [class.dragging]="isDragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+    >
+      <div class="drop-circle">
+        <span class="drop-icon">🖼️</span>
+      </div>
+      <h3>Trascina la copertina dell'avventura</h3>
+      <p>oppure <span class="highlight-browse">clicca per sfogliare i file</span></p>
+      <span class="file-type-hint">Formati supportati: PNG, JPG, WEBP (Max 5MB)</span>
+
+      <input
+        #fileInput
+        type="file"
+        [accept]="accept()"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
+    </div>
+  } @else {
+    <div class="cinema-preview-wrapper">
+      <img [src]="previewUrl()" alt="Anteprima Cover" class="preview-full-img" />
+      <div class="preview-overlay">
+        <div class="preview-meta">
+          <span class="file-tag">📄 {{ fileName() }}</span>
+        </div>
+        <button type="button" class="btn-discard" (click)="removeFile()">
+          Rimuovi Immagine
+        </button>
+      </div>
+    </div>
+  }
+</div>

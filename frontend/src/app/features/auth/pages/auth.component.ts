@@ -2,9 +2,9 @@ import {Component, computed, inject, signal} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthService } from '../../core/services/auth.service';
-import { AuthRequest } from '../../core/models/auth.model';
-import { ErrorResponse } from '../../core/models/error-response.model';
+import { AuthService } from '../../../core/services/auth.service';
+import { AuthRequest } from '../../../core/models/auth.model';
+import { ErrorResponse } from '../../../core/models/error-response.model';
 
 @Component({
   selector: 'app-auth',

@@ -9,7 +9,6 @@
 
     <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
 
-      <!-- CAMPO USERNAME -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="username">Username</label>
@@ -32,7 +31,6 @@
           required
         />
 
-        <!-- Feedback Reattivo Username -->
         @if (usernameError()) {
           <div class="field-feedback error">
             @if (invalidChars().length > 0) {
@@ -49,7 +47,6 @@
         }
       </div>
 
-      <!-- CAMPO PASSWORD -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="password">Password</label>
@@ -70,7 +67,6 @@
           required
         />
 
-        <!-- Feedback Reattivo Password -->
         @if (passwordError()) {
           <div class="field-feedback error">
             <span>{{ passwordError() }}</span>

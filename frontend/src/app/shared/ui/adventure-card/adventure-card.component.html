@@ -1,0 +1,62 @@
+<article class="game-plate" (click)="onCardClick()">
+  @if (coverUrl()) {
+    <img
+      [src]="coverUrl()"
+      [alt]="adventure().title"
+      class="plate-art"
+    />
+  } @else {
+    <div class="plate-art-empty">
+      <span class="empty-pic-icon">🖼️</span>
+    </div>
+  }
+
+  <div class="plate-shade"></div>
+
+  <span class="plate-slug">{{ adventure().code }}</span>
+
+  <div class="plate-bottom">
+    <button
+      type="button"
+      class="play-pill"
+      (click)="onPlay($event)"
+      title="Avvia gioco"
+    >
+      <span class="play-arrow">▶</span>
+    </button>
+
+    <div class="plate-meta">
+      <h2 class="plate-title">{{ adventure().title }}</h2>
+    </div>
+
+    <div class="action-tools">
+      <button
+        type="button"
+        class="btn-icon-action info"
+        (click)="onInfo($event)"
+        title="Dettagli e Sinossi"
+      >
+        🔍
+      </button>
+
+      @if (isAuthor()) {
+        <button
+          type="button"
+          class="btn-icon-action edit"
+          (click)="onEdit($event)"
+          title="Modifica Avventura"
+        >
+          ✏️
+        </button>
+        <button
+          type="button"
+          class="btn-icon-action delete"
+          (click)="onDelete($event)"
+          title="Elimina Avventura"
+        >
+          🗑️
+        </button>
+      }
+    </div>
+  </div>
+</article>
