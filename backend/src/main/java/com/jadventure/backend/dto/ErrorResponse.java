@@ -20,6 +20,4 @@ public class ErrorResponse {
 
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
-
-    private Map<String, String> errors;
 }
