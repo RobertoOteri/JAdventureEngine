@@ -19,6 +19,8 @@ dist/
 # Package files
 *.jar
 
+*.json
+
 # Maven
 target/
 dist/
@@ -47,4 +49,9 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+
+.angular/
+frontend/.angular/
+.vscode/
+frontend/.vscode/
 

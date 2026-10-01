@@ -1,0 +1,114 @@
+<div class="auth-viewport">
+  <div class="auth-box">
+
+    <header class="auth-header">
+      <span class="brand-tag">JADVENTURE</span>
+      <h1>{{ isLoginMode() ? 'Accedi' : 'Registrati' }}</h1>
+      <p>{{ isLoginMode() ? 'Inserisci le credenziali del tuo account.' : 'Crea un account per iniziare a creare.' }}</p>
+    </header>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+
+      <!-- CAMPO USERNAME -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label for="username">Username</label>
+          @if (usernameLen() > 0) {
+            <span class="field-counter" [class.counter-limit]="usernameLen() > 50">
+              {{ usernameLen() }}/50
+            </span>
+          }
+        </div>
+
+        <input
+          id="username"
+          type="text"
+          name="username"
+          [ngModel]="username()"
+          (ngModelChange)="username.set($event)"
+          placeholder="es. guybrush"
+          autocomplete="username"
+          [class.input-error]="usernameError()"
+          required
+        />
+
+        <!-- Feedback Reattivo Username -->
+        @if (usernameError()) {
+          <div class="field-feedback error">
+            @if (invalidChars().length > 0) {
+              <div class="bad-chars-list">
+                <span>Non ammessi:</span>
+                @for (char of invalidChars(); track char) {
+                  <span class="bad-char-tag">{{ char }}</span>
+                }
+              </div>
+            } @else {
+              <span>{{ usernameError() }}</span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- CAMPO PASSWORD -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label for="password">Password</label>
+          @if (passwordLen() > 0) {
+            <span class="field-counter">{{ passwordLen() }} car.</span>
+          }
+        </div>
+
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          [class.input-error]="passwordError()"
+          required
+        />
+
+        <!-- Feedback Reattivo Password -->
+        @if (passwordError()) {
+          <div class="field-feedback error">
+            <span>{{ passwordError() }}</span>
+          </div>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="status-msg error">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="status-msg success">
+          {{ successMessage() }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="authService.isLoading() || isFormInvalid()"
+      >
+        @if (authService.isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          {{ isLoginMode() ? 'Continua' : 'Crea account' }}
+        }
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <span>{{ isLoginMode() ? 'Non hai ancora un profilo?' : 'Hai già un account?' }}</span>
+      <button type="button" class="btn-link" (click)="toggleMode()">
+        {{ isLoginMode() ? 'Registrati' : 'Accedi' }}
+      </button>
+    </footer>
+
+  </div>
+</div>
