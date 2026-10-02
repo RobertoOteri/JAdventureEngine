@@ -1,13 +1,14 @@
 <article class="game-plate" (click)="onCardClick()">
-  @if (coverUrl()) {
+  @if (adventure().coverImageUrl) {
     <img
-      [src]="coverUrl()"
+      [src]="adventure().coverImageUrl"
       [alt]="adventure().title"
       class="plate-art"
+      loading="lazy"
     />
   } @else {
     <div class="plate-art-empty">
-      <span class="empty-pic-icon">🖼️</span>
+      <i class="bi bi-image empty-pic-icon"></i>
     </div>
   }
 
@@ -22,7 +23,7 @@
       (click)="onPlay($event)"
       title="Avvia gioco"
     >
-      <span class="play-arrow">▶</span>
+      <i class="bi bi-play-fill play-arrow"></i>
     </button>
 
     <div class="plate-meta">
@@ -36,7 +37,7 @@
         (click)="onInfo($event)"
         title="Dettagli e Sinossi"
       >
-        🔍
+        <i class="bi bi-search"></i>
       </button>
 
       @if (isAuthor()) {
@@ -46,7 +47,7 @@
           (click)="onEdit($event)"
           title="Modifica Avventura"
         >
-          ✏️
+          <i class="bi bi-pencil"></i>
         </button>
         <button
           type="button"
@@ -54,7 +55,7 @@
           (click)="onDelete($event)"
           title="Elimina Avventura"
         >
-          🗑️
+          <i class="bi bi-trash"></i>
         </button>
       }
     </div>

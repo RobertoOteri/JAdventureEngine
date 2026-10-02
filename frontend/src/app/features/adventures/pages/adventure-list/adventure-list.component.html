@@ -13,8 +13,9 @@
         class="fab-add"
         (click)="goToCreate()"
         title="Crea nuova avventura"
+        aria-label="Crea nuova avventura"
       >
-        <span class="fab-cross">+</span>
+        <i class="bi bi-plus-lg fab-cross"></i>
       </button>
     </header>
 
@@ -34,7 +35,11 @@
           />
         } @empty {
           <div class="empty-wrap">
-            <p>Nessun'avventura creata. Usa il tasto <strong>+</strong> in alto per iniziare.</p>
+            <i class="bi bi-journal-album empty-icon"></i>
+            <p>Nessun'avventura disponibile nella libreria.</p>
+            <button type="button" class="btn-create-first" (click)="goToCreate()">
+              <i class="bi bi-plus-lg"></i> Crea la prima storia
+            </button>
           </div>
         }
       </div>

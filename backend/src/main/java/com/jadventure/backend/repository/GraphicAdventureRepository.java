@@ -20,5 +20,5 @@ public interface GraphicAdventureRepository extends JpaRepository <GraphicAdvent
 
     // Controlli di unicità in creazione/modifica
     boolean existsByCode(String code);
-    boolean existsByTitleIgnoreCase(String title);
+    boolean existsByTitle(String title);
 }

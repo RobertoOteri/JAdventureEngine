@@ -2,7 +2,7 @@
   <header class="workspace-topbar">
     <div class="topbar-left">
       <button type="button" class="btn-back" (click)="onCancel()">
-        <span class="icon">‹</span>
+        <i class="bi bi-arrow-left"></i>
         <span>Annulla</span>
       </button>
       <div class="crumb-separator">/</div>
@@ -16,7 +16,13 @@
         [disabled]="form.invalid || isSubmitting()"
         (click)="onSubmit()"
       >
-        <span>{{ isSubmitting() ? 'Creazione...' : 'Crea ed entra in Editor →' }}</span>
+        @if (isSubmitting()) {
+          <span class="spinner-btn"></span>
+          <span>Creazione...</span>
+        } @else {
+          <span>Crea ed entra in Editor</span>
+          <i class="bi bi-arrow-right"></i>
+        }
       </button>
     </div>
   </header>
@@ -24,7 +30,8 @@
   <main class="workspace-body">
     @if (errorMessage()) {
       <div class="error-banner">
-        <span>⚠️ {{ errorMessage() }}</span>
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ errorMessage() }}</span>
       </div>
     }
 
@@ -48,6 +55,9 @@
           @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
             <span class="error-hint">Il titolo è obbligatorio.</span>
           }
+          @if (form.get('title')?.touched && form.get('title')?.errors?.['maxlength']) {
+            <span class="error-hint">Il titolo non può superare i 100 caratteri.</span>
+          }
         </div>
 
         <div class="field-group flex-fill">
@@ -64,6 +74,7 @@
       <section class="preview-column">
         <app-file-dropzone
           label="Locandina / Copertina (16:9)"
+          dropTitle="Trascina la copertina dell'avventura"
           (fileChange)="onFileChange($event)"
         />
       </section>

@@ -43,10 +43,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
   cursor: pointer;
   z-index: 10;
   transition: all 0.2s ease;
+}
+
+.btn-close i {
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 .btn-close:hover {
@@ -79,8 +83,9 @@
 }
 
 .banner-icon {
-  font-size: 3rem;
-  opacity: 0.3;
+  font-size: 3.5rem;
+  color: #ffffff;
+  opacity: 0.2;
 }
 
 .banner-overlay {
@@ -129,7 +134,7 @@
 .meta-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.3rem 0.7rem;
@@ -137,6 +142,11 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #b5bcc9;
+}
+
+.meta-icon {
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 .meta-pill.author {
@@ -206,6 +216,14 @@
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.play-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .btn-play-game:hover {

@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
-import { GraphicAdventureResponse } from '../../../../core/models';
+import { GraphicAdventureDto } from '../../../../core/models';
 import { SidebarComponent } from '../../../../shared/ui/sidebar/sidebar.component';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
 import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
@@ -17,16 +17,16 @@ import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-d
     AdventureDetailModalComponent
   ],
   templateUrl: './adventure-list.component.html',
-  styleUrls: ['./adventure-list.component.css']
+  styleUrl: './adventure-list.component.css'
 })
 export class AdventureListComponent implements OnInit {
   private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
 
-  readonly adventures = signal<GraphicAdventureResponse[]>([]);
+  readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly loading = signal<boolean>(true);
 
-  readonly selectedAdventure = signal<GraphicAdventureResponse | null>(null);
+  readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
 
   ngOnInit(): void {
     this.loadAdventures();

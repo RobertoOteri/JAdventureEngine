@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .sidebar {
   width: 240px;
   height: 100vh;
@@ -21,6 +25,8 @@
 
 .brand-icon {
   font-size: 1.35rem;
+  color: #60a5fa;
+  line-height: 1;
 }
 
 .brand-name {
@@ -61,7 +67,13 @@
 }
 
 .nav-icon {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.08);
 }
 
 .sidebar-footer {
@@ -75,5 +87,11 @@
 
 .status-indicator {
   color: #22c55e;
-  font-size: 0.65rem;
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+.status-text {
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }

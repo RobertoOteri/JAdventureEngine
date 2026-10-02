@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
-import { GraphicAdventureResponse } from '../../../../core/models';
+import { GraphicAdventureDto } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
 
 @Component({
@@ -57,7 +57,7 @@ export class AdventureCreateComponent {
     }
 
     this.adventureService.createAdventure(formData).subscribe({
-      next: (createdAdventure: GraphicAdventureResponse) => {
+      next: (createdAdventure: GraphicAdventureDto) => {
         this.isSubmitting.set(false);
         const sceneTarget = createdAdventure.initialSceneCode || 'new';
         this.router.navigate(['/editor', createdAdventure.code, sceneTarget]);

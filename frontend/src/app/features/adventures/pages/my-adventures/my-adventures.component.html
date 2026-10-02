@@ -13,8 +13,9 @@
         class="fab-add"
         (click)="goToCreate()"
         title="Crea nuova avventura"
+        aria-label="Crea nuova avventura"
       >
-        <span class="fab-cross">+</span>
+        <i class="bi bi-plus-lg fab-cross"></i>
       </button>
     </header>
 
@@ -22,6 +23,7 @@
 
     @if (errorMessage()) {
       <div class="empty-wrap">
+        <i class="bi bi-exclamation-triangle-fill empty-icon error"></i>
         <p class="error-text">{{ errorMessage() }}</p>
       </div>
     } @else if (isLoading()) {
@@ -41,7 +43,11 @@
           />
         } @empty {
           <div class="empty-wrap">
-            <p>Non hai ancora creato nessuna avventura. Usa il tasto <strong>+</strong> in alto per cominciare.</p>
+            <i class="bi bi-folder-plus empty-icon"></i>
+            <p>Non hai ancora creato nessuna avventura.</p>
+            <button type="button" class="btn-create-first" (click)="goToCreate()">
+              <i class="bi bi-plus-lg"></i> Comincia ora
+            </button>
           </div>
         }
       </div>

@@ -1,32 +1,33 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GraphicAdventureResponse } from '../models/adventure.model';
+import { GraphicAdventureDto} from '../models/adventure.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdventureService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/adventures';
+  private readonly apiUrl = `${environment.apiUrl}/adventures`;
 
-  getAllAdventures(): Observable<GraphicAdventureResponse[]> {
-    return this.http.get<GraphicAdventureResponse[]>(this.baseUrl);
+  getAllAdventures(): Observable<GraphicAdventureDto[]> {
+    return this.http.get<GraphicAdventureDto[]>(this.apiUrl);
   }
 
-  getMyAdventures(): Observable<GraphicAdventureResponse[]> {
-    return this.http.get<GraphicAdventureResponse[]>(`${this.baseUrl}/my`);
+  getMyAdventures(): Observable<GraphicAdventureDto[]> {
+    return this.http.get<GraphicAdventureDto[]>(`${this.apiUrl}/my`);
   }
 
-  getAdventureByCode(code: string): Observable<GraphicAdventureResponse> {
-    return this.http.get<GraphicAdventureResponse>(`${this.baseUrl}/${code}`);
+  getAdventureByCode(code: string): Observable<GraphicAdventureDto> {
+    return this.http.get<GraphicAdventureDto>(`${this.apiUrl}/${code}`);
   }
 
-  createAdventure(formData: FormData): Observable<GraphicAdventureResponse> {
-    return this.http.post<GraphicAdventureResponse>(this.baseUrl, formData);
+  createAdventure(formData: FormData): Observable<GraphicAdventureDto> {
+    return this.http.post<GraphicAdventureDto>(this.apiUrl, formData);
   }
 
   deleteAdventure(code: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${code}`);
+    return this.http.delete<void>(`${this.apiUrl}/${code}`);
   }
 }

@@ -1,6 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { GraphicAdventureResponse } from '../../../core/models';
+import { GraphicAdventureDto } from '../../../core/models';
 
 @Component({
   selector: 'app-adventure-detail-modal',
@@ -10,18 +10,9 @@ import { GraphicAdventureResponse } from '../../../core/models';
   styleUrl: './adventure-detail-modal.component.css'
 })
 export class AdventureDetailModalComponent {
-  readonly adventure = input.required<GraphicAdventureResponse>();
+  readonly adventure = input.required<GraphicAdventureDto>();
   readonly close = output<void>();
   readonly play = output<string>();
-
-  readonly coverUrl = computed(() => {
-    const rawUrl = this.adventure().coverImageUrl;
-    if (!rawUrl) return null;
-    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
-      return rawUrl;
-    }
-    return `http://localhost:8080${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
-  });
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {

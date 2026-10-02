@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,9 +9,15 @@ import { CommonModule } from '@angular/common';
   styleUrl: './file-dropzone.component.css'
 })
 export class FileDropzoneComponent {
-  readonly label = input<string>('Locandina / Copertina (16:9)');
+  readonly label = input<string>('Immagine');
+  readonly dropTitle = input<string>("Trascina un'immagine qui");
+  readonly dropSubtitle = input<string>('oppure clicca per sfogliare');
+  readonly hint = input<string>('Formati supportati: PNG, JPG, WEBP (Max 5MB)');
+
   readonly accept = input<string>('image/*');
-  readonly maxSizeBytes = input<number>(5 * 1024 * 1024); // Default: 5MB
+  readonly maxSizeBytes = input<number>(5 * 1024 * 1024); // 5MB
+
+  readonly initialUrl = input<string | null>(null);
 
   readonly fileChange = output<File | null>();
 
@@ -19,6 +25,15 @@ export class FileDropzoneComponent {
   readonly previewUrl = signal<string | null>(null);
   readonly fileName = signal<string | null>(null);
   readonly error = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const initial = this.initialUrl();
+      if (initial) {
+        this.previewUrl.set(initial);
+      }
+    });
+  }
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();

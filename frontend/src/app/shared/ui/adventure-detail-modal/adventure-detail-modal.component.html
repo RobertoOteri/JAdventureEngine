@@ -1,13 +1,15 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-card">
-    <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi">✕</button>
+    <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi" aria-label="Chiudi">
+      <i class="bi bi-x-lg"></i>
+    </button>
 
     <div class="modal-banner">
-      @if (coverUrl()) {
-        <img [src]="coverUrl()" [alt]="adventure().title" class="banner-img" />
+      @if (adventure().coverImageUrl) {
+        <img [src]="adventure().coverImageUrl" [alt]="adventure().title" class="banner-img" />
       } @else {
         <div class="banner-fallback">
-          <span class="banner-icon">🖼️</span>
+          <i class="bi bi-image banner-icon"></i>
         </div>
       }
       <div class="banner-overlay"></div>
@@ -19,10 +21,10 @@
         <h2 class="adventure-title">{{ adventure().title }}</h2>
         <div class="meta-row">
           <span class="meta-pill author">
-            <span class="meta-icon">👤</span> {{ adventure().authorUsername }}
+            <i class="bi bi-person-fill meta-icon"></i> {{ adventure().authorUsername }}
           </span>
           <span class="meta-pill date">
-            <span class="meta-icon">📅</span> {{ adventure().createdAt | date:'dd/MM/yyyy HH:mm' }}
+            <i class="bi bi-calendar3 meta-icon"></i> {{ adventure().createdAt | date:'dd/MM/yyyy HH:mm' }}
           </span>
         </div>
       </div>
@@ -39,7 +41,8 @@
           Chiudi
         </button>
         <button type="button" class="btn-play-game" (click)="onPlay()">
-          <span>▶ Gioca Ora</span>
+          <i class="bi bi-play-fill play-icon"></i>
+          <span>Gioca Ora</span>
         </button>
       </div>
     </div>

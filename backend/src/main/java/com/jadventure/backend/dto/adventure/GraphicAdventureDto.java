@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GraphicAdventureResponse {
+public class GraphicAdventureDto {
 
     private String code;
     private String title;

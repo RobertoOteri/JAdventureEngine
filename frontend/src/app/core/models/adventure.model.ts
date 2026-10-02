@@ -1,4 +1,4 @@
-export interface GraphicAdventureResponse {
+export interface GraphicAdventureDto {
   code: string;
   title: string;
   description?: string;

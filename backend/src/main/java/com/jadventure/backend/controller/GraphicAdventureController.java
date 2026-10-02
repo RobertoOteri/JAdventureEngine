@@ -1,7 +1,6 @@
 package com.jadventure.backend.controller;
 
-import com.jadventure.backend.dto.adventure.GraphicAdventureCreateRequest;
-import com.jadventure.backend.dto.adventure.GraphicAdventureResponse;
+import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.service.GraphicAdventureService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,33 +22,32 @@ public class GraphicAdventureController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GraphicAdventureResponse>> getAllAdventures() {
+    public ResponseEntity<List<GraphicAdventureDto>> getAllAdventures() {
         return ResponseEntity.ok(graphicAdventureService.getAllAdventures());
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<GraphicAdventureResponse>> getMyAdventures(Principal principal) {
-        return ResponseEntity.ok(graphicAdventureService.getAdventuresByAuthor(principal.getName()));
+    public ResponseEntity<List<GraphicAdventureDto>> getMyAdventures() {
+        return ResponseEntity.ok(graphicAdventureService.getMyAdventures());
     }
 
     @GetMapping("/{code}")
-    public ResponseEntity<GraphicAdventureResponse> getAdventureByCode(@PathVariable("code") String code) {
+    public ResponseEntity<GraphicAdventureDto> getAdventureByCode(@PathVariable("code") String code) {
         return ResponseEntity.ok(graphicAdventureService.getAdventureByCode(code));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GraphicAdventureResponse> createAdventure(
-            @Valid @RequestPart("data") GraphicAdventureCreateRequest request,
-            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage) {
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(graphicAdventureService.createAdventure(request, coverImage));
+    public ResponseEntity<GraphicAdventureDto> createAdventure(
+            @Valid @RequestPart("data") GraphicAdventureDto data,
+            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage
+    ) {
+        GraphicAdventureDto created = graphicAdventureService.createAdventure(data, coverImage);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{code}")
-    public ResponseEntity<Void> deleteAdventure(@PathVariable String code, Principal principal) {
-        graphicAdventureService.deleteAdventure(code, principal.getName());
+    public ResponseEntity<Void> deleteAdventure(@PathVariable String code) {
+        graphicAdventureService.deleteAdventure(code);
         return ResponseEntity.noContent().build();
     }
-
 }
