@@ -1,0 +1,50 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-card">
+    <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi" aria-label="Chiudi">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="modal-banner">
+      @if (adventure().coverImageUrl) {
+        <img [src]="adventure().coverImageUrl" [alt]="adventure().title" class="banner-img" />
+      } @else {
+        <div class="banner-fallback">
+          <i class="bi bi-image banner-icon"></i>
+        </div>
+      }
+      <div class="banner-overlay"></div>
+      <span class="badge-code">{{ adventure().code }}</span>
+    </div>
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="adventure-title">{{ adventure().title }}</h2>
+        <div class="meta-row">
+          <span class="meta-pill author">
+            <i class="bi bi-person-fill meta-icon"></i> {{ adventure().authorUsername }}
+          </span>
+          <span class="meta-pill date">
+            <i class="bi bi-calendar3 meta-icon"></i> {{ adventure().createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="synopsis-box">
+        <label class="synopsis-label">Sinossi & Dettagli</label>
+        <p class="synopsis-text">
+          {{ adventure().description || 'Nessuna descrizione fornita per questa avventura grafica.' }}
+        </p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="close.emit()">
+          Chiudi
+        </button>
+        <button type="button" class="btn-play-game" (click)="onPlay()">
+          <i class="bi bi-play-fill play-icon"></i>
+          <span>Gioca Ora</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

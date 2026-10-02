@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, finalize } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { AuthRequest, AuthResponse } from '../models/auth.model';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { AuthRequest, AuthResponse } from '../models/auth.model';
 export class AuthService {
   private readonly http = inject(HttpClient);
 
-  private readonly authEndpoint = 'http://localhost:8080/api/auth';
+  private readonly authEndpoint = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'jadventure_token';
   private readonly USER_KEY = 'jadventure_user';
 

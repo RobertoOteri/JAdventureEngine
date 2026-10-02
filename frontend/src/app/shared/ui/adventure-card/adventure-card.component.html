@@ -1,0 +1,63 @@
+<article class="game-plate" (click)="onCardClick()">
+  @if (adventure().coverImageUrl) {
+    <img
+      [src]="adventure().coverImageUrl"
+      [alt]="adventure().title"
+      class="plate-art"
+      loading="lazy"
+    />
+  } @else {
+    <div class="plate-art-empty">
+      <i class="bi bi-image empty-pic-icon"></i>
+    </div>
+  }
+
+  <div class="plate-shade"></div>
+
+  <span class="plate-slug">{{ adventure().code }}</span>
+
+  <div class="plate-bottom">
+    <button
+      type="button"
+      class="play-pill"
+      (click)="onPlay($event)"
+      title="Avvia gioco"
+    >
+      <i class="bi bi-play-fill play-arrow"></i>
+    </button>
+
+    <div class="plate-meta">
+      <h2 class="plate-title">{{ adventure().title }}</h2>
+    </div>
+
+    <div class="action-tools">
+      <button
+        type="button"
+        class="btn-icon-action info"
+        (click)="onInfo($event)"
+        title="Dettagli e Sinossi"
+      >
+        <i class="bi bi-search"></i>
+      </button>
+
+      @if (isAuthor()) {
+        <button
+          type="button"
+          class="btn-icon-action edit"
+          (click)="onEdit($event)"
+          title="Modifica Avventura"
+        >
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button
+          type="button"
+          class="btn-icon-action delete"
+          (click)="onDelete($event)"
+          title="Elimina Avventura"
+        >
+          <i class="bi bi-trash"></i>
+        </button>
+      }
+    </div>
+  </div>
+</article>

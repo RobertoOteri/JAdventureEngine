@@ -1,0 +1,64 @@
+<div class="shell-layout">
+  <app-sidebar />
+
+  <main class="content-body">
+    <header class="masthead">
+      <div class="masthead-text">
+        <h1>Le Mie Avventure</h1>
+        <span class="counter">{{ adventures().length }} progetti personali</span>
+      </div>
+
+      <button
+        type="button"
+        class="fab-add"
+        (click)="goToCreate()"
+        title="Crea nuova avventura"
+        aria-label="Crea nuova avventura"
+      >
+        <i class="bi bi-plus-lg fab-cross"></i>
+      </button>
+    </header>
+
+    <div class="divider"></div>
+
+    @if (errorMessage()) {
+      <div class="empty-wrap">
+        <i class="bi bi-exclamation-triangle-fill empty-icon error"></i>
+        <p class="error-text">{{ errorMessage() }}</p>
+      </div>
+    } @else if (isLoading()) {
+      <div class="empty-wrap">
+        <div class="loader"></div>
+      </div>
+    } @else {
+      <div class="catalog-grid">
+        @for (adv of adventures(); track adv.code) {
+          <app-adventure-card
+            [adventure]="adv"
+            [isAuthor]="true"
+            (play)="playAdventure($event)"
+            (edit)="onEditAdventure($event)"
+            (delete)="onDeleteAdventure($event)"
+            (info)="selectedAdventure.set($event)"
+          />
+        } @empty {
+          <div class="empty-wrap">
+            <i class="bi bi-folder-plus empty-icon"></i>
+            <p>Non hai ancora creato nessuna avventura.</p>
+            <button type="button" class="btn-create-first" (click)="goToCreate()">
+              <i class="bi bi-plus-lg"></i> Comincia ora
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  @if (selectedAdventure()) {
+    <app-adventure-detail-modal
+      [adventure]="selectedAdventure()!"
+      (close)="selectedAdventure.set(null)"
+      (play)="playAdventure($event)"
+    />
+  }
+</div>

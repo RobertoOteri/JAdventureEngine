@@ -55,3 +55,7 @@ frontend/.angular/
 .vscode/
 frontend/.vscode/
 
+# Uploaded files and media storage
+uploads/
+**/uploads/
+

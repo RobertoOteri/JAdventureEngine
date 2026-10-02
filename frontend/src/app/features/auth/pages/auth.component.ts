@@ -1,10 +1,10 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthService } from '../../core/services/auth.service';
-import { AuthRequest } from '../../core/models/auth.model';
-import { ErrorResponse } from '../../core/models/error-response.model';
+import { AuthService } from '../../../core/services/auth.service';
+import { AuthRequest } from '../../../core/models/auth.model';
+import { ErrorResponse } from '../../../core/models/error-response.model';
 
 @Component({
   selector: 'app-auth',
@@ -18,13 +18,14 @@ export class AuthComponent {
   private readonly router = inject(Router);
 
   readonly isLoginMode = signal<boolean>(true);
+  readonly showPassword = signal<boolean>(false);
   readonly errorMessage = signal<string>('');
   readonly successMessage = signal<string>('');
 
   username = signal<string>('');
   password = signal<string>('');
 
-  private readonly allowedCharRegex = /^[a-zA-Z0-9_.-]$/;
+  private readonly allowedCharRegex = /^[a-zA-Z0-9_.\-]$/;
 
   readonly usernameLen = computed(() => this.username().length);
 
@@ -33,11 +34,11 @@ export class AuthComponent {
     const badChars = new Set<string>();
     for (const char of val) {
       if (!this.allowedCharRegex.test(char)) {
-        badChars.add(char == ' ' ? 'Spazio' : char);
+        badChars.add(char === ' ' ? 'Spazio' : char);
       }
     }
     return Array.from(badChars);
-  })
+  });
 
   readonly usernameError = computed(() => {
     const len = this.usernameLen();
@@ -89,6 +90,10 @@ export class AuthComponent {
     this.successMessage.set('');
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword.update(show => !show);
+  }
+
   onSubmit(): void {
     this.errorMessage.set('');
     this.successMessage.set('');
@@ -101,7 +106,7 @@ export class AuthComponent {
       return;
     }
 
-    const payload: AuthRequest = {username: user, password: pass};
+    const payload: AuthRequest = { username: user, password: pass };
 
     if (this.isLoginMode()) {
       this.authService.login(payload).subscribe({

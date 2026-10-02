@@ -1,0 +1,53 @@
+<div class="dropzone-container">
+  @if (label()) {
+    <label class="section-label">{{ label() }}</label>
+  }
+
+  @if (error()) {
+    <span class="error-hint">
+      <i class="bi bi-exclamation-triangle-fill"></i> {{ error() }}
+    </span>
+  }
+
+  @if (!previewUrl()) {
+    <div
+      class="cinema-dropzone"
+      [class.dragging]="isDragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+    >
+      <div class="drop-circle">
+        <i class="bi bi-image drop-icon"></i>
+      </div>
+      <h3>{{ dropTitle() }}</h3>
+      <p><span class="highlight-browse">{{ dropSubtitle() }}</span></p>
+      <span class="file-type-hint">{{ hint() }}</span>
+
+      <input
+        #fileInput
+        type="file"
+        [accept]="accept()"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
+    </div>
+  } @else {
+    <div class="cinema-preview-wrapper">
+      <img [src]="previewUrl()" alt="Anteprima file" class="preview-full-img" />
+      <div class="preview-overlay">
+        <div class="preview-meta">
+          @if (fileName()) {
+            <span class="file-tag">
+              <i class="bi bi-file-earmark-image"></i> {{ fileName() }}
+            </span>
+          }
+        </div>
+        <button type="button" class="btn-discard" (click)="removeFile()">
+          <i class="bi bi-trash3"></i> Rimuovi Immagine
+        </button>
+      </div>
+    </div>
+  }
+</div>

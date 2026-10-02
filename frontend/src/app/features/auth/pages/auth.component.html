@@ -9,7 +9,6 @@
 
     <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
 
-      <!-- CAMPO USERNAME -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="username">Username</label>
@@ -32,9 +31,9 @@
           required
         />
 
-        <!-- Feedback Reattivo Username -->
         @if (usernameError()) {
           <div class="field-feedback error">
+            <i class="bi bi-exclamation-triangle-fill"></i>
             @if (invalidChars().length > 0) {
               <div class="bad-chars-list">
                 <span>Non ammessi:</span>
@@ -49,7 +48,6 @@
         }
       </div>
 
-      <!-- CAMPO PASSWORD -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="password">Password</label>
@@ -58,21 +56,32 @@
           }
         </div>
 
-        <input
-          id="password"
-          type="password"
-          name="password"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-          placeholder="••••••••"
-          autocomplete="current-password"
-          [class.input-error]="passwordError()"
-          required
-        />
+        <div class="password-input-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            name="password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            [class.input-error]="passwordError()"
+            required
+          />
+          <button
+            type="button"
+            class="btn-toggle-pwd"
+            (click)="togglePasswordVisibility()"
+            title="Mostra / Nascondi Password"
+            tabindex="-1"
+          >
+            <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+          </button>
+        </div>
 
-        <!-- Feedback Reattivo Password -->
         @if (passwordError()) {
           <div class="field-feedback error">
+            <i class="bi bi-exclamation-triangle-fill"></i>
             <span>{{ passwordError() }}</span>
           </div>
         }
@@ -80,13 +89,15 @@
 
       @if (errorMessage()) {
         <div class="status-msg error">
-          {{ errorMessage() }}
+          <i class="bi bi-exclamation-octagon-fill"></i>
+          <span>{{ errorMessage() }}</span>
         </div>
       }
 
       @if (successMessage()) {
         <div class="status-msg success">
-          {{ successMessage() }}
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ successMessage() }}</span>
         </div>
       }
 

@@ -1,0 +1,32 @@
+<aside class="sidebar">
+  <div class="brand">
+    <i class="bi bi-controller brand-icon"></i>
+    <span class="brand-name">JAdventure</span>
+  </div>
+
+  <nav class="nav-menu">
+    <a
+      routerLink="/adventures"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-item"
+    >
+      <i class="bi bi-collection-play nav-icon"></i>
+      <span>Libreria</span>
+    </a>
+
+    <a
+      routerLink="/adventures/my"
+      routerLinkActive="active"
+      class="nav-item"
+    >
+      <i class="bi bi-hammer nav-icon"></i>
+      <span>Le mie storie</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <i class="bi bi-circle-fill status-indicator"></i>
+    <span class="status-text">Studio Online</span>
+  </div>
+</aside>
