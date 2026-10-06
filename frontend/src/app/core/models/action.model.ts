@@ -1,0 +1,41 @@
+export type ActionType =
+  | 'LOOK_AT'
+  | 'OPEN'
+  | 'PICK_UP'
+  | 'MOVE'
+  | 'USE'
+  | 'TALK_TO';
+
+export type PreconditionType =
+  | 'HAS_ITEM'
+  | 'DOES_NOT_HAVE_ITEM'
+  | 'FLAG_EQUALS';
+
+export type EffectType =
+  | 'CHANGE_SCENE'
+  | 'ADD_ITEM'
+  | 'REMOVE_ITEM'
+  | 'SET_FLAG'
+  | 'SHOW_SCENE_ITEM'
+  | 'HIDE_SCENE_ITEM';
+
+export interface Precondition {
+  type: PreconditionType;
+  requiredKey: string;
+  expectedValue?: string;
+  failureMessage?: string;
+}
+
+export interface GameEffect {
+  type: EffectType;
+  targetValue?: string;
+}
+
+export interface Action {
+  code?: string;
+  type: ActionType;
+  successMessage?: string;
+  defaultFailureMessage?: string;
+  preconditions?: Precondition[];
+  effects?: GameEffect[];
+}

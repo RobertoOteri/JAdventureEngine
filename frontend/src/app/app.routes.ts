@@ -34,6 +34,33 @@ export const routes: Routes = [
   },
 
   {
+    path: 'adventures/:adventureCode/scenes/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './features/scene-editor/components/scene-create/scene-create.component'
+        ).then((m) => m.SceneCreateComponent)
+  },
+
+  {
+    path: 'editor/:adventureCode',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/scene-editor/scene-editor.component').then(
+        (m) => m.SceneEditorComponent
+      )
+  },
+
+  {
+    path: 'editor/:adventureCode/:sceneCode',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/scene-editor/scene-editor.component').then(
+        (m) => m.SceneEditorComponent
+      )
+  },
+
+  {
     path: '',
     redirectTo: 'auth',
     pathMatch: 'full'

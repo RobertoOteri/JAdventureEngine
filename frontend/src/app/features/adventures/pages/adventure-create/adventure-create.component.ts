@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,12 +11,22 @@ import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent],
   templateUrl: './adventure-create.component.html',
-  styleUrl: './adventure-create.component.css'
+  styleUrl: './adventure-create.component.css',
+  host: {
+    '[class.is-modal-host]': 'isModal()',
+    '[class.is-page-host]': '!isModal()'
+  }
 })
 export class AdventureCreateComponent {
   private readonly fb = inject(FormBuilder);
   private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
+
+  readonly isModal = input<boolean>(false);
+  readonly initialAdventure = input<GraphicAdventureDto | null>(null);
+
+  readonly closeRequested = output<void>();
+  readonly saved = output<FormData>();
 
   readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
@@ -24,9 +34,23 @@ export class AdventureCreateComponent {
   });
 
   private selectedFile: File | null = null;
+  readonly existingCoverUrl = signal<string | null>(null);
 
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const init = this.initialAdventure();
+      if (init) {
+        this.form.patchValue({
+          title: init.title,
+          description: init.description || ''
+        });
+        this.existingCoverUrl.set(init.coverImageUrl || null);
+      }
+    });
+  }
 
   onFileChange(file: File | null): void {
     this.selectedFile = file;
@@ -56,22 +80,31 @@ export class AdventureCreateComponent {
       formData.append('coverImage', this.selectedFile);
     }
 
+    if (this.isModal()) {
+      this.saved.emit(formData);
+      return;
+    }
+
     this.adventureService.createAdventure(formData).subscribe({
       next: (createdAdventure: GraphicAdventureDto) => {
         this.isSubmitting.set(false);
         const sceneTarget = createdAdventure.initialSceneCode || 'new';
         this.router.navigate(['/editor', createdAdventure.code, sceneTarget]);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(
-          err.error?.message || err.error?.detail || "Errore durante il salvataggio dell'avventura."
+          err?.error?.message || err?.error?.detail || "Errore durante il salvataggio dell'avventura."
         );
       }
     });
   }
 
   onCancel(): void {
-    this.router.navigate(['/adventures/my']);
+    if (this.isModal()) {
+      this.closeRequested.emit();
+    } else {
+      this.router.navigate(['/adventures/my']);
+    }
   }
 }

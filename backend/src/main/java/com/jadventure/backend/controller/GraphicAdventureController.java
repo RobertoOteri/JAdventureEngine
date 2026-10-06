@@ -46,8 +46,18 @@ public class GraphicAdventureController {
     }
 
     @DeleteMapping("/{code}")
-    public ResponseEntity<Void> deleteAdventure(@PathVariable String code) {
+    public ResponseEntity<Void> deleteAdventure(@PathVariable("code") String code) {
         graphicAdventureService.deleteAdventure(code);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{code}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GraphicAdventureDto> updateAdventure(
+            @PathVariable("code") String code,
+            @Valid @RequestPart("data") GraphicAdventureDto data,
+            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage
+    ) {
+        GraphicAdventureDto updated = graphicAdventureService.updateAdventure(code, data, coverImage);
+        return ResponseEntity.ok(updated);
     }
 }

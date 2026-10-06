@@ -1,0 +1,47 @@
+<div class="gizmo-toolbar-card">
+  <button
+    type="button"
+    class="btn-tool"
+    [class.active]="activeTool() === 'SELECT'"
+    (click)="selectTool('SELECT')"
+    title="Selezione (Cursore)"
+  >
+    <i class="bi bi-cursor-fill icon-tool"></i>
+  </button>
+
+  @if (hasSprite()) {
+    <div class="tool-divider"></div>
+
+    <button
+      type="button"
+      class="btn-tool"
+      [class.active]="activeTool() === 'MOVE'"
+      (click)="selectTool('MOVE')"
+      title="Sposta Sprite (Assi X/Y)"
+    >
+      <i class="bi bi-arrows-move icon-tool"></i>
+    </button>
+
+    <button
+      type="button"
+      class="btn-tool"
+      [class.active]="activeTool() === 'SCALE'"
+      (click)="selectTool('SCALE')"
+      title="Ridimensiona Sprite"
+    >
+      <i class="bi bi-aspect-ratio icon-tool"></i>
+    </button>
+  }
+
+  <div class="tool-divider"></div>
+
+  <button
+    type="button"
+    class="btn-tool"
+    [class.active]="activeTool() === 'HOTSPOT'"
+    (click)="selectTool('HOTSPOT')"
+    title="Disegna Poligono Hotspot"
+  >
+    <i class="bi bi-pencil-fill icon-tool"></i>
+  </button>
+</div>

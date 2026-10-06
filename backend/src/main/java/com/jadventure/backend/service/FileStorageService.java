@@ -1,11 +1,9 @@
 package com.jadventure.backend.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,9 +17,10 @@ import java.util.Set;
 @Service
 public class FileStorageService {
 
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".webp");
+
     private final Path rootUploadPath;
     private final String publicUrlBase;
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".webp");
 
     public FileStorageService(@Value("${app.upload.dir}") String uploadDir) {
         this.rootUploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
@@ -50,35 +49,33 @@ public class FileStorageService {
                 this.publicUrlBase + "/" + adventureCode);
     }
 
-//    public String storeSceneBackground(String adventureCode, String sceneCode, MultipartFile file) {
-//        requireNonEmpty(file, "Il file di sfondo della scena è obbligatorio");
-//        return saveFile(file, this.rootUploadPath.resolve(adventureCode).resolve("scenes"), sceneCode,
-//                this.publicUrlBase + "/" + adventureCode + "/scenes");
-//    }
-//
-//    public String storeInventoryItemIcon(String adventureCode, String itemCode, MultipartFile file) {
-//        requireNonEmpty(file, "L'icona dell'oggetto dell'inventario è obbligatoria");
-//        return saveFile(file, this.rootUploadPath.resolve(adventureCode).resolve("inventory-items"), itemCode,
-//                this.publicUrlBase + "/"  + adventureCode + "/inventory-items");
-//    }
-//
-//    public String storeItemImage(String adventureCode, String itemCode, MultipartFile file) {
-//        if (file == null || file.isEmpty()) {
-//            return null;
-//        }
-//        return saveFile(file, this.rootUploadPath.resolve(adventureCode).resolve("items"), itemCode,
-//                this.publicUrlBase + "/"  + adventureCode + "/items");
-//    }
+    public String storeSceneBackground(String adventureCode, String sceneCode, MultipartFile file) {
+        requireNonEmpty(file, "Il file di sfondo della scena è obbligatorio");
+        return saveFile(file, this.rootUploadPath.resolve(adventureCode).resolve("scenes"), sceneCode,
+                this.publicUrlBase + "/" + adventureCode + "/scenes");
+    }
+
+    public String storeItemImage(String adventureCode, String sceneCode, String itemCode, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        Path targetDir = this.rootUploadPath.resolve(adventureCode).resolve("scenes").resolve(sceneCode).resolve("items");
+        String urlPrefix = this.publicUrlBase + "/" + adventureCode + "/scenes/" + sceneCode + "/items";
+        return saveFile(file, targetDir, itemCode, urlPrefix);
+    }
+
+    public String storeInventoryItemIcon(String adventureCode, String itemCode, MultipartFile file) {
+        requireNonEmpty(file, "L'icona dell'oggetto dell'inventario è obbligatoria");
+        return saveFile(file, this.rootUploadPath.resolve(adventureCode).resolve("inventory-items"), itemCode,
+                this.publicUrlBase + "/" + adventureCode + "/inventory-items");
+    }
 
     private String saveFile(MultipartFile file, Path targetDirectory, String baseFileName, String publicUrlPrefix) {
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNullElse(file.getOriginalFilename(), ""));
         String extension = extractExtension(originalFilename);
 
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Formato file non supportato. Estensioni consentite: " + ALLOWED_EXTENSIONS
-            );
+            throw new IllegalArgumentException("Formato file non supportato. Estensioni consentite: " + ALLOWED_EXTENSIONS);
         }
 
         try {
@@ -88,7 +85,7 @@ public class FileStorageService {
             Path destinationFile = targetDirectory.resolve(finalFileName).normalize();
 
             if (!destinationFile.startsWith(this.rootUploadPath)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Percorso di salvataggio non valido");
+                throw new IllegalArgumentException("Percorso di salvataggio non valido");
             }
 
             try (InputStream inputStream = file.getInputStream()) {
@@ -98,17 +95,13 @@ public class FileStorageService {
             return publicUrlPrefix + "/" + finalFileName;
 
         } catch (IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Errore durante il salvataggio del file: " + baseFileName,
-                    e
-            );
+            throw new IllegalStateException("Errore durante il salvataggio del file: " + baseFileName, e);
         }
     }
 
     private void requireNonEmpty(MultipartFile file, String message) {
         if (file == null || file.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+            throw new IllegalArgumentException(message);
         }
     }
 
@@ -120,4 +113,3 @@ public class FileStorageService {
         return filename.substring(dotIndex).toLowerCase();
     }
 }
-

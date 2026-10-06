@@ -1,0 +1,693 @@
+:host {
+  display: block;
+  width: 360px;
+  min-width: 360px;
+  max-width: 360px;
+  height: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-properties {
+  width: 100%;
+  height: 100%;
+  background: #0f1117;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Lista Hotspot in alto */
+.list-section {
+  max-height: 42%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.properties-header {
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-header {
+  font-size: 0.85rem;
+  color: #71717a;
+}
+
+.properties-header h2 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.btn-new-hotspot {
+  background: #ffffff;
+  color: #09090b;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.btn-new-hotspot:hover {
+  background: #e4e4e7;
+}
+
+.hotspots-list {
+  padding: 0.65rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.hotspots-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.hotspots-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+/* Card Hotspot Singola */
+.hotspot-item-card {
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hotspot-item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.hotspot-item-card.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hotspot-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.hotspot-card-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hotspot-item-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f4f4f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hotspot-item-code {
+  font-size: 0.72rem;
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+/* Badges */
+.indicator-badge {
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1;
+}
+
+.badge-item {
+  background: rgba(255, 255, 255, 0.09);
+  color: #e4e4e7;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.badge-inventory {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.badge-inventory:hover {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #ffffff;
+}
+
+.badge-inventory .bi-chevron-down,
+.badge-inventory .bi-chevron-up {
+  font-size: 0.6rem;
+  margin-left: 1px;
+}
+
+.indicator-badge.muted {
+  color: #71717a;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Pannello a Tendina Dettagli Inventario */
+.inventory-accordion-panel {
+  background: #12151e;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  animation: slideDownFade 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.15rem;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accordion-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accordion-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #34d399;
+}
+
+.accordion-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.btn-accordion-action {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-accordion-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.btn-accordion-action.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.accordion-body-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.accordion-thumb {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.accordion-texts {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.accordion-item-name {
+  font-size: 0.78rem;
+  color: #fafafa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accordion-item-desc {
+  font-size: 0.7rem;
+  color: #8b92a0;
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hotspots-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  color: #71717a;
+  font-size: 0.8rem;
+}
+
+.icon-empty {
+  font-size: 1rem;
+  color: #52525b;
+}
+
+.panel-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+/* 2. Dettaglio e Form Hotspot */
+.detail-section {
+  flex: 1;
+  padding: 1.15rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.detail-section::-webkit-scrollbar {
+  width: 5px;
+}
+
+.detail-section::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+.creation-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.creation-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+
+.tag-points-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.95rem;
+}
+
+.field-group label {
+  font-size: 0.78rem;
+  color: #a1a1aa;
+  font-weight: 600;
+}
+
+.studio-input {
+  background: #141720;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  color: #ffffff;
+  font-size: 0.85rem;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+.studio-input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.studio-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* File Picker */
+.file-field-group {
+  margin-bottom: 0.95rem;
+}
+
+.file-native-hidden {
+  display: none !important;
+}
+
+.file-picker-wrap {
+  width: 100%;
+}
+
+.file-custom-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #141720;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  color: #d4d4d8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.file-custom-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.file-custom-btn.highlight-picker {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.file-btn-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Toggle Checkboxes */
+.toggle-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #ffffff;
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #e4e4e7;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Pulsanti Salva / Annulla Bozza */
+.actions-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-save-draft {
+  flex: 1;
+  background: #ffffff;
+  border: none;
+  border-radius: 6px;
+  color: #09090b;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease;
+}
+
+.btn-save-draft:hover {
+  background: #e4e4e7;
+}
+
+.btn-cancel-draft {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #a1a1aa;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancel-draft:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* Dettagli Item Selezionato */
+.details-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.details-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-edit-header {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background 0.15s ease;
+}
+
+.btn-edit-header:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-delete-header {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  font-size: 0.75rem;
+  transition: background 0.15s ease;
+}
+
+.btn-delete-header:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Azioni Hotspot */
+.actions-management {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.actions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actions-header h3 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.btn-open-action-modal {
+  background: #ffffff;
+  color: #09090b;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background 0.15s ease;
+}
+
+.btn-open-action-modal:hover {
+  background: #e4e4e7;
+}
+
+.action-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #141720;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+}
+
+.action-card-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.action-card-code {
+  font-size: 0.72rem;
+  color: #71717a;
+}
+
+.btn-remove-action {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.btn-remove-action:hover {
+  color: #ef4444;
+}
+
+.actions-empty-note {
+  font-size: 0.75rem;
+  color: #52525b;
+  font-style: italic;
+  padding: 0.4rem 0;
+}
+
+.properties-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #71717a;
+  padding: 2.5rem 1rem;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  color: #3f3f46;
+}

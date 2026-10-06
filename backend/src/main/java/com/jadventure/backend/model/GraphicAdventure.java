@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,13 +49,13 @@ public class GraphicAdventure {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-//    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Builder.Default
-//    private List<Scene> scenes = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Builder.Default
-//    private List<InventoryItem> inventoryItems = new ArrayList<>();
+    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Scene> scenes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Builder.Default
