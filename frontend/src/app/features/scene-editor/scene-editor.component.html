@@ -1,0 +1,81 @@
+<div class="editor-shell">
+  <app-editor-header
+    [draftPointsCount]="canvasRef?.draftPoints()?.length || 0"
+    (undoPoint)="canvasRef?.undoLastPoint()"
+    (editAdventureRequested)="openAdventureModal()"
+  />
+
+  <div class="editor-workspace">
+    <app-scenes-sidebar />
+
+    <app-scene-canvas
+      #canvasRef
+      [isEditingOrCreating]="isEditingOrCreating()"
+      [editingItemCode]="editingItemCode()"
+      [previewSpriteUrl]="previewSpriteUrl()"
+      [spritePosX]="spritePosX()"
+      [spritePosY]="spritePosY()"
+      [spriteWidth]="spriteWidth()"
+      [spriteHeight]="spriteHeight()"
+      (transformChange)="onTransformChange($event)"
+      (fileDropped)="onFileDropped($event)"
+      (createSceneRequested)="goToAddScene()"
+    />
+
+    <app-inspector-sidebar
+      [isEditingOrCreating]="isEditingOrCreating()"
+      [editingItemCode]="editingItemCode()"
+      [draftPointsCount]="canvasRef?.draftPoints()?.length || 0"
+      [itemName]="itemName()"
+      [itemCode]="itemCode()"
+      [isCollectible]="isCollectible()"
+      [isInitiallyVisible]="isInitiallyVisible()"
+      [sceneImageFile]="sceneImageFile()"
+      [previewSpriteUrl]="previewSpriteUrl()"
+      (startCreateRequested)="startNewHotspot()"
+      (editItemRequested)="editExistingItem($event)"
+      (cancelDraftRequested)="cancelDraft()"
+      (saveDraftRequested)="saveDraft()"
+      (deleteItemRequested)="deleteItem($event)"
+      (itemNameChange)="onNameChange($event)"
+      (itemCodeChange)="itemCode.set($event)"
+      (isCollectibleChange)="isCollectible.set($event)"
+      (isInitiallyVisibleChange)="isInitiallyVisible.set($event)"
+      (sceneImageSelected)="onSceneFileSelected($event)"
+      (openInventoryModalRequested)="openInventoryModal()"
+      (editInventoryItemRequested)="onEditInventoryItem($event)"
+      (deleteInventoryItemRequested)="onDeleteInventoryItem($event)"
+      (openAddActionRequested)="openActionModal()"
+      (deleteActionRequested)="onDeleteAction($event)"
+    />
+  </div>
+
+  @if (isActionModalOpen() && store.selectedItem()) {
+    <app-action-modal
+      [itemCode]="store.selectedItem()!.code"
+      (saveRequested)="onSaveAction($event)"
+      (closeRequested)="closeActionModal()"
+    />
+  }
+
+  @if (isInventoryModalOpen()) {
+    <app-inventory-item-modal
+      [initialName]="invItemName()"
+      [initialDescription]="invItemDesc()"
+      [initialUseSceneImage]="invUseSceneImage()"
+      [scenePreviewUrl]="previewSpriteUrl()"
+      [initialCustomFile]="invCustomFile()"
+      (confirmRequested)="onInventoryConfirmed($event)"
+      (cancelRequested)="onInventoryCancelled()"
+    />
+  }
+
+  @if (isAdventureModalOpen() && store.adventure()) {
+    <app-adventure-create
+      [isModal]="true"
+      [initialAdventure]="store.adventure()"
+      (saved)="onSaveAdventureDetails($event)"
+      (closeRequested)="isAdventureModalOpen.set(false)"
+    />
+  }
+</div>

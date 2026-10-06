@@ -1,0 +1,172 @@
+<section class="canvas-viewport">
+  @if (store.isLoading()) {
+    <div class="editor-loading-overlay">
+      <div class="spinner"></div>
+      <p>Caricamento scena...</p>
+    </div>
+  } @else if (store.currentScene() && store.backgroundUrl()) {
+    <div
+      class="canvas-stage"
+      [class.drag-over-active]="isDragOverScene()"
+      (dragover)="onSceneDragOver($event)"
+      (dragleave)="onSceneDragLeave($event)"
+      (drop)="onSceneDrop($event)"
+    >
+      @if (showUnityToolbar()) {
+        <app-scene-gizmo-toolbar
+          [activeTool]="activeTool()"
+          [hasSprite]="currentHasSprite()"
+          (toolChange)="setTool($event)"
+        />
+      }
+
+      <img
+        [src]="store.backgroundUrl()"
+        [alt]="store.currentScene()?.name"
+        class="stage-bg"
+        draggable="false"
+        (load)="onSceneImageLoaded()"
+      />
+
+      <!-- Livello Sprite Posizionati -->
+      <div class="editor-sprites-layer">
+        @for (item of store.currentScene()?.items; track item.code) {
+          @if (item.imageUrl && (!isEditingOrCreating() || editingItemCode() !== item.code)) {
+            <img
+              [src]="resolveImageUrl(item.imageUrl)"
+              [alt]="item.name"
+              class="editor-sprite-item"
+              [class.is-ghost-hidden]="!item.initiallyVisible"
+              [class.is-dimmed]="isEditingOrCreating() && editingItemCode() !== item.code"
+              [style.left.%]="(item.posX != null ? item.posX : 0) / 10"
+              [style.top.%]="(item.posY != null ? item.posY : 0) / 10"
+              [style.width.%]="(item.width && item.width > 0 ? item.width : 120) / 10"
+              [style.height.%]="(item.height && item.height > 0 ? item.height : 120) / 10"
+              draggable="false"
+            />
+          }
+        }
+      </div>
+
+      <!-- Gizmo Box di Trasformazione (per la sprite attiva in anteprima) -->
+      @if (previewSpriteUrl()) {
+        <div
+          #gizmoBox
+          class="unity-gizmo-box"
+          [style.left.%]="spritePosX() / 10"
+          [style.top.%]="spritePosY() / 10"
+          [style.width.%]="spriteWidth() / 10"
+          [style.height.%]="spriteHeight() / 10"
+        >
+          <img [src]="resolveImageUrl(previewSpriteUrl())" class="gizmo-image" alt="Bozza Sprite" draggable="false" />
+
+          @if (activeTool() === 'MOVE') {
+            <div class="unity-translate-gizmo">
+              <div
+                class="gizmo-center-handle"
+                (mousedown)="startAxisDrag($event, 'BOTH')"
+                title="Sposta su entrambi gli assi"
+              ></div>
+              <div
+                class="gizmo-axis axis-x"
+                (mousedown)="startAxisDrag($event, 'X')"
+                title="Sposta asse X"
+              >
+                <div class="axis-line"></div>
+                <div class="axis-arrow"></div>
+              </div>
+              <div
+                class="gizmo-axis axis-y"
+                (mousedown)="startAxisDrag($event, 'Y')"
+                title="Sposta asse Y"
+              >
+                <div class="axis-arrow"></div>
+                <div class="axis-line"></div>
+              </div>
+            </div>
+          }
+
+          @if (activeTool() === 'SCALE') {
+            <div class="unity-scale-gizmo">
+              <div
+                class="scale-center-cube"
+                (mousedown)="startScaleDrag($event, 'BOTH')"
+                title="Stretch libero diagonale"
+              ></div>
+              <div
+                class="scale-axis axis-x"
+                (mousedown)="startScaleDrag($event, 'X')"
+                title="Stretch larghezza (X)"
+              >
+                <div class="scale-line"></div>
+                <div class="scale-cube"></div>
+              </div>
+              <div
+                class="scale-axis axis-y"
+                (mousedown)="startScaleDrag($event, 'Y')"
+                title="Stretch altezza (Y)"
+              >
+                <div class="scale-cube"></div>
+                <div class="scale-line"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Canvas SVG Poligoni -->
+      <svg
+        class="stage-svg"
+        #svgCanvas
+        [class.svg-drawing-active]="activeTool() === 'HOTSPOT'"
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="none"
+        (click)="onSvgClick($event)"
+      >
+        @for (item of store.currentScene()?.items; track item.code) {
+          @if (item.points && (!isEditingOrCreating() || editingItemCode() !== item.code)) {
+            <polygon
+              [attr.points]="item.points"
+              class="hotspot-polygon"
+              [class.is-dimmed]="isEditingOrCreating() && editingItemCode() !== item.code"
+              [class.is-ghost-polygon]="!item.initiallyVisible"
+              [class.selected]="store.selectedItem()?.code === item.code"
+              (click)="onSelectItem($event, item)"
+            />
+          }
+        }
+
+        @if (draftPoints().length > 0) {
+          @if (draftPoints().length >= 3) {
+            <polygon [attr.points]="draftPolygonPoints()" class="draft-polygon-live" />
+          }
+          @if (draftPoints().length >= 2) {
+            <polyline [attr.points]="draftPolygonPoints()" class="draft-polyline-live" />
+          }
+          @for (p of draftPoints(); track $index) {
+            <circle [attr.cx]="p.x" [attr.cy]="p.y" r="5" class="draft-point" />
+          }
+        }
+      </svg>
+
+      @if (isDragOverScene()) {
+        <div class="drop-zone-overlay">
+          <div class="drop-zone-badge">
+            <i class="bi bi-file-earmark-arrow-down icon-drop"></i>
+            <span>Rilascia lo sprite qui</span>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="scene-empty-stage">
+      <i class="bi bi-film empty-stage-icon"></i>
+      <h2>Nessuna Scena Selezionata</h2>
+      <p>Crea o seleziona una stanza per iniziare a configurarla.</p>
+      <button type="button" class="btn-create-first-scene" (click)="createSceneRequested.emit()">
+        <i class="bi bi-plus-lg"></i>
+        <span>Aggiungi Scena</span>
+      </button>
+    </div>
+  }
+</section>

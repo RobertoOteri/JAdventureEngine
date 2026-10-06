@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
+  height: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-scenes {
+  width: 100%;
+  background: #0f1117;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-header {
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-header {
+  font-size: 0.9rem;
+  color: #71717a;
+}
+
+.sidebar-header h2 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.btn-add-scene {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  background: #ffffff;
+  border: none;
+  color: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-add-scene:hover {
+  background: #e4e4e7;
+  transform: scale(1.05);
+}
+
+.scenes-list {
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.scene-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.scene-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.scene-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.scene-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #52525b;
+  flex-shrink: 0;
+}
+
+.scene-item.active .scene-dot {
+  background-color: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.scene-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.scene-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #f4f4f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scene-code {
+  font-size: 0.7rem;
+  color: #71717a;
+}
+
+.btn-delete-scene {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+  opacity: 0.7;
+}
+
+.btn-delete-scene:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12);
+  opacity: 1;
+}
+
+.scenes-empty {
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: #71717a;
+  text-align: center;
+}
+
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}

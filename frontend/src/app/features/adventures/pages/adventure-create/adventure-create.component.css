@@ -1,5 +1,8 @@
 :host {
   display: block;
+}
+
+:host.is-page-host {
   min-height: 100vh;
   background-color: #080a0f;
   color: #e6e8ec;
@@ -11,17 +14,21 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+  background-color: #080a0f;
+  color: #e6e8ec;
+  box-sizing: border-box;
 }
 
+/* TOPBAR */
 .workspace-topbar {
-  height: 54px;
+  height: 56px;
   background: #0f1117;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -37,23 +44,18 @@
   align-items: center;
   gap: 0.45rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.4rem 0.85rem;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #9aa1b0;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-back i {
-  font-size: 0.95rem;
-  line-height: 1;
+  transition: all 0.15s ease;
 }
 
 .btn-back:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.25);
 }
@@ -63,12 +65,18 @@
 }
 
 .badge-title {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #f3f4f6;
   background: rgba(255, 255, 255, 0.06);
   padding: 0.25rem 0.65rem;
   border-radius: 6px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .btn-primary-action {
@@ -79,29 +87,21 @@
   color: #0b0c10;
   border: none;
   font-weight: 700;
-  font-size: 0.88rem;
-  padding: 0.55rem 1.4rem;
-  border-radius: 8px;
+  font-size: 0.85rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-  transition: all 0.2s ease;
-}
-
-.btn-primary-action i {
-  font-size: 0.9rem;
-  line-height: 1;
+  transition: all 0.15s ease;
 }
 
 .btn-primary-action:hover:not(:disabled) {
-  background: #f1f3f7;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.15);
+  background: #e4e4e7;
 }
 
 .btn-primary-action:disabled {
-  opacity: 0.35;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
 }
 
 .spinner-btn {
@@ -117,9 +117,10 @@
   to { transform: rotate(360deg); }
 }
 
+/* BODY */
 .workspace-body {
   flex: 1;
-  padding: 2.5rem 3.5rem;
+  padding: 2rem 2.5rem;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -132,23 +133,19 @@
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #f87171;
-  padding: 0.85rem 1.25rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 500;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.error-banner i {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-
+/* STUDIO 2 COLONNE */
 .studio-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(380px, 480px) 1fr;
-  gap: 3.5rem;
+  grid-template-columns: minmax(360px, 460px) 1fr;
+  gap: 2.5rem;
   align-items: stretch;
 }
 
@@ -158,74 +155,76 @@
 }
 
 .column-header h1 {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem 0;
   color: #ffffff;
 }
 
 .subtitle {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   color: #8b92a0;
-  margin: 0 0 2rem 0;
-  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.45;
 }
 
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
 }
 
 .field-group.flex-fill {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 label {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #9aa1b0;
-  letter-spacing: 0.02em;
 }
 
 .studio-input {
   background: #141720;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  padding: 0.75rem 0.95rem;
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.92rem;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .studio-input:focus {
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .studio-textarea {
   background: #141720;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
+  border-radius: 8px;
+  padding: 0.85rem 0.95rem;
   color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   outline: none;
-  min-height: 200px;
+  min-height: 140px;
   height: 100%;
   resize: vertical;
-  line-height: 1.6;
+  line-height: 1.5;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .studio-textarea:focus {
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .input-error {
@@ -233,8 +232,9 @@ label {
 }
 
 .error-hint {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: #f87171;
+  margin-top: 0.2rem;
 }
 
 .preview-column {
@@ -249,9 +249,60 @@ label {
   height: 100%;
 }
 
+/* ========================================================= */
+/* --- MODAL WRAPPER (QUANDO isModal() === true) --- */
+/* ========================================================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-container.workspace-screen {
+  min-height: auto;
+  height: 82vh;
+  max-height: 750px;
+  width: 1100px;
+  max-width: 92vw;
+  background-color: #0b0d13;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal-container .workspace-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.modal-container .workspace-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal-container .workspace-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.modal-container .studio-layout {
+  gap: 2rem;
+}
+
+.modal-container .column-header h1 {
+  font-size: 1.6rem;
+}
+
 @media (max-width: 1024px) {
   .studio-layout {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }

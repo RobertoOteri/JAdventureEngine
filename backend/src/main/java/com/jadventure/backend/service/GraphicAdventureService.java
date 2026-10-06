@@ -7,6 +7,7 @@ import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class GraphicAdventureService {
     @Transactional(readOnly = true)
     public GraphicAdventureDto getAdventureByCode(String code) {
         GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con codice: " + code));
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
         return graphicAdventureMapper.toDto(adventure);
     }
 
@@ -77,21 +78,40 @@ public class GraphicAdventureService {
                 .author(author)
                 .build();
 
-        GraphicAdventure saved = graphicAdventureRepository.save(adventure);
-        return graphicAdventureMapper.toDto(saved);
+        return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
     }
 
     @Transactional
     public void deleteAdventure(String code) {
         GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con codice: " + code));
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!adventure.getAuthor().getUsername().equals(currentUsername)) {
-            throw new IllegalArgumentException("Non puoi eliminare un'avventura non tua");
+        validateOwnership(adventure);
+        graphicAdventureRepository.delete(adventure);
+    }
+
+    @Transactional
+    public GraphicAdventureDto updateAdventure(String code, GraphicAdventureDto dto, MultipartFile coverImage) {
+        GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
+
+        validateOwnership(adventure);
+
+        adventure.setTitle(dto.getTitle());
+        adventure.setDescription(dto.getDescription());
+
+        if (coverImage != null && !coverImage.isEmpty()) {
+            adventure.setCoverImageUrl(fileStorageService.storeAdventureCover(code, coverImage));
         }
 
-        graphicAdventureRepository.delete(adventure);
+        return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
+    }
+
+    private void validateOwnership(GraphicAdventure adventure) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!adventure.getAuthor().getUsername().equals(currentUsername)) {
+            throw new AccessDeniedException("Accesso negato");
+        }
     }
 
     private String generateUniqueCode(String input) {

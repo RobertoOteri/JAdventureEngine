@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  user-select: none;
+  z-index: 120;
+}
+
+.gizmo-toolbar-card {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(15, 17, 23, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.35rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.btn-tool {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #a1a1aa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tool:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.btn-tool.active {
+  background: #ffffff;
+  color: #09090b;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.icon-tool {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.tool-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 0.15rem;
+}

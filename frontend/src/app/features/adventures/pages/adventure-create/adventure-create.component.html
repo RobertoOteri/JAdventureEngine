@@ -1,83 +1,91 @@
-<div class="workspace-screen">
-  <header class="workspace-topbar">
-    <div class="topbar-left">
-      <button type="button" class="btn-back" (click)="onCancel()">
-        <i class="bi bi-arrow-left"></i>
-        <span>Annulla</span>
-      </button>
-      <div class="crumb-separator">/</div>
-      <span class="badge-title">Nuova Avventura</span>
-    </div>
-
-    <div class="topbar-actions">
-      <button
-        type="button"
-        class="btn-primary-action"
-        [disabled]="form.invalid || isSubmitting()"
-        (click)="onSubmit()"
-      >
-        @if (isSubmitting()) {
-          <span class="spinner-btn"></span>
-          <span>Creazione...</span>
-        } @else {
-          <span>Crea ed entra in Editor</span>
-          <i class="bi bi-arrow-right"></i>
-        }
-      </button>
-    </div>
-  </header>
-
-  <main class="workspace-body">
-    @if (errorMessage()) {
-      <div class="error-banner">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <span>{{ errorMessage() }}</span>
+<div [class.modal-backdrop]="isModal()">
+  <div [class.modal-container]="isModal()" class="workspace-screen" (click)="$event.stopPropagation()">
+    <!-- Topbar Header -->
+    <header class="workspace-topbar">
+      <div class="topbar-left">
+        <button type="button" class="btn-back" (click)="onCancel()">
+          <i class="bi" [class.bi-arrow-left]="!isModal()" [class.bi-x-lg]="isModal()"></i>
+          <span>Annulla</span>
+        </button>
+        <div class="crumb-separator">/</div>
+        <span class="badge-title">
+          {{ initialAdventure() ? 'Modifica Avventura' : 'Nuova Avventura' }}
+        </span>
       </div>
-    }
 
-    <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">
-      <section class="meta-column">
-        <div class="column-header">
-          <h1>Nuova Storia</h1>
-          <p class="subtitle">Definisci l'identità del gioco. Potrai creare le scene nell'editor subito dopo.</p>
+      <div class="topbar-actions">
+        <button
+          type="button"
+          class="btn-primary-action"
+          [disabled]="form.invalid || isSubmitting()"
+          (click)="onSubmit()"
+        >
+          @if (isSubmitting()) {
+            <span class="spinner-btn"></span>
+            <span>Salvataggio...</span>
+          } @else {
+            <span>{{ initialAdventure() ? 'Salva Modifiche' : 'Crea ed entra in Editor' }}</span>
+            <i class="bi" [class.bi-check-lg]="initialAdventure()" [class.bi-arrow-right]="!initialAdventure()"></i>
+          }
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="workspace-body custom-scroll">
+      @if (errorMessage()) {
+        <div class="error-banner">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ errorMessage() }}</span>
         </div>
+      }
 
-        <div class="field-group">
-          <label for="title">Titolo dell'Avventura *</label>
-          <input
-            id="title"
-            type="text"
-            formControlName="title"
-            class="studio-input"
-            placeholder="es. Il Segreto del Faro Abbandonato"
-            [class.input-error]="form.get('title')?.touched && form.get('title')?.invalid"
+      <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">
+        <section class="meta-column">
+          <div class="column-header">
+            <h1>{{ initialAdventure() ? 'Modifica Dettagli' : 'Nuova Storia' }}</h1>
+            <p class="subtitle">
+              {{ initialAdventure() ? 'Aggiorna titolo, sinossi o locandina del tuo gioco.' : 'Definisci l\'identità del gioco. Potrai creare le scene nell\'editor subito dopo.' }}
+            </p>
+          </div>
+
+          <div class="field-group">
+            <label for="title">Titolo dell'Avventura *</label>
+            <input
+              id="title"
+              type="text"
+              formControlName="title"
+              class="studio-input"
+              placeholder="es. Il Segreto del Faro Abbandonato"
+              [class.input-error]="form.get('title')?.touched && form.get('title')?.invalid"
+            />
+            @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
+              <span class="error-hint">Il titolo è obbligatorio.</span>
+            }
+            @if (form.get('title')?.touched && form.get('title')?.errors?.['maxlength']) {
+              <span class="error-hint">Il titolo non può superare i 100 caratteri.</span>
+            }
+          </div>
+
+          <div class="field-group flex-fill">
+            <label for="description">Sinossi / Ambientazione</label>
+            <textarea
+              id="description"
+              formControlName="description"
+              class="studio-textarea"
+              placeholder="Descrivi l'atmosfera, l'incipit della storia e i suoi misteri..."
+            ></textarea>
+          </div>
+        </section>
+
+        <section class="preview-column">
+          <app-file-dropzone
+            label="Locandina / Copertina (16:9)"
+            dropTitle="Trascina la copertina dell'avventura"
+            (fileChange)="onFileChange($event)"
           />
-          @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
-            <span class="error-hint">Il titolo è obbligatorio.</span>
-          }
-          @if (form.get('title')?.touched && form.get('title')?.errors?.['maxlength']) {
-            <span class="error-hint">Il titolo non può superare i 100 caratteri.</span>
-          }
-        </div>
-
-        <div class="field-group flex-fill">
-          <label for="description">Sinossi / Ambientazione</label>
-          <textarea
-            id="description"
-            formControlName="description"
-            class="studio-textarea"
-            placeholder="Descrivi l'atmosfera, l'incipit della storia e i suoi misteri..."
-          ></textarea>
-        </div>
-      </section>
-
-      <section class="preview-column">
-        <app-file-dropzone
-          label="Locandina / Copertina (16:9)"
-          dropTitle="Trascina la copertina dell'avventura"
-          (fileChange)="onFileChange($event)"
-        />
-      </section>
-    </form>
-  </main>
+        </section>
+      </form>
+    </main>
+  </div>
 </div>

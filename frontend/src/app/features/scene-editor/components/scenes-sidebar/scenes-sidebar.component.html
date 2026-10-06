@@ -1,0 +1,40 @@
+<aside class="sidebar-scenes">
+  <div class="sidebar-header">
+    <div class="header-title">
+      <i class="bi bi-grid-1x2 icon-header"></i>
+      <h2>Stanze</h2>
+    </div>
+    <button type="button" class="btn-add-scene" (click)="goToAddScene()" title="Aggiungi Nuova Stanza">
+      <i class="bi bi-plus-lg"></i>
+    </button>
+  </div>
+
+  <nav class="scenes-list custom-scroll">
+    @for (scene of store.scenes(); track scene.code) {
+      <div
+        class="scene-item"
+        [class.active]="scene.code === store.currentScene()?.code"
+        (click)="switchScene(scene.code)"
+      >
+        <div class="scene-dot"></div>
+        <div class="scene-info">
+          <span class="scene-title">{{ scene.name }}</span>
+          <span class="scene-code">#{{ scene.code }}</span>
+        </div>
+        <button
+          type="button"
+          class="btn-delete-scene"
+          (click)="deleteScene($event, scene.code)"
+          title="Elimina stanza"
+        >
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    } @empty {
+      <div class="scenes-empty">
+        <i class="bi bi-inbox icon-empty"></i>
+        <span>Nessuna stanza presente</span>
+      </div>
+    }
+  </nav>
+</aside>

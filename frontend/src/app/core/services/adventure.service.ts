@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GraphicAdventureDto} from '../models/adventure.model';
+import { GraphicAdventureDto } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -29,5 +29,9 @@ export class AdventureService {
 
   deleteAdventure(code: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${code}`);
+  }
+
+  updateAdventure(code: string, formData: FormData): Observable<GraphicAdventureDto> {
+    return this.http.put<GraphicAdventureDto>(`${this.apiUrl}/${code}`, formData);
   }
 }

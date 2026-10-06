@@ -1,0 +1,190 @@
+<div class="modal-backdrop" (click)="closeRequested.emit()">
+  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
+
+    <header class="modal-header">
+      <div class="modal-header-left">
+        <div class="icon-wrap">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <div>
+          <h3>Nuova Azione di Gioco</h3>
+          <span class="modal-subtitle">Assegna un comportamento all'hotspot <strong>#{{ itemCode() }}</strong></span>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeRequested.emit()" title="Chiudi finestra">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+
+    <div class="modal-body custom-scroll">
+
+      <div class="main-fields">
+        <div class="field-group">
+          <label for="actionVerboSelect">Verbo di Interazione (Tipo Azione) *</label>
+          <select id="actionVerboSelect" class="studio-select" [(ngModel)]="actionType">
+            @for (t of availableActionTypes; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="successMsgInput">Messaggio di Successo</label>
+          <input
+            id="successMsgInput"
+            type="text"
+            class="studio-input"
+            [(ngModel)]="actionSuccessMsg"
+            placeholder="Es. Apri la porta con la chiave d'ottone ed entri..."
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="failureMsgInput">Messaggio di Fallimento (se le precondizioni non sono soddisfatte)</label>
+          <input
+            id="failureMsgInput"
+            type="text"
+            class="studio-input"
+            [(ngModel)]="actionFailureMsg"
+            placeholder="Es. La serratura è bloccata. Ti serve una chiave..."
+          />
+        </div>
+      </div>
+
+      <section class="section-card theme-preconditions">
+        <div class="section-card-header">
+          <div class="section-title">
+            <span class="color-badge badge-amber"></span>
+            <i class="bi bi-shield-lock-fill icon-theme-amber"></i>
+            <h4>Precondizioni Richieste</h4>
+            <span class="count-pill amber">({{ actionPreconditions().length }})</span>
+          </div>
+          <button type="button" class="btn-sub-add amber" (click)="addPrecondition()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Aggiungi Regola</span>
+          </button>
+        </div>
+
+        <div class="section-card-content">
+          @for (prec of actionPreconditions(); track $index; let i = $index) {
+            <div class="rule-row amber-border">
+              <div class="rule-type-col">
+                <select class="studio-select" [(ngModel)]="prec.type">
+                  @for (pt of preconditionTypes; track pt) {
+                    <option [value]="pt">{{ pt }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="rule-val-col">
+                @if (prec.type === 'HAS_ITEM' || prec.type === 'DOES_NOT_HAVE_ITEM') {
+                  <select class="studio-select" [(ngModel)]="prec.requiredKey">
+                    <option value="" disabled selected>-- Seleziona Oggetto Richiesto --</option>
+                    @for (it of availableItemOptions(); track it.code) {
+                      <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    class="studio-input"
+                    [(ngModel)]="prec.requiredKey"
+                    placeholder="Nome Flag (es. porta_aperta)"
+                  />
+                }
+              </div>
+
+              <button type="button" class="btn-del-rule" (click)="removePrecondition(i)" title="Rimuovi precondizione">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          } @empty {
+            <div class="empty-rules amber">
+              <i class="bi bi-unlock"></i>
+              <span>Nessuna precondizione: l'azione sarà sempre accessibile al giocatore.</span>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="section-card theme-effects">
+        <div class="section-card-header">
+          <div class="section-title">
+            <span class="color-badge badge-cyan"></span>
+            <i class="bi bi-magic icon-theme-cyan"></i>
+            <h4>Effetti di Gioco</h4>
+            <span class="count-pill cyan">({{ actionEffects().length }})</span>
+          </div>
+          <button type="button" class="btn-sub-add cyan" (click)="addEffect()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Aggiungi Effetto</span>
+          </button>
+        </div>
+
+        <div class="section-card-content">
+          @for (eff of actionEffects(); track $index; let i = $index) {
+            <div class="rule-row cyan-border">
+              <div class="rule-type-col">
+                <select class="studio-select" [(ngModel)]="eff.type">
+                  @for (et of effectTypes; track et) {
+                    <option [value]="et">{{ et }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="rule-val-col">
+                @if (
+                  eff.type === 'SHOW_SCENE_ITEM' ||
+                  eff.type === 'HIDE_SCENE_ITEM' ||
+                  eff.type === 'ADD_ITEM' ||
+                  eff.type === 'REMOVE_ITEM'
+                  ) {
+                  <select class="studio-select" [(ngModel)]="eff.targetValue">
+                    <option value="" disabled selected>-- Seleziona Hotspot / Oggetto Bersaglio --</option>
+                    @for (it of availableItemOptions(); track it.code) {
+                      <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                    }
+                  </select>
+                } @else if (eff.type === 'CHANGE_SCENE') {
+                  <select class="studio-select" [(ngModel)]="eff.targetValue">
+                    <option value="" disabled selected>-- Stanza di Destinazione --</option>
+                    @for (sc of availableSceneOptions(); track sc.code) {
+                      <option [value]="sc.code">{{ sc.name }} (#{{ sc.code }})</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    class="studio-input"
+                    [(ngModel)]="eff.targetValue"
+                    placeholder="Valore (es. sbloccato=true)"
+                  />
+                }
+              </div>
+
+              <button type="button" class="btn-del-rule" (click)="removeEffect(i)" title="Rimuovi effetto">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          } @empty {
+            <div class="empty-rules cyan">
+              <i class="bi bi-dash-circle"></i>
+              <span>Nessun effetto registrato: l'azione mostrerà soltanto il messaggio a schermo.</span>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="closeRequested.emit()">
+        Annulla
+      </button>
+      <button type="button" class="btn-save" (click)="onSubmit()">
+        <i class="bi bi-check2"></i>
+        <span>Salva Azione</span>
+      </button>
+    </footer>
+  </div>
+</div>
