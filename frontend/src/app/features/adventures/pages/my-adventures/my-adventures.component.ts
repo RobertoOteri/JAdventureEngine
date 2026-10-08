@@ -53,8 +53,8 @@ export class MyAdventuresComponent implements OnInit {
     this.router.navigate(['/adventures/new']);
   }
 
-  playAdventure(code: string): void {
-    this.router.navigate(['/game', code]);
+  playAdventure(adventureCode: string): void {
+    this.router.navigate(['/adventures', adventureCode, 'play']);
   }
 
   onEditAdventure(adv: GraphicAdventureDto): void {

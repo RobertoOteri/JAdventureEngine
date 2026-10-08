@@ -5,3 +5,6 @@ export * from './action.model';
 export * from './inventory-item.model';
 export * from './item.model';
 export * from './scene.model';
+export * from './game-save.model';
+export * from './game-action.model';
+export * from './game-state.model'

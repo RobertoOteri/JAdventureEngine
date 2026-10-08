@@ -1,0 +1,18 @@
+@if (visible()) {
+  <div
+    class="banner-wrapper"
+    [class.fade-out]="isFadingOut()"
+    [class.type-success]="type() === 'success'"
+    [class.type-error]="type() === 'error'"
+  >
+    <div class="banner-plaque">
+      <div class="plaque-gem left"></div>
+
+      <div class="message-content">
+        <p class="message-text">{{ currentText() }}</p>
+      </div>
+
+      <div class="plaque-gem right"></div>
+    </div>
+  </div>
+}

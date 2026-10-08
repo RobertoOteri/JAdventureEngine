@@ -43,6 +43,15 @@ export const routes: Routes = [
   },
 
   {
+    path: 'adventures/:adventureCode/play',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/gameplay/gameplay.component').then(
+        (m) => m.GameplayComponent
+      )
+  },
+
+  {
     path: 'editor/:adventureCode',
     canActivate: [authGuard],
     loadComponent: () =>

@@ -16,7 +16,6 @@
       </button>
     </header>
 
-
     <div class="modal-body custom-scroll">
 
       <div class="main-fields">
@@ -41,13 +40,13 @@
         </div>
 
         <div class="field-group">
-          <label for="failureMsgInput">Messaggio di Fallimento (se le precondizioni non sono soddisfatte)</label>
+          <label for="failureMsgInput">Messaggio di Fallimento Predefinito (fallback globale)</label>
           <input
             id="failureMsgInput"
             type="text"
             class="studio-input"
             [(ngModel)]="actionFailureMsg"
-            placeholder="Es. La serratura è bloccata. Ti serve una chiave..."
+            placeholder="Es. Non riesci a farlo adesso..."
           />
         </div>
       </div>
@@ -68,36 +67,49 @@
 
         <div class="section-card-content">
           @for (prec of actionPreconditions(); track $index; let i = $index) {
-            <div class="rule-row amber-border">
-              <div class="rule-type-col">
-                <select class="studio-select" [(ngModel)]="prec.type">
-                  @for (pt of preconditionTypes; track pt) {
-                    <option [value]="pt">{{ pt }}</option>
-                  }
-                </select>
-              </div>
-
-              <div class="rule-val-col">
-                @if (prec.type === 'HAS_ITEM' || prec.type === 'DOES_NOT_HAVE_ITEM') {
-                  <select class="studio-select" [(ngModel)]="prec.requiredKey">
-                    <option value="" disabled selected>-- Seleziona Oggetto Richiesto --</option>
-                    @for (it of availableItemOptions(); track it.code) {
-                      <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+            <div class="precondition-card amber-border">
+              <div class="rule-main-row">
+                <div class="rule-type-col">
+                  <select class="studio-select" [(ngModel)]="prec.type">
+                    @for (pt of preconditionTypes; track pt) {
+                      <option [value]="pt">{{ pt }}</option>
                     }
                   </select>
-                } @else {
+                </div>
+
+                <div class="rule-val-col">
+                  @if (prec.type === 'HAS_ITEM' || prec.type === 'DOES_NOT_HAVE_ITEM') {
+                    <select class="studio-select" [(ngModel)]="prec.requiredKey">
+                      <option value="" disabled selected>-- Seleziona Oggetto Richiesto --</option>
+                      @for (it of availableItemOptions(); track it.code) {
+                        <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                      }
+                    </select>
+                  } @else {
+                    <input
+                      type="text"
+                      class="studio-input"
+                      [(ngModel)]="prec.requiredKey"
+                      placeholder="Nome Flag (es. porta_aperta)"
+                    />
+                  }
+                </div>
+
+                <button type="button" class="btn-del-rule" (click)="removePrecondition(i)" title="Rimuovi precondizione">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+              <div class="precondition-failure-msg-row">
+                <div class="msg-input-wrapper">
+                  <i class="bi bi-chat-square-dots-fill msg-icon"></i>
                   <input
                     type="text"
-                    class="studio-input"
-                    [(ngModel)]="prec.requiredKey"
-                    placeholder="Nome Flag (es. porta_aperta)"
+                    class="studio-input sub-input"
+                    [(ngModel)]="prec.failureMessage"
+                    placeholder="Messaggio di errore se manca questo requisito (opzionale)"
                   />
-                }
+                </div>
               </div>
-
-              <button type="button" class="btn-del-rule" (click)="removePrecondition(i)" title="Rimuovi precondizione">
-                <i class="bi bi-trash3"></i>
-              </button>
             </div>
           } @empty {
             <div class="empty-rules amber">

@@ -18,7 +18,6 @@ import java.util.List;
 @Builder
 public class ActionDto {
 
-    @NotBlank(message = "Il codice dell'azione è obbligatorio")
     @Size(max = 255, message = "Il codice non può superare i 255 caratteri")
     private String code;
 

@@ -1,0 +1,46 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="modal-header-left">
+        <div class="icon-wrap">
+          <i class="bi bi-folder2-open"></i>
+        </div>
+        <div>
+          <h3>Carica Partita</h3>
+          <span class="modal-subtitle">{{ adventureTitle() }}</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi finestra">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="modal-body custom-scroll">
+      <div class="saves-list">
+        @for (save of saves(); track save.code) {
+          <div class="save-row" (click)="selectSave.emit(save.code)">
+            <div class="save-info">
+              <strong class="save-title">{{ save.name }}</strong>
+              <span class="save-meta">
+                <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.currentSceneCode }}</strong>
+              </span>
+            </div>
+            <button type="button" class="btn-select-save" title="Carica questo salvataggio">
+              <i class="bi bi-box-arrow-in-right"></i>
+              <span>Carica</span>
+            </button>
+          </div>
+        } @empty {
+          <div class="empty-saves">
+            <i class="bi bi-inbox icon-empty"></i>
+            <p>Nessun salvataggio trovato per questa avventura.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="close.emit()">Chiudi</button>
+    </footer>
+  </div>
+</div>

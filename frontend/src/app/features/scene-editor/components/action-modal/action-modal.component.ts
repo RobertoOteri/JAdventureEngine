@@ -81,7 +81,7 @@ export class ActionModalComponent {
   addPrecondition(): void {
     this.actionPreconditions.update((list) => [
       ...list,
-      { type: 'HAS_ITEM', requiredKey: '' }
+      { type: 'HAS_ITEM', requiredKey: '', failureMessage: '' }
     ]);
   }
 

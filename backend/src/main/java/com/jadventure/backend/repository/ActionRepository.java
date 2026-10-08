@@ -1,6 +1,7 @@
 package com.jadventure.backend.repository;
 
 import com.jadventure.backend.model.Action;
+import com.jadventure.backend.model.enums.ActionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +17,5 @@ public interface ActionRepository extends JpaRepository<Action, Long> {
 
     List<Action> findAllByItemCode(String itemCode);
 
-    Optional<Action> findByItemCodeAndCode(String itemCode, String code);
+    Optional<Action> findByItemCodeAndType(String itemCode, ActionType type);
 }

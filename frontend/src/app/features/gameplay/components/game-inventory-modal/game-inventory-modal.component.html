@@ -1,0 +1,60 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="parchment-container" (click)="$event.stopPropagation()">
+
+    <div class="parchment-backpack-badge" title="Zaino del protagonista">
+      <img src="/icons/backpack.svg" alt="Backpack" class="backpack-icon" />
+    </div>
+
+    <button type="button" class="btn-parchment-close" (click)="close.emit()" title="Chiudi inventario">
+      ✕
+    </button>
+
+    <div class="parchment-header">
+      <h3 class="parchment-title">Inventario</h3>
+    </div>
+
+    <div class="parchment-body custom-scroll">
+      <div class="inventory-grid">
+        @for (item of items(); track item.code) {
+          <div
+            class="item-pocket"
+            [class.active]="selectedItem?.code === item.code"
+            (click)="selectItem(item)"
+          >
+            @if (item.imageUrl) {
+              <img [src]="item.imageUrl" [alt]="item.name" class="pocket-sprite" />
+            } @else {
+              <div class="pocket-placeholder">
+                <span>{{ item.name.charAt(0) }}</span>
+              </div>
+            }
+            <span class="pocket-label">{{ item.name }}</span>
+          </div>
+        } @empty {
+          <div class="empty-parchment">
+            <p>Il tuo borsello è completamente vuoto...</p>
+          </div>
+        }
+      </div>
+
+      @if (selectedItem) {
+        <div class="inspector-plate">
+          <div class="inspector-plate-header">
+            <span class="inspector-item-title">{{ selectedItem.name }}</span>
+            <span class="inspector-item-code">#{{ selectedItem.code }}</span>
+          </div>
+          <p class="inspector-item-desc">
+            {{ selectedItem.description || 'Nessun dettaglio particolare su quest\'oggetto.' }}
+          </p>
+        </div>
+      }
+    </div>
+
+    <div class="parchment-footer">
+      <button type="button" class="btn-roll-up" (click)="close.emit()">
+        Riponi nello zaino
+      </button>
+    </div>
+
+  </div>
+</div>
