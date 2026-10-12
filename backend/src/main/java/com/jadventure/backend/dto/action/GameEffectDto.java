@@ -1,6 +1,7 @@
 package com.jadventure.backend.dto.action;
 
-import jakarta.validation.constraints.NotBlank;
+import com.jadventure.backend.model.enums.EffectType;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class GameEffectDto {
     private Long id;
 
-    @NotBlank(message = "Il tipo di effetto è obbligatorio")
-    private String type;
+    @NotNull(message = "Il tipo di effetto è obbligatorio")
+    private EffectType type;
 
     private String targetValue;
 }

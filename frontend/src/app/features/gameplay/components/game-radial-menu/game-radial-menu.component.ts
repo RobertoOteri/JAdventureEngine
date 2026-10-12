@@ -1,4 +1,4 @@
-import { Component, input, output, signal, HostListener, computed } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Item, ActionType } from '../../../../core/models';
 
@@ -18,75 +18,55 @@ export class GameRadialMenuComponent {
   close = output<void>();
 
   hoveredAction = signal<ActionType | null>(null);
-  needleAngle = signal<number>(0);
 
-  actionSentence = computed(() => {
-    const act = this.hoveredAction();
-    const itemName = this.item()?.name || '';
-    if (!act) return '';
-
-    switch (act) {
-      case 'LOOK_AT': return `Guarda ${itemName}`;
-      case 'PICK_UP': return `Raccogli ${itemName}`;
-      case 'USE': return `Usa ${itemName}`;
-      case 'OPEN': return `Apri ${itemName}`;
-      case 'TALK_TO': return `Parla con ${itemName}`;
-      case 'MOVE': return `Muovi ${itemName}`;
-      default: return `Interagisci con ${itemName}`;
-    }
-  });
-
-  @HostListener('window:mousemove', ['$event'])
-  onWindowMouseMove(event: MouseEvent): void {
-    const el = document.elementFromPoint(event.clientX, event.clientY);
-    const actionBtn = el?.closest('.btn-radial-action');
-
-    if (actionBtn) {
-      const type = actionBtn.getAttribute('data-action-type') as ActionType;
-      const angle = Number(actionBtn.getAttribute('data-angle') || '0');
-      this.hoveredAction.set(type);
-      this.needleAngle.set(angle);
-    } else {
-      const dx = event.clientX - this.x();
-      const dy = event.clientY - this.y();
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < 26 || dist > 130) {
-        this.hoveredAction.set(null);
-      }
+  getActionIcon(type: ActionType): string {
+    switch (type) {
+      case 'LOOK_AT': return 'bi-eye';
+      case 'PICK_UP': return 'bi-hand-index-thumb';
+      case 'USE': return 'bi-gear';
+      case 'OPEN': return 'bi-unlock';
+      case 'TALK_TO': return 'bi-chat-dots';
+      case 'MOVE': return 'bi-arrows-move';
+      default: return 'bi-cursor';
     }
   }
 
-  @HostListener('window:mouseup', ['$event'])
-  onWindowMouseUp(event: MouseEvent): void {
-    event.preventDefault();
+  getActionLabel(type: ActionType): string {
+    switch (type) {
+      case 'LOOK_AT': return 'Guarda';
+      case 'PICK_UP': return 'Prendi';
+      case 'USE': return 'Usa';
+      case 'OPEN': return 'Apri';
+      case 'TALK_TO': return 'Parla';
+      case 'MOVE': return 'Muovi';
+      default: return type;
+    }
+  }
+
+  onSelectAction(actionType: ActionType, event: MouseEvent): void {
     event.stopPropagation();
-
-    const active = this.hoveredAction();
     const currentItem = this.item();
-
-    if (active && currentItem) {
+    if (currentItem) {
       this.actionSelected.emit({
         itemCode: currentItem.code,
-        actionType: active
+        actionType
       });
     }
     this.close.emit();
   }
 
-  getSlotStyle(index: number, total: number): { top: string; left: string; angle: number } {
+  getSlotStyle(index: number, total: number): { top: string; left: string } {
     const angleStep = 360 / Math.max(total, 1);
     const angleDeg = -90 + (index * angleStep);
     const angleRad = (angleDeg * Math.PI) / 180;
-    const radius = 68;
+    const radius = 64;
 
     const x = Math.cos(angleRad) * radius;
     const y = Math.sin(angleRad) * radius;
 
     return {
       left: `calc(50% + ${x}px)`,
-      top: `calc(50% + ${y}px)`,
-      angle: angleDeg + 90
+      top: `calc(50% + ${y}px)`
     };
   }
 }

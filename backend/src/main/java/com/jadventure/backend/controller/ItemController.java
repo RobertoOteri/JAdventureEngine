@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/adventures/{adventureCode}/scenes/{sceneCode}/items")
+@RequestMapping("/api/items")
 public class ItemController {
 
     private final ItemService itemService;
@@ -21,14 +21,14 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping
+    @GetMapping("/scene/{adventureCode}/{sceneCode}")
     public ResponseEntity<List<ItemDto>> getItems(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode) {
         return ResponseEntity.ok(itemService.getItemsByScene(adventureCode, sceneCode));
     }
 
-    @GetMapping("/{itemCode}")
+    @GetMapping("/{adventureCode}/{sceneCode}/{itemCode}")
     public ResponseEntity<ItemDto> getItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode,
@@ -36,7 +36,7 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getItemByCode(adventureCode, sceneCode, itemCode));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/scene/{adventureCode}/{sceneCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemDto> createItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode,
@@ -47,7 +47,7 @@ public class ItemController {
                 .body(itemService.createItem(adventureCode, sceneCode, dto, image));
     }
 
-    @PutMapping(value = "/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{adventureCode}/{sceneCode}/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemDto> updateItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode,
@@ -58,7 +58,7 @@ public class ItemController {
         return ResponseEntity.ok(itemService.updateItem(adventureCode, sceneCode, itemCode, dto, image));
     }
 
-    @DeleteMapping("/{itemCode}")
+    @DeleteMapping("/{adventureCode}/{sceneCode}/{itemCode}")
     public ResponseEntity<Void> deleteItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode,

@@ -1,15 +1,11 @@
 package com.jadventure.backend.service;
 
+import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.SceneMapper;
-import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.Scene;
-import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.repository.SceneRepository;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,26 +17,28 @@ import java.util.List;
 public class SceneService {
 
     private final SceneRepository sceneRepository;
-    private final GraphicAdventureRepository graphicAdventureRepository;
-    private final FileStorageService fileStorageService;
     private final SceneMapper sceneMapper;
 
+    private final GraphicAdventureService graphicAdventureService;
+    private final FileStorageService fileStorageService;
+    private final AuthService authService;
+
     public SceneService(SceneRepository sceneRepository,
-                        GraphicAdventureRepository graphicAdventureRepository,
+                        SceneMapper sceneMapper,
+                        GraphicAdventureService graphicAdventureService,
                         FileStorageService fileStorageService,
-                        SceneMapper sceneMapper) {
+                        AuthService authService) {
         this.sceneRepository = sceneRepository;
-        this.graphicAdventureRepository = graphicAdventureRepository;
-        this.fileStorageService = fileStorageService;
         this.sceneMapper = sceneMapper;
+        this.graphicAdventureService = graphicAdventureService;
+        this.fileStorageService = fileStorageService;
+        this.authService = authService;
     }
 
     @Transactional
     public SceneDto createScene(String adventureCode, SceneDto dto, MultipartFile backgroundFile) {
-        GraphicAdventure adventure = graphicAdventureRepository.findByCode(adventureCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + adventureCode));
-
-        validateOwnership(adventure);
+        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
+        authService.validateOwnership(adventureDto.getAuthorUsername());
 
         String sceneCode = dto.getCode();
         if (sceneCode == null || sceneCode.isBlank()) {
@@ -53,23 +51,20 @@ public class SceneService {
 
         String backgroundUrl = fileStorageService.storeSceneBackground(adventureCode, sceneCode, backgroundFile);
 
-        Scene scene = Scene.builder()
-                .code(sceneCode)
-                .name(dto.getName())
-                .backgroundImageUrl(backgroundUrl)
-                .graphicAdventure(adventure)
-                .items(new ArrayList<>())
-                .build();
+        Scene scene = sceneMapper.toEntity(dto, adventureDto);
+        scene.setBackgroundImageUrl(backgroundUrl);
+        if (scene.getItems() == null) {
+            scene.setItems(new ArrayList<>());
+        }
 
         Scene savedScene = sceneRepository.save(scene);
 
-        boolean currentInitialExists = adventure.getInitialSceneCode() != null
-                && !adventure.getInitialSceneCode().isBlank()
-                && sceneRepository.existsByGraphicAdventureCodeAndCode(adventureCode, adventure.getInitialSceneCode());
+        boolean currentInitialExists = adventureDto.getInitialSceneCode() != null
+                && !adventureDto.getInitialSceneCode().isBlank()
+                && sceneRepository.existsByGraphicAdventureCodeAndCode(adventureCode, adventureDto.getInitialSceneCode());
 
         if (dto.isSetAsInitial() || !currentInitialExists) {
-            adventure.setInitialSceneCode(savedScene.getCode());
-            graphicAdventureRepository.save(adventure);
+            graphicAdventureService.updateInitialSceneCode(adventureCode, savedScene.getCode());
         }
 
         return sceneMapper.toDto(savedScene);
@@ -77,7 +72,7 @@ public class SceneService {
 
     @Transactional(readOnly = true)
     public List<SceneDto> getScenesByAdventure(String adventureCode) {
-        if (!graphicAdventureRepository.existsByCode(adventureCode)) {
+        if (!graphicAdventureService.existsByCode(adventureCode)) {
             throw new ResourceNotFoundException("Avventura non trovata: " + adventureCode);
         }
         return sceneMapper.toDtoList(sceneRepository.findAllByGraphicAdventureCode(adventureCode));
@@ -95,21 +90,13 @@ public class SceneService {
         Scene scene = sceneRepository.findByGraphicAdventureCodeAndCode(adventureCode, sceneCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata: " + sceneCode));
 
-        validateOwnership(scene.getGraphicAdventure());
+        authService.validateOwnership(scene.getGraphicAdventure().getAuthor().getUsername());
 
-        GraphicAdventure adventure = scene.getGraphicAdventure();
-        if (sceneCode.equals(adventure.getInitialSceneCode())) {
-            adventure.setInitialSceneCode(null);
-            graphicAdventureRepository.save(adventure);
+        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
+        if (sceneCode.equals(adventureDto.getInitialSceneCode())) {
+            graphicAdventureService.updateInitialSceneCode(adventureCode, null);
         }
 
         sceneRepository.delete(scene);
-    }
-
-    private void validateOwnership(GraphicAdventure adventure) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && !adventure.getAuthor().getUsername().equals(auth.getName())) {
-            throw new AccessDeniedException("Accesso negato");
-        }
     }
 }

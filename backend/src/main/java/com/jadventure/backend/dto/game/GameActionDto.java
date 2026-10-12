@@ -13,6 +13,9 @@ import lombok.*;
 public class GameActionDto {
 
     @NotBlank
+    private String saveCode;
+
+    @NotBlank
     private String itemCode;
 
     @NotNull

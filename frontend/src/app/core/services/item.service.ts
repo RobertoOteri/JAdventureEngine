@@ -9,25 +9,17 @@ import { environment } from '../../../environments/environment';
 })
 export class ItemService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/adventures`;
-
-  getItems(adventureCode: string, sceneCode: string): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items`);
-  }
-
-  getItem(adventureCode: string, sceneCode: string, itemCode: string): Observable<Item> {
-    return this.http.get<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`);
-  }
+  private readonly apiUrl = `${environment.apiUrl}/items`;
 
   createItem(adventureCode: string, sceneCode: string, formData: FormData): Observable<Item> {
-    return this.http.post<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items`, formData);
+    return this.http.post<Item>(`${this.apiUrl}/scene/${adventureCode}/${sceneCode}`, formData);
   }
 
   updateItem(adventureCode: string, sceneCode: string, itemCode: string, formData: FormData): Observable<Item> {
-    return this.http.put<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`, formData);
+    return this.http.put<Item>(`${this.apiUrl}/${adventureCode}/${sceneCode}/${itemCode}`, formData);
   }
 
   deleteItem(adventureCode: string, sceneCode: string, itemCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`);
+    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/${sceneCode}/${itemCode}`);
   }
 }

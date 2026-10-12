@@ -43,7 +43,7 @@ public class PreconditionService {
         } else if (type == PreconditionType.DOES_NOT_HAVE_ITEM) {
             return save.getInventory() == null || !save.getInventory().contains(key);
         } else  if (type == PreconditionType.FLAG_EQUALS) {
-            String val = save.getWorldFlags() != null ? save.getWorldFlags().get(key) : null;
+            String val = save.getAdventureFlags() != null ? save.getAdventureFlags().get(key) : null;
             return Objects.equals(val, precondition.getExpectedValue());
         }
         return false;

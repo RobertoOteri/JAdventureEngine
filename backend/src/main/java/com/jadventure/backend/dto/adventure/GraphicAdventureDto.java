@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GraphicAdventureDto {
-
+    private Long id;
     private String code;
     private String title;
     private String description;

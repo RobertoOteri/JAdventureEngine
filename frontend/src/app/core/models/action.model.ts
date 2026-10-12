@@ -20,6 +20,7 @@ export type EffectType =
   | 'HIDE_SCENE_ITEM';
 
 export interface Precondition {
+  id?: number;
   type: PreconditionType;
   requiredKey: string;
   expectedValue?: string;
@@ -27,11 +28,13 @@ export interface Precondition {
 }
 
 export interface GameEffect {
+  id?: number;
   type: EffectType;
   targetValue?: string;
 }
 
 export interface Action {
+  id?: number;
   code?: string;
   type: ActionType;
   successMessage?: string;

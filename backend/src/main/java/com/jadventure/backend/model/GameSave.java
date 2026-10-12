@@ -24,14 +24,13 @@ public class GameSave {
     )
     private Long id;
 
-    @Builder.Default
     @Column(nullable = false, unique = true)
-    private String code = UUID.randomUUID().toString();
+    private String code;
 
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -49,25 +48,31 @@ public class GameSave {
     @MapKeyColumn(name = "flag_key")
     @Column(name = "flag_value")
     @Builder.Default
-    private Map<String, String> worldFlags = new HashMap<>();
+    private Map<String, String> adventureFlags = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "game_save_scene_items", joinColumns = @JoinColumn(name = "game_save_id"))
     @Column(name = "item_code")
     @Builder.Default
-    private Set<String> visibleSceneItems = new HashSet<>();
+    private Set<String> visibleItems = new HashSet<>();
 
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graphic_adventure_id", nullable = false)
     private GraphicAdventure graphicAdventure;
 
     @PrePersist
-    @PreUpdate
-    protected void onSave() {
+    protected void onPrePersist() {
         this.savedAt = LocalDateTime.now();
+        if (this.code == null || this.code.isBlank()) {
+            this.code = "save_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        }
     }
 
+    @PreUpdate
+    protected void onPreUpdate() {
+        this.savedAt = LocalDateTime.now();
+    }
 }

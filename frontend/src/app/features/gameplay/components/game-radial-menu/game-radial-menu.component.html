@@ -1,55 +1,38 @@
 <div
   class="radial-menu-backdrop"
+  (click)="close.emit()"
   (contextmenu)="$event.preventDefault(); close.emit()"
 >
   <div
     class="radial-container"
     [style.left.px]="x()"
     [style.top.px]="y()"
+    (click)="$event.stopPropagation()"
   >
-    <div class="compass-casing">
-      <div class="compass-dial">
-        <svg class="compass-rose" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="44" stroke="#8a6739" stroke-width="1.8" fill="none" opacity="0.6"/>
-          <circle cx="50" cy="50" r="38" stroke="#5a3d1c" stroke-width="1.2" stroke-dasharray="2,3" fill="none"/>
-          <path d="M50 10 L53 45 L50 48 L47 45 Z" fill="#66461f"/>
-          <path d="M50 90 L53 55 L50 52 L47 55 Z" fill="#66461f"/>
-          <path d="M10 50 L45 47 L48 50 L45 53 Z" fill="#66461f"/>
-          <path d="M90 50 L55 47 L52 50 L55 53 Z" fill="#66461f"/>
-        </svg>
-
-        <div class="compass-needle" [style.transform]="'rotate(' + needleAngle() + 'deg)'">
-          <div class="needle-tip-gold"></div>
-          <div class="needle-cap"></div>
-        </div>
-      </div>
+    <div class="radial-hub">
+      <i class="bi bi-crosshair"></i>
     </div>
 
     <div class="actions-ring">
       @for (action of item()?.actions; track action.type; let idx = $index) {
         @let slot = getSlotStyle(idx, (item()?.actions?.length || 1));
-        <div
+        <button
+          type="button"
           class="btn-radial-action"
-          [attr.data-action-type]="action.type"
-          [attr.data-angle]="slot.angle"
-          [class.active]="hoveredAction() === action.type"
           [style.left]="slot.left"
           [style.top]="slot.top"
+          (mouseenter)="hoveredAction.set(action.type)"
+          (mouseleave)="hoveredAction.set(null)"
+          (click)="onSelectAction(action.type, $event)"
         >
-          <img
-            [src]="'/icons/actions/' + action.type.toLowerCase() + '.svg'"
-            [alt]="action.type"
-            class="action-icon-img"
-          />
-        </div>
+          <i class="bi" [ngClass]="getActionIcon(action.type)"></i>
+          <span class="action-label">{{ getActionLabel(action.type) }}</span>
+        </button>
       }
     </div>
 
-    <div class="tombstone-plaque">
-      <div class="target-title">{{ item()?.name }}</div>
-      @if (actionSentence()) {
-        <div class="action-banner-text">{{ actionSentence() }}</div>
-      }
+    <div class="target-card">
+      <strong class="item-name">{{ item()?.name }}</strong>
     </div>
   </div>
 </div>

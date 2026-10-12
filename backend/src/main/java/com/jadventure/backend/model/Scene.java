@@ -45,7 +45,4 @@ public class Scene {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graphic_adventure_id")
     private GraphicAdventure graphicAdventure;
-
-
-
 }

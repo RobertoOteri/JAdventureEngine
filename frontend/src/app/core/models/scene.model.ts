@@ -1,3 +1,4 @@
+import { GraphicAdventureDto } from './adventure.model';
 import { Item } from './item.model';
 
 export interface Scene {
@@ -5,4 +6,5 @@ export interface Scene {
   name: string;
   backgroundImageUrl?: string;
   items?: Item[];
+  graphicAdventureDto?: GraphicAdventureDto;
 }

@@ -3,6 +3,8 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { GamePlayService } from '../../../core/services/game-play.service';
+import { GameSaveService } from '../../../core/services/game-save.service';
+import { ActionService } from '../../../core/services/action.service';
 import {
   GameStateDto,
   GameActionDto,
@@ -55,14 +57,19 @@ export const GameplayStore = signalStore(
     currentScene: computed(() => store.gameState()?.currentScene ?? null),
     inventory: computed<InventoryItem[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
-    visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleSceneItemCodes ?? []),
-    worldFlags: computed(() => store.gameState()?.worldFlags ?? {}),
+    visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
+    adventureFlags: computed(() => store.gameState()?.adventureFlags ?? {}),
     currentSceneBackgroundUrl: computed(() => {
       return store.gameState()?.currentScene?.backgroundImageUrl ?? '';
     })
   })),
 
-  withMethods((store, gameService = inject(GamePlayService)) => {
+  withMethods((
+    store,
+    gameService = inject(GamePlayService),
+    saveService = inject(GameSaveService),
+    actionService = inject(ActionService)
+  ) => {
     let feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
     const setFeedbackMessage = (message: string | null, durationMs = 3500): void => {
@@ -110,7 +117,7 @@ export const GameplayStore = signalStore(
     const fetchSaves = rxMethod<string>(
       pipe(
         switchMap((adventureCode) =>
-          gameService.getSavesForAdventure(adventureCode).pipe(
+          saveService.getSavesForAdventure(adventureCode).pipe(
             tap({
               next: (savesList) => patchState(store, { savesList }),
               error: (err) => console.error('Errore recupero lista salvataggi:', err)
@@ -152,7 +159,7 @@ export const GameplayStore = signalStore(
         switchMap((adventureCode) =>
           gameService.startNewGame(adventureCode).pipe(
             switchMap((gameState) =>
-              gameService.getSavesForAdventure(adventureCode).pipe(
+              saveService.getSavesForAdventure(adventureCode).pipe(
                 tap({
                   next: (savesList) => {
                     patchState(store, {
@@ -249,7 +256,12 @@ export const GameplayStore = signalStore(
             return [];
           }
 
-          return gameService.executeAction(saveCode, actionDto).pipe(
+          const payload: GameActionDto = {
+            ...actionDto,
+            saveCode
+          };
+
+          return actionService.executeAction(payload).pipe(
             tap({
               next: (result) => {
                 if (result.state) {
@@ -280,7 +292,7 @@ export const GameplayStore = signalStore(
             return [];
           }
 
-          return gameService.createSave(saveCode, saveName).pipe(
+          return saveService.createSave(saveCode, saveName).pipe(
             tap({
               next: () => {
                 setFeedbackMessage('Partita salvata con successo!');

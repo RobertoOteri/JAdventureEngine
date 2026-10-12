@@ -14,4 +14,7 @@ public interface GraphicAdventureMapper {
     GraphicAdventureDto toDto(GraphicAdventure entity);
 
     List<GraphicAdventureDto> toDtoList(List<GraphicAdventure> entities);
+
+    @Mapping(target = "author", ignore = true)
+    GraphicAdventure toEntity(GraphicAdventureDto dto);
 }

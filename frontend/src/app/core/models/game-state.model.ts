@@ -5,6 +5,6 @@ export interface GameStateDto {
   saveCode: string;
   currentScene: Scene;
   inventory: InventoryItem[];
-  worldFlags: Record<string, string>;
-  visibleSceneItemCodes: string[];
+  adventureFlags: Record<string, string>;
+  visibleItemCodes: string[];
 }

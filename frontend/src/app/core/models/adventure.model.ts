@@ -1,4 +1,5 @@
 export interface GraphicAdventureDto {
+  id?: number;
   code: string;
   title: string;
   description?: string;

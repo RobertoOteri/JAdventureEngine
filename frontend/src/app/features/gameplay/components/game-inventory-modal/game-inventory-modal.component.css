@@ -67,15 +67,11 @@
 }
 
 .backpack-icon {
-  width: 27px;
-  height: 27px;
-  object-fit: contain;
-  pointer-events: none;
-  filter:
-    brightness(0)
-    saturate(100%)
-    invert(85%) sepia(22%) saturate(950%) hue-rotate(352deg) brightness(108%) contrast(100%)
-    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.9));
+  font-size: 1.5rem;
+  color: #ecd48d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-parchment-close {
@@ -186,32 +182,20 @@
     inset 0 3px 8px rgba(0, 0, 0, 0.85);
 }
 
-.pocket-sprite {
-  max-width: 70px;
-  max-height: 55px;
-  object-fit: contain;
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.9));
-  transition: transform 0.12s ease;
-}
-
-.item-pocket:hover .pocket-sprite,
-.item-pocket.active .pocket-sprite {
-  transform: scale(1.08);
-}
-
 .pocket-placeholder {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #452a12;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pocket-item-icon {
+  font-size: 1.4rem;
   color: #ecd29b;
-  font-family: 'Cinzel', serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  border: 1px solid #704a21;
 }
 
 .pocket-label {
@@ -236,6 +220,15 @@
   font-style: italic;
   font-size: 1.1rem;
   color: #553314;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  color: #71461b;
+  margin-bottom: 0.5rem;
 }
 
 .inspector-plate {
@@ -283,6 +276,9 @@
 }
 
 .btn-roll-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background: radial-gradient(circle at 40% 30%, #442a12 0%, #261608 100%);
   border: 1.5px solid #9c6e32;
   color: #faebd7;

@@ -8,10 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/adventures/{adventureCode}/inventory-items")
+@RequestMapping("/api/inventory-items")
 public class InventoryItemController {
 
     private final InventoryItemService inventoryItemService;
@@ -20,14 +18,14 @@ public class InventoryItemController {
         this.inventoryItemService = inventoryItemService;
     }
 
-    @GetMapping("/{itemCode}")
+    @GetMapping("/{adventureCode}/{itemCode}")
     public ResponseEntity<InventoryItemDto> getInventoryItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("itemCode") String itemCode) {
         return ResponseEntity.ok(inventoryItemService.getInventoryItem(adventureCode, itemCode));
     }
 
-    @PutMapping(value = "/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{adventureCode}/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<InventoryItemDto> updateInventoryItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("itemCode") String itemCode,
@@ -36,7 +34,7 @@ public class InventoryItemController {
         return ResponseEntity.ok(inventoryItemService.updateInventoryItem(adventureCode, itemCode, dto, image));
     }
 
-    @DeleteMapping("/{itemCode}")
+    @DeleteMapping("/{adventureCode}/{itemCode}")
     public ResponseEntity<Void> deleteInventoryItem(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("itemCode") String itemCode) {

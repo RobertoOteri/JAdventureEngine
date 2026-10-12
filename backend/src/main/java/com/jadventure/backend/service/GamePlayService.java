@@ -1,224 +1,101 @@
 package com.jadventure.backend.service;
 
-import com.jadventure.backend.dto.game.GameActionDto;
-import com.jadventure.backend.dto.game.GameActionResultDto;
-import com.jadventure.backend.dto.game.GameSaveDto;
+import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.dto.inventory.InventoryItemDto;
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
-import com.jadventure.backend.mapper.GameSaveMapper;
-import com.jadventure.backend.mapper.InventoryItemMapper;
-import com.jadventure.backend.mapper.SceneMapper;
-import com.jadventure.backend.model.*;
-import com.jadventure.backend.repository.*;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.jadventure.backend.model.GameSave;
+import com.jadventure.backend.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class GamePlayService {
 
-    private final GameSaveRepository gameSaveRepository;
-    private final GraphicAdventureRepository adventureRepository;
-    private final UserRepository userRepository;
-    private final SceneRepository sceneRepository;
-    private final ActionRepository actionRepository;
-    private final InventoryItemRepository inventoryItemRepository;
+    private final GraphicAdventureService graphicAdventureService;
+    private final GameSaveService gameSaveService;
+    private final AuthService authService;
+    private final SceneService sceneService;
+    private final InventoryItemService inventoryItemService;
 
-    private final PreconditionService preconditionService;
-    private final GameEffectService gameEffectService;
-
-    private final GameSaveMapper gameSaveMapper;
-    private final SceneMapper sceneMapper;
-    private final InventoryItemMapper inventoryItemMapper;
-
-    public GamePlayService(GameSaveRepository gameSaveRepository,
-                           GraphicAdventureRepository adventureRepository,
-                           UserRepository userRepository,
-                           SceneRepository sceneRepository,
-                           ActionRepository actionRepository,
-                           InventoryItemRepository inventoryItemRepository,
-                           PreconditionService preconditionService,
-                           GameEffectService gameEffectService,
-                           GameSaveMapper gameSaveMapper,
-                           SceneMapper sceneMapper,
-                           InventoryItemMapper inventoryItemMapper) {
-        this.gameSaveRepository = gameSaveRepository;
-        this.adventureRepository = adventureRepository;
-        this.userRepository = userRepository;
-        this.sceneRepository = sceneRepository;
-        this.actionRepository = actionRepository;
-        this.inventoryItemRepository = inventoryItemRepository;
-        this.preconditionService = preconditionService;
-        this.gameEffectService = gameEffectService;
-        this.gameSaveMapper = gameSaveMapper;
-        this.sceneMapper = sceneMapper;
-        this.inventoryItemMapper = inventoryItemMapper;
+    public GamePlayService(GraphicAdventureService graphicAdventureService,
+                           GameSaveService gameSaveService,
+                           AuthService authService,
+                           SceneService sceneService,
+                           InventoryItemService inventoryItemService) {
+        this.graphicAdventureService = graphicAdventureService;
+        this.gameSaveService = gameSaveService;
+        this.authService = authService;
+        this.sceneService = sceneService;
+        this.inventoryItemService = inventoryItemService;
     }
 
     @Transactional
     public GameStateDto startNewGame(String adventureCode) {
-        User user = getValidatedAuthenticatedUser();
-        GraphicAdventure adventure = findAdventure(adventureCode);
+        User user = authService.getCurrentUser();
+        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
 
-        gameSaveRepository.deleteAllByUserUsernameAndGraphicAdventureCode(user.getUsername(), adventureCode);
+        gameSaveService.deleteSavesForAdventure(user.getUsername(), adventureCode);
 
-        String startingSceneCode = adventure.getInitialSceneCode();
-        Scene startingScene = sceneRepository.findByGraphicAdventureCodeAndCode(adventureCode, startingSceneCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena iniziale non trovata: " + startingSceneCode));
+        String startingSceneCode = adventureDto.getInitialSceneCode();
+        if (startingSceneCode == null || startingSceneCode.isBlank()) {
+            throw new ResourceNotFoundException("L'avventura non ha una scena iniziale configurata");
+        }
 
-        Set<String> initialVisibleItems = startingScene.getItems().stream()
-                .filter(Item::isInitiallyVisible)
-                .map(Item::getCode)
+        SceneDto startingSceneDto = sceneService.getSceneByCode(adventureCode, startingSceneCode);
+
+        Set<String> initialVisibleItems = startingSceneDto.getItems() == null
+                ? Collections.emptySet()
+                : startingSceneDto.getItems().stream()
+                .filter(ItemDto::isInitiallyVisible)
+                .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 
-        GameSave sessionSave = GameSave.builder()
-                .name("Sessione iniziale - " + adventure.getTitle())
-                .user(user)
-                .graphicAdventure(adventure)
-                .currentSceneCode(startingScene.getCode())
-                .visibleSceneItems(initialVisibleItems)
-                .build();
+        GameSave initialSave = gameSaveService.createInitialSave(
+                user,
+                adventureDto,
+                startingSceneDto.getCode(),
+                initialVisibleItems
+        );
 
-        GameSave saved = gameSaveRepository.save(sessionSave);
-        return buildGameState(saved);
+        return buildGameState(initialSave);
     }
 
     @Transactional(readOnly = true)
     public GameStateDto continueGame(String adventureCode) {
-        User user = getValidatedAuthenticatedUser();
-
-        GameSave lastSave = gameSaveRepository
-                .findFirstByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(user.getUsername(), adventureCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Nessun salvataggio trovato per riprendere la partita"));
-
+        User user = authService.getCurrentUser();
+        GameSave lastSave = gameSaveService.findLatestSave(user.getUsername(), adventureCode);
         return buildGameState(lastSave);
     }
 
     @Transactional(readOnly = true)
     public GameStateDto loadGame(String saveCode) {
-        GameSave save = findSaveByUser(saveCode);
+        GameSave save = gameSaveService.findSaveByUser(saveCode);
         return buildGameState(save);
     }
 
     @Transactional(readOnly = true)
-    public List<GameSaveDto> getSavesForAdventure(String adventureCode) {
-        User user = getValidatedAuthenticatedUser();
-        List<GameSave> saves = gameSaveRepository
-                .findAllByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(user.getUsername(), adventureCode);
-        return gameSaveMapper.toDtoList(saves);
-    }
+    public GameStateDto buildGameState(GameSave save) {
+        SceneDto sceneDto = sceneService.getSceneByCode(
+                save.getGraphicAdventure().getCode(),
+                save.getCurrentSceneCode()
+        );
 
-
-    @Transactional
-    public GameActionResultDto executeAction(String saveCode, GameActionDto actionDto) {
-        GameSave save = findSaveByUser(saveCode);
-
-        Action action = actionRepository.findByItemCodeAndType(actionDto.getItemCode(), actionDto.getActionType())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Azione '" + actionDto.getActionType() + "' non trovata per l'item: " + actionDto.getItemCode()
-                ));
-
-        Optional<String> failureMessage = preconditionService.validatePreconditions(save, action);
-
-        if(failureMessage.isPresent()) {
-            return GameActionResultDto.builder()
-                    .success(false)
-                    .feedbackMessage(failureMessage.get())
-                    .state(buildGameState(save))
-                    .build();
-        }
-
-        gameEffectService.applyAll(save, action.getEffects());
-        gameSaveRepository.save(save);
-
-        String successMessage = action.getSuccessMessage() != null
-                ? action.getSuccessMessage()
-                : "Azione eseguita con successo.";
-
-        return GameActionResultDto.builder()
-                .success(true)
-                .feedbackMessage(successMessage)
-                .state(buildGameState(save))
-                .build();
-
-    }
-
-    @Transactional
-    public GameSaveDto createSave(String activeSaveCode, String saveName) {
-        GameSave sourceSave = findSaveByUser(activeSaveCode);
-
-        String finalName = (saveName != null && !saveName.isBlank())
-                ? saveName
-                : "Salvataggio " + sourceSave.getGraphicAdventure().getTitle();
-
-        GameSave newSave = GameSave.builder()
-                .name(finalName)
-                .user(sourceSave.getUser())
-                .graphicAdventure(sourceSave.getGraphicAdventure())
-                .currentSceneCode(sourceSave.getCurrentSceneCode())
-                .inventory(new HashSet<>(sourceSave.getInventory()))
-                .worldFlags(new HashMap<>(sourceSave.getWorldFlags()))
-                .visibleSceneItems(new HashSet<>(sourceSave.getVisibleSceneItems()))
-                .build();
-
-        GameSave persisted = gameSaveRepository.save(newSave);
-        return gameSaveMapper.toDto(persisted);
-    }
-
-    private GameStateDto buildGameState(GameSave save) {
-        Scene currentScene = sceneRepository.findByGraphicAdventureCodeAndCode(
-                        save.getGraphicAdventure().getCode(), save.getCurrentSceneCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata: " + save.getCurrentSceneCode()));
-
-        SceneDto sceneDto = sceneMapper.toDto(currentScene);
-
-        List<InventoryItemDto> inventoryDtos = save.getInventory().isEmpty()
-                ? List.of()
-                : inventoryItemRepository.findAllByCodeIn(save.getInventory())
-                .stream()
-                .map(inventoryItemMapper::toDto)
-                .collect(Collectors.toList());
+        List<InventoryItemDto> inventoryDtos = inventoryItemService.getInventoryItemsByCodes(save.getInventory());
 
         return GameStateDto.builder()
                 .saveCode(save.getCode())
                 .currentScene(sceneDto)
                 .inventory(inventoryDtos)
-                .worldFlags(save.getWorldFlags())
-                .visibleSceneItemCodes(save.getVisibleSceneItems())
+                .adventureFlags(save.getAdventureFlags())
+                .visibleItemCodes(save.getVisibleItems())
                 .build();
-    }
-
-    private GameSave findSaveByUser(String saveCode) {
-        User user = getValidatedAuthenticatedUser();
-        return gameSaveRepository.findByCodeAndUserUsername(saveCode, user.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Salvataggio non trovato: " + saveCode));
-    }
-
-    private GraphicAdventure findAdventure(String code) {
-        return adventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
-    }
-
-    private User getValidatedAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null
-                || !authentication.isAuthenticated()
-                || authentication instanceof AnonymousAuthenticationToken) {
-            throw new AccessDeniedException("Operazione non consentita: utente non autenticato");
-        }
-
-        String username = authentication.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Utente autenticato non trovato: " + username));
     }
 }

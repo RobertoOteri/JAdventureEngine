@@ -13,7 +13,6 @@ import java.util.List;
 public class GameEffectService {
 
     public void applyAll(GameSave save, List<GameEffect> effects) {
-
         if (effects == null || effects.isEmpty()) {
             return;
         }
@@ -26,9 +25,11 @@ public class GameEffectService {
         EffectType type = effect.getType();
         String val = effect.getTargetValue();
 
-        if(val == null || val.isBlank()) {
+        if (val == null || val.isBlank()) {
             return;
         }
+
+        val = val.trim();
 
         if (type == EffectType.CHANGE_SCENE) {
             save.setCurrentSceneCode(val);
@@ -38,14 +39,16 @@ public class GameEffectService {
         } else if (type == EffectType.REMOVE_ITEM) {
             if (save.getInventory() != null) save.getInventory().remove(val);
         } else if (type == EffectType.SET_FLAG) {
-            if (save.getWorldFlags() == null) save.setWorldFlags(new HashMap<>());
+            if (save.getAdventureFlags() == null) save.setAdventureFlags(new HashMap<>());
             String[] parts = val.split("=", 2);
-            save.getWorldFlags().put(parts[0], parts.length > 1 ? parts[1] : "true");
+            String flagKey = parts[0].trim();
+            String flagValue = parts.length > 1 ? parts[1].trim() : "true";
+            save.getAdventureFlags().put(flagKey, flagValue);
         } else if (type == EffectType.SHOW_SCENE_ITEM) {
-            if (save.getVisibleSceneItems() == null) save.setVisibleSceneItems(new HashSet<>());
-            save.getVisibleSceneItems().add(val);
+            if (save.getVisibleItems() == null) save.setVisibleItems(new HashSet<>());
+            save.getVisibleItems().add(val);
         } else if (type == EffectType.HIDE_SCENE_ITEM) {
-            if (save.getVisibleSceneItems() != null) save.getVisibleSceneItems().remove(val);
+            if (save.getVisibleItems() != null) save.getVisibleItems().remove(val);
         }
     }
 }

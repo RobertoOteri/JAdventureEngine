@@ -66,8 +66,15 @@ export const EditorStore = signalStore(
         ? items.map((i, idx) => (idx === index ? updatedItem : i))
         : [...items, updatedItem];
 
+      const updatedCurrentScene = { ...scene, items: updatedItems };
+
+      const updatedScenes = store.scenes().map((s) =>
+        s.code === updatedCurrentScene.code ? updatedCurrentScene : s
+      );
+
       patchState(store, {
-        currentScene: { ...scene, items: updatedItems },
+        scenes: updatedScenes,
+        currentScene: updatedCurrentScene,
         selectedItem: updatedItem
       });
     };
@@ -229,8 +236,15 @@ export const EditorStore = signalStore(
               const current = store.currentScene();
               if (current) {
                 const remaining = (current.items || []).filter((i) => i.code !== itemCode);
+                const updatedCurrentScene = { ...current, items: remaining };
+
+                const updatedScenes = store.scenes().map((s) =>
+                  s.code === updatedCurrentScene.code ? updatedCurrentScene : s
+                );
+
                 patchState(store, {
-                  currentScene: { ...current, items: remaining },
+                  scenes: updatedScenes,
+                  currentScene: updatedCurrentScene,
                   selectedItem: store.selectedItem()?.code === itemCode ? null : store.selectedItem(),
                   isSaving: false
                 });
@@ -256,9 +270,16 @@ export const EditorStore = signalStore(
                 const updatedItems = (current.items || []).map((it) =>
                   it.code === itemCode ? { ...it, linkedInventoryItem: updatedInv } : it
                 );
+                const updatedCurrentScene = { ...current, items: updatedItems };
+
+                const updatedScenes = store.scenes().map((s) =>
+                  s.code === updatedCurrentScene.code ? updatedCurrentScene : s
+                );
+
                 const selected = store.selectedItem();
                 patchState(store, {
-                  currentScene: { ...current, items: updatedItems },
+                  scenes: updatedScenes,
+                  currentScene: updatedCurrentScene,
                   selectedItem: selected?.code === itemCode ? { ...selected, linkedInventoryItem: updatedInv } : selected,
                   isSaving: false,
                   feedbackMessage: `Oggetto inventario aggiornato!`
@@ -288,9 +309,16 @@ export const EditorStore = signalStore(
                 const updatedItems = (current.items || []).map((it) =>
                   it.code === itemCode ? { ...it, linkedInventoryItem: undefined } : it
                 );
+                const updatedCurrentScene = { ...current, items: updatedItems };
+
+                const updatedScenes = store.scenes().map((s) =>
+                  s.code === updatedCurrentScene.code ? updatedCurrentScene : s
+                );
+
                 const selected = store.selectedItem();
                 patchState(store, {
-                  currentScene: { ...current, items: updatedItems },
+                  scenes: updatedScenes,
+                  currentScene: updatedCurrentScene,
                   selectedItem: selected?.code === itemCode ? { ...selected, linkedInventoryItem: undefined } : selected,
                   isSaving: false,
                   feedbackMessage: `Oggetto rimosso dall'inventario.`
@@ -327,10 +355,8 @@ export const EditorStore = signalStore(
 
       deleteAction(itemCode: string, actionCode: string): Observable<void> {
         patchState(store, { isSaving: true });
-        const advCode = store.adventure()?.code || '';
-        const scnCode = store.currentScene()?.code || '';
 
-        return actionService.deleteAction(advCode, scnCode, itemCode, actionCode).pipe(
+        return actionService.deleteAction(actionCode).pipe(
           tap({
             next: () => {
               const current = store.selectedItem();

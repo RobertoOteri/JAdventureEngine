@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Action } from '../models';
+import { Action, GameActionDto, GameActionResultDto } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,21 +9,21 @@ import { environment } from '../../../environments/environment';
 })
 export class ActionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/adventures`;
-
-  getActions(adventureCode: string, sceneCode: string, itemCode: string): Observable<Action[]> {
-    return this.http.get<Action[]>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}/actions`);
-  }
-
-  getAction(adventureCode: string, sceneCode: string, itemCode: string, actionCode: string): Observable<Action> {
-    return this.http.get<Action>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}/actions/${actionCode}`);
-  }
+  private readonly apiUrl = `${environment.apiUrl}/actions`;
 
   addAction(adventureCode: string, sceneCode: string, itemCode: string, action: Action): Observable<Action> {
-    return this.http.post<Action>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}/actions`, action);
+    return this.http.post<Action>(`${this.apiUrl}/${adventureCode}/${sceneCode}/${itemCode}`, action);
   }
 
-  deleteAction(adventureCode: string, sceneCode: string, itemCode: string, actionCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}/actions/${actionCode}`);
+  deleteAction(actionCode: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${actionCode}`);
+  }
+
+  executeAction(actionDto: GameActionDto): Observable<GameActionResultDto> {
+    return this.http.post<GameActionResultDto>(`${this.apiUrl}/execute`, actionDto);
+  }
+
+  getActionsByItem(itemCode: string): Observable<Action[]> {
+    return this.http.get<Action[]>(`${this.apiUrl}/item/${itemCode}`);
   }
 }

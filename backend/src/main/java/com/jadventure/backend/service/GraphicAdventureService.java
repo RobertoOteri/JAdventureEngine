@@ -6,9 +6,6 @@ import com.jadventure.backend.mapper.GraphicAdventureMapper;
 import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
-import com.jadventure.backend.repository.UserRepository;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,16 +19,17 @@ public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
     private final GraphicAdventureMapper graphicAdventureMapper;
-    private final UserRepository userRepository;
+
+    private final AuthService authService;
     private final FileStorageService fileStorageService;
 
     public GraphicAdventureService(GraphicAdventureRepository graphicAdventureRepository,
                                    GraphicAdventureMapper graphicAdventureMapper,
-                                   UserRepository userRepository,
+                                   AuthService authService,
                                    FileStorageService fileStorageService) {
         this.graphicAdventureRepository = graphicAdventureRepository;
         this.graphicAdventureMapper = graphicAdventureMapper;
-        this.userRepository = userRepository;
+        this.authService = authService;
         this.fileStorageService = fileStorageService;
     }
 
@@ -42,7 +40,7 @@ public class GraphicAdventureService {
 
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getMyAdventures() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = authService.getCurrentUsername();
         return graphicAdventureMapper.toDtoList(
                 graphicAdventureRepository.findAllByAuthorUsernameOrderByCreatedAtDesc(username)
         );
@@ -50,9 +48,12 @@ public class GraphicAdventureService {
 
     @Transactional(readOnly = true)
     public GraphicAdventureDto getAdventureByCode(String code) {
-        GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
-        return graphicAdventureMapper.toDto(adventure);
+        return graphicAdventureMapper.toDto(findAdventureByCode(code));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByCode(String code) {
+        return graphicAdventureRepository.existsByCode(code);
     }
 
     @Transactional
@@ -60,9 +61,7 @@ public class GraphicAdventureService {
         String title = dto.getTitle();
         String code = generateUniqueCode(title);
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User author = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato: " + currentUsername));
+        User author = authService.getCurrentUser();
 
         String coverUrl = null;
         if (coverImage != null && !coverImage.isEmpty()) {
@@ -82,20 +81,9 @@ public class GraphicAdventureService {
     }
 
     @Transactional
-    public void deleteAdventure(String code) {
-        GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
-
-        validateOwnership(adventure);
-        graphicAdventureRepository.delete(adventure);
-    }
-
-    @Transactional
     public GraphicAdventureDto updateAdventure(String code, GraphicAdventureDto dto, MultipartFile coverImage) {
-        GraphicAdventure adventure = graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
-
-        validateOwnership(adventure);
+        GraphicAdventure adventure = findAdventureByCode(code);
+        authService.validateOwnership(adventure.getAuthor().getUsername());
 
         adventure.setTitle(dto.getTitle());
         adventure.setDescription(dto.getDescription());
@@ -107,11 +95,17 @@ public class GraphicAdventureService {
         return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
     }
 
-    private void validateOwnership(GraphicAdventure adventure) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!adventure.getAuthor().getUsername().equals(currentUsername)) {
-            throw new AccessDeniedException("Accesso negato");
-        }
+    @Transactional
+    public void deleteAdventure(String code) {
+        GraphicAdventure adventure = findAdventureByCode(code);
+        authService.validateOwnership(adventure.getAuthor().getUsername());
+
+        graphicAdventureRepository.delete(adventure);
+    }
+
+    private GraphicAdventure findAdventureByCode(String code) {
+        return graphicAdventureRepository.findByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
     }
 
     private String generateUniqueCode(String input) {
@@ -127,6 +121,13 @@ public class GraphicAdventureService {
             counter++;
         }
         return code;
+    }
+
+    @Transactional
+    public void updateInitialSceneCode(String adventureCode, String sceneCode) {
+        GraphicAdventure adventure = findAdventureByCode(adventureCode);
+        adventure.setInitialSceneCode(sceneCode);
+        graphicAdventureRepository.save(adventure);
     }
 
     private String generateCode(String input) {

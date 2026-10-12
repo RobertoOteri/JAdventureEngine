@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/adventures/{adventureCode}/scenes")
+@RequestMapping("/api/scenes")
 public class SceneController {
 
     private final SceneService sceneService;
@@ -21,34 +21,31 @@ public class SceneController {
         this.sceneService = sceneService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<SceneDto>> getAllScenes(
-            @PathVariable("adventureCode") String adventureCode) {
+    @GetMapping("/adventure/{adventureCode}")
+    public ResponseEntity<List<SceneDto>> getScenesByAdventure(@PathVariable("adventureCode") String adventureCode) {
         return ResponseEntity.ok(sceneService.getScenesByAdventure(adventureCode));
     }
 
-    @GetMapping("/{sceneCode}")
+    @PostMapping(value = "/adventure/{adventureCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<SceneDto> createScene(
+            @PathVariable("adventureCode") String adventureCode,
+            @Valid @RequestPart("data") SceneDto dto,
+            @RequestPart("backgroundImage") MultipartFile backgroundImage) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(sceneService.createScene(adventureCode, dto, backgroundImage));
+    }
+
+    @GetMapping("/{adventureCode}/{sceneCode}")
     public ResponseEntity<SceneDto> getScene(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode) {
         return ResponseEntity.ok(sceneService.getSceneByCode(adventureCode, sceneCode));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SceneDto> createScene(
-            @PathVariable("adventureCode") String adventureCode,
-            @Valid @RequestPart("data") SceneDto dto,
-            @RequestPart("backgroundImage") MultipartFile backgroundImage) {
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(sceneService.createScene(adventureCode, dto, backgroundImage));
-    }
-
-    @DeleteMapping("/{sceneCode}")
+    @DeleteMapping("/{adventureCode}/{sceneCode}")
     public ResponseEntity<Void> deleteScene(
             @PathVariable("adventureCode") String adventureCode,
             @PathVariable("sceneCode") String sceneCode) {
-
         sceneService.deleteScene(adventureCode, sceneCode);
         return ResponseEntity.noContent().build();
     }

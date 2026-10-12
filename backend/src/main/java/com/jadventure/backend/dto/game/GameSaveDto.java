@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameSaveDto {
+    private Long id;
     private String code;
     private String name;
     private String currentSceneCode;

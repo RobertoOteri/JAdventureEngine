@@ -10,11 +10,15 @@ import java.util.Optional;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Optional<Item> findBySceneCodeAndCode(String sceneCode, String code);
 
     List<Item> findAllBySceneCode(String sceneCode);
 
     boolean existsBySceneCodeAndCode(String sceneCode, String code);
 
-    Optional<Item> findByLinkedInventoryItemId(Long inventoryItemId);
+
+    Optional<Item> findBySceneGraphicAdventureCodeAndSceneCodeAndCode(
+            String adventureCode,
+            String sceneCode,
+            String itemCode
+    );
 }

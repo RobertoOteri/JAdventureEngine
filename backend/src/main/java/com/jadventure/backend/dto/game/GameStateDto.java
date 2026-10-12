@@ -17,6 +17,6 @@ public class GameStateDto {
     private String saveCode;
     private SceneDto currentScene;
     private List<InventoryItemDto> inventory;
-    private Map<String, String> worldFlags;
-    private Set<String> visibleSceneItemCodes;
+    private Map<String, String> adventureFlags;
+    private Set<String> visibleItemCodes;
 }

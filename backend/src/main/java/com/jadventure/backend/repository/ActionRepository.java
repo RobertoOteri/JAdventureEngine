@@ -11,11 +11,13 @@ import java.util.Optional;
 @Repository
 public interface ActionRepository extends JpaRepository<Action, Long> {
 
-    Optional<Action> findByCode(String code);
-
-    boolean existsByCode(String code);
+    boolean existsByItemCodeAndType(String itemCode, ActionType type);
 
     List<Action> findAllByItemCode(String itemCode);
+
+    Optional<Action> findByCode(String code);
+
+    boolean existsByItemCodeAndCode(String itemCode, String code);
 
     Optional<Action> findByItemCodeAndType(String itemCode, ActionType type);
 }

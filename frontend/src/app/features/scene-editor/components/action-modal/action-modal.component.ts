@@ -58,10 +58,19 @@ export class ActionModalComponent {
 
   readonly availableItemOptions = computed(() => {
     const scenes = this.store.scenes();
+    const currentScene = this.store.currentScene();
     const itemMap = new Map<string, string>();
 
     for (const scene of scenes) {
       for (const it of scene.items || []) {
+        if (!itemMap.has(it.code)) {
+          itemMap.set(it.code, it.name);
+        }
+      }
+    }
+
+    if (currentScene?.items) {
+      for (const it of currentScene.items) {
         if (!itemMap.has(it.code)) {
           itemMap.set(it.code, it.name);
         }
