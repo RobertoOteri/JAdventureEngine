@@ -1,11 +1,11 @@
 import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { GameSaveDto } from '../../../core/models';
 
 @Component({
   selector: 'app-game-saves-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DatePipe],
   templateUrl: './game-saves-modal.component.html',
   styleUrl: './game-saves-modal.component.css'
 })

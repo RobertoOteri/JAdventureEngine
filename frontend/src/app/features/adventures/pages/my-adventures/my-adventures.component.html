@@ -32,7 +32,7 @@
       </div>
     } @else {
       <div class="catalog-grid">
-        @for (adv of adventures(); track adv.code) {
+        @for (adv of adventures(); track adv.id ?? adv.code) {
           <app-adventure-card
             [adventure]="adv"
             [isAuthor]="true"
@@ -58,7 +58,7 @@
     <app-adventure-detail-modal
       [adventure]="selectedAdventure()!"
       (close)="selectedAdventure.set(null)"
-      (play)="playAdventure($event)"
+      (play)="playAdventure(selectedAdventure()!)"
     />
   }
 </div>

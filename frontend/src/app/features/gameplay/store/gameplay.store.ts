@@ -10,7 +10,8 @@ import {
   GameActionDto,
   GameSaveDto,
   Item,
-  InventoryItem
+  InventoryItem,
+  ActionType, GameActionResultDto
 } from '../../../core/models';
 
 export interface RadialMenuState {
@@ -247,32 +248,39 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const executeAction = rxMethod<GameActionDto>(
+    const executeAction = rxMethod<{ actionCode: string; actionType: ActionType }>(
       pipe(
-        switchMap((actionDto) => {
+        switchMap(({ actionCode, actionType }) => {
           const saveCode = store.currentSaveCode();
           if (!saveCode) {
             console.error('Nessun saveCode attivo presente nello store');
+            setFeedbackMessage('Errore: sessione di gioco non valida.');
+            closeRadialMenu();
             return [];
           }
 
           const payload: GameActionDto = {
-            ...actionDto,
-            saveCode
+            saveCode,
+            actionCode,
+            actionType
           };
 
           return actionService.executeAction(payload).pipe(
             tap({
-              next: (result) => {
+              next: (result: GameActionResultDto) => {
                 if (result.state) {
                   patchState(store, { gameState: result.state });
                 }
-                setFeedbackMessage(result.feedbackMessage);
+                setFeedbackMessage(result.feedbackMessage || (result.success ? 'Azione eseguita.' : 'Non succede nulla.'));
                 closeRadialMenu();
               },
-              error: (err) => {
-                console.error('Errore esecuzione azione:', err);
-                const msg = err?.error?.message || err?.error?.feedbackMessage || 'Non succede nulla.';
+              error: (err: any) => {
+                console.error('Errore durante l\'esecuzione dell\'azione:', err);
+                const msg =
+                  err?.error?.feedbackMessage ||
+                  err?.error?.message ||
+                  err?.message ||
+                  'Non puoi fare questa azione qui.';
                 setFeedbackMessage(msg);
                 closeRadialMenu();
               }

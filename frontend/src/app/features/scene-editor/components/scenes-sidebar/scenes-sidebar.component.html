@@ -10,11 +10,11 @@
   </div>
 
   <nav class="scenes-list custom-scroll">
-    @for (scene of store.scenes(); track scene.code) {
+    @for (scene of store.scenes(); track scene.id ?? scene.code) {
       <div
         class="scene-item"
-        [class.active]="scene.code === store.currentScene()?.code"
-        (click)="switchScene(scene.code)"
+        [class.active]="scene.id === store.currentScene()?.id || scene.code === store.currentScene()?.code"
+        (click)="switchScene(scene)"
       >
         <div class="scene-dot"></div>
         <div class="scene-info">
@@ -24,7 +24,7 @@
         <button
           type="button"
           class="btn-delete-scene"
-          (click)="deleteScene($event, scene.code)"
+          (click)="deleteScene($event, scene)"
           title="Elimina stanza"
         >
           <i class="bi bi-trash3"></i>

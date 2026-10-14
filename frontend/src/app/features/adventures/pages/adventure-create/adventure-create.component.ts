@@ -89,7 +89,7 @@ export class AdventureCreateComponent {
       next: (createdAdventure: GraphicAdventureDto) => {
         this.isSubmitting.set(false);
         const sceneTarget = createdAdventure.initialSceneCode || 'new';
-        this.router.navigate(['/editor', createdAdventure.code, sceneTarget]);
+        this.router.navigate(['/editor', createdAdventure.id, sceneTarget]);
       },
       error: (err: any) => {
         this.isSubmitting.set(false);

@@ -200,7 +200,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Pannello a Tendina Dettagli Inventario */
+/* Pannello Dettagli Inventario */
 .inventory-accordion-panel {
   background: #12151e;
   border: 1px solid rgba(16, 185, 129, 0.25);
@@ -634,12 +634,15 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 0.5rem 0.65rem;
   border-radius: 6px;
+  gap: 0.5rem;
 }
 
 .action-card-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .action-badge {
@@ -649,22 +652,45 @@
   background: rgba(255, 255, 255, 0.1);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
-.action-card-code {
+.action-card-desc {
   font-size: 0.72rem;
-  color: #71717a;
+  color: #a1a1aa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.btn-remove-action {
+.action-item-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.btn-action-icon {
   background: transparent;
   border: none;
   color: #71717a;
   cursor: pointer;
-  transition: color 0.15s ease;
+  padding: 3px 5px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
 }
 
-.btn-remove-action:hover {
+.btn-action-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.btn-action-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
 }
 

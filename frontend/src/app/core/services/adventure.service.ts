@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GraphicAdventureDto } from '../models';
+import { GraphicAdventureDto, Scene } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -19,6 +19,10 @@ export class AdventureService {
     return this.http.get<GraphicAdventureDto[]>(`${this.apiUrl}/my`);
   }
 
+  getAdventureById(adventureId: number): Observable<GraphicAdventureDto> {
+    return this.http.get<GraphicAdventureDto>(`${this.apiUrl}/${adventureId}`);
+  }
+
   getAdventureByCode(code: string): Observable<GraphicAdventureDto> {
     return this.http.get<GraphicAdventureDto>(`${this.apiUrl}/${code}`);
   }
@@ -27,11 +31,15 @@ export class AdventureService {
     return this.http.post<GraphicAdventureDto>(this.apiUrl, formData);
   }
 
-  deleteAdventure(code: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${code}`);
+  updateAdventure(adventureId: number, formData: FormData): Observable<GraphicAdventureDto> {
+    return this.http.put<GraphicAdventureDto>(`${this.apiUrl}/${adventureId}`, formData);
   }
 
-  updateAdventure(code: string, formData: FormData): Observable<GraphicAdventureDto> {
-    return this.http.put<GraphicAdventureDto>(`${this.apiUrl}/${code}`, formData);
+  deleteAdventure(adventureId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${adventureId}`);
+  }
+
+  addScene(adventureId: number, formData: FormData): Observable<Scene> {
+    return this.http.post<Scene>(`${this.apiUrl}/${adventureId}/scenes`, formData);
   }
 }

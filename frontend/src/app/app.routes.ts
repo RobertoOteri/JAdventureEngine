@@ -34,7 +34,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'adventures/:adventureCode/scenes/new',
+    path: 'adventures/:adventureId/scenes/new',
     canActivate: [authGuard],
     loadComponent: () =>
       import(
@@ -52,7 +52,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'editor/:adventureCode',
+    path: 'editor/:adventureId',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/scene-editor/scene-editor.component').then(
@@ -61,7 +61,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'editor/:adventureCode/:sceneCode',
+    path: 'editor/:adventureId/:sceneCode',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/scene-editor/scene-editor.component').then(

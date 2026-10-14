@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SceneService } from '../../../../core/services/scene.service';
+import { AdventureService } from '../../../../core/services/adventure.service';
 import { Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
 
@@ -16,9 +17,11 @@ import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-
 export class SceneCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly sceneService = inject(SceneService);
+  private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
+  readonly adventureId = signal<number | null>(null);
   readonly adventureCode = signal<string>('');
   readonly isInitialScene = signal<boolean>(false);
 
@@ -33,26 +36,36 @@ export class SceneCreateComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    const code = this.route.snapshot.paramMap.get('adventureCode') || '';
-    this.adventureCode.set(code);
+    const idParam = this.route.snapshot.paramMap.get('adventureId');
+    const advId = idParam ? Number(idParam) : null;
+    this.adventureId.set(advId);
 
     const isInitialParam = this.route.snapshot.queryParamMap.get('isInitial');
 
-    if (isInitialParam !== null) {
-      this.applyInitialState(isInitialParam === 'true');
-    } else if (code) {
-      this.sceneService.getAllScenes(code).subscribe({
-        next: (scenes) => {
-          const isFirstScene = scenes.length === 0;
-          this.applyInitialState(isFirstScene);
+    if (advId) {
+      this.adventureService.getAdventureById(advId).subscribe({
+        next: (adv) => {
+          this.adventureCode.set(adv.code);
+
+          if (isInitialParam !== null) {
+            this.applyInitialState(isInitialParam === 'true');
+          } else {
+            this.sceneService.getAllScenes(adv.code).subscribe({
+              next: (scenes) => {
+                const isFirstScene = scenes.length === 0;
+                this.applyInitialState(isFirstScene);
+              },
+              error: () => this.applyInitialState(false)
+            });
+          }
         },
-        error: () => {
-          this.applyInitialState(false);
+        error: (err) => {
+          console.error('Errore nel caricamento dei dati avventura:', err);
+          this.errorMessage.set('Impossibile caricare i dati dell\'avventura.');
         }
       });
     }
 
-    // Generazione automatica reattiva del codice/slug dal nome
     this.form.get('name')?.valueChanges.subscribe((nameVal) => {
       if (this.isInitialScene() || !nameVal) {
         return;
@@ -90,6 +103,8 @@ export class SceneCreateComponent implements OnInit {
 
   onSubmit(): void {
     const file = this.selectedFile();
+    const advId = this.adventureId();
+
     if (this.form.invalid || !file) {
       this.form.markAllAsTouched();
       if (!file) {
@@ -98,11 +113,17 @@ export class SceneCreateComponent implements OnInit {
       return;
     }
 
+    if (!advId) {
+      this.errorMessage.set("Identificativo dell'avventura non disponibile. Riprova.");
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
     const formData = new FormData();
-    const payload = {
+
+    const scenePayload = {
       name: this.form.value.name?.trim(),
       code: this.form.value.code?.trim(),
       setAsInitial: this.form.value.setAsInitial
@@ -110,14 +131,15 @@ export class SceneCreateComponent implements OnInit {
 
     formData.append(
       'data',
-      new Blob([JSON.stringify(payload)], { type: 'application/json' })
+      new Blob([JSON.stringify(scenePayload)], { type: 'application/json' })
     );
+
     formData.append('backgroundImage', file);
 
-    this.sceneService.createScene(this.adventureCode(), formData).subscribe({
+    this.adventureService.addScene(advId, formData).subscribe({
       next: (createdScene: Scene) => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/editor', this.adventureCode(), createdScene.code]);
+        void this.router.navigate(['/editor', advId, createdScene.code]);
       },
       error: (err: any) => {
         this.isSubmitting.set(false);
@@ -129,6 +151,11 @@ export class SceneCreateComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/editor', this.adventureCode()]);
+    const advId = this.adventureId();
+    if (advId) {
+      void this.router.navigate(['/editor', advId]);
+    } else {
+      void this.router.navigate(['/adventures/my']);
+    }
   }
 }

@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -27,8 +26,7 @@ public class Action {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @Builder.Default
-    private String code = UUID.randomUUID().toString();
+    private String code;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,11 +46,4 @@ public class Action {
     @OneToMany(mappedBy = "action", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<GameEffect> effects = new ArrayList<>();
-
-    @PrePersist
-    protected void ensureCode() {
-        if (this.code == null || this.code.isBlank()) {
-            this.code = UUID.randomUUID().toString();
-        }
-    }
 }

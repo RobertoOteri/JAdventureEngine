@@ -76,7 +76,6 @@ export class SceneCanvasComponent {
 
   constructor() {
     effect(() => {
-      // Quando cambia l'URL di sfondo o la scena, reimposta il loader
       if (this.store.backgroundUrl()) {
         this.isSceneImageLoading.set(true);
       }

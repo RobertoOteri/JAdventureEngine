@@ -14,7 +14,7 @@
     </div>
 
     <div class="actions-ring">
-      @for (action of item()?.actions; track action.type; let idx = $index) {
+      @for (action of item()?.actions; track action.id ?? action.type; let idx = $index) {
         @let slot = getSlotStyle(idx, (item()?.actions?.length || 1));
         <button
           type="button"
@@ -23,7 +23,7 @@
           [style.top]="slot.top"
           (mouseenter)="hoveredAction.set(action.type)"
           (mouseleave)="hoveredAction.set(null)"
-          (click)="onSelectAction(action.type, $event)"
+          (click)="onSelectAction(action, $event)"
         >
           <i class="bi" [ngClass]="getActionIcon(action.type)"></i>
           <span class="action-label">{{ getActionLabel(action.type) }}</span>

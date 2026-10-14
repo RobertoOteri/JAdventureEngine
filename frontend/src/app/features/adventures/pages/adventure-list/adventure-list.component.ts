@@ -50,7 +50,7 @@ export class AdventureListComponent implements OnInit {
     this.router.navigate(['/adventures/new']);
   }
 
-  onPlayAdventure(adventureCode: string): void {
-    this.router.navigate(['/adventures', adventureCode, 'play']);
+  onPlayAdventure(adv: GraphicAdventureDto): void {
+    this.router.navigate(['/adventures', adv.id, 'play']);
   }
 }

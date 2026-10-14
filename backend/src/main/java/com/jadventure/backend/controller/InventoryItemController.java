@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/inventory-items")
 public class InventoryItemController {
@@ -18,27 +20,30 @@ public class InventoryItemController {
         this.inventoryItemService = inventoryItemService;
     }
 
-    @GetMapping("/{adventureCode}/{itemCode}")
-    public ResponseEntity<InventoryItemDto> getInventoryItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("itemCode") String itemCode) {
-        return ResponseEntity.ok(inventoryItemService.getInventoryItem(adventureCode, itemCode));
+    @GetMapping
+    public ResponseEntity<List<InventoryItemDto>> getAdventureInventoryItems(
+            @RequestParam("adventureCode") String adventureCode) {
+        return ResponseEntity.ok(inventoryItemService.getAdventureInventoryItems(adventureCode));
     }
 
-    @PutMapping(value = "/{adventureCode}/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<InventoryItemDto> updateInventoryItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("itemCode") String itemCode,
+    @GetMapping("/{inventoryItemId}")
+    public ResponseEntity<InventoryItemDto> getInventoryItemById(
+            @PathVariable Long inventoryItemId) {
+        return ResponseEntity.ok(inventoryItemService.getInventoryItemById(inventoryItemId));
+    }
+
+    @PutMapping(value = "/{inventoryItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<InventoryItemDto> updateInventoryItemById(
+            @PathVariable Long inventoryItemId,
             @Valid @RequestPart("data") InventoryItemDto dto,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        return ResponseEntity.ok(inventoryItemService.updateInventoryItem(adventureCode, itemCode, dto, image));
+        return ResponseEntity.ok(inventoryItemService.updateInventoryItemById(inventoryItemId, dto, image));
     }
 
-    @DeleteMapping("/{adventureCode}/{itemCode}")
-    public ResponseEntity<Void> deleteInventoryItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("itemCode") String itemCode) {
-        inventoryItemService.deleteInventoryItem(adventureCode, itemCode);
+    @DeleteMapping("/{inventoryItemId}")
+    public ResponseEntity<Void> deleteInventoryItemById(
+            @PathVariable Long inventoryItemId) {
+        inventoryItemService.deleteInventoryItemById(inventoryItemId);
         return ResponseEntity.noContent().build();
     }
 }

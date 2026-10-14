@@ -1,6 +1,7 @@
 package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
+import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.service.GraphicAdventureService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -31,9 +32,9 @@ public class GraphicAdventureController {
         return ResponseEntity.ok(graphicAdventureService.getMyAdventures());
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity<GraphicAdventureDto> getAdventureByCode(@PathVariable("code") String code) {
-        return ResponseEntity.ok(graphicAdventureService.getAdventureByCode(code));
+    @GetMapping("/{adventureId}")
+    public ResponseEntity<GraphicAdventureDto> getAdventureById(@PathVariable Long adventureId) {
+        return ResponseEntity.ok(graphicAdventureService.getAdventureById(adventureId));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -45,19 +46,29 @@ public class GraphicAdventureController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @DeleteMapping("/{code}")
-    public ResponseEntity<Void> deleteAdventure(@PathVariable("code") String code) {
-        graphicAdventureService.deleteAdventure(code);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/{code}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{adventureId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GraphicAdventureDto> updateAdventure(
-            @PathVariable("code") String code,
+            @PathVariable Long adventureId,
             @Valid @RequestPart("data") GraphicAdventureDto data,
             @RequestPart(value = "coverImage", required = false) MultipartFile coverImage
     ) {
-        GraphicAdventureDto updated = graphicAdventureService.updateAdventure(code, data, coverImage);
+        GraphicAdventureDto updated = graphicAdventureService.updateAdventureById(adventureId, data, coverImage);
         return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{adventureId}")
+    public ResponseEntity<Void> deleteAdventure(@PathVariable Long adventureId) {
+        graphicAdventureService.deleteAdventureById(adventureId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{adventureId}/scenes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<SceneDto> addScene(
+            @PathVariable Long adventureId,
+            @Valid @RequestPart("data") SceneDto sceneDto,
+            @RequestPart("backgroundImage") MultipartFile backgroundImage) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(graphicAdventureService.addScene(adventureId, sceneDto, backgroundImage));
     }
 }

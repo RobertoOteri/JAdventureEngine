@@ -10,7 +10,6 @@ import { Scene, Item } from '../../../../core/models';
   styleUrl: './game-viewport.component.css'
 })
 export class GameViewportComponent {
-
   scene = input<Scene | null>(null);
   backgroundUrl = input<string>('');
   visibleItemCodes = input<string[]>([]);
@@ -24,7 +23,7 @@ export class GameViewportComponent {
     if (visibleCodes && visibleCodes.length > 0) {
       return visibleCodes.includes(item.code);
     }
-    return item.initiallyVisible;
+    return item.initiallyVisible ?? true;
   }
 
   onHotspotMouseDown(event: MouseEvent, item: Item): void {

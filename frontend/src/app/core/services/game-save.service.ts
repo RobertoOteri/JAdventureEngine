@@ -15,10 +15,6 @@ export class GameSaveService {
     return this.http.get<GameSaveDto[]>(`${this.apiUrl}/adventure/${adventureCode}`);
   }
 
-  getSave(saveCode: string): Observable<GameSaveDto> {
-    return this.http.get<GameSaveDto>(`${this.apiUrl}/${saveCode}`);
-  }
-
   createSave(activeSaveCode: string, saveName?: string): Observable<GameSaveDto> {
     const params = saveName ? new HttpParams().set('saveName', saveName) : undefined;
     return this.http.post<GameSaveDto>(`${this.apiUrl}/${activeSaveCode}`, null, { params });

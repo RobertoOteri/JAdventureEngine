@@ -3,7 +3,6 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.game.GameActionDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
-import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.model.Action;
@@ -20,11 +19,8 @@ public class ActionService {
 
     private final ActionRepository actionRepository;
     private final ActionMapper actionMapper;
-
     private final PreconditionService preconditionService;
     private final GameEffectService gameEffectService;
-    private final ItemService itemService;
-    private final GraphicAdventureService graphicAdventureService;
     private final GameSaveService gameSaveService;
     private final GamePlayService gamePlayService;
     private final AuthService authService;
@@ -33,8 +29,6 @@ public class ActionService {
                          ActionMapper actionMapper,
                          PreconditionService preconditionService,
                          GameEffectService gameEffectService,
-                         ItemService itemService,
-                         GraphicAdventureService graphicAdventureService,
                          GameSaveService gameSaveService,
                          GamePlayService gamePlayService,
                          AuthService authService) {
@@ -42,8 +36,6 @@ public class ActionService {
         this.actionMapper = actionMapper;
         this.preconditionService = preconditionService;
         this.gameEffectService = gameEffectService;
-        this.itemService = itemService;
-        this.graphicAdventureService = graphicAdventureService;
         this.gameSaveService = gameSaveService;
         this.gamePlayService = gamePlayService;
         this.authService = authService;
@@ -53,10 +45,16 @@ public class ActionService {
     public GameActionResultDto executeAction(GameActionDto actionDto) {
         GameSave save = gameSaveService.findSaveByUser(actionDto.getSaveCode());
 
-        Action action = actionRepository.findByItemCodeAndType(actionDto.getItemCode(), actionDto.getActionType())
+        Action action = actionRepository.findByCode(actionDto.getActionCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Azione '" + actionDto.getActionType() + "' non trovata per l'item: " + actionDto.getItemCode()
+                        "Azione non trovata con codice: " + actionDto.getActionCode()
                 ));
+
+        if (action.getType() != actionDto.getActionType()) {
+            throw new IllegalArgumentException(
+                    "Tipo di azione non corrispondente: atteso " + action.getType() + " ma ricevuto " + actionDto.getActionType()
+            );
+        }
 
         Optional<String> failureMessage = preconditionService.validatePreconditions(save, action);
 
@@ -83,54 +81,44 @@ public class ActionService {
     }
 
     @Transactional(readOnly = true)
-    public List<ActionDto> getActionsByItem(String itemCode) {
-        return actionMapper.toDtoList(actionRepository.findAllByItemCode(itemCode));
+    public List<ActionDto> getActionsByItemId(Long itemId) {
+        return actionMapper.toDtoList(actionRepository.findAllByItemId(itemId));
     }
 
     @Transactional(readOnly = true)
-    public ActionDto getActionByCode(String actionCode) {
-        Action action = actionRepository.findByCode(actionCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata: " + actionCode));
+    public ActionDto getActionById(Long actionId) {
+        Action action = actionRepository.findById(actionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
         return actionMapper.toDto(action);
     }
 
     @Transactional
-    public ActionDto addActionToItem(String adventureCode, String sceneCode, String itemCode, ActionDto dto) {
-        ItemDto itemDto = itemService.getItemByCode(adventureCode, sceneCode, itemCode);
-        authService.validateOwnership(graphicAdventureService.getAdventureByCode(adventureCode).getAuthorUsername());
+    public ActionDto updateActionById(Long actionId, ActionDto dto) {
+        Action action = actionRepository.findById(actionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
 
-        if (actionRepository.existsByItemCodeAndType(itemCode, dto.getType())) {
-            throw new IllegalArgumentException("Azione " + dto.getType() + " già presente per l'item: " + itemCode);
+        authService.validateOwnership(action.getItem().getScene().getGraphicAdventure().getAuthor().getUsername());
+
+        if (action.getType() != dto.getType()) {
+            boolean duplicate = action.getItem().getActions().stream()
+                    .anyMatch(a -> !a.getId().equals(actionId) && a.getType() == dto.getType());
+            if (duplicate) {
+                throw new IllegalArgumentException("Esiste già un'altra azione con tipo: " + dto.getType());
+            }
         }
 
-        String actionCode = (dto.getCode() != null && !dto.getCode().isBlank())
-                ? dto.getCode()
-                : (dto.getType().name().toLowerCase() + "_" + itemCode);
-
-        if (actionRepository.existsByItemCodeAndCode(itemCode, actionCode)) {
-            throw new IllegalArgumentException("Codice azione già esistente: " + actionCode);
-        }
-
-        dto.setCode(actionCode);
-
-        Action action = actionMapper.toEntity(dto, itemDto);
-
-        if (action.getPreconditions() != null) {
-            action.getPreconditions().forEach(p -> p.setAction(action));
-        }
-        if (action.getEffects() != null) {
-            action.getEffects().forEach(e -> e.setAction(action));
-        }
+        actionMapper.updateEntityFromDto(dto, action);
 
         return actionMapper.toDto(actionRepository.save(action));
     }
 
     @Transactional
-    public void deleteAction(String actionCode) {
-        Action action = actionRepository.findByCode(actionCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata: " + actionCode));
+    public void deleteActionById(Long actionId) {
+        Action action = actionRepository.findById(actionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
 
         authService.validateOwnership(action.getItem().getScene().getGraphicAdventure().getAuthor().getUsername());
+        action.getItem().getActions().remove(action);
 
         actionRepository.delete(action);
     }

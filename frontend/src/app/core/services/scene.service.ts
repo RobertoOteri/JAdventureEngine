@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Scene } from '../models';
+import { Item, Scene } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,15 +11,24 @@ export class SceneService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/scenes`;
 
+  getScenes(adventureCode: string): Observable<Scene[]> {
+    const params = new HttpParams().set('adventureCode', adventureCode);
+    return this.http.get<Scene[]>(this.apiUrl, { params });
+  }
+
   getAllScenes(adventureCode: string): Observable<Scene[]> {
-    return this.http.get<Scene[]>(`${this.apiUrl}/adventure/${adventureCode}`);
+    return this.getScenes(adventureCode);
   }
 
-  createScene(adventureCode: string, formData: FormData): Observable<Scene> {
-    return this.http.post<Scene>(`${this.apiUrl}/adventure/${adventureCode}`, formData);
+  getSceneById(sceneId: number): Observable<Scene> {
+    return this.http.get<Scene>(`${this.apiUrl}/${sceneId}`);
   }
 
-  deleteScene(adventureCode: string, sceneCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/${sceneCode}`);
+  deleteScene(sceneId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${sceneId}`);
+  }
+
+  addItemToScene(sceneId: number, formData: FormData): Observable<Item> {
+    return this.http.post<Item>(`${this.apiUrl}/${sceneId}/items`, formData);
   }
 }

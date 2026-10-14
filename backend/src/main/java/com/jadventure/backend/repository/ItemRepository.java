@@ -1,6 +1,8 @@
 package com.jadventure.backend.repository;
 
+import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.model.Item;
+import com.jadventure.backend.model.Scene;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,15 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
+    List<Item> findAllBySceneId(Long sceneId);
 
-    List<Item> findAllBySceneCode(String sceneCode);
-
-    boolean existsBySceneCodeAndCode(String sceneCode, String code);
-
-
-    Optional<Item> findBySceneGraphicAdventureCodeAndSceneCodeAndCode(
-            String adventureCode,
-            String sceneCode,
-            String itemCode
-    );
 }

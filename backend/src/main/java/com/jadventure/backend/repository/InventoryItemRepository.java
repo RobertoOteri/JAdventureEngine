@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
@@ -17,5 +18,5 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     boolean existsByGraphicAdventureCodeAndCode(String adventureCode, String code);
 
-    List<InventoryItem> findAllByCodeIn(Collection<String> codes);
+    List<InventoryItem> findAllByGraphicAdventureCodeAndCodeIn(String graphicAdventureCode, Set<String> codes);
 }

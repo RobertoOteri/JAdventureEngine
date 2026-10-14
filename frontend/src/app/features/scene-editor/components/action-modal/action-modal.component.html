@@ -7,7 +7,7 @@
           <i class="bi bi-lightning-charge-fill"></i>
         </div>
         <div>
-          <h3>Nuova Azione di Gioco</h3>
+          <h3>{{ actionToEdit() ? 'Modifica Azione di Gioco' : 'Nuova Azione di Gioco' }}</h3>
           <span class="modal-subtitle">Assegna un comportamento all'hotspot <strong>#{{ itemCode() }}</strong></span>
         </div>
       </div>
@@ -17,56 +17,58 @@
     </header>
 
     <div class="modal-body custom-scroll">
-
+      <!-- 1. Campi Principali -->
       <div class="main-fields">
         <div class="field-group">
-          <label for="actionVerboSelect">Verbo di Interazione (Tipo Azione) *</label>
-          <select id="actionVerboSelect" class="studio-select" [(ngModel)]="actionType">
-            @for (t of availableActionTypes; track t) {
-              <option [value]="t">{{ t }}</option>
+          <label for="actionTypeSelect">Tipo di Azione *</label>
+          <select id="actionTypeSelect" class="studio-select" [(ngModel)]="actionType">
+            @for (type of availableActionTypes; track type) {
+              <option [value]="type">{{ type }}</option>
             }
           </select>
         </div>
 
         <div class="field-group">
-          <label for="successMsgInput">Messaggio di Successo</label>
+          <label for="successMsgInput">Messaggio di Successo (opzionale)</label>
           <input
             id="successMsgInput"
             type="text"
             class="studio-input"
             [(ngModel)]="actionSuccessMsg"
-            placeholder="Es. Apri la porta con la chiave d'ottone ed entri..."
+            placeholder="Es. Hai sbloccato il lucchetto con la chiave d'ottone."
           />
         </div>
 
         <div class="field-group">
-          <label for="failureMsgInput">Messaggio di Fallimento Predefinito (fallback globale)</label>
+          <label for="failureMsgInput">Messaggio di Errore Predefinito (opzionale)</label>
           <input
             id="failureMsgInput"
             type="text"
             class="studio-input"
             [(ngModel)]="actionFailureMsg"
-            placeholder="Es. Non riesci a farlo adesso..."
+            placeholder="Es. Non puoi farlo in questo momento."
           />
         </div>
       </div>
 
-      <section class="section-card theme-preconditions">
+      <!-- 2. Precondizioni -->
+      <div class="section-card">
         <div class="section-card-header">
           <div class="section-title">
             <span class="color-badge badge-amber"></span>
-            <i class="bi bi-shield-lock-fill icon-theme-amber"></i>
-            <h4>Precondizioni Richieste</h4>
-            <span class="count-pill amber">({{ actionPreconditions().length }})</span>
+            <i class="bi bi-shield-check icon-theme-amber"></i>
+            <h4>Precondizioni</h4>
+            <span class="count-pill amber">{{ actionPreconditions().length }}</span>
           </div>
+
           <button type="button" class="btn-sub-add amber" (click)="addPrecondition()">
             <i class="bi bi-plus-lg"></i>
-            <span>Aggiungi Regola</span>
+            <span>Aggiungi Condizione</span>
           </button>
         </div>
 
         <div class="section-card-content">
-          @for (prec of actionPreconditions(); track $index; let i = $index) {
+          @for (prec of actionPreconditions(); track $index) {
             <div class="precondition-card amber-border">
               <div class="rule-main-row">
                 <div class="rule-type-col">
@@ -80,7 +82,7 @@
                 <div class="rule-val-col">
                   @if (prec.type === 'HAS_ITEM' || prec.type === 'DOES_NOT_HAVE_ITEM') {
                     <select class="studio-select" [(ngModel)]="prec.requiredKey">
-                      <option value="" disabled selected>-- Seleziona Oggetto Richiesto --</option>
+                      <option value="" disabled>-- Seleziona oggetto --</option>
                       @for (it of availableItemOptions(); track it.code) {
                         <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
                       }
@@ -90,44 +92,52 @@
                       type="text"
                       class="studio-input"
                       [(ngModel)]="prec.requiredKey"
-                      placeholder="Nome Flag (es. porta_aperta)"
+                      placeholder="Nome Flag (es. leva_tirata)"
                     />
                   }
                 </div>
 
-                <button type="button" class="btn-del-rule" (click)="removePrecondition(i)" title="Rimuovi precondizione">
+                <button
+                  type="button"
+                  class="btn-del-rule"
+                  (click)="removePrecondition($index)"
+                  title="Rimuovi precondizione"
+                >
                   <i class="bi bi-trash3"></i>
                 </button>
               </div>
+
               <div class="precondition-failure-msg-row">
                 <div class="msg-input-wrapper">
-                  <i class="bi bi-chat-square-dots-fill msg-icon"></i>
+                  <i class="bi bi-chat-left-dots msg-icon"></i>
                   <input
                     type="text"
                     class="studio-input sub-input"
                     [(ngModel)]="prec.failureMessage"
-                    placeholder="Messaggio di errore se manca questo requisito (opzionale)"
+                    placeholder="Messaggio specifico se non soddisfatta (opzionale)..."
                   />
                 </div>
               </div>
             </div>
           } @empty {
             <div class="empty-rules amber">
-              <i class="bi bi-unlock"></i>
-              <span>Nessuna precondizione: l'azione sarà sempre accessibile al giocatore.</span>
+              <i class="bi bi-info-circle"></i>
+              <span>Nessuna precondizione impostata: l'azione sarà sempre eseguibile.</span>
             </div>
           }
         </div>
-      </section>
+      </div>
 
-      <section class="section-card theme-effects">
+      <!-- 3. Effetti di Gioco -->
+      <div class="section-card">
         <div class="section-card-header">
           <div class="section-title">
             <span class="color-badge badge-cyan"></span>
             <i class="bi bi-magic icon-theme-cyan"></i>
             <h4>Effetti di Gioco</h4>
-            <span class="count-pill cyan">({{ actionEffects().length }})</span>
+            <span class="count-pill cyan">{{ actionEffects().length }}</span>
           </div>
+
           <button type="button" class="btn-sub-add cyan" (click)="addEffect()">
             <i class="bi bi-plus-lg"></i>
             <span>Aggiungi Effetto</span>
@@ -135,7 +145,7 @@
         </div>
 
         <div class="section-card-content">
-          @for (eff of actionEffects(); track $index; let i = $index) {
+          @for (eff of actionEffects(); track $index) {
             <div class="rule-row cyan-border">
               <div class="rule-type-col">
                 <select class="studio-select" [(ngModel)]="eff.type">
@@ -146,23 +156,18 @@
               </div>
 
               <div class="rule-val-col">
-                @if (
-                  eff.type === 'SHOW_SCENE_ITEM' ||
-                  eff.type === 'HIDE_SCENE_ITEM' ||
-                  eff.type === 'ADD_ITEM' ||
-                  eff.type === 'REMOVE_ITEM'
-                  ) {
+                @if (eff.type === 'CHANGE_SCENE') {
                   <select class="studio-select" [(ngModel)]="eff.targetValue">
-                    <option value="" disabled selected>-- Seleziona Hotspot / Oggetto Bersaglio --</option>
-                    @for (it of availableItemOptions(); track it.code) {
-                      <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                    <option value="" disabled>-- Seleziona stanza di destinazione --</option>
+                    @for (scene of availableSceneOptions(); track scene.code) {
+                      <option [value]="scene.code">{{ scene.name }} (#{{ scene.code }})</option>
                     }
                   </select>
-                } @else if (eff.type === 'CHANGE_SCENE') {
+                } @else if (eff.type === 'ADD_ITEM' || eff.type === 'REMOVE_ITEM' || eff.type === 'SHOW_SCENE_ITEM' || eff.type === 'HIDE_SCENE_ITEM') {
                   <select class="studio-select" [(ngModel)]="eff.targetValue">
-                    <option value="" disabled selected>-- Stanza di Destinazione --</option>
-                    @for (sc of availableSceneOptions(); track sc.code) {
-                      <option [value]="sc.code">{{ sc.name }} (#{{ sc.code }})</option>
+                    <option value="" disabled>-- Seleziona oggetto o hotspot --</option>
+                    @for (it of availableItemOptions(); track it.code) {
+                      <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
                     }
                   </select>
                 } @else {
@@ -170,23 +175,28 @@
                     type="text"
                     class="studio-input"
                     [(ngModel)]="eff.targetValue"
-                    placeholder="Valore (es. sbloccato=true)"
+                    placeholder="Valore Flag (es. porta_aperta=true)"
                   />
                 }
               </div>
 
-              <button type="button" class="btn-del-rule" (click)="removeEffect(i)" title="Rimuovi effetto">
+              <button
+                type="button"
+                class="btn-del-rule"
+                (click)="removeEffect($index)"
+                title="Rimuovi effetto"
+              >
                 <i class="bi bi-trash3"></i>
               </button>
             </div>
           } @empty {
             <div class="empty-rules cyan">
-              <i class="bi bi-dash-circle"></i>
-              <span>Nessun effetto registrato: l'azione mostrerà soltanto il messaggio a schermo.</span>
+              <i class="bi bi-info-circle"></i>
+              <span>Nessun effetto impostato: l'azione mostrerà solo il messaggio.</span>
             </div>
           }
         </div>
-      </section>
+      </div>
     </div>
 
     <footer class="modal-footer">
@@ -195,7 +205,7 @@
       </button>
       <button type="button" class="btn-save" (click)="onSubmit()">
         <i class="bi bi-check2"></i>
-        <span>Salva Azione</span>
+        <span>{{ actionToEdit() ? 'Salva Modifiche' : 'Salva Azione' }}</span>
       </button>
     </footer>
   </div>

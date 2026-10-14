@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { InventoryItem } from '../models';
 import { environment } from '../../../environments/environment';
@@ -11,15 +11,20 @@ export class InventoryItemService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/inventory-items`;
 
-  getInventoryItem(adventureCode: string, itemCode: string): Observable<InventoryItem> {
-    return this.http.get<InventoryItem>(`${this.apiUrl}/${adventureCode}/${itemCode}`);
+  getAdventureInventoryItems(adventureCode: string): Observable<InventoryItem[]> {
+    const params = new HttpParams().set('adventureCode', adventureCode);
+    return this.http.get<InventoryItem[]>(this.apiUrl, { params });
   }
 
-  updateInventoryItem(adventureCode: string, itemCode: string, formData: FormData): Observable<InventoryItem> {
-    return this.http.put<InventoryItem>(`${this.apiUrl}/${adventureCode}/${itemCode}`, formData);
+  getInventoryItemById(inventoryItemId: number): Observable<InventoryItem> {
+    return this.http.get<InventoryItem>(`${this.apiUrl}/${inventoryItemId}`);
   }
 
-  deleteInventoryItem(adventureCode: string, itemCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/${itemCode}`);
+  updateInventoryItem(inventoryItemId: number, formData: FormData): Observable<InventoryItem> {
+    return this.http.put<InventoryItem>(`${this.apiUrl}/${inventoryItemId}`, formData);
+  }
+
+  deleteInventoryItem(inventoryItemId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${inventoryItemId}`);
   }
 }

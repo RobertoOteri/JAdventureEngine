@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Item, ActionType } from '../../../../core/models';
+import { Item, ActionType, Action } from '../../../../core/models';
 
 @Component({
   selector: 'app-game-radial-menu',
@@ -14,7 +14,7 @@ export class GameRadialMenuComponent {
   y = input<number>(0);
   item = input<Item | null>(null);
 
-  actionSelected = output<{ itemCode: string; actionType: ActionType }>();
+  actionSelected = output<{ actionCode: string; actionType: ActionType }>();
   close = output<void>();
 
   hoveredAction = signal<ActionType | null>(null);
@@ -43,14 +43,20 @@ export class GameRadialMenuComponent {
     }
   }
 
-  onSelectAction(actionType: ActionType, event: MouseEvent): void {
+  onSelectAction(action: Action, event: MouseEvent): void {
     event.stopPropagation();
     const currentItem = this.item();
-    if (currentItem) {
+
+    // Fallback prioritario: usa action.code se valorizzato, altrimenti l'item.code (target) o l'id numerico
+    const targetCode = action.code || currentItem?.code || (action.id ? String(action.id) : '');
+
+    if (targetCode) {
       this.actionSelected.emit({
-        itemCode: currentItem.code,
-        actionType
+        actionCode: targetCode,
+        actionType: action.type
       });
+    } else {
+      console.warn('Impossibile determinare il target per l\'azione selezionata:', action);
     }
     this.close.emit();
   }

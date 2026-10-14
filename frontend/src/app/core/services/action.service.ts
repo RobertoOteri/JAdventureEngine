@@ -11,19 +11,23 @@ export class ActionService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/actions`;
 
-  addAction(adventureCode: string, sceneCode: string, itemCode: string, action: Action): Observable<Action> {
-    return this.http.post<Action>(`${this.apiUrl}/${adventureCode}/${sceneCode}/${itemCode}`, action);
+  deleteAction(actionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${actionId}`);
   }
 
-  deleteAction(actionCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${actionCode}`);
+  getActionById(actionId: number): Observable<Action> {
+    return this.http.get<Action>(`${this.apiUrl}/${actionId}`);
+  }
+
+  updateAction(actionId: number, actionDto: Action): Observable<Action> {
+    return this.http.put<Action>(`${this.apiUrl}/${actionId}`, actionDto);
+  }
+
+  getActionsByItem(itemId: number): Observable<Action[]> {
+    return this.http.get<Action[]>(`${this.apiUrl}/item/${itemId}`);
   }
 
   executeAction(actionDto: GameActionDto): Observable<GameActionResultDto> {
     return this.http.post<GameActionResultDto>(`${this.apiUrl}/execute`, actionDto);
-  }
-
-  getActionsByItem(itemCode: string): Observable<Action[]> {
-    return this.http.get<Action[]>(`${this.apiUrl}/item/${itemCode}`);
   }
 }

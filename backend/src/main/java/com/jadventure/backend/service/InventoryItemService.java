@@ -1,9 +1,9 @@
 package com.jadventure.backend.service;
 
-import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.InventoryItemMapper;
+import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.InventoryItem;
 import com.jadventure.backend.repository.InventoryItemRepository;
 import org.springframework.stereotype.Service;
@@ -20,150 +20,123 @@ public class InventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryItemMapper inventoryItemMapper;
-    private final GraphicAdventureService graphicAdventureService;
     private final FileStorageService fileStorageService;
     private final AuthService authService;
 
     public InventoryItemService(InventoryItemRepository inventoryItemRepository,
                                 InventoryItemMapper inventoryItemMapper,
-                                GraphicAdventureService graphicAdventureService,
                                 FileStorageService fileStorageService,
                                 AuthService authService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryItemMapper = inventoryItemMapper;
-        this.graphicAdventureService = graphicAdventureService;
         this.fileStorageService = fileStorageService;
         this.authService = authService;
     }
 
     @Transactional(readOnly = true)
-    public InventoryItemDto getInventoryItem(String adventureCode, String itemCode) {
-        graphicAdventureService.getAdventureByCode(adventureCode);
+    public List<InventoryItemDto> getAdventureInventoryItems(String adventureCode) {
+        return inventoryItemRepository.findAllByGraphicAdventureCode(adventureCode).stream()
+                .map(inventoryItemMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-        InventoryItem item = inventoryItemRepository.findByGraphicAdventureCodeAndCode(adventureCode, itemCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato: " + itemCode));
+    @Transactional(readOnly = true)
+    public InventoryItemDto getInventoryItemById(Long inventoryItemId) {
+        InventoryItem item = inventoryItemRepository.findById(inventoryItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
         return inventoryItemMapper.toDto(item);
     }
 
     @Transactional
-    public InventoryItemDto createInventoryItem(String adventureCode, InventoryItemDto dto, MultipartFile image) {
-        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
-        authService.validateOwnership(adventureDto.getAuthorUsername());
+    public InventoryItemDto updateInventoryItemById(Long inventoryItemId, InventoryItemDto dto, MultipartFile image) {
+        InventoryItem item = inventoryItemRepository.findById(inventoryItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
 
-        String itemCode = dto.getCode();
-        if (itemCode == null || itemCode.isBlank()) {
-            throw new IllegalArgumentException("Codice oggetto inventario obbligatorio");
-        }
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
 
-        if (inventoryItemRepository.existsByGraphicAdventureCodeAndCode(adventureCode, itemCode)) {
-            throw new IllegalArgumentException("Oggetto inventario già esistente: " + itemCode);
-        }
+        item.setName(dto.getName());
+        item.setDescription(dto.getDescription());
 
-        String imageUrl = "";
         if (image != null && !image.isEmpty()) {
-            imageUrl = fileStorageService.storeInventoryItemIcon(adventureCode, itemCode, image);
-        } else if (dto.getImageUrl() != null) {
-            imageUrl = dto.getImageUrl();
+            String advCode = item.getGraphicAdventure().getCode();
+            String imageUrl = fileStorageService.storeInventoryItemIcon(advCode, item.getCode(), image);
+            item.setImageUrl(imageUrl);
+        } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
+            item.setImageUrl(dto.getImageUrl());
         }
-        dto.setImageUrl(imageUrl);
 
-        InventoryItem entity = inventoryItemMapper.toEntity(dto, adventureDto);
-        return inventoryItemMapper.toDto(inventoryItemRepository.save(entity));
+        return inventoryItemMapper.toDto(inventoryItemRepository.save(item));
     }
 
     @Transactional
-    public InventoryItem createLinkedInventoryItem(GraphicAdventureDto adventureDto,
-                                                   InventoryItemDto dto,
-                                                   String fallbackName,
-                                                   String iconUrl) {
-        String itemCode = dto.getCode();
-        if (itemCode == null || itemCode.isBlank()) {
-            throw new IllegalArgumentException("Codice oggetto inventario obbligatorio");
-        }
+    public void deleteInventoryItemById(Long inventoryItemId) {
+        InventoryItem item = inventoryItemRepository.findById(inventoryItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
 
-        if (inventoryItemRepository.existsByGraphicAdventureCodeAndCode(adventureDto.getCode(), itemCode)) {
-            throw new IllegalArgumentException("Oggetto inventario già esistente: " + itemCode);
-        }
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
 
-        if (dto.getName() == null || dto.getName().isBlank()) {
-            dto.setName(fallbackName);
-        }
-        dto.setImageUrl(iconUrl != null ? iconUrl : "");
-
-        InventoryItem entity = inventoryItemMapper.toEntity(dto, adventureDto);
-        return inventoryItemRepository.save(entity);
+        inventoryItemRepository.delete(item);
     }
 
     @Transactional
-    public InventoryItem updateOrCreateLinkedItem(GraphicAdventureDto adventureDto,
+    public InventoryItem updateOrCreateLinkedItem(GraphicAdventure adventure,
                                                   InventoryItem existingItem,
                                                   InventoryItemDto dto,
                                                   String fallbackName,
-                                                  String iconUrl) {
+                                                  String fallbackIconUrl) {
         if (existingItem == null) {
-            return createLinkedInventoryItem(adventureDto, dto, fallbackName, iconUrl);
+            return createInventoryItem(adventure, dto, fallbackIconUrl);
         }
 
         existingItem.setName(dto.getName() != null && !dto.getName().isBlank() ? dto.getName() : fallbackName);
         existingItem.setDescription(dto.getDescription());
-        if (iconUrl != null && !iconUrl.isBlank()) {
-            existingItem.setImageUrl(iconUrl);
+
+        if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
+            existingItem.setImageUrl(dto.getImageUrl());
+        } else if ((existingItem.getImageUrl() == null || existingItem.getImageUrl().isBlank())
+                && fallbackIconUrl != null && !fallbackIconUrl.isBlank()) {
+            existingItem.setImageUrl(fallbackIconUrl);
         }
 
         return inventoryItemRepository.save(existingItem);
     }
 
     @Transactional
-    public InventoryItemDto updateInventoryItem(String adventureCode, String itemCode, InventoryItemDto dto, MultipartFile image) {
-        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
-        authService.validateOwnership(adventureDto.getAuthorUsername());
-
-        InventoryItem item = inventoryItemRepository.findByGraphicAdventureCodeAndCode(adventureCode, itemCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato: " + itemCode));
-
-        item.setName(dto.getName());
-        item.setDescription(dto.getDescription());
-
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = fileStorageService.storeInventoryItemIcon(adventureCode, itemCode, image);
-            item.setImageUrl(imageUrl);
-        } else if (dto.getImageUrl() != null) {
-            item.setImageUrl(dto.getImageUrl());
+    public InventoryItem createInventoryItem(GraphicAdventure adventure,
+                                             InventoryItemDto dto,
+                                             String fallbackImageUrl) {
+        if (dto == null || dto.getCode() == null || dto.getCode().isBlank()) {
+            return null;
         }
 
-        InventoryItem saved = inventoryItemRepository.save(item);
-        return inventoryItemMapper.toDto(saved);
-    }
+        return inventoryItemRepository
+                .findByGraphicAdventureCodeAndCode(adventure.getCode(), dto.getCode())
+                .orElseGet(() -> {
+                    InventoryItem entity = inventoryItemMapper.toEntity(dto);
+                    entity.setGraphicAdventure(adventure);
 
-    @Transactional
-    public void deleteInventoryItem(String adventureCode, String itemCode) {
-        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
-        authService.validateOwnership(adventureDto.getAuthorUsername());
+                    String img = entity.getImageUrl();
+                    if (img == null || img.isBlank()) {
+                        img = (fallbackImageUrl != null && !fallbackImageUrl.isBlank()) ? fallbackImageUrl : "";
+                    }
+                    entity.setImageUrl(img);
 
-        InventoryItem invItem = inventoryItemRepository.findByGraphicAdventureCodeAndCode(adventureCode, itemCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato: " + itemCode));
+                    if (entity.getName() == null || entity.getName().isBlank()) {
+                        entity.setName(dto.getName() != null ? dto.getName() : dto.getCode());
+                    }
 
-        inventoryItemRepository.delete(invItem);
+                    return inventoryItemRepository.save(entity);
+                });
     }
 
     @Transactional(readOnly = true)
-    public List<InventoryItemDto> getInventoryItemsByCodes(Set<String> codes) {
+    public List<InventoryItemDto> getInventoryItemsByAdventureAndCodes(String adventureCode, Set<String> codes) {
         if (codes == null || codes.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return inventoryItemRepository.findAllByCodeIn(codes).stream()
+        return inventoryItemRepository.findAllByGraphicAdventureCodeAndCodeIn(adventureCode, codes).stream()
                 .map(inventoryItemMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public boolean exists(String adventureCode, String itemCode) {
-        return inventoryItemRepository.existsByGraphicAdventureCodeAndCode(adventureCode, itemCode);
-    }
-
-    @Transactional
-    public InventoryItem save(InventoryItem inventoryItem) {
-        return inventoryItemRepository.save(inventoryItem);
     }
 }

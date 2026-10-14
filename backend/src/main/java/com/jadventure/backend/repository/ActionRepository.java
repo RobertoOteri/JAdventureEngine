@@ -11,13 +11,8 @@ import java.util.Optional;
 @Repository
 public interface ActionRepository extends JpaRepository<Action, Long> {
 
-    boolean existsByItemCodeAndType(String itemCode, ActionType type);
-
-    List<Action> findAllByItemCode(String itemCode);
+    List<Action> findAllByItemId(Long itemId);
 
     Optional<Action> findByCode(String code);
 
-    boolean existsByItemCodeAndCode(String itemCode, String code);
-
-    Optional<Action> findByItemCodeAndType(String itemCode, ActionType type);
 }

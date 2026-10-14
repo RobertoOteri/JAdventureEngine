@@ -1,5 +1,6 @@
 package com.jadventure.backend.controller;
 
+import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.service.ItemService;
 import jakarta.validation.Valid;
@@ -21,50 +22,37 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping("/scene/{adventureCode}/{sceneCode}")
-    public ResponseEntity<List<ItemDto>> getItems(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode) {
-        return ResponseEntity.ok(itemService.getItemsByScene(adventureCode, sceneCode));
+    @GetMapping
+    public ResponseEntity<List<ItemDto>> getItems(@RequestParam Long sceneId) {
+        return ResponseEntity.ok(itemService.getItemsBySceneId(sceneId));
     }
 
-    @GetMapping("/{adventureCode}/{sceneCode}/{itemCode}")
-    public ResponseEntity<ItemDto> getItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode,
-            @PathVariable("itemCode") String itemCode) {
-        return ResponseEntity.ok(itemService.getItemByCode(adventureCode, sceneCode, itemCode));
+    @GetMapping("/{itemId}")
+    public ResponseEntity<ItemDto> getItemById(@PathVariable Long itemId) {
+        return ResponseEntity.ok(itemService.getItemById(itemId));
     }
 
-    @PostMapping(value = "/scene/{adventureCode}/{sceneCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ItemDto> createItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode,
+    @PutMapping(value = "/{itemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemDto> updateItem(
+            @PathVariable Long itemId,
             @Valid @RequestPart("data") ItemDto dto,
             @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        return ResponseEntity.ok(itemService.updateItemById(itemId, dto, image));
+    }
+
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
+        itemService.deleteItemById(itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{itemId}/actions")
+    public ResponseEntity<ActionDto> addAction(
+            @PathVariable Long itemId,
+            @Valid @RequestBody ActionDto actionDto) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(itemService.createItem(adventureCode, sceneCode, dto, image));
-    }
-
-    @PutMapping(value = "/{adventureCode}/{sceneCode}/{itemCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ItemDto> updateItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode,
-            @PathVariable("itemCode") String itemCode,
-            @Valid @RequestPart("data") ItemDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-
-        return ResponseEntity.ok(itemService.updateItem(adventureCode, sceneCode, itemCode, dto, image));
-    }
-
-    @DeleteMapping("/{adventureCode}/{sceneCode}/{itemCode}")
-    public ResponseEntity<Void> deleteItem(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode,
-            @PathVariable("itemCode") String itemCode) {
-
-        itemService.deleteItem(adventureCode, sceneCode, itemCode);
-        return ResponseEntity.noContent().build();
+                .body(itemService.addAction(itemId, actionDto));
     }
 }

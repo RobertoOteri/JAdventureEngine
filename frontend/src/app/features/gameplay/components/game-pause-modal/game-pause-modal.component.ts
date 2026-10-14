@@ -18,20 +18,26 @@ export class GamePauseModalComponent {
   load = output<string>();
   exit = output<void>();
 
-  mode = signal<'MENU' | 'SAVE_FORM' | 'LOAD_LIST'>('MENU');
-  saveSlotName = signal<string>('');
+  readonly mode = signal<'MENU' | 'SAVE_FORM' | 'LOAD_LIST'>('MENU');
+  saveSlotName = '';
 
   setMode(newMode: 'MENU' | 'SAVE_FORM' | 'LOAD_LIST'): void {
     this.mode.set(newMode);
+    if (newMode === 'SAVE_FORM') {
+      this.saveSlotName = '';
+    }
   }
 
   onConfirmSave(): void {
-    this.save.emit(this.saveSlotName().trim());
-    this.saveSlotName.set('');
-    this.mode.set('MENU');
+    const trimmed = this.saveSlotName.trim();
+    this.save.emit(trimmed || 'Salvataggio rapido');
+    this.setMode('MENU');
   }
 
-  onSelectSaveToLoad(code: string): void {
-    this.load.emit(code);
+  onSelectSaveToLoad(saveCode: string): void {
+    if (saveCode) {
+      this.load.emit(saveCode);
+      this.resume.emit();
+    }
   }
 }

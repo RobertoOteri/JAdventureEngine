@@ -83,12 +83,17 @@ public class GamePlayService {
 
     @Transactional(readOnly = true)
     public GameStateDto buildGameState(GameSave save) {
+        String advCode = save.getGraphicAdventure().getCode();
+
         SceneDto sceneDto = sceneService.getSceneByCode(
-                save.getGraphicAdventure().getCode(),
+                advCode,
                 save.getCurrentSceneCode()
         );
 
-        List<InventoryItemDto> inventoryDtos = inventoryItemService.getInventoryItemsByCodes(save.getInventory());
+        List<InventoryItemDto> inventoryDtos = inventoryItemService.getInventoryItemsByAdventureAndCodes(
+                advCode,
+                save.getInventory()
+        );
 
         return GameStateDto.builder()
                 .saveCode(save.getCode())

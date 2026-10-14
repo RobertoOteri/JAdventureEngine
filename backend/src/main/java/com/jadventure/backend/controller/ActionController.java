@@ -5,7 +5,6 @@ import com.jadventure.backend.dto.game.GameActionDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
 import com.jadventure.backend.service.ActionService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,29 +25,26 @@ public class ActionController {
         return ResponseEntity.ok(actionService.executeAction(actionDto));
     }
 
-    @GetMapping("/item/{itemCode}")
-    public ResponseEntity<List<ActionDto>> getActions(@PathVariable("itemCode") String itemCode) {
-        return ResponseEntity.ok(actionService.getActionsByItem(itemCode));
+    @GetMapping("/item/{itemId}")
+    public ResponseEntity<List<ActionDto>> getActionsByItemId(@PathVariable Long itemId) {
+        return ResponseEntity.ok(actionService.getActionsByItemId(itemId));
     }
 
-    @GetMapping("/{actionCode}")
-    public ResponseEntity<ActionDto> getAction(@PathVariable("actionCode") String actionCode) {
-        return ResponseEntity.ok(actionService.getActionByCode(actionCode));
+    @GetMapping("/{actionId}")
+    public ResponseEntity<ActionDto> getActionById(@PathVariable Long actionId) {
+        return ResponseEntity.ok(actionService.getActionById(actionId));
     }
 
-    @PostMapping("/{adventureCode}/{sceneCode}/{itemCode}")
-    public ResponseEntity<ActionDto> addAction(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode,
-            @PathVariable("itemCode") String itemCode,
-            @Valid @RequestBody ActionDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(actionService.addActionToItem(adventureCode, sceneCode, itemCode, dto));
+    @PutMapping("/{actionId}")
+    public ResponseEntity<ActionDto> updateAction(
+            @PathVariable Long actionId,
+            @Valid @RequestBody ActionDto actionDto) {
+        return ResponseEntity.ok(actionService.updateActionById(actionId, actionDto));
     }
 
-    @DeleteMapping("/{actionCode}")
-    public ResponseEntity<Void> deleteAction(@PathVariable("actionCode") String actionCode) {
-        actionService.deleteAction(actionCode);
+    @DeleteMapping("/{actionId}")
+    public ResponseEntity<Void> deleteActionById(@PathVariable Long actionId) {
+        actionService.deleteActionById(actionId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.jadventure.backend.service;
 
+import com.jadventure.backend.model.Scene;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -55,10 +56,14 @@ public class FileStorageService {
                 this.publicUrlBase + "/" + adventureCode + "/scenes");
     }
 
-    public String storeItemImage(String adventureCode, String sceneCode, String itemCode, MultipartFile file) {
-        if (file == null || file.isEmpty()) {
+    // Metodo UNIFICATO per tutti gli item (sia create che update)
+    public String storeItemImage(Scene scene, String itemCode, MultipartFile file) {
+        if (file == null || file.isEmpty() || scene == null) {
             return null;
         }
+        String adventureCode = scene.getGraphicAdventure().getCode();
+        String sceneCode = scene.getCode();
+
         Path targetDir = this.rootUploadPath.resolve(adventureCode).resolve("scenes").resolve(sceneCode).resolve("items");
         String urlPrefix = this.publicUrlBase + "/" + adventureCode + "/scenes/" + sceneCode + "/items";
         return saveFile(file, targetDir, itemCode, urlPrefix);

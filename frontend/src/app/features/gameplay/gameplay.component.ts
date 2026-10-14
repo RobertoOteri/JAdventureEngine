@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
-import { GameActionDto, GraphicAdventureDto } from '../../core/models';
+import { ActionType, GraphicAdventureDto } from '../../core/models';
 
 import { GameTopbarComponent } from './components/game-topbar/game-topbar.component';
 import { GameViewportComponent } from './components/game-viewport/game-viewport.component';
@@ -59,19 +59,36 @@ export class GameplayComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const adventureCode = this.route.snapshot.paramMap.get('adventureCode');
-    if (!adventureCode) {
-      this.router.navigate(['/adventures']);
+    const rawParam =
+      this.route.snapshot.paramMap.get('adventureCode') ||
+      this.route.snapshot.paramMap.get('adventureId') ||
+      this.route.snapshot.paramMap.get('id');
+
+    if (!rawParam) {
+      void this.router.navigate(['/adventures']);
       return;
     }
 
-    this.store.setAdventureCode(adventureCode);
-    this.store.fetchSaves(adventureCode);
+    const isNumericId = /^\d+$/.test(rawParam);
 
-    this.adventureService.getAdventureByCode(adventureCode).subscribe({
-      next: (adv) => this.adventureDetails.set(adv),
-      error: () => this.router.navigate(['/adventures'])
-    });
+    if (isNumericId) {
+      const advId = Number(rawParam);
+      this.adventureService.getAdventureById(advId).subscribe({
+        next: (adv) => {
+          this.adventureDetails.set(adv);
+          this.store.setAdventureCode(adv.code);
+          this.store.fetchSaves(adv.code);
+        },
+        error: () => void this.router.navigate(['/adventures'])
+      });
+    } else {
+      this.store.setAdventureCode(rawParam);
+      this.store.fetchSaves(rawParam);
+      this.adventureService.getAdventureByCode(rawParam).subscribe({
+        next: (adv) => this.adventureDetails.set(adv),
+        error: () => void this.router.navigate(['/adventures'])
+      });
+    }
   }
 
   onStartNew(): void {
@@ -95,7 +112,7 @@ export class GameplayComponent implements OnInit {
     this.isLaunchModalOpen.set(false);
   }
 
-  onExecuteAction(action: GameActionDto): void {
+  onExecuteAction(action: { actionCode: string; actionType: ActionType }): void {
     this.store.executeAction(action);
   }
 
