@@ -14,7 +14,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameStateDto {
-    private String saveCode;
     private SceneDto currentScene;
     private List<InventoryItemDto> inventory;
     private Map<String, String> adventureFlags;

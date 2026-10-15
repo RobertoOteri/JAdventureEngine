@@ -10,5 +10,5 @@ export interface GameActionDto {
 export interface GameActionResultDto {
   success: boolean;
   feedbackMessage: string;
-  state: GameStateDto;
+  state?: GameStateDto;
 }

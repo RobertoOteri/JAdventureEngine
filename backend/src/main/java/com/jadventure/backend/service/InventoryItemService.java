@@ -6,6 +6,7 @@ import com.jadventure.backend.mapper.InventoryItemMapper;
 import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.InventoryItem;
 import com.jadventure.backend.repository.InventoryItemRepository;
+import com.jadventure.backend.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,23 +14,22 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class InventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryItemMapper inventoryItemMapper;
-    private final FileStorageService fileStorageService;
+    private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
     public InventoryItemService(InventoryItemRepository inventoryItemRepository,
                                 InventoryItemMapper inventoryItemMapper,
-                                FileStorageService fileStorageService,
+                                FileStorageUtil fileStorageUtil,
                                 AuthService authService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryItemMapper = inventoryItemMapper;
-        this.fileStorageService = fileStorageService;
+        this.fileStorageUtil = fileStorageUtil;
         this.authService = authService;
     }
 
@@ -37,7 +37,7 @@ public class InventoryItemService {
     public List<InventoryItemDto> getAdventureInventoryItems(String adventureCode) {
         return inventoryItemRepository.findAllByGraphicAdventureCode(adventureCode).stream()
                 .map(inventoryItemMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -48,9 +48,9 @@ public class InventoryItemService {
     }
 
     @Transactional
-    public InventoryItemDto updateInventoryItemById(Long inventoryItemId, InventoryItemDto dto, MultipartFile image) {
-        InventoryItem item = inventoryItemRepository.findById(inventoryItemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
+    public InventoryItemDto updateInventoryItem(InventoryItemDto dto, MultipartFile image) {
+        InventoryItem item = inventoryItemRepository.findById(dto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + dto.getId()));
 
         authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
 
@@ -58,9 +58,8 @@ public class InventoryItemService {
         item.setDescription(dto.getDescription());
 
         if (image != null && !image.isEmpty()) {
-            String advCode = item.getGraphicAdventure().getCode();
-            String imageUrl = fileStorageService.storeInventoryItemIcon(advCode, item.getCode(), image);
-            item.setImageUrl(imageUrl);
+            String path = String.format(FileStorageUtil.PATH_INVENTORY_ITEM, item.getGraphicAdventure().getCode(), item.getCode());
+            item.setImageUrl(fileStorageUtil.storeFile(path, image));
         } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
             item.setImageUrl(dto.getImageUrl());
         }
@@ -74,69 +73,56 @@ public class InventoryItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
 
         authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
-
         inventoryItemRepository.delete(item);
     }
 
     @Transactional
-    public InventoryItem updateOrCreateLinkedItem(GraphicAdventure adventure,
-                                                  InventoryItem existingItem,
-                                                  InventoryItemDto dto,
-                                                  String fallbackName,
-                                                  String fallbackIconUrl) {
-        if (existingItem == null) {
-            return createInventoryItem(adventure, dto, fallbackIconUrl);
-        }
-
-        existingItem.setName(dto.getName() != null && !dto.getName().isBlank() ? dto.getName() : fallbackName);
-        existingItem.setDescription(dto.getDescription());
-
-        if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
-            existingItem.setImageUrl(dto.getImageUrl());
-        } else if ((existingItem.getImageUrl() == null || existingItem.getImageUrl().isBlank())
-                && fallbackIconUrl != null && !fallbackIconUrl.isBlank()) {
-            existingItem.setImageUrl(fallbackIconUrl);
-        }
-
-        return inventoryItemRepository.save(existingItem);
-    }
-
-    @Transactional
-    public InventoryItem createInventoryItem(GraphicAdventure adventure,
-                                             InventoryItemDto dto,
-                                             String fallbackImageUrl) {
-        if (dto == null || dto.getCode() == null || dto.getCode().isBlank()) {
+    public InventoryItem resolveInventoryItem(GraphicAdventure adventure,
+                                              InventoryItem existingLinkedItem,
+                                              InventoryItemDto dto,
+                                              MultipartFile dedicatedImage,
+                                              String fallbackImageUrl) {
+        if (dto == null) {
             return null;
         }
 
-        return inventoryItemRepository
-                .findByGraphicAdventureCodeAndCode(adventure.getCode(), dto.getCode())
-                .orElseGet(() -> {
-                    InventoryItem entity = inventoryItemMapper.toEntity(dto);
-                    entity.setGraphicAdventure(adventure);
+        InventoryItem item = existingLinkedItem;
+        if (item == null) {
+            item = inventoryItemRepository
+                    .findByGraphicAdventureCodeAndCode(adventure.getCode(), dto.getCode())
+                    .orElseGet(() -> {
+                        InventoryItem newItem = new InventoryItem();
+                        newItem.setCode(dto.getCode());
+                        newItem.setGraphicAdventure(adventure);
+                        return newItem;
+                    });
+        }
 
-                    String img = entity.getImageUrl();
-                    if (img == null || img.isBlank()) {
-                        img = (fallbackImageUrl != null && !fallbackImageUrl.isBlank()) ? fallbackImageUrl : "";
-                    }
-                    entity.setImageUrl(img);
+        item.setName(dto.getName() != null && !dto.getName().isBlank() ? dto.getName() : dto.getCode());
+        item.setDescription(dto.getDescription());
 
-                    if (entity.getName() == null || entity.getName().isBlank()) {
-                        entity.setName(dto.getName() != null ? dto.getName() : dto.getCode());
-                    }
+        if (dedicatedImage != null && !dedicatedImage.isEmpty()) {
+            String path = String.format(FileStorageUtil.PATH_INVENTORY_ITEM, adventure.getCode(), item.getCode());
+            item.setImageUrl(fileStorageUtil.storeFile(path, dedicatedImage));
+        } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
+            item.setImageUrl(dto.getImageUrl());
+        } else if (fallbackImageUrl != null && !fallbackImageUrl.isBlank()) {
+            item.setImageUrl(fallbackImageUrl);
+        } else if (item.getImageUrl() == null) {
+            item.setImageUrl("");
+        }
 
-                    return inventoryItemRepository.save(entity);
-                });
+        return inventoryItemRepository.save(item);
     }
 
     @Transactional(readOnly = true)
-    public List<InventoryItemDto> getInventoryItemsByAdventureAndCodes(String adventureCode, Set<String> codes) {
-        if (codes == null || codes.isEmpty()) {
+    public List<InventoryItemDto> loadPlayerInventory(String adventureCode, Set<String> itemCodes) {
+        if (itemCodes == null || itemCodes.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return inventoryItemRepository.findAllByGraphicAdventureCodeAndCodeIn(adventureCode, codes).stream()
+        return inventoryItemRepository.findAllByGraphicAdventureCodeAndCodeIn(adventureCode, itemCodes).stream()
                 .map(inventoryItemMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

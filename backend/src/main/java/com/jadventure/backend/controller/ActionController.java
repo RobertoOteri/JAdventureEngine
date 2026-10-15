@@ -35,11 +35,10 @@ public class ActionController {
         return ResponseEntity.ok(actionService.getActionById(actionId));
     }
 
-    @PutMapping("/{actionId}")
+    @PutMapping
     public ResponseEntity<ActionDto> updateAction(
-            @PathVariable Long actionId,
             @Valid @RequestBody ActionDto actionDto) {
-        return ResponseEntity.ok(actionService.updateActionById(actionId, actionDto));
+        return ResponseEntity.ok(actionService.updateAction(actionDto));
     }
 
     @DeleteMapping("/{actionId}")

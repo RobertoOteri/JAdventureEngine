@@ -84,8 +84,15 @@ export class GameplayComponent implements OnInit {
     } else {
       this.store.setAdventureCode(rawParam);
       this.store.fetchSaves(rawParam);
-      this.adventureService.getAdventureByCode(rawParam).subscribe({
-        next: (adv) => this.adventureDetails.set(adv),
+      this.adventureService.getAllAdventures().subscribe({
+        next: (adventures) => {
+          const adv = adventures.find((a) => a.code.toLowerCase() === rawParam.toLowerCase());
+          if (adv) {
+            this.adventureDetails.set(adv);
+          } else {
+            void this.router.navigate(['/adventures']);
+          }
+        },
         error: () => void this.router.navigate(['/adventures'])
       });
     }
@@ -122,6 +129,6 @@ export class GameplayComponent implements OnInit {
 
   onExitToLobby(): void {
     this.store.resetStore();
-    this.router.navigate(['/adventures']);
+    void this.router.navigate(['/adventures']);
   }
 }

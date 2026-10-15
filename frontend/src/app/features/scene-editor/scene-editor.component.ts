@@ -10,9 +10,6 @@ import { InspectorSidebarComponent } from './components/inspector-sidebar/inspec
 import { ActionModalComponent } from './components/action-modal/action-modal.component';
 import { InventoryItemData, InventoryItemModalComponent } from './components/inventory-item-modal/inventory-item-modal.component';
 import { AdventureCreateComponent } from '../adventures/pages/adventure-create/adventure-create.component';
-import { environment } from '../../../environments/environment';
-
-const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 
 @Component({
   selector: 'app-scene-editor',
@@ -103,11 +100,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   private resolveImageUrl(url?: string | null): string {
-    if (!url) return '';
-    if (/^https?:\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) {
-      return url;
-    }
-    return `${BACKEND_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+    return url ?? '';
   }
 
   startNewHotspot(): void {
@@ -257,7 +250,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
         formData.append('image', data.customFile);
       }
 
-      this.store.updateInventoryItem(invId, formData).subscribe({
+      this.store.updateInventoryItem(formData).subscribe({
         next: () => {
           this.isInventoryModalOpen.set(false);
           this.editingInventoryItemId.set(null);
@@ -325,7 +318,16 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     if (!points || points.split(/\s+/).length < 3) return;
 
+    const isEdit = !!this.editingItemCode();
+    const targetItemId = selected?.id;
+
+    if (isEdit && !targetItemId) {
+      console.error("Impossibile aggiornare l'oggetto: ID mancante.");
+      return;
+    }
+
     const itemPayload: any = {
+      ...(isEdit ? { id: targetItemId } : {}),
       name,
       code,
       points,
@@ -366,16 +368,8 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       formData.append('inventoryImage', invCustomFile);
     }
 
-    const isEdit = !!this.editingItemCode();
-    const targetItemId = selected?.id;
-
-    if (isEdit && !targetItemId) {
-      console.error("Impossibile aggiornare l'oggetto: ID mancante.");
-      return;
-    }
-
     const save$ = isEdit
-      ? this.store.updateItem(targetItemId!, formData)
+      ? this.store.updateItem(formData)
       : this.store.saveItem(formData);
 
     save$.subscribe({
@@ -458,7 +452,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     if (!current?.id) return;
 
     const actionToEdit = this.editingAction();
-
     let targetActionId: number | undefined = actionToEdit?.id ?? actionPayload.id;
 
     if (!targetActionId && actionToEdit) {
@@ -469,11 +462,11 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     }
 
     if (targetActionId) {
-      this.store.updateAction(targetActionId, { ...actionPayload, id: targetActionId }).subscribe({
+      this.store.updateAction({ ...actionPayload, id: targetActionId }).subscribe({
         next: () => this.closeActionModal(),
         error: (err: any) => {
           console.error('Errore aggiornamento azione:', err);
-          alert(err?.error?.message || 'Impossibile aggiornare l\'azione.');
+          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
         }
       });
       return;
@@ -481,11 +474,11 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     const duplicate = current.actions?.find((a) => a.type === actionPayload.type);
     if (duplicate?.id) {
-      this.store.updateAction(duplicate.id, { ...actionPayload, id: duplicate.id }).subscribe({
+      this.store.updateAction({ ...actionPayload, id: duplicate.id }).subscribe({
         next: () => this.closeActionModal(),
         error: (err: any) => {
           console.error('Errore aggiornamento azione:', err);
-          alert(err?.error?.message || 'Impossibile aggiornare l\'azione.');
+          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
         }
       });
       return;
@@ -495,7 +488,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       next: () => this.closeActionModal(),
       error: (err: any) => {
         console.error('Errore salvataggio azione:', err);
-        alert(err?.error?.message || 'Errore durante la creazione dell\'azione.');
+        alert(err?.error?.message || "Errore durante la creazione dell'azione.");
       }
     });
   }

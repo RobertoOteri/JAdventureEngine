@@ -56,13 +56,17 @@ public class ActionService {
             );
         }
 
-        Optional<String> failureMessage = preconditionService.validatePreconditions(save, action);
+        Optional<String> failureMessage = preconditionService.validatePreconditions(
+                save.getInventory(),
+                save.getAdventureFlags(),
+                action
+        );
 
         if (failureMessage.isPresent()) {
             return GameActionResultDto.builder()
                     .success(false)
                     .feedbackMessage(failureMessage.get())
-                    .state(gamePlayService.buildGameState(save))
+                    .state(gamePlayService.buildGameSaveDto(save).getGameState())
                     .build();
         }
 
@@ -76,7 +80,7 @@ public class ActionService {
         return GameActionResultDto.builder()
                 .success(true)
                 .feedbackMessage(successMessage)
-                .state(gamePlayService.buildGameState(save))
+                .state(gamePlayService.buildGameSaveDto(save).getGameState())
                 .build();
     }
 
@@ -93,19 +97,11 @@ public class ActionService {
     }
 
     @Transactional
-    public ActionDto updateActionById(Long actionId, ActionDto dto) {
-        Action action = actionRepository.findById(actionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
+    public ActionDto updateAction(ActionDto dto) {
+        Action action = actionRepository.findById(dto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + dto.getId()));
 
         authService.validateOwnership(action.getItem().getScene().getGraphicAdventure().getAuthor().getUsername());
-
-        if (action.getType() != dto.getType()) {
-            boolean duplicate = action.getItem().getActions().stream()
-                    .anyMatch(a -> !a.getId().equals(actionId) && a.getType() == dto.getType());
-            if (duplicate) {
-                throw new IllegalArgumentException("Esiste già un'altra azione con tipo: " + dto.getType());
-            }
-        }
 
         actionMapper.updateEntityFromDto(dto, action);
 

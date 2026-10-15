@@ -5,6 +5,5 @@ export interface Scene {
   code: string;
   name: string;
   backgroundImageUrl?: string;
-  setAsInitial?: boolean;
   items?: Item[];
 }

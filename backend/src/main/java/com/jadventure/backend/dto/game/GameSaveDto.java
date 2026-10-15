@@ -15,4 +15,5 @@ public class GameSaveDto {
     private String name;
     private String currentSceneCode;
     private LocalDateTime savedAt;
+    private GameStateDto gameState;
 }

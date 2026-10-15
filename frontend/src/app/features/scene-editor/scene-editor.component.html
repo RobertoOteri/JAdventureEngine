@@ -78,6 +78,7 @@
     <app-adventure-create
       [isModal]="true"
       [initialAdventure]="store.adventure()"
+      [scenes]="store.scenes()"
       (saved)="onSaveAdventureDetails($event)"
       (closeRequested)="isAdventureModalOpen.set(false)"
     />

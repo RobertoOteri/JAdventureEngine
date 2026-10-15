@@ -1,4 +1,5 @@
 import { GraphicAdventureDto } from './adventure.model';
+import {GameStateDto} from './game-state.model';
 
 export interface GameSaveDto {
   id?: number;
@@ -7,4 +8,5 @@ export interface GameSaveDto {
   currentSceneCode: string;
   savedAt: string;
   graphicAdventureDto?: GraphicAdventureDto;
+  gameState?: GameStateDto;
 }

@@ -1,18 +1,18 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
+import com.jadventure.backend.dto.game.GameSaveDto;
 import com.jadventure.backend.dto.game.GameStateDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
+import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,83 +24,74 @@ public class GamePlayService {
     private final AuthService authService;
     private final SceneService sceneService;
     private final InventoryItemService inventoryItemService;
+    private final GameSaveMapper gameSaveMapper;
 
     public GamePlayService(GraphicAdventureService graphicAdventureService,
                            GameSaveService gameSaveService,
                            AuthService authService,
                            SceneService sceneService,
-                           InventoryItemService inventoryItemService) {
+                           InventoryItemService inventoryItemService,
+                           GameSaveMapper gameSaveMapper) {
         this.graphicAdventureService = graphicAdventureService;
         this.gameSaveService = gameSaveService;
         this.authService = authService;
         this.sceneService = sceneService;
         this.inventoryItemService = inventoryItemService;
+        this.gameSaveMapper = gameSaveMapper;
     }
 
     @Transactional
-    public GameStateDto startNewGame(String adventureCode) {
+    public GameSaveDto startNewGame(String adventureCode) {
         User user = authService.getCurrentUser();
-        GraphicAdventureDto adventureDto = graphicAdventureService.getAdventureByCode(adventureCode);
+        GraphicAdventureDto adventure = graphicAdventureService.getAdventureByCode(adventureCode);
 
         gameSaveService.deleteSavesForAdventure(user.getUsername(), adventureCode);
 
-        String startingSceneCode = adventureDto.getInitialSceneCode();
-        if (startingSceneCode == null || startingSceneCode.isBlank()) {
+        String initialSceneCode = adventure.getInitialSceneCode();
+        if (initialSceneCode == null || initialSceneCode.isBlank()) {
             throw new ResourceNotFoundException("L'avventura non ha una scena iniziale configurata");
         }
 
-        SceneDto startingSceneDto = sceneService.getSceneByCode(adventureCode, startingSceneCode);
+        SceneDto initialScene = sceneService.getSceneByCode(adventureCode, initialSceneCode);
 
-        Set<String> initialVisibleItems = startingSceneDto.getItems() == null
+        Set<String> visibleItems = (initialScene.getItems() == null)
                 ? Collections.emptySet()
-                : startingSceneDto.getItems().stream()
+                : initialScene.getItems().stream()
                 .filter(ItemDto::isInitiallyVisible)
                 .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 
-        GameSave initialSave = gameSaveService.createInitialSave(
-                user,
-                adventureDto,
-                startingSceneDto.getCode(),
-                initialVisibleItems
-        );
+        GameSave save = gameSaveService.createInitialSave(user, adventure, initialScene.getCode(), visibleItems);
 
-        return buildGameState(initialSave);
+        return buildGameSaveDto(save);
     }
 
     @Transactional(readOnly = true)
-    public GameStateDto continueGame(String adventureCode) {
+    public GameSaveDto continueGame(String adventureCode) {
         User user = authService.getCurrentUser();
         GameSave lastSave = gameSaveService.findLatestSave(user.getUsername(), adventureCode);
-        return buildGameState(lastSave);
+        return buildGameSaveDto(lastSave);
     }
 
     @Transactional(readOnly = true)
-    public GameStateDto loadGame(String saveCode) {
+    public GameSaveDto loadGame(String saveCode) {
         GameSave save = gameSaveService.findSaveByUser(saveCode);
-        return buildGameState(save);
+        return buildGameSaveDto(save);
     }
 
     @Transactional(readOnly = true)
-    public GameStateDto buildGameState(GameSave save) {
-        String advCode = save.getGraphicAdventure().getCode();
+    public GameSaveDto buildGameSaveDto(GameSave save) {
+        String adventureCode = save.getGraphicAdventure().getCode();
 
-        SceneDto sceneDto = sceneService.getSceneByCode(
-                advCode,
-                save.getCurrentSceneCode()
-        );
-
-        List<InventoryItemDto> inventoryDtos = inventoryItemService.getInventoryItemsByAdventureAndCodes(
-                advCode,
-                save.getInventory()
-        );
-
-        return GameStateDto.builder()
-                .saveCode(save.getCode())
-                .currentScene(sceneDto)
-                .inventory(inventoryDtos)
+        GameStateDto state = GameStateDto.builder()
+                .currentScene(sceneService.getSceneByCode(adventureCode, save.getCurrentSceneCode()))
+                .inventory(inventoryItemService.loadPlayerInventory(adventureCode, save.getInventory()))
                 .adventureFlags(save.getAdventureFlags())
                 .visibleItemCodes(save.getVisibleItems())
                 .build();
+
+        GameSaveDto dto = gameSaveMapper.toDto(save);
+        dto.setGameState(state);
+        return dto;
     }
 }

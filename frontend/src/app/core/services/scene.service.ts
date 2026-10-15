@@ -29,6 +29,6 @@ export class SceneService {
   }
 
   addItemToScene(sceneId: number, formData: FormData): Observable<Item> {
-    return this.http.post<Item>(`${this.apiUrl}/${sceneId}/items`, formData);
+    return this.http.post<Item>(`${this.apiUrl}/${sceneId}/addItem`, formData);
   }
 }

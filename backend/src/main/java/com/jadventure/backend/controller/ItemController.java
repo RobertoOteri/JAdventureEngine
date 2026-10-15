@@ -32,13 +32,13 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getItemById(itemId));
     }
 
-    @PutMapping(value = "/{itemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemDto> updateItem(
-            @PathVariable Long itemId,
             @Valid @RequestPart("data") ItemDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "inventoryImage", required = false) MultipartFile inventoryImage) {
 
-        return ResponseEntity.ok(itemService.updateItemById(itemId, dto, image));
+        return ResponseEntity.ok(itemService.updateItem(dto, image, inventoryImage));
     }
 
     @DeleteMapping("/{itemId}")
@@ -47,7 +47,7 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{itemId}/actions")
+    @PostMapping("/{itemId}/addAction")
     public ResponseEntity<ActionDto> addAction(
             @PathVariable Long itemId,
             @Valid @RequestBody ActionDto actionDto) {

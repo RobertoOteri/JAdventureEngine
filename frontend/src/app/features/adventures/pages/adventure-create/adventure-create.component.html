@@ -1,6 +1,5 @@
 <div [class.modal-backdrop]="isModal()">
   <div [class.modal-container]="isModal()" class="workspace-screen" (click)="$event.stopPropagation()">
-    <!-- Topbar Header -->
     <header class="workspace-topbar">
       <div class="topbar-left">
         <button type="button" class="btn-back" (click)="onCancel()">
@@ -66,6 +65,25 @@
               <span class="error-hint">Il titolo non può superare i 100 caratteri.</span>
             }
           </div>
+
+          @if (initialAdventure()) {
+            <div class="field-group">
+              <label for="initialSceneCode">Scena Iniziale di Partenza</label>
+              <select
+                id="initialSceneCode"
+                formControlName="initialSceneCode"
+                class="studio-select"
+              >
+                <option value="">-- Nessuna scena iniziale --</option>
+                @for (scene of scenes(); track scene.code) {
+                  <option [value]="scene.code">
+                    {{ scene.name }} ({{ scene.code }})
+                  </option>
+                }
+              </select>
+              <span class="field-hint">Questa è la prima stanza mostrata ai giocatori quando avviano una nuova partita.</span>
+            </div>
+          }
 
           <div class="field-group flex-fill">
             <label for="description">Sinossi / Ambientazione</label>

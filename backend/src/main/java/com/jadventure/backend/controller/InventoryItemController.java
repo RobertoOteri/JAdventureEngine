@@ -32,12 +32,11 @@ public class InventoryItemController {
         return ResponseEntity.ok(inventoryItemService.getInventoryItemById(inventoryItemId));
     }
 
-    @PutMapping(value = "/{inventoryItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<InventoryItemDto> updateInventoryItemById(
-            @PathVariable Long inventoryItemId,
             @Valid @RequestPart("data") InventoryItemDto dto,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        return ResponseEntity.ok(inventoryItemService.updateInventoryItemById(inventoryItemId, dto, image));
+        return ResponseEntity.ok(inventoryItemService.updateInventoryItem(dto, image));
     }
 
     @DeleteMapping("/{inventoryItemId}")

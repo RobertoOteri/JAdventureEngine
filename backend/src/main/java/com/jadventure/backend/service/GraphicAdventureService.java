@@ -9,6 +9,7 @@ import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.Scene;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
+import com.jadventure.backend.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,18 +25,18 @@ public class GraphicAdventureService {
     private final GraphicAdventureMapper graphicAdventureMapper;
     private final SceneMapper sceneMapper;
     private final AuthService authService;
-    private final FileStorageService fileStorageService;
+    private final FileStorageUtil fileStorageUtil;
 
     public GraphicAdventureService(GraphicAdventureRepository graphicAdventureRepository,
                                    GraphicAdventureMapper graphicAdventureMapper,
                                    SceneMapper sceneMapper,
                                    AuthService authService,
-                                   FileStorageService fileStorageService) {
+                                   FileStorageUtil fileStorageUtil) {
         this.graphicAdventureRepository = graphicAdventureRepository;
         this.graphicAdventureMapper = graphicAdventureMapper;
         this.sceneMapper = sceneMapper;
         this.authService = authService;
-        this.fileStorageService = fileStorageService;
+        this.fileStorageUtil = fileStorageUtil;
     }
 
     @Transactional(readOnly = true)
@@ -62,11 +63,6 @@ public class GraphicAdventureService {
         return graphicAdventureMapper.toDto(findAdventureByCode(code));
     }
 
-    @Transactional(readOnly = true)
-    public boolean existsByCode(String code) {
-        return graphicAdventureRepository.existsByCode(code);
-    }
-
     @Transactional
     public GraphicAdventureDto createAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
         String title = dto.getTitle();
@@ -76,7 +72,8 @@ public class GraphicAdventureService {
 
         String coverUrl = null;
         if (coverImage != null && !coverImage.isEmpty()) {
-            coverUrl = fileStorageService.storeAdventureCover(code, coverImage);
+            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, code);
+            coverUrl = fileStorageUtil.storeFile(path, coverImage);
         }
 
         GraphicAdventure adventure = GraphicAdventure.builder()
@@ -92,15 +89,20 @@ public class GraphicAdventureService {
     }
 
     @Transactional
-    public GraphicAdventureDto updateAdventureById(Long adventureId, GraphicAdventureDto dto, MultipartFile coverImage) {
-        GraphicAdventure adventure = findAdventureById(adventureId);
+    public GraphicAdventureDto updateAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
+        GraphicAdventure adventure = findAdventureById(dto.getId());
         authService.validateOwnership(adventure.getAuthor().getUsername());
 
         adventure.setTitle(dto.getTitle());
         adventure.setDescription(dto.getDescription());
 
+        if (dto.getInitialSceneCode() != null && !dto.getInitialSceneCode().isBlank()) {
+            adventure.setInitialSceneCode(dto.getInitialSceneCode());
+        }
+
         if (coverImage != null && !coverImage.isEmpty()) {
-            adventure.setCoverImageUrl(fileStorageService.storeAdventureCover(adventure.getCode(), coverImage));
+            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, adventure.getCode());
+            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
         }
 
         return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
@@ -115,31 +117,20 @@ public class GraphicAdventureService {
     }
 
     @Transactional
-    public void updateInitialSceneCode(String adventureCode, String sceneCode) {
-        GraphicAdventure adventure = findAdventureByCode(adventureCode);
-        authService.validateOwnership(adventure.getAuthor().getUsername());
-        adventure.setInitialSceneCode(sceneCode);
-        graphicAdventureRepository.save(adventure);
-    }
-
-    @Transactional
     public SceneDto addScene(Long adventureId, SceneDto sceneDto, MultipartFile backgroundImage) {
         GraphicAdventure adventure = findAdventureById(adventureId);
         authService.validateOwnership(adventure.getAuthor().getUsername());
 
-        if (adventure.getScenes().stream().anyMatch(s -> s.getCode().equalsIgnoreCase(sceneDto.getCode()))) {
-            throw new IllegalArgumentException("Scena già presente con codice: " + sceneDto.getCode());
-        }
-
         Scene scene = sceneMapper.toEntity(sceneDto);
 
-        String bgUrl = fileStorageService.storeSceneBackground(adventure.getCode(), sceneDto.getCode(), backgroundImage);
-        scene.setBackgroundImageUrl(bgUrl);
+        String path = String.format(FileStorageUtil.PATH_SCENE_BACKGROUND, adventure.getCode(), sceneDto.getCode());
+        String backgroundImageUrl = fileStorageUtil.storeFile(path, backgroundImage);
+
+        scene.setBackgroundImageUrl(backgroundImageUrl);
         scene.setGraphicAdventure(adventure);
         adventure.getScenes().add(scene);
 
-        boolean hasNoInitialScene = adventure.getInitialSceneCode() == null || adventure.getInitialSceneCode().isBlank();
-        if (hasNoInitialScene || sceneDto.isSetAsInitial()) {
+        if (adventure.getInitialSceneCode() == null || adventure.getInitialSceneCode().isBlank()) {
             adventure.setInitialSceneCode(scene.getCode());
         }
 

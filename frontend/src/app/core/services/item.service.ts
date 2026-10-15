@@ -20,8 +20,8 @@ export class ItemService {
     return this.http.get<Item>(`${this.apiUrl}/${itemId}`);
   }
 
-  updateItem(itemId: number, formData: FormData): Observable<Item> {
-    return this.http.put<Item>(`${this.apiUrl}/${itemId}`, formData);
+  updateItem(formData: FormData): Observable<Item> {
+    return this.http.put<Item>(this.apiUrl, formData);
   }
 
   deleteItem(itemId: number): Observable<void> {
@@ -29,6 +29,6 @@ export class ItemService {
   }
 
   addAction(itemId: number, actionDto: Action): Observable<Action> {
-    return this.http.post<Action>(`${this.apiUrl}/${itemId}/actions`, actionDto);
+    return this.http.post<Action>(`${this.apiUrl}/${itemId}/addAction`, actionDto);
   }
 }

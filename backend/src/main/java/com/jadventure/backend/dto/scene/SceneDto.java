@@ -29,8 +29,6 @@ public class SceneDto {
 
     private String backgroundImageUrl;
 
-    private boolean setAsInitial;
-
     @Builder.Default
     private List<ItemDto> items = new ArrayList<>();
 }

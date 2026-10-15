@@ -27,8 +27,7 @@ export class SceneCreateComponent implements OnInit {
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
-    code: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-z0-9_]+$/)]],
-    setAsInitial: [false]
+    code: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-z0-9_]+$/)]]
   });
 
   readonly selectedFile = signal<File | null>(null);
@@ -61,7 +60,7 @@ export class SceneCreateComponent implements OnInit {
         },
         error: (err) => {
           console.error('Errore nel caricamento dei dati avventura:', err);
-          this.errorMessage.set('Impossibile caricare i dati dell\'avventura.');
+          this.errorMessage.set("Impossibile caricare i dati dell'avventura.");
         }
       });
     }
@@ -82,15 +81,9 @@ export class SceneCreateComponent implements OnInit {
   private applyInitialState(isInitial: boolean): void {
     this.isInitialScene.set(isInitial);
     if (isInitial) {
-      this.form.patchValue({
-        code: 'start',
-        setAsInitial: true
-      });
+      this.form.patchValue({ code: 'start' });
     } else {
-      this.form.patchValue({
-        code: '',
-        setAsInitial: false
-      });
+      this.form.patchValue({ code: '' });
     }
   }
 
@@ -125,8 +118,7 @@ export class SceneCreateComponent implements OnInit {
 
     const scenePayload = {
       name: this.form.value.name?.trim(),
-      code: this.form.value.code?.trim(),
-      setAsInitial: this.form.value.setAsInitial
+      code: this.form.value.code?.trim()
     };
 
     formData.append(

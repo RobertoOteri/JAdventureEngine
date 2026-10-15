@@ -23,16 +23,12 @@ export class AdventureService {
     return this.http.get<GraphicAdventureDto>(`${this.apiUrl}/${adventureId}`);
   }
 
-  getAdventureByCode(code: string): Observable<GraphicAdventureDto> {
-    return this.http.get<GraphicAdventureDto>(`${this.apiUrl}/${code}`);
-  }
-
   createAdventure(formData: FormData): Observable<GraphicAdventureDto> {
     return this.http.post<GraphicAdventureDto>(this.apiUrl, formData);
   }
 
-  updateAdventure(adventureId: number, formData: FormData): Observable<GraphicAdventureDto> {
-    return this.http.put<GraphicAdventureDto>(`${this.apiUrl}/${adventureId}`, formData);
+  updateAdventure(formData: FormData): Observable<GraphicAdventureDto> {
+    return this.http.put<GraphicAdventureDto>(this.apiUrl, formData);
   }
 
   deleteAdventure(adventureId: number): Observable<void> {
@@ -40,6 +36,6 @@ export class AdventureService {
   }
 
   addScene(adventureId: number, formData: FormData): Observable<Scene> {
-    return this.http.post<Scene>(`${this.apiUrl}/${adventureId}/scenes`, formData);
+    return this.http.post<Scene>(`${this.apiUrl}/${adventureId}/addScene`, formData);
   }
 }

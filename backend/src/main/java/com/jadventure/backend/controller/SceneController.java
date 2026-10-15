@@ -38,7 +38,7 @@ public class SceneController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/{sceneId}/items", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{sceneId}/addItem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemDto> addItem(
             @PathVariable Long sceneId,
             @Valid @RequestPart("data") ItemDto itemDto,

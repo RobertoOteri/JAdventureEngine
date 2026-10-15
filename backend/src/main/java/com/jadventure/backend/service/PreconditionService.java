@@ -1,25 +1,28 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.model.Action;
-import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.model.Precondition;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PreconditionService {
 
-    public Optional<String> validatePreconditions(GameSave save, Action action) {
+    public Optional<String> validatePreconditions(Set<String> inventory,
+                                                  Map<String, String> adventureFlags,
+                                                  Action action) {
         List<Precondition> preconditions = action.getPreconditions();
         if (preconditions == null || preconditions.isEmpty()) {
             return Optional.empty();
         }
 
         for (Precondition precondition : preconditions) {
-            if (!isSatisfied(save, precondition)) {
+            if (!isSatisfied(inventory, adventureFlags, precondition)) {
                 if (precondition.getFailureMessage() != null && !precondition.getFailureMessage().isBlank()) {
                     return Optional.of(precondition.getFailureMessage());
                 }
@@ -33,7 +36,9 @@ public class PreconditionService {
         return Optional.empty();
     }
 
-    public boolean isSatisfied(GameSave save, Precondition precondition) {
+    public boolean isSatisfied(Set<String> inventory,
+                               Map<String, String> adventureFlags,
+                               Precondition precondition) {
         if (precondition == null || precondition.getType() == null) {
             return false;
         }
@@ -42,13 +47,13 @@ public class PreconditionService {
 
         return switch (precondition.getType()) {
             case HAS_ITEM ->
-                    save.getInventory() != null && save.getInventory().contains(key);
+                    inventory != null && inventory.contains(key);
 
             case DOES_NOT_HAVE_ITEM ->
-                    save.getInventory() == null || !save.getInventory().contains(key);
+                    inventory == null || !inventory.contains(key);
 
             case FLAG_EQUALS -> {
-                String val = (save.getAdventureFlags() != null) ? save.getAdventureFlags().get(key) : null;
+                String val = (adventureFlags != null) ? adventureFlags.get(key) : null;
                 yield Objects.equals(val, precondition.getExpectedValue());
             }
         };

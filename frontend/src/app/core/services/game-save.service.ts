@@ -12,7 +12,7 @@ export class GameSaveService {
   private readonly apiUrl = `${environment.apiUrl}/saves`;
 
   getSavesForAdventure(adventureCode: string): Observable<GameSaveDto[]> {
-    return this.http.get<GameSaveDto[]>(`${this.apiUrl}/adventure/${adventureCode}`);
+    return this.http.get<GameSaveDto[]>(`${this.apiUrl}/saveGame/${adventureCode}`);
   }
 
   createSave(activeSaveCode: string, saveName?: string): Observable<GameSaveDto> {

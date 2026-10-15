@@ -19,8 +19,8 @@ export class ActionService {
     return this.http.get<Action>(`${this.apiUrl}/${actionId}`);
   }
 
-  updateAction(actionId: number, actionDto: Action): Observable<Action> {
-    return this.http.put<Action>(`${this.apiUrl}/${actionId}`, actionDto);
+  updateAction(actionDto: Action): Observable<Action> {
+    return this.http.put<Action>(this.apiUrl, actionDto);
   }
 
   getActionsByItem(itemId: number): Observable<Action[]> {

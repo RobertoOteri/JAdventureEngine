@@ -46,13 +46,12 @@ public class GraphicAdventureController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping(value = "/{adventureId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GraphicAdventureDto> updateAdventure(
-            @PathVariable Long adventureId,
             @Valid @RequestPart("data") GraphicAdventureDto data,
             @RequestPart(value = "coverImage", required = false) MultipartFile coverImage
     ) {
-        GraphicAdventureDto updated = graphicAdventureService.updateAdventureById(adventureId, data, coverImage);
+        GraphicAdventureDto updated = graphicAdventureService.updateAdventure(data, coverImage);
         return ResponseEntity.ok(updated);
     }
 
@@ -62,7 +61,7 @@ public class GraphicAdventureController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/{adventureId}/scenes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{adventureId}/addScene", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SceneDto> addScene(
             @PathVariable Long adventureId,
             @Valid @RequestPart("data") SceneDto sceneDto,

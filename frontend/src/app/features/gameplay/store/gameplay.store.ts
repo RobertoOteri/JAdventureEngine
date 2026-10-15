@@ -11,7 +11,8 @@ import {
   GameSaveDto,
   Item,
   InventoryItem,
-  ActionType, GameActionResultDto
+  ActionType,
+  GameActionResultDto
 } from '../../../core/models';
 
 export interface RadialMenuState {
@@ -23,6 +24,7 @@ export interface RadialMenuState {
 
 export interface GameplayState {
   adventureCode: string | null;
+  currentSaveCode: string | null;
   gameState: GameStateDto | null;
   savesList: GameSaveDto[];
   isLoading: boolean;
@@ -41,6 +43,7 @@ const initialRadialState: RadialMenuState = {
 
 const initialState: GameplayState = {
   adventureCode: null,
+  currentSaveCode: null,
   gameState: null,
   savesList: [],
   isLoading: false,
@@ -54,7 +57,6 @@ export const GameplayStore = signalStore(
   withState(initialState),
 
   withComputed((store) => ({
-    currentSaveCode: computed(() => store.gameState()?.saveCode ?? null),
     currentScene: computed(() => store.gameState()?.currentScene ?? null),
     inventory: computed<InventoryItem[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
@@ -159,12 +161,13 @@ export const GameplayStore = signalStore(
         ),
         switchMap((adventureCode) =>
           gameService.startNewGame(adventureCode).pipe(
-            switchMap((gameState) =>
+            switchMap((save) =>
               saveService.getSavesForAdventure(adventureCode).pipe(
                 tap({
                   next: (savesList) => {
                     patchState(store, {
-                      gameState,
+                      currentSaveCode: save.code,
+                      gameState: save.gameState ?? null,
                       savesList,
                       isLoading: false
                     });
@@ -172,7 +175,8 @@ export const GameplayStore = signalStore(
                   },
                   error: () => {
                     patchState(store, {
-                      gameState,
+                      currentSaveCode: save.code,
+                      gameState: save.gameState ?? null,
                       savesList: [],
                       isLoading: false
                     });
@@ -205,11 +209,31 @@ export const GameplayStore = signalStore(
         ),
         switchMap((adventureCode) =>
           gameService.continueGame(adventureCode).pipe(
+            switchMap((save) =>
+              saveService.getSavesForAdventure(adventureCode).pipe(
+                tap({
+                  next: (savesList) => {
+                    patchState(store, {
+                      currentSaveCode: save.code,
+                      gameState: save.gameState ?? null,
+                      savesList,
+                      isLoading: false
+                    });
+                    closeRadialMenu();
+                  },
+                  error: () => {
+                    patchState(store, {
+                      currentSaveCode: save.code,
+                      gameState: save.gameState ?? null,
+                      savesList: [],
+                      isLoading: false
+                    });
+                    closeRadialMenu();
+                  }
+                })
+              )
+            ),
             tap({
-              next: (gameState) => {
-                patchState(store, { gameState, isLoading: false });
-                closeRadialMenu();
-              },
               error: (err) => {
                 console.error('Errore ripresa partita:', err);
                 patchState(store, { isLoading: false });
@@ -233,9 +257,17 @@ export const GameplayStore = signalStore(
         switchMap((saveCode) =>
           gameService.loadGame(saveCode).pipe(
             tap({
-              next: (gameState) => {
-                patchState(store, { gameState, isLoading: false });
+              next: (save) => {
+                patchState(store, {
+                  currentSaveCode: save.code,
+                  gameState: save.gameState ?? null,
+                  isLoading: false
+                });
                 closeRadialMenu();
+                const advCode = store.adventureCode();
+                if (advCode) {
+                  fetchSaves(advCode);
+                }
               },
               error: (err) => {
                 console.error('Errore caricamento partita:', err);

@@ -18,7 +18,7 @@ public class GameSaveController {
         this.gameSaveService = gameSaveService;
     }
 
-    @GetMapping("/adventure/{adventureCode}")
+    @GetMapping("/saveGame/{adventureCode}")
     public ResponseEntity<List<GameSaveDto>> getSavesForAdventure(@PathVariable("adventureCode") String adventureCode) {
         return ResponseEntity.ok(gameSaveService.getSavesForAdventure(adventureCode));
     }

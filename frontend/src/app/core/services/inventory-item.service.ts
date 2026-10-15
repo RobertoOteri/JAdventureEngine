@@ -20,8 +20,8 @@ export class InventoryItemService {
     return this.http.get<InventoryItem>(`${this.apiUrl}/${inventoryItemId}`);
   }
 
-  updateInventoryItem(inventoryItemId: number, formData: FormData): Observable<InventoryItem> {
-    return this.http.put<InventoryItem>(`${this.apiUrl}/${inventoryItemId}`, formData);
+  updateInventoryItem(formData: FormData): Observable<InventoryItem> {
+    return this.http.put<InventoryItem>(this.apiUrl, formData);
   }
 
   deleteInventoryItem(inventoryItemId: number): Observable<void> {

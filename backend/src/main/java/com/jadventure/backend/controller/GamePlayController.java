@@ -1,5 +1,6 @@
 package com.jadventure.backend.controller;
 
+import com.jadventure.backend.dto.game.GameSaveDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.service.GamePlayService;
 import org.springframework.http.HttpStatus;
@@ -17,17 +18,17 @@ public class GamePlayController {
     }
 
     @PostMapping("/adventure/{adventureCode}")
-    public ResponseEntity<GameStateDto> startNewGame(@PathVariable("adventureCode") String adventureCode) {
+    public ResponseEntity<GameSaveDto> startNewGame(@PathVariable("adventureCode") String adventureCode) {
         return ResponseEntity.status(HttpStatus.CREATED).body(gamePlayService.startNewGame(adventureCode));
     }
 
     @GetMapping("/adventure/{adventureCode}/continue")
-    public ResponseEntity<GameStateDto> continueGame(@PathVariable("adventureCode") String adventureCode) {
+    public ResponseEntity<GameSaveDto> continueGame(@PathVariable("adventureCode") String adventureCode) {
         return ResponseEntity.ok(gamePlayService.continueGame(adventureCode));
     }
 
     @PostMapping("/load/{saveCode}")
-    public ResponseEntity<GameStateDto> loadGame(@PathVariable("saveCode") String saveCode) {
+    public ResponseEntity<GameSaveDto> loadGame(@PathVariable("saveCode") String saveCode) {
         return ResponseEntity.ok(gamePlayService.loadGame(saveCode));
     }
 }
