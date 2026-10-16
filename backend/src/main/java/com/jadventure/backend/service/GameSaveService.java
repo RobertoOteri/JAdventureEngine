@@ -2,6 +2,8 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.game.GameSaveDto;
+import com.jadventure.backend.dto.game.GameStateDto;
+import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
@@ -10,43 +12,77 @@ import com.jadventure.backend.repository.GameSaveRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GameSaveService {
 
     private final GameSaveRepository gameSaveRepository;
+    private final GraphicAdventureService graphicAdventureService;
     private final GameSaveMapper gameSaveMapper;
     private final AuthService authService;
 
-    public GameSaveService(GameSaveRepository gameSaveRepository,
-                           GameSaveMapper gameSaveMapper,
-                           AuthService authService) {
+    public GameSaveService(
+            GameSaveRepository gameSaveRepository,
+            GraphicAdventureService graphicAdventureService,
+            GameSaveMapper gameSaveMapper,
+            AuthService authService
+    ) {
         this.gameSaveRepository = gameSaveRepository;
+        this.graphicAdventureService = graphicAdventureService;
         this.gameSaveMapper = gameSaveMapper;
         this.authService = authService;
     }
 
     @Transactional
-    public GameSave createInitialSave(User user,
-                                      GraphicAdventureDto adventureDto,
-                                      String currentSceneCode,
-                                      Set<String> visibleItems) {
-        GameSaveDto saveDto = GameSaveDto.builder()
-                .name("Autosave - " + adventureDto.getTitle())
-                .currentSceneCode(currentSceneCode)
-                .build();
+    public GameSaveDto createSave(String adventureCode, String saveName, GameStateDto gameStateDto) {
+        User user = authService.getCurrentUser();
+        GraphicAdventureDto adventure = graphicAdventureService.getAdventureByCode(adventureCode);
 
-        GameSave sessionSave = gameSaveMapper.toEntity(saveDto, adventureDto);
-        sessionSave.setUser(user);
-        sessionSave.setVisibleItems(visibleItems != null ? new HashSet<>(visibleItems) : new HashSet<>());
-        sessionSave.setInventory(new HashSet<>());
-        sessionSave.setAdventureFlags(new HashMap<>());
+        if (gameStateDto == null || gameStateDto.getCurrentScene() == null) {
+            throw new IllegalArgumentException("Stato di gioco mancante");
+        }
 
-        return gameSaveRepository.save(sessionSave);
+        GameSave save = gameSaveMapper.toEntity(GameSaveDto.builder()
+                .name(saveName)
+                .currentSceneCode(gameStateDto.getCurrentScene().getCode())
+                .build(), adventure);
+
+        save.setUser(user);
+        save.setAutoSave(false);
+
+        populateSaveData(save, gameStateDto);
+        return gameSaveMapper.toDto(gameSaveRepository.save(save));
+    }
+
+    // Metodo specifico richiamato dalle azioni per aggiornare l'autosave esistente in-place
+    @Transactional
+    public void updateAutoSave(String adventureCode, GameStateDto gameStateDto) {
+        User user = authService.getCurrentUser();
+
+        if (gameStateDto == null || gameStateDto.getCurrentScene() == null) {
+            throw new IllegalArgumentException("Stato di gioco mancante");
+        }
+
+        GameSave save = gameSaveRepository
+                .findFirstByUserUsernameAndGraphicAdventureCodeAndAutoSaveTrue(user.getUsername(), adventureCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Autosave non trovato per questa avventura"));
+
+        save.setName("Salvataggio automatico");
+        populateSaveData(save, gameStateDto);
+        gameSaveRepository.save(save);
+    }
+
+    private void populateSaveData(GameSave save, GameStateDto gameStateDto) {
+        save.setCurrentSceneCode(gameStateDto.getCurrentScene().getCode());
+        save.setVisibleItems(gameStateDto.getVisibleItemCodes() == null ? new HashSet<>() : new HashSet<>(gameStateDto.getVisibleItemCodes()));
+        save.setInventory(gameStateDto.getInventory() == null ? new HashSet<>() : gameStateDto.getInventory().stream().map(InventoryItemDto::getCode).collect(Collectors.toSet()));
+        save.setAdventureFlags(gameStateDto.getAdventureFlags() == null ? new HashMap<>() : new HashMap<>(gameStateDto.getAdventureFlags()));
+        save.setSavedAt(LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)
@@ -63,40 +99,13 @@ public class GameSaveService {
     }
 
     @Transactional
-    public GameSaveDto createSaveFromActive(String activeSaveCode, String saveName) {
-        GameSave currentSave = findSaveByUser(activeSaveCode);
-
-        String finalName = (saveName != null && !saveName.isBlank())
-                ? saveName
-                : "Salvataggio " + currentSave.getGraphicAdventure().getTitle();
-
-        GameSave checkpoint = GameSave.builder()
-                .name(finalName)
-                .user(currentSave.getUser())
-                .graphicAdventure(currentSave.getGraphicAdventure())
-                .currentSceneCode(currentSave.getCurrentSceneCode())
-                .inventory(new HashSet<>(currentSave.getInventory()))
-                .adventureFlags(new HashMap<>(currentSave.getAdventureFlags()))
-                .visibleItems(new HashSet<>(currentSave.getVisibleItems()))
-                .build();
-
-        return gameSaveMapper.toDto(gameSaveRepository.save(checkpoint));
-    }
-
-    @Transactional
-    public GameSave save(GameSave save) {
-        return gameSaveRepository.save(save);
-    }
-
-    @Transactional
     public void deleteSavesForAdventure(String username, String adventureCode) {
         gameSaveRepository.deleteAllByUserUsernameAndGraphicAdventureCode(username, adventureCode);
     }
 
     @Transactional(readOnly = true)
     public GameSave findLatestSave(String username, String adventureCode) {
-        return gameSaveRepository
-                .findFirstByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(username, adventureCode)
+        return gameSaveRepository.findFirstByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(username, adventureCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun salvataggio trovato per l'avventura: " + adventureCode));
     }
 

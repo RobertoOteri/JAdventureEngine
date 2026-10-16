@@ -293,3 +293,49 @@
 .btn-save:hover {
   background: #e2e8f0;
 }
+
+.save-section-group {
+  margin-bottom: 1.25rem;
+}
+
+.save-section-group:last-child {
+  margin-bottom: 0;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  margin-bottom: 0.5rem;
+}
+
+.autosave-row {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  background: rgba(56, 189, 248, 0.06) !important;
+}
+
+.autosave-row:hover {
+  border-color: rgba(56, 189, 248, 0.7) !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+}
+
+.manual-saves-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.empty-saves-inline {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}

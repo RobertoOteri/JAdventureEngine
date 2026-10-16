@@ -33,10 +33,8 @@ export class GameLaunchModalComponent {
 
   onNewGameClick(): void {
     if (this.hasSaves()) {
-      // Ha già dei salvataggi: chiedi conferma prima di sovrascrivere
       this.isConfirmOverwriteOpen.set(true);
     } else {
-      // Prima partita in assoluto: avvia direttamente
       this.startNew.emit();
     }
   }

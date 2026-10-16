@@ -1,12 +1,12 @@
-import { Component, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, output, signal, computed } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameSaveDto } from '../../../../core/models';
 
 @Component({
   selector: 'app-game-pause-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './game-pause-modal.component.html',
   styleUrl: './game-pause-modal.component.css'
 })
@@ -20,6 +20,14 @@ export class GamePauseModalComponent {
 
   readonly mode = signal<'MENU' | 'SAVE_FORM' | 'LOAD_LIST'>('MENU');
   saveSlotName = '';
+
+  autoSave = computed(() =>
+    this.saves().find(s => s.autoSave || s.name === 'Salvataggio automatico' || s.name === 'Inizio Avventura')
+  );
+
+  manualSaves = computed(() =>
+    this.saves().filter(s => s !== this.autoSave())
+  );
 
   setMode(newMode: 'MENU' | 'SAVE_FORM' | 'LOAD_LIST'): void {
     this.mode.set(newMode);

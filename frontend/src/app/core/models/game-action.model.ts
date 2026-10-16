@@ -2,7 +2,8 @@ import { ActionType } from './action.model';
 import { GameStateDto } from './game-state.model';
 
 export interface GameActionDto {
-  saveCode: string;
+  adventureCode: string;
+  gameState: GameStateDto;
   actionCode: string;
   actionType: ActionType;
 }

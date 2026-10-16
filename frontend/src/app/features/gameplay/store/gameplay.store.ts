@@ -1,7 +1,7 @@
 import { inject, computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { GamePlayService } from '../../../core/services/game-play.service';
 import { GameSaveService } from '../../../core/services/game-save.service';
 import { ActionService } from '../../../core/services/action.service';
@@ -130,22 +130,16 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const togglePauseMenu = (): void => {
-      patchState(store, (state) => {
-        const nextState = !state.isPauseMenuOpen;
-        if (nextState && state.adventureCode) {
-          fetchSaves(state.adventureCode);
-        }
-        return { isPauseMenuOpen: nextState };
-      });
-    };
-
     const setPauseMenuOpen = (isOpen: boolean): void => {
       patchState(store, { isPauseMenuOpen: isOpen });
       const advCode = store.adventureCode();
       if (isOpen && advCode) {
         fetchSaves(advCode);
       }
+    };
+
+    const togglePauseMenu = (): void => {
+      setPauseMenuOpen(!store.isPauseMenuOpen());
     };
 
     const startNewGame = rxMethod<string>(
@@ -282,17 +276,20 @@ export const GameplayStore = signalStore(
 
     const executeAction = rxMethod<{ actionCode: string; actionType: ActionType }>(
       pipe(
-        switchMap(({ actionCode, actionType }) => {
-          const saveCode = store.currentSaveCode();
-          if (!saveCode) {
-            console.error('Nessun saveCode attivo presente nello store');
+        exhaustMap(({ actionCode, actionType }) => {
+          const adventureCode = store.adventureCode();
+          const gameState = store.gameState();
+
+          if (!adventureCode || !gameState) {
+            console.error('Nessuna partita attiva nello store');
             setFeedbackMessage('Errore: sessione di gioco non valida.');
             closeRadialMenu();
             return [];
           }
 
           const payload: GameActionDto = {
-            saveCode,
+            adventureCode,
+            gameState,
             actionCode,
             actionType
           };
@@ -325,20 +322,19 @@ export const GameplayStore = signalStore(
     const saveCurrentGame = rxMethod<string | undefined>(
       pipe(
         switchMap((saveName) => {
-          const saveCode = store.currentSaveCode();
           const advCode = store.adventureCode();
-          if (!saveCode) {
-            console.error('Nessun salvataggio attivo da salvare');
+          const currentState = store.gameState();
+
+          if (!advCode) {
+            console.error('Nessuna avventura attiva da salvare');
             return [];
           }
 
-          return saveService.createSave(saveCode, saveName).pipe(
+          return saveService.createSave(advCode, currentState, saveName).pipe(
             tap({
               next: () => {
                 setFeedbackMessage('Partita salvata con successo!');
-                if (advCode) {
-                  fetchSaves(advCode);
-                }
+                fetchSaves(advCode);
               },
               error: (err) => {
                 console.error('Errore durante il salvataggio:', err);

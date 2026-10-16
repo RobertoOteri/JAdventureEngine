@@ -75,7 +75,7 @@
 @if (isConfirmOverwriteOpen()) {
   <app-confirmation-modal
     title="Avviare una Nuova Partita?"
-    message="Attenzione: avviando una nuova partita sovrascriverai i progressi salvati per questa avventura. Sei sicuro di voler continuare?"
+    message="Attenzione: avviando una nuova partita cancellerai tutti i salvataggi di questa avventura. Sei sicuro di voler continuare?"
     confirmText="Sì, ricomincia"
     cancelText="Annulla"
     [isDestructive]="true"
@@ -83,3 +83,4 @@
     (cancel)="isConfirmOverwriteOpen.set(false)"
   />
 }
+

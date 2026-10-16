@@ -8,5 +8,6 @@ export interface GameSaveDto {
   currentSceneCode: string;
   savedAt: string;
   graphicAdventureDto?: GraphicAdventureDto;
+  autoSave?: boolean;
   gameState?: GameStateDto;
 }

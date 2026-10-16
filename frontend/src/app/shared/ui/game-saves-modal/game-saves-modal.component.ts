@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { GameSaveDto } from '../../../core/models';
 
@@ -15,4 +15,12 @@ export class GameSavesModalComponent {
 
   selectSave = output<string>();
   close = output<void>();
+
+  autoSave = computed(() =>
+    this.saves().find(s => s.name === 'Salvataggio automatico' || s.name === 'Inizio Avventura')
+  );
+
+  manualSaves = computed(() =>
+    this.saves().filter(s => s !== this.autoSave())
+  );
 }

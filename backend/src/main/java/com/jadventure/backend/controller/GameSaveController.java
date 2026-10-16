@@ -1,6 +1,7 @@
 package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.game.GameSaveDto;
+import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.service.GameSaveService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,12 @@ public class GameSaveController {
         return ResponseEntity.ok(gameSaveService.getSaveByCode(saveCode));
     }
 
-    @PostMapping("/{activeSaveCode}")
-    public ResponseEntity<GameSaveDto> createSave(
-            @PathVariable("activeSaveCode") String activeSaveCode,
-            @RequestParam(required = false) String saveName) {
+
+    @PostMapping("/{adventureCode}")
+    public ResponseEntity<GameSaveDto> createSave(@PathVariable("adventureCode") String adventureCode,
+                                                  @RequestParam(required = false) String saveName,
+                                                  @RequestBody GameStateDto gameStateDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(gameSaveService.createSaveFromActive(activeSaveCode, saveName));
+                .body(gameSaveService.createSave(adventureCode, saveName, gameStateDto));
     }
 }

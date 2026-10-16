@@ -63,6 +63,9 @@ public class GameSave {
     @JoinColumn(name = "graphic_adventure_id", nullable = false)
     private GraphicAdventure graphicAdventure;
 
+    @Column(name = "is_auto_save", nullable = false)
+    private boolean autoSave = false;
+
     @PrePersist
     protected void onPrePersist() {
         this.savedAt = LocalDateTime.now();

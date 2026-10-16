@@ -105,9 +105,10 @@ CREATE TABLE IF NOT EXISTS game_saves (
     user_id BIGINT NOT NULL,
     graphic_adventure_id BIGINT NOT NULL,
     current_scene_code VARCHAR(255) NOT NULL,
-    saved_at TIMESTAMP WITHOUT TIME ZONE,
-    CONSTRAINT fk_game_save_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_game_save_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures (id) ON DELETE CASCADE
+    is_auto_save BOOLEAN NOT NULL DEFAULT FALSE,
+    saved_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    CONSTRAINT fk_game_save_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_game_save_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS game_save_inventory (
@@ -140,5 +141,6 @@ CREATE INDEX IF NOT EXISTS idx_actions_item_id ON actions (item_id);
 CREATE INDEX IF NOT EXISTS idx_preconditions_action_id ON preconditions (action_id);
 CREATE INDEX IF NOT EXISTS idx_game_effects_action_id ON game_effects (action_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_items_adventure_id ON inventory_items (graphic_adventure_id);
-CREATE INDEX IF NOT EXISTS idx_game_saves_user_adv_date ON game_saves (user_id, graphic_adventure_id, saved_at DESC);
+CREATE INDEX IF NOT EXISTS idx_game_saves_user_adv_auto_date ON game_saves (user_id, graphic_adventure_id, is_auto_save, saved_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_saves_code_user ON game_saves (code, user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_game_saves_one_auto ON game_saves (user_id, graphic_adventure_id) WHERE is_auto_save = TRUE;

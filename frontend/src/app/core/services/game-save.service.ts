@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GameSaveDto } from '../models';
+import { GameSaveDto, GameStateDto } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -15,8 +15,8 @@ export class GameSaveService {
     return this.http.get<GameSaveDto[]>(`${this.apiUrl}/saveGame/${adventureCode}`);
   }
 
-  createSave(activeSaveCode: string, saveName?: string): Observable<GameSaveDto> {
+  createSave(adventureCode: string, gameState: GameStateDto | null, saveName?: string): Observable<GameSaveDto> {
     const params = saveName ? new HttpParams().set('saveName', saveName) : undefined;
-    return this.http.post<GameSaveDto>(`${this.apiUrl}/${activeSaveCode}`, null, { params });
+    return this.http.post<GameSaveDto>(`${this.apiUrl}/${adventureCode}`, gameState, { params });
   }
 }

@@ -16,27 +16,59 @@
     </header>
 
     <div class="modal-body custom-scroll">
-      <div class="saves-list">
-        @for (save of saves(); track save.code) {
-          <div class="save-row" (click)="selectSave.emit(save.code)">
+
+      @if (autoSave(); as auto) {
+        <div class="save-section-group">
+          <span class="section-label">
+            <i class="bi bi-lightning-charge-fill"></i> Autosalvataggio
+          </span>
+          <div class="save-row autosave-row" (click)="selectSave.emit(auto.code)">
             <div class="save-info">
-              <strong class="save-title">{{ save.name }}</strong>
+              <strong class="save-title">{{ auto.name }}</strong>
               <span class="save-meta">
-                <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.currentSceneCode }}</strong>
+                <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.currentSceneCode }}</strong>
               </span>
             </div>
-            <button type="button" class="btn-select-save" title="Carica questo salvataggio">
+            <button type="button" class="btn-select-save" title="Carica l'autosave">
               <i class="bi bi-box-arrow-in-right"></i>
               <span>Carica</span>
             </button>
           </div>
-        } @empty {
-          <div class="empty-saves">
-            <i class="bi bi-inbox icon-empty"></i>
-            <p>Nessun salvataggio trovato per questa avventura.</p>
-          </div>
-        }
+        </div>
+      }
+
+      <div class="save-section-group">
+        <span class="section-label">
+          <i class="bi bi-journal-bookmark-fill"></i> Salvataggi Manuali
+        </span>
+        <div class="saves-list">
+          @for (save of manualSaves(); track save.code) {
+            <div class="save-row" (click)="selectSave.emit(save.code)">
+              <div class="save-info">
+                <strong class="save-title">{{ save.name }}</strong>
+                <span class="save-meta">
+                  <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.currentSceneCode }}</strong>
+                </span>
+              </div>
+              <button type="button" class="btn-select-save" title="Carica questo salvataggio">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Carica</span>
+              </button>
+            </div>
+          } @empty {
+            <div class="empty-saves-inline">
+              <p>Nessun salvataggio manuale presente.</p>
+            </div>
+          }
+        </div>
       </div>
+
+      @if (!autoSave() && saves().length === 0) {
+        <div class="empty-saves">
+          <i class="bi bi-inbox icon-empty"></i>
+          <p>Nessun salvataggio trovato per questa avventura.</p>
+        </div>
+      }
     </div>
 
     <footer class="modal-footer">

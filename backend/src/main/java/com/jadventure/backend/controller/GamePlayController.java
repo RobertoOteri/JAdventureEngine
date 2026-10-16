@@ -1,7 +1,6 @@
 package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.game.GameSaveDto;
-import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.service.GamePlayService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class GamePlayController {
         return ResponseEntity.ok(gamePlayService.continueGame(adventureCode));
     }
 
-    @PostMapping("/load/{saveCode}")
+    @GetMapping("/load/{saveCode}")
     public ResponseEntity<GameSaveDto> loadGame(@PathVariable("saveCode") String saveCode) {
         return ResponseEntity.ok(gamePlayService.loadGame(saveCode));
     }

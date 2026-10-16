@@ -12,8 +12,11 @@ import lombok.*;
 @AllArgsConstructor
 public class GameActionDto {
 
-    @NotBlank(message = "Il codice del salvataggio è obbligatorio")
-    private String saveCode;
+    @NotBlank(message = "Il codice dell'avventura è obbligatorio")
+    private String adventureCode;
+
+    @NotNull(message = "Lo stato di gioco è obbligatorio")
+    private GameStateDto gameState;
 
     @NotBlank(message = "Il codice dell'azione è obbligatorio")
     private String actionCode;

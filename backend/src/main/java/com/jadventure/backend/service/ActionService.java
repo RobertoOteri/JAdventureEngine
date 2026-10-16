@@ -3,10 +3,10 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.game.GameActionDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
+import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.model.Action;
-import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.repository.ActionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,6 @@ public class ActionService {
     private final PreconditionService preconditionService;
     private final GameEffectService gameEffectService;
     private final GameSaveService gameSaveService;
-    private final GamePlayService gamePlayService;
     private final AuthService authService;
 
     public ActionService(ActionRepository actionRepository,
@@ -30,20 +29,23 @@ public class ActionService {
                          PreconditionService preconditionService,
                          GameEffectService gameEffectService,
                          GameSaveService gameSaveService,
-                         GamePlayService gamePlayService,
                          AuthService authService) {
         this.actionRepository = actionRepository;
         this.actionMapper = actionMapper;
         this.preconditionService = preconditionService;
         this.gameEffectService = gameEffectService;
         this.gameSaveService = gameSaveService;
-        this.gamePlayService = gamePlayService;
         this.authService = authService;
     }
 
     @Transactional
     public GameActionResultDto executeAction(GameActionDto actionDto) {
-        GameSave save = gameSaveService.findSaveByUser(actionDto.getSaveCode());
+        String adventureCode = actionDto.getAdventureCode();
+        GameStateDto stateDto = actionDto.getGameState();
+
+        if (adventureCode == null || stateDto == null || stateDto.getCurrentScene() == null) {
+            throw new IllegalArgumentException("Stato di gioco o codice avventura mancante");
+        }
 
         Action action = actionRepository.findByCode(actionDto.getActionCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -56,22 +58,19 @@ public class ActionService {
             );
         }
 
-        Optional<String> failureMessage = preconditionService.validatePreconditions(
-                save.getInventory(),
-                save.getAdventureFlags(),
-                action
-        );
+        Optional<String> failureMessage = preconditionService.validatePreconditions(stateDto, action);
 
         if (failureMessage.isPresent()) {
             return GameActionResultDto.builder()
                     .success(false)
                     .feedbackMessage(failureMessage.get())
-                    .state(gamePlayService.buildGameSaveDto(save).getGameState())
+                    .state(stateDto)
                     .build();
         }
 
-        gameEffectService.applyAll(save, action.getEffects());
-        gameSaveService.save(save);
+        gameEffectService.applyAll(adventureCode, stateDto, action.getEffects());
+
+        gameSaveService.updateAutoSave(adventureCode, stateDto);
 
         String successMessage = (action.getSuccessMessage() != null && !action.getSuccessMessage().isBlank())
                 ? action.getSuccessMessage()
@@ -80,7 +79,7 @@ public class ActionService {
         return GameActionResultDto.builder()
                 .success(true)
                 .feedbackMessage(successMessage)
-                .state(gamePlayService.buildGameSaveDto(save).getGameState())
+                .state(stateDto)
                 .build();
     }
 

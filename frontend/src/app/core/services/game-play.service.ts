@@ -20,6 +20,6 @@ export class GamePlayService {
   }
 
   loadGame(saveCode: string): Observable<GameSaveDto> {
-    return this.http.post<GameSaveDto>(`${this.apiUrl}/load/${saveCode}`, {});
+    return this.http.get<GameSaveDto>(`${this.apiUrl}/load/${saveCode}`, {});
   }
 }

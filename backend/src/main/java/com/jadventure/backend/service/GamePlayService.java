@@ -61,9 +61,17 @@ public class GamePlayService {
                 .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 
-        GameSave save = gameSaveService.createInitialSave(user, adventure, initialScene.getCode(), visibleItems);
+        GameStateDto initialState = GameStateDto.builder()
+                .currentScene(initialScene)
+                .visibleItemCodes(visibleItems)
+                .build();
 
-        return buildGameSaveDto(save);
+        GameSaveDto saveDto = gameSaveService.createSave(adventureCode, "Salvataggio automatico", initialState);
+
+        GameSave saveEntity = gameSaveService.findSaveByUser(saveDto.getCode());
+        saveEntity.setAutoSave(true);
+
+        return loadGame(saveDto.getCode());
     }
 
     @Transactional(readOnly = true)
