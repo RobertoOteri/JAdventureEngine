@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
-import { GraphicAdventureDto } from '../../../../core/models';
+import { GraphicAdventureDto, Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
 
 @Component({
@@ -24,13 +24,15 @@ export class AdventureCreateComponent {
 
   readonly isModal = input<boolean>(false);
   readonly initialAdventure = input<GraphicAdventureDto | null>(null);
+  readonly scenes = input<Scene[]>([]);
 
   readonly closeRequested = output<void>();
   readonly saved = output<FormData>();
 
   readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(2000)]]
+    description: ['', [Validators.maxLength(2000)]],
+    initialSceneCode: ['']
   });
 
   private selectedFile: File | null = null;
@@ -45,7 +47,8 @@ export class AdventureCreateComponent {
       if (init) {
         this.form.patchValue({
           title: init.title,
-          description: init.description || ''
+          description: init.description || '',
+          initialSceneCode: init.initialSceneCode || ''
         });
         this.existingCoverUrl.set(init.coverImageUrl || null);
       }
@@ -65,11 +68,19 @@ export class AdventureCreateComponent {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+    const init = this.initialAdventure();
     const formData = new FormData();
-    const adventurePayload = {
+
+    const adventurePayload: any = {
       title: this.form.value.title?.trim(),
       description: this.form.value.description?.trim() || null
     };
+
+    if (init?.id) {
+      adventurePayload.id = init.id;
+      adventurePayload.code = init.code;
+      adventurePayload.initialSceneCode = this.form.value.initialSceneCode || null;
+    }
 
     formData.append(
       'data',
@@ -89,7 +100,7 @@ export class AdventureCreateComponent {
       next: (createdAdventure: GraphicAdventureDto) => {
         this.isSubmitting.set(false);
         const sceneTarget = createdAdventure.initialSceneCode || 'new';
-        this.router.navigate(['/editor', createdAdventure.code, sceneTarget]);
+        void this.router.navigate(['/editor', createdAdventure.id, sceneTarget]);
       },
       error: (err: any) => {
         this.isSubmitting.set(false);
@@ -104,7 +115,7 @@ export class AdventureCreateComponent {
     if (this.isModal()) {
       this.closeRequested.emit();
     } else {
-      this.router.navigate(['/adventures/my']);
+      void this.router.navigate(['/adventures/my']);
     }
   }
 }

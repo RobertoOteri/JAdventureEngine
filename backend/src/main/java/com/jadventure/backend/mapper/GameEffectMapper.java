@@ -1,9 +1,7 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.action.GameEffectDto;
-import com.jadventure.backend.dto.action.PreconditionDto;
 import com.jadventure.backend.model.GameEffect;
-import com.jadventure.backend.model.Precondition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -16,7 +14,7 @@ public interface GameEffectMapper {
 
     List<GameEffectDto> toDtoList(List<GameEffect> entities);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "action", ignore = true)
     GameEffect toEntity(GameEffectDto dto);
-
-    List<GameEffect> toEntityList(List<GameEffectDto> dtos);
 }

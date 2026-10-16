@@ -18,6 +18,8 @@ import java.util.List;
 @Builder
 public class ItemDto {
 
+    private Long id;
+
     @NotBlank(message = "Il codice dell'item è obbligatorio")
     @Size(max = 50, message = "Il codice dell'item non può superare i 50 caratteri")
     private String code;
@@ -31,7 +33,7 @@ public class ItemDto {
     private Integer posY;
 
     @NotBlank(message = "I punti dell'area interattiva sono obbligatori")
-    @Size(max = 100)
+    @Size(max = 1000, message = "I punti non possono superare i 1000 caratteri")
     private String points;
 
     private Integer width;

@@ -1,0 +1,129 @@
+<div class="modal-backdrop" (click)="resume.emit()">
+  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="modal-header-left">
+        <div class="icon-wrap">
+          <i class="bi bi-pause-fill"></i>
+        </div>
+        <div>
+          <h3>Menu di Pausa</h3>
+          <span class="modal-subtitle">Gestione della sessione di gioco</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="resume.emit()" title="Riprendi gioco">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="modal-body custom-scroll">
+      @if (mode() === 'MENU') {
+        <div class="pause-actions-list">
+          <button type="button" class="btn-pause-option primary" (click)="resume.emit()">
+            <i class="bi bi-play-fill"></i>
+            <span>Riprendi Partita</span>
+          </button>
+
+          <button type="button" class="btn-pause-option" (click)="setMode('SAVE_FORM')">
+            <i class="bi bi-floppy-fill"></i>
+            <span>Salva Partita</span>
+          </button>
+
+          <button type="button" class="btn-pause-option" (click)="setMode('LOAD_LIST')">
+            <i class="bi bi-folder2-open"></i>
+            <span>Carica Partita</span>
+          </button>
+
+          <div class="pause-divider"></div>
+
+          <button type="button" class="btn-pause-option danger" (click)="exit.emit()">
+            <i class="bi bi-box-arrow-left"></i>
+            <span>Esci all'Elenco Avventure</span>
+          </button>
+        </div>
+      }
+
+      @if (mode() === 'SAVE_FORM') {
+        <div class="save-form-container">
+          <div class="field-group">
+            <label for="saveName">Nome del Salvataggio</label>
+            <input
+              id="saveName"
+              type="text"
+              class="studio-input"
+              [(ngModel)]="saveSlotName"
+              placeholder="Es. Prima della porta chiusa..."
+            />
+          </div>
+
+          <div class="action-buttons-row">
+            <button type="button" class="btn-cancel" (click)="setMode('MENU')">Indietro</button>
+            <button type="button" class="btn-save" (click)="onConfirmSave()">
+              <i class="bi bi-check2"></i>
+              <span>Conferma Salvataggio</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (mode() === 'LOAD_LIST') {
+        <div class="load-list-container">
+          <div class="saves-list custom-scroll">
+
+            <!-- SEZIONE AUTOSALVATAGGIO -->
+            @if (autoSave(); as auto) {
+              <div class="save-section-group">
+                <span class="section-label">
+                  <i class="bi bi-lightning-charge-fill"></i> Autosalvataggio
+                </span>
+                <div class="save-row autosave-row" (click)="onSelectSaveToLoad(auto.code)">
+                  <div class="save-info">
+                    <strong class="save-title">{{ auto.name }}</strong>
+                    <span class="save-meta">
+                      <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.currentSceneCode }}</strong>
+                    </span>
+                  </div>
+                  <button type="button" class="btn-load-slot">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Carica</span>
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- SEZIONE SALVATAGGI MANUALI -->
+            <div class="save-section-group">
+              <span class="section-label">
+                <i class="bi bi-journal-bookmark-fill"></i> Salvataggi Manuali
+              </span>
+              <div class="manual-saves-stack">
+                @for (save of manualSaves(); track save.code) {
+                  <div class="save-row" (click)="onSelectSaveToLoad(save.code)">
+                    <div class="save-info">
+                      <strong class="save-title">{{ save.name }}</strong>
+                      <span class="save-meta">
+                        <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.currentSceneCode }}</strong>
+                      </span>
+                    </div>
+                    <button type="button" class="btn-load-slot">
+                      <i class="bi bi-box-arrow-in-right"></i>
+                      <span>Carica</span>
+                    </button>
+                  </div>
+                } @empty {
+                  <div class="empty-saves-inline">
+                    <p>Nessun salvataggio manuale presente.</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+
+          <div class="action-buttons-row">
+            <button type="button" class="btn-cancel" (click)="setMode('MENU')">Indietro</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -56,13 +56,10 @@ public class GraphicAdventure {
     @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<InventoryItem> inventoryItems = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Builder.Default
-//    private List<GameSession> sessions = new ArrayList<>();
-//
-//    @OneToOne(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private AdventureInitialState initialState;
+
+    @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<GameSave> saves = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {

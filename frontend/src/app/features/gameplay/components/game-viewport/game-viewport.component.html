@@ -1,0 +1,55 @@
+<div class="viewport-shell" (click)="canvasClicked.emit()">
+  @if (scene(); as currentScene) {
+    <div class="viewport-frame">
+      @if (backgroundUrl()) {
+        <img [src]="backgroundUrl()" alt="Sfondo Scena" class="scene-background" />
+      }
+
+      <div class="scene-sprites-layer">
+        @for (item of currentScene.items; track item.code) {
+          @if (item.imageUrl && isItemVisible(item)) {
+            <img
+              [src]="item.imageUrl"
+              [alt]="item.name"
+              class="item-sprite"
+              [style.left.%]="(item.posX != null ? item.posX : 0) / 10"
+              [style.top.%]="(item.posY != null ? item.posY : 0) / 10"
+              [style.width.%]="(item.width && item.width > 0 ? item.width : 120) / 10"
+              [style.height.%]="(item.height && item.height > 0 ? item.height : 120) / 10"
+            />
+          }
+        }
+      </div>
+
+      <svg class="scene-hotspot-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+        @for (item of currentScene.items; track item.code) {
+          @if (isItemVisible(item)) {
+            <polygon
+              [attr.points]="item.points"
+              class="hotspot-polygon"
+              (mousedown)="onHotspotMouseDown($event, item)"
+            >
+              <title>{{ item.name }}</title>
+            </polygon>
+          }
+        }
+      </svg>
+
+      @if (feedbackMessage(); as msg) {
+        <div class="feedback-banner" (click)="$event.stopPropagation()">
+          <div class="feedback-icon">
+            <i class="bi bi-chat-left-dots-fill"></i>
+          </div>
+          <div class="feedback-content">
+            <p>{{ msg }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="viewport-empty">
+      <i class="bi bi-image empty-icon"></i>
+      <p>Caricamento della scena in corso...</p>
+    </div>
+  }
+</div>

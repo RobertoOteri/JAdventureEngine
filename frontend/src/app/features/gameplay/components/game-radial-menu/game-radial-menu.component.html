@@ -1,0 +1,38 @@
+<div
+  class="radial-menu-backdrop"
+  (click)="close.emit()"
+  (contextmenu)="$event.preventDefault(); close.emit()"
+>
+  <div
+    class="radial-container"
+    [style.left.px]="x()"
+    [style.top.px]="y()"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="radial-hub">
+      <i class="bi bi-crosshair"></i>
+    </div>
+
+    <div class="actions-ring">
+      @for (action of item()?.actions; track action.id ?? action.type; let idx = $index) {
+        @let slot = getSlotStyle(idx, (item()?.actions?.length || 1));
+        <button
+          type="button"
+          class="btn-radial-action"
+          [style.left]="slot.left"
+          [style.top]="slot.top"
+          (mouseenter)="hoveredAction.set(action.type)"
+          (mouseleave)="hoveredAction.set(null)"
+          (click)="onSelectAction(action, $event)"
+        >
+          <i class="bi" [ngClass]="getActionIcon(action.type)"></i>
+          <span class="action-label">{{ getActionLabel(action.type) }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="target-card">
+      <strong class="item-name">{{ item()?.name }}</strong>
+    </div>
+  </div>
+</div>

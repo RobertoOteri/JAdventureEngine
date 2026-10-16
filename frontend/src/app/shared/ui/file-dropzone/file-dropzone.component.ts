@@ -1,4 +1,4 @@
-import { Component, input, output, signal, effect } from '@angular/core';
+import { Component, input, output, signal, effect, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -15,7 +15,7 @@ export class FileDropzoneComponent {
   readonly hint = input<string>('Formati supportati: PNG, JPG, WEBP (Max 5MB)');
 
   readonly accept = input<string>('image/*');
-  readonly maxSizeBytes = input<number>(5 * 1024 * 1024); // 5MB
+  readonly maxSizeBytes = input<number>(5 * 1024 * 1024);
 
   readonly initialUrl = input<string | null>(null);
 
@@ -25,6 +25,8 @@ export class FileDropzoneComponent {
   readonly previewUrl = signal<string | null>(null);
   readonly fileName = signal<string | null>(null);
   readonly error = signal<string | null>(null);
+
+  private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   constructor() {
     effect(() => {
@@ -91,6 +93,10 @@ export class FileDropzoneComponent {
     this.previewUrl.set(null);
     this.fileName.set(null);
     this.error.set(null);
+    const inputEl = this.fileInputRef()?.nativeElement;
+    if (inputEl) {
+      inputEl.value = '';
+    }
     this.fileChange.emit(null);
   }
 }

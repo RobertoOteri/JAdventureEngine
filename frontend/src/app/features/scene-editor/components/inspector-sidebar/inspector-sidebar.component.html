@@ -1,5 +1,4 @@
 <aside class="sidebar-properties">
-  <!-- 1. Elenco Hotspot presenti nella scena -->
   <div class="panel-section list-section">
     <div class="properties-header">
       <div class="header-title">
@@ -57,7 +56,6 @@
             </div>
           </div>
 
-          <!-- Tendina Dettagli Inventario Espandibile -->
           @if (item.linkedInventoryItem && expandedInventoryItemCode() === item.code) {
             <div class="inventory-accordion-panel" (click)="$event.stopPropagation()">
               <div class="accordion-header-row">
@@ -83,10 +81,16 @@
               </div>
 
               <div class="accordion-body-row">
-                @if (item.linkedInventoryItem.imageUrl || item.imageUrl) {
+                @if (item.linkedInventoryItem.imageUrl) {
                   <img
-                    [src]="resolveImageUrl(item.linkedInventoryItem.imageUrl || item.imageUrl)"
+                    [src]="resolveImageUrl(item.linkedInventoryItem.imageUrl)"
                     alt="Icona Inventario"
+                    class="accordion-thumb"
+                  />
+                } @else if (item.imageUrl) {
+                  <img
+                    [src]="resolveImageUrl(item.imageUrl)"
+                    alt="Sprite Scena (Fallback)"
                     class="accordion-thumb"
                   />
                 }
@@ -111,7 +115,6 @@
 
   <div class="panel-divider"></div>
 
-  <!-- 2. Form Creazione / Modifica Hotspot -->
   <div class="panel-section detail-section custom-scroll">
     @if (isEditingOrCreating()) {
       <div class="creation-box">
@@ -168,7 +171,6 @@
           </div>
         </div>
 
-        <!-- Spunta Raccoglibile -->
         <div class="toggle-card">
           <label class="toggle-label">
             <input
@@ -181,7 +183,6 @@
           </label>
         </div>
 
-        <!-- Spunta Visibile Inizialmente -->
         <div class="toggle-card">
           <label class="toggle-label">
             <input
@@ -244,7 +245,6 @@
 
         <div class="panel-divider" style="margin: 1.25rem 0;"></div>
 
-        <!-- Azioni Collegate -->
         <div class="actions-management">
           <div class="actions-header">
             <h3>Azioni ({{ store.selectedItem()?.actions?.length || 0 }})</h3>
@@ -254,22 +254,34 @@
             </button>
           </div>
 
-          @for (action of store.selectedItem()?.actions; track $index) {
+          @for (action of store.selectedItem()?.actions; track action.id ?? $index) {
             <div class="action-card-item">
               <div class="action-card-info">
                 <span class="action-badge">{{ action.type }}</span>
-                @if (action.code) {
-                  <span class="action-card-code">#{{ action.code }}</span>
+                @if (action.successMessage) {
+                  <span class="action-card-desc" [title]="action.successMessage">
+                    {{ action.successMessage }}
+                  </span>
                 }
               </div>
-              <button
-                type="button"
-                class="btn-remove-action"
-                (click)="deleteActionRequested.emit(action.code || '')"
-                title="Elimina azione"
-              >
-                <i class="bi bi-x-lg"></i>
-              </button>
+              <div class="action-item-buttons">
+                <button
+                  type="button"
+                  class="btn-action-icon edit"
+                  (click)="editActionRequested.emit(action)"
+                  title="Modifica azione"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn-action-icon delete"
+                  (click)="onDeleteAction($event, action.id)"
+                  title="Elimina azione"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
             </div>
           } @empty {
             <div class="actions-empty-note">Nessuna azione collegata a questo hotspot.</div>

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EditorStore } from '../../store/editor.store';
@@ -22,6 +22,7 @@ export class ActionModalComponent {
   readonly store = inject(EditorStore);
 
   readonly itemCode = input.required<string>();
+  readonly actionToEdit = input<Action | null>(null);
 
   readonly saveRequested = output<Action>();
   readonly closeRequested = output<void>();
@@ -56,12 +57,44 @@ export class ActionModalComponent {
     'HIDE_SCENE_ITEM'
   ];
 
+  constructor() {
+    effect(() => {
+      const existing = this.actionToEdit();
+      if (existing) {
+        this.actionType = existing.type;
+        this.actionSuccessMsg = existing.successMessage || '';
+        this.actionFailureMsg = existing.defaultFailureMessage || '';
+        this.actionPreconditions.set(
+          existing.preconditions ? structuredClone(existing.preconditions) : []
+        );
+        this.actionEffects.set(
+          existing.effects ? structuredClone(existing.effects) : []
+        );
+      } else {
+        this.actionType = 'LOOK_AT';
+        this.actionSuccessMsg = '';
+        this.actionFailureMsg = '';
+        this.actionPreconditions.set([]);
+        this.actionEffects.set([]);
+      }
+    });
+  }
+
   readonly availableItemOptions = computed(() => {
     const scenes = this.store.scenes();
+    const currentScene = this.store.currentScene();
     const itemMap = new Map<string, string>();
 
     for (const scene of scenes) {
       for (const it of scene.items || []) {
+        if (!itemMap.has(it.code)) {
+          itemMap.set(it.code, it.name);
+        }
+      }
+    }
+
+    if (currentScene?.items) {
+      for (const it of currentScene.items) {
         if (!itemMap.has(it.code)) {
           itemMap.set(it.code, it.name);
         }
@@ -81,7 +114,7 @@ export class ActionModalComponent {
   addPrecondition(): void {
     this.actionPreconditions.update((list) => [
       ...list,
-      { type: 'HAS_ITEM', requiredKey: '' }
+      { type: 'HAS_ITEM', requiredKey: '', failureMessage: '' }
     ]);
   }
 
@@ -101,7 +134,9 @@ export class ActionModalComponent {
   }
 
   onSubmit(): void {
+    const existing = this.actionToEdit();
     const actionPayload: Action = {
+      ...(existing?.id ? { id: existing.id } : {}),
       type: this.actionType,
       successMessage: this.actionSuccessMsg.trim() || undefined,
       defaultFailureMessage: this.actionFailureMsg.trim() || undefined,

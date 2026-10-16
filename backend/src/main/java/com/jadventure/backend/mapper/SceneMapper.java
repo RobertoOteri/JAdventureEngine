@@ -13,4 +13,9 @@ public interface SceneMapper {
     SceneDto toDto(Scene entity);
 
     List<SceneDto> toDtoList(List<Scene> entities);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "graphicAdventure", ignore = true)
+    @Mapping(target = "items", ignore = true)
+    Scene toEntity(SceneDto dto);
 }

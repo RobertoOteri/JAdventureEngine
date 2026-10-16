@@ -13,7 +13,7 @@ export class AdventureCardComponent {
   readonly adventure = input.required<GraphicAdventureDto>();
   readonly isAuthor = input<boolean>(false);
 
-  readonly play = output<string>();
+  readonly play = output<GraphicAdventureDto>();
   readonly edit = output<GraphicAdventureDto>();
   readonly delete = output<GraphicAdventureDto>();
   readonly info = output<GraphicAdventureDto>();
@@ -22,13 +22,13 @@ export class AdventureCardComponent {
     if (this.isAuthor()) {
       this.edit.emit(this.adventure());
     } else {
-      this.play.emit(this.adventure().code);
+      this.play.emit(this.adventure());
     }
   }
 
   onPlay(event: MouseEvent): void {
     event.stopPropagation();
-    this.play.emit(this.adventure().code);
+    this.play.emit(this.adventure());
   }
 
   onEdit(event: MouseEvent): void {

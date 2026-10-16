@@ -1,0 +1,64 @@
+<div class="gameplay-shell">
+  <app-game-topbar
+    [adventureTitle]="adventureDetails()?.title || 'Avventura Grafica'"
+    [sceneName]="store.currentScene()?.name || 'In attesa...'"
+    [inventoryCount]="store.inventoryCount()"
+    (openInventory)="store.setInventoryOpen(true)"
+    (openPauseMenu)="store.setPauseMenuOpen(true)"
+    (goBack)="onExitToLobby()"
+  />
+
+  <div class="gameplay-workspace">
+    <app-game-viewport
+      [scene]="store.currentScene()"
+      [backgroundUrl]="store.currentSceneBackgroundUrl()"
+      [visibleItemCodes]="store.visibleItemCodes()"
+      [feedbackMessage]="store.feedbackMessage()"
+      (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
+      (canvasClicked)="store.closeRadialMenu()"
+    />
+
+    <app-game-message-banner
+      [message]="store.feedbackMessage()"
+    />
+
+  </div>
+
+  @if (store.radialMenu.isOpen()) {
+    <app-game-radial-menu
+      [x]="store.radialMenu.x()"
+      [y]="store.radialMenu.y()"
+      [item]="store.radialMenu.item()"
+      (actionSelected)="onExecuteAction($event)"
+      (close)="store.closeRadialMenu()"
+    />
+  }
+
+  @if (store.isInventoryOpen()) {
+    <app-game-inventory-modal
+      [items]="store.inventory()"
+      (close)="store.setInventoryOpen(false)"
+    />
+  }
+
+  @if (store.isPauseMenuOpen()) {
+    <app-game-pause-modal
+      [saves]="store.savesList()"
+      (resume)="store.setPauseMenuOpen(false)"
+      (save)="onSaveGame($event)"
+      (load)="store.loadGame($event)"
+      (exit)="onExitToLobby()"
+    />
+  }
+
+  @if (isLaunchModalOpen()) {
+    <app-game-launch-modal
+      [adventureTitle]="adventureDetails()?.title || 'Avventura'"
+      [saves]="store.savesList()"
+      (startNew)="onStartNew()"
+      (continueGame)="onContinue()"
+      (loadSave)="onLoadSave($event)"
+      (cancel)="onExitToLobby()"
+    />
+  }
+</div>

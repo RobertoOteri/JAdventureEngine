@@ -2,11 +2,16 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.auth.AuthRequest;
 import com.jadventure.backend.dto.auth.AuthResponse;
+import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.exception.UsernameAlreadyExistsException;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.UserRepository;
 import com.jadventure.backend.security.JwtService;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +32,6 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
-
         User user = userRepository.findByUsername(request.getUsername())
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
                 .orElseThrow(() -> new BadCredentialsException("Credenziali non valide"));
@@ -38,9 +42,8 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(AuthRequest request) {
-
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UsernameAlreadyExistsException("L'useranme '" + request.getUsername() + "' è già in uso");
+            throw new UsernameAlreadyExistsException("L'username '" + request.getUsername() + "' è già in uso");
         }
         User newUser = User.builder()
                 .username(request.getUsername())
@@ -50,8 +53,36 @@ public class AuthService {
         userRepository.save(newUser);
 
         String token = jwtService.generateToken(newUser.getUsername());
-
         return new AuthResponse(token, newUser.getUsername());
     }
 
+    public boolean isUserLoggedIn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+
+    public String getCurrentUsername() {
+        if (!isUserLoggedIn()) {
+            throw new AccessDeniedException("Operazione non consentita: utente non autenticato");
+        }
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        String username = getCurrentUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Utente autenticato non trovato: " + username));
+    }
+
+    @Transactional(readOnly = true)
+    public void validateOwnership(String ownerUsername) {
+        String currentUsername = getCurrentUsername();
+        if (ownerUsername == null || !ownerUsername.equals(currentUsername)) {
+            throw new AccessDeniedException("Accesso negato: non sei il proprietario di questa risorsa");
+        }
+    }
 }

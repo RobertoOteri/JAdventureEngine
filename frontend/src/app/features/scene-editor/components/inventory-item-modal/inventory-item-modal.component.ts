@@ -1,9 +1,10 @@
-import { Component, OnDestroy, effect, input, output, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
 
 export interface InventoryItemData {
+  code: string;
   name: string;
   description: string;
   useSceneImage: boolean;
@@ -19,19 +20,18 @@ const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
   templateUrl: './inventory-item-modal.component.html',
   styleUrl: './inventory-item-modal.component.css'
 })
-export class InventoryItemModalComponent implements OnDestroy {
-  // Input
+export class InventoryItemModalComponent implements OnInit, OnDestroy {
+  readonly itemCode = input<string>('');
   readonly initialName = input<string>('');
   readonly initialDescription = input<string>('');
   readonly initialUseSceneImage = input<boolean>(true);
   readonly scenePreviewUrl = input<string | null>(null);
   readonly initialCustomFile = input<File | null>(null);
+  readonly initialCustomPreviewUrl = input<string | null>(null);
 
-  // Output
   readonly confirmRequested = output<InventoryItemData>();
   readonly cancelRequested = output<void>();
 
-  // Stato form interno
   name = '';
   description = '';
   useSceneImage = true;
@@ -41,22 +41,18 @@ export class InventoryItemModalComponent implements OnDestroy {
 
   private activeBlobUrl: string | null = null;
 
-  constructor() {
-    effect(() => {
-      this.name = this.initialName();
-      this.description = this.initialDescription();
-      this.useSceneImage = this.initialUseSceneImage();
-      this.customFile = this.initialCustomFile();
-      this.errorMessage.set(null);
+  ngOnInit(): void {
+    this.name = this.initialName();
+    this.description = this.initialDescription();
+    this.useSceneImage = this.initialUseSceneImage();
+    this.customFile = this.initialCustomFile();
 
-      this.revokeCurrentBlob();
-      if (this.customFile) {
-        this.activeBlobUrl = URL.createObjectURL(this.customFile);
-        this.customPreviewUrl.set(this.activeBlobUrl);
-      } else {
-        this.customPreviewUrl.set(null);
-      }
-    });
+    if (this.customFile) {
+      this.activeBlobUrl = URL.createObjectURL(this.customFile);
+      this.customPreviewUrl.set(this.activeBlobUrl);
+    } else if (this.initialCustomPreviewUrl()) {
+      this.customPreviewUrl.set(this.resolveImageUrl(this.initialCustomPreviewUrl()));
+    }
   }
 
   ngOnDestroy(): void {
@@ -71,9 +67,9 @@ export class InventoryItemModalComponent implements OnDestroy {
   }
 
   onCustomFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.customFile = input.files[0];
+    const inputEl = event.target as HTMLInputElement;
+    if (inputEl.files && inputEl.files[0]) {
+      this.customFile = inputEl.files[0];
       this.revokeCurrentBlob();
       this.activeBlobUrl = URL.createObjectURL(this.customFile);
       this.customPreviewUrl.set(this.activeBlobUrl);
@@ -95,10 +91,15 @@ export class InventoryItemModalComponent implements OnDestroy {
     }
 
     this.confirmRequested.emit({
+      code: this.itemCode().trim(),
       name: this.name.trim(),
       description: this.description.trim(),
       useSceneImage: this.useSceneImage,
       customFile: this.useSceneImage ? null : this.customFile
     });
+  }
+
+  onCancel(): void {
+    this.cancelRequested.emit();
   }
 }

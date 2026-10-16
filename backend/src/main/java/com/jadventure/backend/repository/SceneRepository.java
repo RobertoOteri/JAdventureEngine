@@ -12,9 +12,5 @@ public interface SceneRepository extends JpaRepository<Scene, Long> {
 
     List<Scene> findAllByGraphicAdventureCode(String adventureCode);
 
-    List<Scene> findAllByGraphicAdventureCodeAndCode(String adventureCode, String code);
-
     Optional<Scene> findByGraphicAdventureCodeAndCode(String adventureCode, String code);
-
-    boolean existsByGraphicAdventureCodeAndCode(String adventureCode, String code);
 }

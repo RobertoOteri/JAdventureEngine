@@ -10,9 +10,6 @@ import { InspectorSidebarComponent } from './components/inspector-sidebar/inspec
 import { ActionModalComponent } from './components/action-modal/action-modal.component';
 import { InventoryItemData, InventoryItemModalComponent } from './components/inventory-item-modal/inventory-item-modal.component';
 import { AdventureCreateComponent } from '../adventures/pages/adventure-create/adventure-create.component';
-import { environment } from '../../../environments/environment';
-
-const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 
 @Component({
   selector: 'app-scene-editor',
@@ -54,25 +51,39 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   readonly spriteHeight = signal<number>(200);
 
   readonly isInventoryModalOpen = signal<boolean>(false);
-  readonly editingInventoryItemCode = signal<string | null>(null);
+  readonly editingInventoryItemId = signal<number | null>(null);
   readonly invItemName = signal<string>('');
   readonly invItemDesc = signal<string>('');
   readonly invUseSceneImage = signal<boolean>(true);
   readonly invCustomFile = signal<File | null>(null);
+  readonly invCustomPreviewUrl = signal<string | null>(null);
+
   readonly isActionModalOpen = signal<boolean>(false);
+  readonly editingAction = signal<Action | null>(null);
+
   readonly isAdventureModalOpen = signal<boolean>(false);
 
   private activePreviewBlobUrl: string | null = null;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      const adventureCode = params.get('adventureCode') || '';
+      const rawAdventure = params.get('adventureCode') || params.get('adventureId') || params.get('id');
+      const sceneIdParam = params.get('sceneId');
       const sceneCode = params.get('sceneCode') || undefined;
 
       this.cancelDraft();
 
-      if (adventureCode) {
-        this.store.loadAdventureAndScenes({ adventureCode, sceneCode });
+      const numericId = rawAdventure && !isNaN(Number(rawAdventure)) ? Number(rawAdventure) : undefined;
+      const stringCode = !numericId && rawAdventure ? rawAdventure : undefined;
+      const sceneId = sceneIdParam ? Number(sceneIdParam) : undefined;
+
+      if (numericId || stringCode) {
+        this.store.loadAdventureAndScenes({
+          adventureId: numericId,
+          adventureCode: stringCode,
+          sceneId,
+          sceneCode
+        });
       }
     });
   }
@@ -89,11 +100,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   private resolveImageUrl(url?: string | null): string {
-    if (!url) return '';
-    if (/^https?:\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) {
-      return url;
-    }
-    return `${BACKEND_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+    return url ?? '';
   }
 
   startNewHotspot(): void {
@@ -119,9 +126,15 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     const hasInv = !!item.linkedInventoryItem;
     this.isCollectible.set(hasInv);
     if (hasInv && item.linkedInventoryItem) {
+      this.editingInventoryItemId.set(item.linkedInventoryItem.id ?? null);
       this.invItemName.set(item.linkedInventoryItem.name || item.name);
       this.invItemDesc.set(item.linkedInventoryItem.description || '');
-      this.invUseSceneImage.set(!item.linkedInventoryItem.imageUrl || item.linkedInventoryItem.imageUrl === item.imageUrl);
+
+      const hasDedicated = !!item.linkedInventoryItem.imageUrl && item.linkedInventoryItem.imageUrl !== item.imageUrl;
+      this.invUseSceneImage.set(!hasDedicated);
+      this.invCustomPreviewUrl.set(hasDedicated ? this.resolveImageUrl(item.linkedInventoryItem.imageUrl) : null);
+    } else {
+      this.invCustomPreviewUrl.set(null);
     }
 
     this.isInitiallyVisible.set(item.initiallyVisible !== undefined ? Boolean(item.initiallyVisible) : true);
@@ -161,11 +174,12 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.sceneImageFile.set(null);
     this.previewSpriteUrl.set(null);
 
-    this.editingInventoryItemCode.set(null);
+    this.editingInventoryItemId.set(null);
     this.invItemName.set('');
     this.invItemDesc.set('');
     this.invUseSceneImage.set(true);
     this.invCustomFile.set(null);
+    this.invCustomPreviewUrl.set(null);
     this.isInventoryModalOpen.set(false);
 
     this.canvasRef?.clearDraftPoints();
@@ -189,32 +203,44 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   openInventoryModal(): void {
-    this.editingInventoryItemCode.set(null);
+    this.editingInventoryItemId.set(null);
     if (!this.invItemName()) {
       this.invItemName.set(this.itemName() || 'Nuovo Oggetto');
     }
+    this.invCustomPreviewUrl.set(null);
     this.isInventoryModalOpen.set(true);
   }
 
   onEditInventoryItem(item: Item): void {
     if (!item.linkedInventoryItem) return;
 
-    this.editingInventoryItemCode.set(item.code);
+    this.store.selectItem(item);
+    this.itemCode.set(item.code);
+    this.editingInventoryItemId.set(item.linkedInventoryItem.id ?? null);
     this.invItemName.set(item.linkedInventoryItem.name);
     this.invItemDesc.set(item.linkedInventoryItem.description || '');
-    this.invUseSceneImage.set(!item.linkedInventoryItem.imageUrl || item.linkedInventoryItem.imageUrl === item.imageUrl);
+
+    const hasDedicated = !!item.linkedInventoryItem.imageUrl && item.linkedInventoryItem.imageUrl !== item.imageUrl;
+    this.invUseSceneImage.set(!hasDedicated);
     this.invCustomFile.set(null);
+    this.invCustomPreviewUrl.set(hasDedicated ? this.resolveImageUrl(item.linkedInventoryItem.imageUrl) : null);
+
+    this.previewSpriteUrl.set(item.imageUrl ? this.resolveImageUrl(item.imageUrl) : null);
+
     this.isInventoryModalOpen.set(true);
   }
 
   onInventoryConfirmed(data: InventoryItemData): void {
-    const invCode = this.editingInventoryItemCode();
+    const invId = this.editingInventoryItemId();
 
-    if (invCode) {
+    if (invId) {
+      const currentItem = this.store.selectedItem();
       const invPayload = {
-        code: invCode,
+        id: invId,
+        code: currentItem?.code,
         name: data.name,
-        description: data.description
+        description: data.description,
+        imageUrl: data.useSceneImage ? (currentItem?.imageUrl ?? '') : ''
       };
 
       const formData = new FormData();
@@ -224,12 +250,12 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
         formData.append('image', data.customFile);
       }
 
-      this.store.updateInventoryItem(invCode, formData).subscribe({
+      this.store.updateInventoryItem(formData).subscribe({
         next: () => {
           this.isInventoryModalOpen.set(false);
-          this.editingInventoryItemCode.set(null);
+          this.editingInventoryItemId.set(null);
         },
-        error: (err: any) => console.error(err?.error?.message || "Errore aggiornamento inventario.")
+        error: (err: any) => console.error(err?.error?.message || 'Errore aggiornamento inventario.')
       });
       return;
     }
@@ -238,29 +264,34 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.invItemDesc.set(data.description);
     this.invUseSceneImage.set(data.useSceneImage);
     this.invCustomFile.set(data.customFile);
+    this.isCollectible.set(true);
     this.isInventoryModalOpen.set(false);
   }
 
   onInventoryCancelled(): void {
     this.isInventoryModalOpen.set(false);
-    this.editingInventoryItemCode.set(null);
+    this.editingInventoryItemId.set(null);
     if (!this.invItemName()) {
       this.isCollectible.set(false);
     }
   }
 
   onDeleteInventoryItem(itemCode: string): void {
+    const currentItem = this.store.currentScene()?.items?.find((i) => i.code === itemCode);
+    const invId = currentItem?.linkedInventoryItem?.id;
+    if (!invId) return;
+
     if (!confirm(`Vuoi rimuovere l'oggetto dall'inventario per #${itemCode}? L'hotspot nella stanza non verrà eliminato.`)) {
       return;
     }
 
-    this.store.deleteInventoryItem(itemCode).subscribe({
+    this.store.deleteInventoryItem(invId).subscribe({
       next: () => {
         if (this.editingItemCode() === itemCode) {
           this.isCollectible.set(false);
         }
       },
-      error: (err: any) => console.error(err?.error?.message || "Errore rimozione inventario.")
+      error: (err: any) => console.error(err?.error?.message || 'Errore rimozione inventario.')
     });
   }
 
@@ -287,7 +318,16 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     if (!points || points.split(/\s+/).length < 3) return;
 
+    const isEdit = !!this.editingItemCode();
+    const targetItemId = selected?.id;
+
+    if (isEdit && !targetItemId) {
+      console.error("Impossibile aggiornare l'oggetto: ID mancante.");
+      return;
+    }
+
     const itemPayload: any = {
+      ...(isEdit ? { id: targetItemId } : {}),
       name,
       code,
       points,
@@ -298,11 +338,17 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       initiallyVisible: this.isInitiallyVisible()
     };
 
+    const sceneFile = this.sceneImageFile();
+    const invCustomFile = this.invCustomFile();
+
     if (this.isCollectible()) {
       itemPayload.linkedInventoryItem = {
-        code: code,
+        code,
         name: this.invItemName() || name,
-        description: this.invItemDesc() || ''
+        description: this.invItemDesc() || '',
+        imageUrl: (!this.invUseSceneImage() && !invCustomFile && this.invCustomPreviewUrl())
+          ? this.invCustomPreviewUrl()
+          : ''
       };
     } else {
       itemPayload.linkedInventoryItem = null;
@@ -314,18 +360,16 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       new Blob([JSON.stringify(itemPayload)], { type: 'application/json' })
     );
 
-    const sceneFile = this.sceneImageFile();
-    const invCustomFile = this.invCustomFile();
-
-    if (!this.invUseSceneImage() && invCustomFile) {
-      formData.append('image', invCustomFile);
-    } else if (sceneFile) {
+    if (sceneFile) {
       formData.append('image', sceneFile);
     }
 
-    const isEdit = !!this.editingItemCode();
+    if (!this.invUseSceneImage() && invCustomFile) {
+      formData.append('inventoryImage', invCustomFile);
+    }
+
     const save$ = isEdit
-      ? this.store.updateItem(this.editingItemCode()!, formData)
+      ? this.store.updateItem(formData)
       : this.store.saveItem(formData);
 
     save$.subscribe({
@@ -335,14 +379,17 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   deleteItem(itemCode: string): void {
+    const item = this.store.currentScene()?.items?.find((i) => i.code === itemCode);
+    if (!item?.id) return;
+
     if (confirm(`Sei sicuro di voler eliminare l'hotspot #${itemCode}?`)) {
-      this.store.deleteItem(itemCode).subscribe({
+      this.store.deleteItem(item.id).subscribe({
         next: () => {
           if (this.editingItemCode() === itemCode) {
             this.cancelDraft();
           }
         },
-        error: (err: any) => console.error(err?.error?.message || "Errore eliminazione.")
+        error: (err: any) => console.error(err?.error?.message || 'Errore eliminazione.')
       });
     }
   }
@@ -385,39 +432,83 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.canvasRef?.setTool('MOVE');
   }
 
-  openActionModal(): void {
+  openAddAction(): void {
+    this.editingAction.set(null);
+    this.isActionModalOpen.set(true);
+  }
+
+  openEditAction(action: Action): void {
+    this.editingAction.set(action);
     this.isActionModalOpen.set(true);
   }
 
   closeActionModal(): void {
     this.isActionModalOpen.set(false);
+    this.editingAction.set(null);
   }
 
-  onSaveAction(action: Action): void {
+  onSaveAction(actionPayload: Action): void {
     const current = this.store.selectedItem();
-    if (!current) return;
+    if (!current?.id) return;
 
-    this.store.addAction(current.code, action).subscribe({
+    const actionToEdit = this.editingAction();
+    let targetActionId: number | undefined = actionToEdit?.id ?? actionPayload.id;
+
+    if (!targetActionId && actionToEdit) {
+      const match = current.actions?.find((a) => a.type === actionToEdit.type || a.id === actionToEdit.id);
+      if (match?.id) {
+        targetActionId = match.id;
+      }
+    }
+
+    if (targetActionId) {
+      this.store.updateAction({ ...actionPayload, id: targetActionId }).subscribe({
+        next: () => this.closeActionModal(),
+        error: (err: any) => {
+          console.error('Errore aggiornamento azione:', err);
+          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
+        }
+      });
+      return;
+    }
+
+    const duplicate = current.actions?.find((a) => a.type === actionPayload.type);
+    if (duplicate?.id) {
+      this.store.updateAction({ ...actionPayload, id: duplicate.id }).subscribe({
+        next: () => this.closeActionModal(),
+        error: (err: any) => {
+          console.error('Errore aggiornamento azione:', err);
+          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
+        }
+      });
+      return;
+    }
+
+    this.store.addAction(actionPayload).subscribe({
       next: () => this.closeActionModal(),
-      error: (err: any) => console.error(err?.error?.message || "Errore azione.")
+      error: (err: any) => {
+        console.error('Errore salvataggio azione:', err);
+        alert(err?.error?.message || "Errore durante la creazione dell'azione.");
+      }
     });
   }
 
-  onDeleteAction(actionCode: string): void {
-    const current = this.store.selectedItem();
-    if (!current || !actionCode) return;
+  onDeleteAction(actionId: number): void {
+    if (!actionId) return;
 
     if (confirm("Vuoi rimuovere questa azione dall'hotspot?")) {
-      this.store.deleteAction(current.code, actionCode).subscribe({
+      this.store.deleteAction(actionId).subscribe({
         error: (err: any) => console.error('Errore eliminazione azione:', err)
       });
     }
   }
 
   goToAddScene(): void {
-    const advCode = this.store.adventure()?.code;
-    if (advCode) {
-      this.router.navigate(['/adventures', advCode, 'scenes', 'new']);
+    const advId = this.store.adventure()?.id
+      || Number(this.route.snapshot.paramMap.get('adventureId') || this.route.snapshot.paramMap.get('id'));
+
+    if (advId) {
+      void this.router.navigate(['/adventures', advId, 'scenes', 'new']);
     }
   }
 
@@ -430,7 +521,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       next: () => {
         this.isAdventureModalOpen.set(false);
       },
-      error: (err: any) => console.error(err?.error?.message || "Errore modifica avventura.")
+      error: (err: any) => console.error(err?.error?.message || 'Errore modifica avventura.')
     });
   }
 }

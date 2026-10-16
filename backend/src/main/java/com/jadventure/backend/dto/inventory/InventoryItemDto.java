@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InventoryItemDto {
 
+    private Long id;
+
     @NotBlank(message = "Il codice dell'oggetto dell'inventario è obbligatorio")
     @Size(max = 50, message = "Il codice non può superare i 50 caratteri")
     private String code;
@@ -25,5 +27,4 @@ public class InventoryItemDto {
     private String description;
 
     private String imageUrl;
-
 }

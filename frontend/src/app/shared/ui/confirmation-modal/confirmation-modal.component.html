@@ -1,0 +1,36 @@
+<div class="modal-backdrop" (click)="cancel.emit()">
+  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="modal-header-left">
+        <div class="icon-wrap" [class.danger]="isDestructive()">
+          <i class="bi" [class.bi-exclamation-triangle-fill]="isDestructive()" [class.bi-info-circle-fill]="!isDestructive()"></i>
+        </div>
+        <div>
+          <h3>{{ title() }}</h3>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="cancel.emit()" title="Chiudi finestra">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <p class="confirm-message">{{ message() }}</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="cancel.emit()">
+        {{ cancelText() }}
+      </button>
+      <button
+        type="button"
+        class="btn-confirm"
+        [class.btn-danger]="isDestructive()"
+        (click)="confirm.emit()"
+      >
+        <i class="bi" [class.bi-trash3]="isDestructive()" [class.bi-check-lg]="!isDestructive()"></i>
+        <span>{{ confirmText() }}</span>
+      </button>
+    </footer>
+  </div>
+</div>

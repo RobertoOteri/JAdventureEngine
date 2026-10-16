@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Item } from '../models';
+import { Action, Item } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,25 +9,26 @@ import { environment } from '../../../environments/environment';
 })
 export class ItemService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/adventures`;
+  private readonly apiUrl = `${environment.apiUrl}/items`;
 
-  getItems(adventureCode: string, sceneCode: string): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items`);
+  getItemsBySceneId(sceneId: number): Observable<Item[]> {
+    const params = new HttpParams().set('sceneId', sceneId.toString());
+    return this.http.get<Item[]>(this.apiUrl, { params });
   }
 
-  getItem(adventureCode: string, sceneCode: string, itemCode: string): Observable<Item> {
-    return this.http.get<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`);
+  getItemById(itemId: number): Observable<Item> {
+    return this.http.get<Item>(`${this.apiUrl}/${itemId}`);
   }
 
-  createItem(adventureCode: string, sceneCode: string, formData: FormData): Observable<Item> {
-    return this.http.post<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items`, formData);
+  updateItem(formData: FormData): Observable<Item> {
+    return this.http.put<Item>(this.apiUrl, formData);
   }
 
-  updateItem(adventureCode: string, sceneCode: string, itemCode: string, formData: FormData): Observable<Item> {
-    return this.http.put<Item>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`, formData);
+  deleteItem(itemId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${itemId}`);
   }
 
-  deleteItem(adventureCode: string, sceneCode: string, itemCode: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${adventureCode}/scenes/${sceneCode}/items/${itemCode}`);
+  addAction(itemId: number, actionDto: Action): Observable<Action> {
+    return this.http.post<Action>(`${this.apiUrl}/${itemId}/addAction`, actionDto);
   }
 }

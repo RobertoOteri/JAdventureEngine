@@ -45,7 +45,8 @@
       (openInventoryModalRequested)="openInventoryModal()"
       (editInventoryItemRequested)="onEditInventoryItem($event)"
       (deleteInventoryItemRequested)="onDeleteInventoryItem($event)"
-      (openAddActionRequested)="openActionModal()"
+      (openAddActionRequested)="openAddAction()"
+      (editActionRequested)="openEditAction($event)"
       (deleteActionRequested)="onDeleteAction($event)"
     />
   </div>
@@ -53,6 +54,7 @@
   @if (isActionModalOpen() && store.selectedItem()) {
     <app-action-modal
       [itemCode]="store.selectedItem()!.code"
+      [actionToEdit]="editingAction()"
       (saveRequested)="onSaveAction($event)"
       (closeRequested)="closeActionModal()"
     />
@@ -60,11 +62,13 @@
 
   @if (isInventoryModalOpen()) {
     <app-inventory-item-modal
+      [itemCode]="itemCode()"
       [initialName]="invItemName()"
       [initialDescription]="invItemDesc()"
       [initialUseSceneImage]="invUseSceneImage()"
       [scenePreviewUrl]="previewSpriteUrl()"
       [initialCustomFile]="invCustomFile()"
+      [initialCustomPreviewUrl]="invCustomPreviewUrl()"
       (confirmRequested)="onInventoryConfirmed($event)"
       (cancelRequested)="onInventoryCancelled()"
     />
@@ -74,6 +78,7 @@
     <app-adventure-create
       [isModal]="true"
       [initialAdventure]="store.adventure()"
+      [scenes]="store.scenes()"
       (saved)="onSaveAdventureDetails($event)"
       (closeRequested)="isAdventureModalOpen.set(false)"
     />

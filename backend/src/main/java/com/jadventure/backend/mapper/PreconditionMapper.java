@@ -14,7 +14,7 @@ public interface PreconditionMapper {
 
     List<PreconditionDto> toDtoList(List<Precondition> entities);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "action", ignore = true)
     Precondition toEntity(PreconditionDto dto);
-
-    List<Precondition> toEntityList(List<PreconditionDto> dtos);
 }

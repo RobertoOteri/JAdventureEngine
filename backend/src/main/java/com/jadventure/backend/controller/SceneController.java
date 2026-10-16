@@ -1,5 +1,6 @@
 package com.jadventure.backend.controller;
 
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.service.SceneService;
 import jakarta.validation.Valid;
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/adventures/{adventureCode}/scenes")
+@RequestMapping("/api/scenes")
 public class SceneController {
 
     private final SceneService sceneService;
@@ -22,34 +23,28 @@ public class SceneController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SceneDto>> getAllScenes(
-            @PathVariable("adventureCode") String adventureCode) {
+    public ResponseEntity<List<SceneDto>> getScenes(@RequestParam String adventureCode) {
         return ResponseEntity.ok(sceneService.getScenesByAdventure(adventureCode));
     }
 
-    @GetMapping("/{sceneCode}")
-    public ResponseEntity<SceneDto> getScene(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode) {
-        return ResponseEntity.ok(sceneService.getSceneByCode(adventureCode, sceneCode));
+    @GetMapping("/{sceneId}")
+    public ResponseEntity<SceneDto> getSceneById(@PathVariable Long sceneId) {
+        return ResponseEntity.ok(sceneService.getSceneById(sceneId));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SceneDto> createScene(
-            @PathVariable("adventureCode") String adventureCode,
-            @Valid @RequestPart("data") SceneDto dto,
-            @RequestPart("backgroundImage") MultipartFile backgroundImage) {
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(sceneService.createScene(adventureCode, dto, backgroundImage));
-    }
-
-    @DeleteMapping("/{sceneCode}")
-    public ResponseEntity<Void> deleteScene(
-            @PathVariable("adventureCode") String adventureCode,
-            @PathVariable("sceneCode") String sceneCode) {
-
-        sceneService.deleteScene(adventureCode, sceneCode);
+    @DeleteMapping("/{sceneId}")
+    public ResponseEntity<Void> deleteSceneById(@PathVariable Long sceneId) {
+        sceneService.deleteSceneById(sceneId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{sceneId}/addItem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemDto> addItem(
+            @PathVariable Long sceneId,
+            @Valid @RequestPart("data") ItemDto itemDto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "inventoryImage", required = false) MultipartFile inventoryImage) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(sceneService.addItem(sceneId, itemDto, image, inventoryImage));
     }
 }

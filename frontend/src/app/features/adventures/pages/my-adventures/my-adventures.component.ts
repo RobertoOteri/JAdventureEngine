@@ -50,27 +50,36 @@ export class MyAdventuresComponent implements OnInit {
   }
 
   goToCreate(): void {
-    this.router.navigate(['/adventures/new']);
+    void this.router.navigate(['/adventures/new']);
   }
 
-  playAdventure(code: string): void {
-    this.router.navigate(['/game', code]);
+  playAdventure(adv: GraphicAdventureDto): void {
+    void this.router.navigate(['/adventures', adv.id, 'play']);
   }
 
   onEditAdventure(adv: GraphicAdventureDto): void {
+    if (!adv.id) {
+      console.error('ID avventura mancante per la modifica.');
+      return;
+    }
     const sceneCode = adv.initialSceneCode || 'new';
-    this.router.navigate(['/editor', adv.code, sceneCode]);
+    void this.router.navigate(['/editor', adv.id, sceneCode]);
   }
 
   onDeleteAdventure(adv: GraphicAdventureDto): void {
+    if (!adv.id) {
+      console.error('ID avventura mancante per l\'eliminazione.');
+      return;
+    }
+
     if (!confirm(`Sei sicuro di voler eliminare definitivamente "${adv.title}"?`)) {
       return;
     }
 
-    this.adventureService.deleteAdventure(adv.code).subscribe({
+    this.adventureService.deleteAdventure(adv.id).subscribe({
       next: () => {
-        this.adventures.update((prev) => prev.filter((a) => a.code !== adv.code));
-        if (this.selectedAdventure()?.code === adv.code) {
+        this.adventures.update((prev) => prev.filter((a) => a.id !== adv.id));
+        if (this.selectedAdventure()?.id === adv.id) {
           this.selectedAdventure.set(null);
         }
       },

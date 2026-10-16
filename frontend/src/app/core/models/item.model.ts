@@ -1,7 +1,9 @@
 import { Action } from './action.model';
 import { InventoryItem } from './inventory-item.model';
+import { Scene } from './scene.model';
 
 export interface Item {
+  id?: number;
   code: string;
   name: string;
   imageUrl?: string;
@@ -13,4 +15,5 @@ export interface Item {
   initiallyVisible: boolean;
   actions?: Action[];
   linkedInventoryItem?: InventoryItem | null;
+  sceneDto?: Scene;
 }

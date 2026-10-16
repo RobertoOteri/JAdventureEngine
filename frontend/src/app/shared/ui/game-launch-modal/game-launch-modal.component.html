@@ -1,0 +1,86 @@
+<div class="modal-backdrop" (click)="cancel.emit()">
+  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="modal-header-left">
+        <div class="icon-wrap">
+          <i class="bi bi-controller"></i>
+        </div>
+        <div>
+          <h3>{{ adventureTitle() }}</h3>
+          <span class="modal-subtitle">Seleziona come iniziare a giocare</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="cancel.emit()" title="Chiudi finestra">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="modal-body custom-scroll">
+      <div class="launch-options">
+        <button
+          type="button"
+          class="btn-launch-option primary"
+          [disabled]="!hasSaves()"
+          (click)="continueGame.emit()"
+          [title]="hasSaves() ? 'Riprendi dall\'ultimo salvataggio effettuato' : 'Nessun salvataggio precedente trovato'"
+        >
+          <div class="option-icon-box green">
+            <i class="bi bi-play-circle-fill"></i>
+          </div>
+          <div class="option-texts">
+            <span class="option-title">Continua Partita</span>
+            <span class="option-desc">Riprendi dall'ultimo punto salvato</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          class="btn-launch-option"
+          [disabled]="!hasSaves()"
+          (click)="isSavesModalOpen.set(true)"
+          [title]="hasSaves() ? 'Visualizza tutti i salvataggi' : 'Nessun salvataggio disponibile'"
+        >
+          <div class="option-icon-box cyan">
+            <i class="bi bi-folder2-open"></i>
+          </div>
+          <div class="option-texts">
+            <span class="option-title">Carica Partita</span>
+            <span class="option-desc">Scegli tra gli slot salvati ({{ saves().length }})</span>
+          </div>
+        </button>
+
+        <button type="button" class="btn-launch-option new-game" (click)="onNewGameClick()">
+          <div class="option-icon-box amber">
+            <i class="bi bi-stars"></i>
+          </div>
+          <div class="option-texts">
+            <span class="option-title">Nuova Partita</span>
+            <span class="option-desc">Inizia l'avventura dal principio</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (isSavesModalOpen()) {
+  <app-game-saves-modal
+    [adventureTitle]="adventureTitle()"
+    [saves]="saves()"
+    (selectSave)="onSelectSave($event)"
+    (close)="isSavesModalOpen.set(false)"
+  />
+}
+
+@if (isConfirmOverwriteOpen()) {
+  <app-confirmation-modal
+    title="Avviare una Nuova Partita?"
+    message="Attenzione: avviando una nuova partita cancellerai tutti i salvataggi di questa avventura. Sei sicuro di voler continuare?"
+    confirmText="Sì, ricomincia"
+    cancelText="Annulla"
+    [isDestructive]="true"
+    (confirm)="onConfirmNewGame()"
+    (cancel)="isConfirmOverwriteOpen.set(false)"
+  />
+}
+

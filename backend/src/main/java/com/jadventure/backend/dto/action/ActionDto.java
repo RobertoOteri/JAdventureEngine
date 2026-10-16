@@ -1,7 +1,6 @@
 package com.jadventure.backend.dto.action;
 
 import com.jadventure.backend.model.enums.ActionType;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,8 @@ import java.util.List;
 @Builder
 public class ActionDto {
 
-    @NotBlank(message = "Il codice dell'azione è obbligatorio")
+    private Long id;
+
     @Size(max = 255, message = "Il codice non può superare i 255 caratteri")
     private String code;
 
@@ -33,5 +33,4 @@ public class ActionDto {
 
     @Builder.Default
     private List<GameEffectDto> effects = new ArrayList<>();
-
 }

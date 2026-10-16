@@ -1,7 +1,7 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EditorStore } from '../../store/editor.store';
-import { Item } from '../../../../core/models';
+import { Action, Item } from '../../../../core/models';
 import { environment } from '../../../../../environments/environment';
 
 const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
@@ -16,15 +16,12 @@ const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 export class InspectorSidebarComponent {
   readonly store = inject(EditorStore);
 
-  // Espansione tendina inventario
   readonly expandedInventoryItemCode = signal<string | null>(null);
 
-  // Ingressi stato
   readonly isEditingOrCreating = input<boolean>(false);
   readonly editingItemCode = input<string | null>(null);
   readonly draftPointsCount = input<number>(0);
 
-  // Ingressi form
   readonly itemName = input<string>('');
   readonly itemCode = input<string>('');
   readonly isCollectible = input<boolean>(false);
@@ -32,28 +29,25 @@ export class InspectorSidebarComponent {
   readonly sceneImageFile = input<File | null>(null);
   readonly previewSpriteUrl = input<string | null>(null);
 
-  // Eventi Hotspot
   readonly startCreateRequested = output<void>();
   readonly editItemRequested = output<Item>();
   readonly cancelDraftRequested = output<void>();
   readonly saveDraftRequested = output<void>();
   readonly deleteItemRequested = output<string>();
 
-  // Eventi sincronizzazione campi
   readonly itemNameChange = output<string>();
   readonly itemCodeChange = output<string>();
   readonly isCollectibleChange = output<boolean>();
   readonly isInitiallyVisibleChange = output<boolean>();
   readonly sceneImageSelected = output<File>();
 
-  // Eventi per Inventory Item
   readonly openInventoryModalRequested = output<void>();
   readonly editInventoryItemRequested = output<Item>();
   readonly deleteInventoryItemRequested = output<string>();
 
-  // Eventi per Azioni
   readonly openAddActionRequested = output<void>();
-  readonly deleteActionRequested = output<string>();
+  readonly editActionRequested = output<Action>();
+  readonly deleteActionRequested = output<number>();
 
   selectItem(item: Item): void {
     this.store.selectItem(item);
@@ -100,5 +94,14 @@ export class InspectorSidebarComponent {
       return url;
     }
     return `${BACKEND_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+
+  onDeleteAction(event: Event, actionId?: number): void {
+    event.stopPropagation();
+    if (actionId) {
+      this.deleteActionRequested.emit(actionId);
+    } else {
+      console.warn("Impossibile eliminare l'azione: ID mancante");
+    }
   }
 }

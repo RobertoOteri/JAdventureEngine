@@ -1,0 +1,82 @@
+package com.jadventure.backend.util;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Set;
+
+@Component
+public class FileStorageUtil {
+
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".webp");
+
+    public static final String PATH_ADVENTURE_COVER = "%s/cover";
+    public static final String PATH_SCENE_BACKGROUND = "%s/scenes/%s";
+    public static final String PATH_ITEM_IMAGE = "%s/scenes/%s/items/%s";
+    public static final String PATH_INVENTORY_ITEM = "%s/inventory-items/%s";
+
+    private final Path rootUploadPath;
+    private final String publicUrlBase;
+
+    public FileStorageUtil(@Value("${app.upload.dir}") String uploadDir) {
+        this.rootUploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+        String normalizedDir = uploadDir.replace("\\", "/");
+        if (!normalizedDir.startsWith("/")) {
+            normalizedDir = "/" + normalizedDir;
+        }
+        if (normalizedDir.endsWith("/")) {
+            normalizedDir = normalizedDir.substring(0, normalizedDir.length() - 1);
+        }
+        this.publicUrlBase = normalizedDir;
+
+        try {
+            Files.createDirectories(this.rootUploadPath);
+        } catch (IOException e) {
+            throw new IllegalStateException("Impossibile inizializzare la cartella uploads: " + uploadDir, e);
+        }
+    }
+
+    public String storeFile(String targetRelativePath, MultipartFile file) {
+        if (file == null || file.isEmpty() || targetRelativePath == null) {
+            return null;
+        }
+
+        String extension = extractExtension(file.getOriginalFilename());
+
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new IllegalArgumentException("Formato file non supportato. Estensioni consentite: " + ALLOWED_EXTENSIONS);
+        }
+
+        try {
+            Path destinationFile = this.rootUploadPath.resolve(targetRelativePath + extension);
+
+            if (destinationFile.getParent() != null) {
+                Files.createDirectories(destinationFile.getParent());
+            }
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return this.publicUrlBase + "/" + targetRelativePath + extension;
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Errore durante il salvataggio del file in: " + targetRelativePath, e);
+        }
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            throw new IllegalArgumentException("Il file caricato non ha un'estensione valida");
+        }
+        return filename.substring(filename.lastIndexOf('.')).toLowerCase();
+    }
+}
