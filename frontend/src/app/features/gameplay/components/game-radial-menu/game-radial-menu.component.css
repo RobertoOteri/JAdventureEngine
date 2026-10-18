@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Marcellus&display=swap');
+
 .radial-menu-backdrop {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: rgba(0, 0, 0, 0.25);
+  background: transparent;
   cursor: default;
   user-select: none;
 }
@@ -10,26 +12,82 @@
 .radial-container {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 200px;
-  height: 200px;
+  width: 210px;
+  height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.compass-casing {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #322214 0%, #1c130b 60%, #0d0804 100%);
+  border: 2px solid #a37336;
+  box-shadow:
+    0 3px 0 #4e3212,
+    0 8px 20px rgba(0, 0, 0, 0.9),
+    inset 0 1px 2px rgba(245, 200, 130, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.compass-dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.radial-hub {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #18181b;
-  border: 2px solid #52525b;
-  color: #a1a1aa;
+.compass-rose {
+  position: absolute;
+  width: 82%;
+  height: 82%;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+}
+
+.compass-needle {
+  position: absolute;
+  width: 14px;
+  height: 50px;
+  top: 7px;
+  left: calc(50% - 7px);
+  transform-origin: 50% 25px;
+  transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  z-index: 2;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+}
+
+.needle-tip-gold {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 24px solid #e5b357;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.9));
+}
+
+.needle-cap {
+  position: absolute;
+  top: 20px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f7dc99 0%, #c28830 65%, #59350d 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  border: 1px solid #d9a54e;
 }
 
 .actions-ring {
@@ -40,60 +98,90 @@
 
 .btn-radial-action {
   position: absolute;
+  width: 52px;
+  height: 52px;
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
   border-radius: 50%;
-  background: #18181b;
-  border: 2px solid #3f3f46;
-  color: #f4f4f5;
+  /* Fondo sobrio, non accecante */
+  background: radial-gradient(circle at 40% 30%, #2f2014 0%, #1c130b 65%, #0e0905 100%);
+  border: 2px solid #8f642d;
+  box-shadow:
+    0 3px 0 #4a2f10,
+    0 6px 16px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(245, 205, 140, 0.3),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.action-icon-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  pointer-events: none;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(80%) sepia(20%) saturate(850%) hue-rotate(5deg) brightness(100%) contrast(98%)
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.95));
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+
+.btn-radial-action.active {
+  background: radial-gradient(circle at 40% 30%, #442d19 0%, #291a0c 65%, #130a04 100%);
+  border-color: #f3cf7a;
+  box-shadow:
+    0 3px 0 #6e4616,
+    0 0 16px rgba(229, 179, 87, 0.7),
+    0 8px 20px rgba(0, 0, 0, 0.9),
+    inset 0 1px 3px rgba(255, 240, 190, 0.6),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.btn-radial-action.active .action-icon-img {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(92%) sepia(18%) saturate(1100%) hue-rotate(355deg) brightness(115%) contrast(105%)
+    drop-shadow(0 0 5px rgba(243, 207, 122, 0.75))
+    drop-shadow(0 2px 3px rgba(0, 0, 0, 0.95));
+  transform: scale(1.08);
+}
+
+
+.tombstone-plaque {
+  position: absolute;
+  top: 108%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  cursor: pointer;
-  pointer-events: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
-  transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
-  padding: 0;
-}
-
-.btn-radial-action i {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.action-label {
-  font-size: 0.6rem;
-  font-weight: 600;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.btn-radial-action:hover {
-  background: #27272a;
-  border-color: #38bdf8;
-  color: #38bdf8;
-  transform: translate(-50%, -50%) scale(1.15);
-}
-
-.target-card {
-  position: absolute;
-  top: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15, 17, 24, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0.35rem 0.8rem;
-  border-radius: 6px;
-  white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.9);
 }
 
-.item-name {
-  color: #ffffff;
-  font-size: 0.85rem;
+.target-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f7f3ea;
+  letter-spacing: 0.04em;
+  padding: 0 12px 3px;
+  border-bottom: 1.5px solid rgba(212, 163, 62, 0.7);
+}
+
+.action-banner-text {
+  font-family: 'Marcellus', 'Georgia', serif;
+  font-size: 1rem;
   font-weight: 600;
+  color: #ecd48d;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
 }
