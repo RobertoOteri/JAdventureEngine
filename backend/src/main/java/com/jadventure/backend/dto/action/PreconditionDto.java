@@ -21,6 +21,6 @@ public class PreconditionDto {
     @NotBlank(message = "La chiave richiesta è obbligatoria")
     private String requiredKey;
 
-    private boolean expectedValue;
+    private String expectedValue;
     private String failureMessage;
 }

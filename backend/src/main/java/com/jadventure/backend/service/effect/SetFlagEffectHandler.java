@@ -5,6 +5,8 @@ import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.model.enums.EffectType;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+
 @Component
 public class SetFlagEffectHandler implements EffectHandler {
 
@@ -15,6 +17,15 @@ public class SetFlagEffectHandler implements EffectHandler {
 
     @Override
     public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
-        state.getAdventureFlags().put(effect.getTargetValue(), effect.isFlagValue());
+        if (state.getAdventureFlags() == null) {
+            state.setAdventureFlags(new HashMap<>());
+        }
+
+        String key = effect.getTargetValue();
+        String val = effect.getFlagValue();
+
+        if (key != null) {
+            state.getAdventureFlags().put(key, val);
+        }
     }
 }

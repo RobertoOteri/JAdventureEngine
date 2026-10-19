@@ -28,7 +28,7 @@ public class GameEffect {
 
     private String targetValue;
 
-    private Boolean flagValue;
+    private String flagValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "action_id", nullable = false)

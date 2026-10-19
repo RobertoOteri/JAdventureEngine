@@ -59,7 +59,6 @@ public class GameSaveService {
         return gameSaveMapper.toDto(gameSaveRepository.save(save));
     }
 
-    // Metodo specifico richiamato dalle azioni per aggiornare l'autosave esistente in-place
     @Transactional
     public void updateAutoSave(String adventureCode, GameStateDto gameStateDto) {
         User user = authService.getCurrentUser();

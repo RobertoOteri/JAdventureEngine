@@ -86,6 +86,7 @@
                       }
                     </select>
                   } @else {
+                    <!-- FLAG_EQUALS: Gestione Chiave + Valore atteso libero -->
                     <div class="flag-condition-grid">
                       <input
                         type="text"
@@ -100,10 +101,12 @@
                         }
                       </datalist>
                       <span class="equals-sign">=</span>
-                      <select class="studio-select flag-bool-select" [(ngModel)]="prec.expectedValue">
-                        <option [value]="true">true</option>
-                        <option [value]="false">false</option>
-                      </select>
+                      <input
+                        type="text"
+                        class="studio-input"
+                        [(ngModel)]="prec.expectedValue"
+                        placeholder="Valore atteso (es. true o 100)"
+                      />
                     </div>
                   }
                 </div>
@@ -191,14 +194,16 @@
                       type="text"
                       class="studio-input"
                       [(ngModel)]="eff.targetValue"
-                      placeholder="Nome Flag (es. porta_aperta)"
+                      placeholder="Chiave (es. punteggio)"
                       list="flagKeysList"
                     />
                     <span class="equals-sign">=</span>
-                    <select class="studio-select flag-bool-select" [(ngModel)]="eff.flagValue">
-                      <option [value]="true">true</option>
-                      <option [value]="false">false</option>
-                    </select>
+                    <input
+                      type="text"
+                      class="studio-input"
+                      [(ngModel)]="eff.flagValue"
+                      placeholder="Valore (es. 100 o true)"
+                    />
                   </div>
                 }
               </div>

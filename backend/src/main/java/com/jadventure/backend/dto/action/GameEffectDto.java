@@ -19,5 +19,5 @@ public class GameEffectDto {
 
     private String targetValue;
 
-    private boolean flagValue;
+    private String flagValue;
 }

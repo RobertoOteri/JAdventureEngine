@@ -24,7 +24,7 @@ export interface Precondition {
   id?: number;
   type: PreconditionType;
   requiredKey: string;
-  expectedValue?: boolean;
+  expectedValue?: string;
   failureMessage?: string;
 }
 
@@ -32,7 +32,7 @@ export interface GameEffect {
   id?: number;
   type: EffectType;
   targetValue?: string;
-  flagValue?: boolean;
+  flagValue?: string;
 }
 
 export interface Action {

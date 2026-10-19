@@ -120,12 +120,12 @@ export class ActionModalComponent {
         for (const act of it.actions || []) {
           for (const eff of act.effects || []) {
             if (eff.type === 'SET_FLAG' && eff.targetValue) {
-              keys.add(eff.targetValue.trim());
+              keys.add(eff.targetValue);
             }
           }
           for (const prec of act.preconditions || []) {
             if (prec.type === 'FLAG_EQUALS' && prec.requiredKey) {
-              keys.add(prec.requiredKey.trim());
+              keys.add(prec.requiredKey);
             }
           }
         }
@@ -137,7 +137,7 @@ export class ActionModalComponent {
   addPrecondition(): void {
     this.actionPreconditions.update((list) => [
       ...list,
-      { type: 'HAS_ITEM', requiredKey: '', expectedValue: true, failureMessage: '' }
+      { type: 'HAS_ITEM', requiredKey: '', expectedValue: '', failureMessage: '' }
     ]);
   }
 
@@ -148,7 +148,7 @@ export class ActionModalComponent {
   addEffect(): void {
     this.actionEffects.update((list) => [
       ...list,
-      { type: 'CHANGE_SCENE', targetValue: '', flagValue: true }
+      { type: 'CHANGE_SCENE', targetValue: '', flagValue: '' }
     ]);
   }
 
@@ -161,22 +161,22 @@ export class ActionModalComponent {
     const actionPayload: Action = {
       ...(existing?.id ? { id: existing.id } : {}),
       type: this.actionType,
-      successMessage: this.actionSuccessMsg.trim() || undefined,
-      defaultFailureMessage: this.actionFailureMsg.trim() || undefined,
+      successMessage: this.actionSuccessMsg || undefined,
+      defaultFailureMessage: this.actionFailureMsg || undefined,
       preconditions: this.actionPreconditions()
-        .filter((p) => p.requiredKey && p.requiredKey.trim().length > 0)
+        .filter((p) => p.requiredKey && p.requiredKey.length > 0)
         .map((p) => ({
           type: p.type,
-          requiredKey: p.requiredKey.trim(),
-          expectedValue: p.type === 'FLAG_EQUALS' ? Boolean(p.expectedValue) : undefined,
-          failureMessage: p.failureMessage?.trim() || undefined
+          requiredKey: p.requiredKey,
+          expectedValue: p.type === 'FLAG_EQUALS' ? (p.expectedValue || undefined) : undefined,
+          failureMessage: p.failureMessage || undefined
         })),
       effects: this.actionEffects()
-        .filter((e) => e.type === 'END_ADVENTURE' || (e.type === 'SET_FLAG' ? !!e.targetValue?.trim() : !!e.targetValue?.trim()))
+        .filter((e) => e.type === 'END_ADVENTURE' || (e.type === 'SET_FLAG' ? !!e.targetValue : !!e.targetValue))
         .map((e) => ({
           type: e.type,
-          targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue!.trim(),
-          flagValue: e.type === 'SET_FLAG' ? Boolean(e.flagValue) : undefined
+          targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue,
+          flagValue: e.type === 'SET_FLAG' ? e.flagValue : undefined
         }))
     };
 
