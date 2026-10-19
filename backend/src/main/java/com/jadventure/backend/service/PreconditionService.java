@@ -1,68 +1,56 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.game.GameStateDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.model.Action;
 import com.jadventure.backend.model.Precondition;
+import com.jadventure.backend.model.enums.PreconditionType;
+import com.jadventure.backend.service.precondition.PreconditionChecker;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class PreconditionService {
 
-    public Optional<String> validatePreconditions(GameStateDto state, Action action) {
-        List<Precondition> preconditions = action.getPreconditions();
-        if (preconditions == null || preconditions.isEmpty()) {
-            return Optional.empty();
-        }
+    private final Map<PreconditionType, PreconditionChecker> checkers;
 
-        for (Precondition precondition : preconditions) {
-            if (!isSatisfied(state, precondition)) {
-                if (precondition.getFailureMessage() != null && !precondition.getFailureMessage().isBlank()) {
-                    return Optional.of(precondition.getFailureMessage());
-                }
-                if (action.getDefaultFailureMessage() != null && !action.getDefaultFailureMessage().isBlank()) {
-                    return Optional.of(action.getDefaultFailureMessage());
-                }
-                return Optional.of("Non puoi compiere questa azione in questo momento.");
+    public PreconditionService(List<PreconditionChecker> checkerList) {
+        this.checkers = checkerList.stream()
+                .collect(Collectors.toMap(PreconditionChecker::type, Function.identity()));
+
+        for (PreconditionType type : PreconditionType.values()) {
+            if (!checkers.containsKey(type)) {
+                throw new IllegalStateException("Manca il checker per la precondizione " + type);
             }
         }
+    }
 
-        return Optional.empty();
+    public Optional<String> validatePreconditions(GameStateDto state, Action action) {
+        return action.getPreconditions().stream()
+                .filter(precondition -> !isSatisfied(state, precondition))
+                .findFirst()
+                .map(precondition -> failureMessage(precondition, action));
     }
 
     public boolean isSatisfied(GameStateDto state, Precondition precondition) {
-        if (precondition == null || precondition.getType() == null || state == null) {
+        if (state == null || precondition == null || precondition.getType() == null) {
             return false;
         }
+        return checkers.get(precondition.getType()).isSatisfied(state, precondition);
+    }
 
-        Set<String> inventoryCodes = state.getInventory() == null
-                ? new HashSet<>()
-                : state.getInventory().stream()
-                .map(InventoryItemDto::getCode)
-                .collect(Collectors.toSet());
-
-        Map<String, String> adventureFlags = state.getAdventureFlags();
-        String key = precondition.getRequiredKey();
-
-        return switch (precondition.getType()) {
-            case HAS_ITEM ->
-                    inventoryCodes.contains(key);
-
-            case DOES_NOT_HAVE_ITEM ->
-                    !inventoryCodes.contains(key);
-
-            case FLAG_EQUALS -> {
-                String val = (adventureFlags != null) ? adventureFlags.get(key) : null;
-                yield Objects.equals(val, precondition.getExpectedValue());
-            }
-        };
+    private String failureMessage(Precondition precondition, Action action) {
+        if (StringUtils.hasText(precondition.getFailureMessage())) {
+            return precondition.getFailureMessage();
+        }
+        if (StringUtils.hasText(action.getDefaultFailureMessage())) {
+            return action.getDefaultFailureMessage();
+        }
+        return "Non puoi compiere questa azione in questo momento.";
     }
 }

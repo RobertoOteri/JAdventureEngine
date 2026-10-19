@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS actions (
     success_message TEXT,
     default_failure_message TEXT,
     item_id BIGINT NOT NULL,
+    CONSTRAINT uq_action_item_type UNIQUE (item_id, type),
     CONSTRAINT fk_action_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
 
