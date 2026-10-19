@@ -411,3 +411,12 @@
   border-color: rgba(245, 158, 11, 0.45);
   font-style: normal;
 }
+
+.rule-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #6a95a8;
+}

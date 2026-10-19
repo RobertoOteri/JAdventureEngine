@@ -17,7 +17,6 @@
     </header>
 
     <div class="modal-body custom-scroll">
-      <!-- 1. Campi Principali -->
       <div class="main-fields">
         <div class="field-group">
           <label for="actionTypeSelect">Tipo di Azione *</label>
@@ -51,7 +50,6 @@
         </div>
       </div>
 
-      <!-- 2. Precondizioni -->
       <div class="section-card">
         <div class="section-card-header">
           <div class="section-title">
@@ -128,7 +126,6 @@
         </div>
       </div>
 
-      <!-- 3. Effetti di Gioco -->
       <div class="section-card">
         <div class="section-card-header">
           <div class="section-title">
@@ -170,6 +167,11 @@
                       <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
                     }
                   </select>
+                } @else if (eff.type === 'END_ADVENTURE') {
+                  <div class="rule-hint">
+                    <i class="bi bi-flag-fill"></i>
+                    <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
+                  </div>
                 } @else {
                   <input
                     type="text"

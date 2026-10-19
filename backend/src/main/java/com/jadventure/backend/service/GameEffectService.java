@@ -5,6 +5,7 @@ import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.model.GameEffect;
+import com.jadventure.backend.model.enums.EffectType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class GameEffectService {
         if (effects == null || effects.isEmpty()) {
             return;
         }
+
         for (GameEffect effect : effects) {
             apply(adventureCode, state, effect);
         }
@@ -36,6 +38,11 @@ public class GameEffectService {
 
     public void apply(String adventureCode, GameStateDto state, GameEffect effect) {
         if (effect == null || effect.getType() == null) {
+            return;
+        }
+
+        if (effect.getType() == EffectType.END_ADVENTURE) {
+            state.setCompleted(true);
             return;
         }
 

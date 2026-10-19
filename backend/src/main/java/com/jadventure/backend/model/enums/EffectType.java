@@ -6,5 +6,6 @@ public enum EffectType {
     REMOVE_ITEM,
     SET_FLAG,
     SHOW_SCENE_ITEM,
-    HIDE_SCENE_ITEM
+    HIDE_SCENE_ITEM,
+    END_ADVENTURE
 }

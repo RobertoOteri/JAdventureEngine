@@ -54,7 +54,8 @@ export class ActionModalComponent {
     'REMOVE_ITEM',
     'SET_FLAG',
     'SHOW_SCENE_ITEM',
-    'HIDE_SCENE_ITEM'
+    'HIDE_SCENE_ITEM',
+    'END_ADVENTURE'
   ];
 
   constructor() {
@@ -149,10 +150,10 @@ export class ActionModalComponent {
           failureMessage: p.failureMessage?.trim() || undefined
         })),
       effects: this.actionEffects()
-        .filter((e) => e.targetValue && e.targetValue.trim().length > 0)
+        .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue?.trim())
         .map((e) => ({
           type: e.type,
-          targetValue: e.targetValue!.trim()
+          targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue!.trim()
         }))
     };
 

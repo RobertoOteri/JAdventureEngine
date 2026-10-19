@@ -51,6 +51,15 @@
     />
   }
 
+  @if (store.isCompleted()) {
+    <app-game-ending-modal
+      [adventureTitle]="adventureDetails()?.title || 'Avventura'"
+      [message]="store.endingMessage()"
+      (continueGame)="onContinue()"
+      (exit)="onExitToLobby()"
+    />
+  }
+
   @if (isLaunchModalOpen()) {
     <app-game-launch-modal
       [adventureTitle]="adventureDetails()?.title || 'Avventura'"

@@ -18,4 +18,5 @@ public class GameStateDto {
     private List<InventoryItemDto> inventory;
     private Map<String, String> adventureFlags;
     private Set<String> visibleItemCodes;
+    private boolean completed;
 }

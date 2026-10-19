@@ -29,6 +29,7 @@ export interface GameplayState {
   savesList: GameSaveDto[];
   isLoading: boolean;
   feedbackMessage: string | null;
+  endingMessage: string | null;
   isInventoryOpen: boolean;
   isPauseMenuOpen: boolean;
   radialMenu: RadialMenuState;
@@ -48,6 +49,7 @@ const initialState: GameplayState = {
   savesList: [],
   isLoading: false,
   feedbackMessage: null,
+  endingMessage: null,
   isInventoryOpen: false,
   isPauseMenuOpen: false,
   radialMenu: initialRadialState
@@ -62,6 +64,7 @@ export const GameplayStore = signalStore(
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
     visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
     adventureFlags: computed(() => store.gameState()?.adventureFlags ?? {}),
+    isCompleted: computed(() => store.gameState()?.completed ?? false),
     currentSceneBackgroundUrl: computed(() => {
       return store.gameState()?.currentScene?.backgroundImageUrl ?? '';
     })
@@ -149,6 +152,7 @@ export const GameplayStore = signalStore(
             adventureCode,
             isLoading: true,
             feedbackMessage: null,
+            endingMessage: null,
             isPauseMenuOpen: false,
             savesList: []
           })
@@ -198,6 +202,7 @@ export const GameplayStore = signalStore(
             adventureCode,
             isLoading: true,
             feedbackMessage: null,
+            endingMessage: null,
             isPauseMenuOpen: false
           })
         ),
@@ -245,6 +250,7 @@ export const GameplayStore = signalStore(
           patchState(store, {
             isLoading: true,
             feedbackMessage: null,
+            endingMessage: null,
             isPauseMenuOpen: false
           })
         ),
@@ -297,10 +303,20 @@ export const GameplayStore = signalStore(
           return actionService.executeAction(payload).pipe(
             tap({
               next: (result: GameActionResultDto) => {
+                const completed = !!result.state?.completed;
+
                 if (result.state) {
-                  patchState(store, { gameState: result.state });
+                  patchState(store, {
+                    gameState: result.state,
+                    endingMessage: completed ? result.feedbackMessage || null : null
+                  });
                 }
-                setFeedbackMessage(result.feedbackMessage || (result.success ? 'Azione eseguita.' : 'Non succede nulla.'));
+
+                if (!completed) {
+                  setFeedbackMessage(
+                    result.feedbackMessage || (result.success ? 'Azione eseguita.' : 'Non succede nulla.')
+                  );
+                }
                 closeRadialMenu();
               },
               error: (err: any) => {

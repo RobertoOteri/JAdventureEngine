@@ -10,6 +10,7 @@ import { GameViewportComponent } from './components/game-viewport/game-viewport.
 import { GameRadialMenuComponent } from './components/game-radial-menu/game-radial-menu.component';
 import { GameInventoryModalComponent } from './components/game-inventory-modal/game-inventory-modal.component';
 import { GamePauseModalComponent } from './components/game-pause-modal/game-pause-modal.component';
+import { GameEndingModalComponent } from './components/game-ending-modal/game-ending-modal.component';
 import { GameLaunchModalComponent } from '../../shared/ui/game-launch-modal/game-launch-modal.component';
 import { GameMessageBannerComponent } from './components/game-message-banner/game-message-banner.component';
 
@@ -23,6 +24,7 @@ import { GameMessageBannerComponent } from './components/game-message-banner/gam
     GameRadialMenuComponent,
     GameInventoryModalComponent,
     GamePauseModalComponent,
+    GameEndingModalComponent,
     GameLaunchModalComponent,
     GameMessageBannerComponent
   ],
@@ -42,7 +44,7 @@ export class GameplayComponent implements OnInit {
 
   @HostListener('window:keydown.escape')
   handleEscape(): void {
-    if (this.isLaunchModalOpen()) {
+    if (this.isLaunchModalOpen() || this.store.isCompleted()) {
       return;
     }
     if (this.store.radialMenu.isOpen()) {

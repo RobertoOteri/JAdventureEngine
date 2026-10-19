@@ -47,6 +47,10 @@ public class ActionService {
             throw new IllegalArgumentException("Stato di gioco o codice avventura mancante");
         }
 
+        if (stateDto.isCompleted()) {
+            throw new IllegalArgumentException("L'avventura è già conclusa");
+        }
+
         Action action = actionRepository.findByCode(actionDto.getActionCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Azione non trovata con codice: " + actionDto.getActionCode()
@@ -70,7 +74,9 @@ public class ActionService {
 
         gameEffectService.applyAll(adventureCode, stateDto, action.getEffects());
 
-        gameSaveService.updateAutoSave(adventureCode, stateDto);
+        if (!stateDto.isCompleted()) {
+            gameSaveService.updateAutoSave(adventureCode, stateDto);
+        }
 
         String successMessage = (action.getSuccessMessage() != null && !action.getSuccessMessage().isBlank())
                 ? action.getSuccessMessage()

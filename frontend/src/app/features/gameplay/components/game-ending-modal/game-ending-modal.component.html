@@ -1,0 +1,22 @@
+<div class="ending-backdrop">
+  <div class="ending-box">
+    <i class="bi bi-trophy-fill ending-icon"></i>
+    <span class="ending-kicker">Fine</span>
+    <h2>{{ adventureTitle() }}</h2>
+
+    @if (message()) {
+      <p class="ending-message">{{ message() }}</p>
+    }
+
+    <div class="ending-actions">
+      <button type="button" class="btn-ending primary" (click)="continueGame.emit()">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        <span>Riprendi dall'ultimo salvataggio</span>
+      </button>
+      <button type="button" class="btn-ending" (click)="exit.emit()">
+        <i class="bi bi-box-arrow-left"></i>
+        <span>Torna alle avventure</span>
+      </button>
+    </div>
+  </div>
+</div>
