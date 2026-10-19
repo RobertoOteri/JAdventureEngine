@@ -18,4 +18,6 @@ public class GameEffectDto {
     private EffectType type;
 
     private String targetValue;
+
+    private boolean flagValue;
 }

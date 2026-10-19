@@ -1,5 +1,6 @@
 package com.jadventure.backend.service;
 
+import com.jadventure.backend.dto.action.GameEffectDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.model.GameEffect;
 import com.jadventure.backend.model.enums.EffectType;
@@ -19,31 +20,18 @@ public class GameEffectService {
     public GameEffectService(List<EffectHandler> handlerList) {
         this.handlers = handlerList.stream()
                 .collect(Collectors.toMap(EffectHandler::type, Function.identity()));
-
-        for (EffectType type : EffectType.values()) {
-            if (!handlers.containsKey(type)) {
-                throw new IllegalStateException("Manca l'handler per l'effetto " + type);
-            }
-        }
     }
 
-    public void applyAll(String adventureCode, GameStateDto state, List<GameEffect> effects) {
+    public void applyAll(String adventureCode, GameStateDto state, List<GameEffectDto> effects) {
         if (effects != null) {
             effects.forEach(effect -> apply(adventureCode, state, effect));
         }
     }
 
-    public void apply(String adventureCode, GameStateDto state, GameEffect effect) {
+    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
         if (effect == null || effect.getType() == null) {
             return;
         }
-
-        EffectHandler handler = handlers.get(effect.getType());
-        String value = effect.getTargetValue() == null ? "" : effect.getTargetValue().trim();
-
-        if (value.isEmpty() && handler.requiresValue()) {
-            return;
-        }
-        handler.apply(adventureCode, state, value);
+        handlers.get(effect.getType()).apply(adventureCode, state, effect);
     }
 }

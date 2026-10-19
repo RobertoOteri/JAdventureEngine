@@ -18,7 +18,7 @@ public class GameStateDto {
     private List<InventoryItemDto> inventory = new ArrayList<>();
 
     @Builder.Default
-    private Map<String, String> adventureFlags = new HashMap<>();
+    private Map<String, Boolean> adventureFlags = new HashMap<>();
 
     @Builder.Default
     private Set<String> visibleItemCodes = new HashSet<>();

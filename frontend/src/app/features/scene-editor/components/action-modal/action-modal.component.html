@@ -86,12 +86,25 @@
                       }
                     </select>
                   } @else {
-                    <input
-                      type="text"
-                      class="studio-input"
-                      [(ngModel)]="prec.requiredKey"
-                      placeholder="Nome Flag (es. leva_tirata)"
-                    />
+                    <div class="flag-condition-grid">
+                      <input
+                        type="text"
+                        class="studio-input"
+                        [(ngModel)]="prec.requiredKey"
+                        placeholder="Nome Flag (es. porta_aperta)"
+                        list="flagKeysList"
+                      />
+                      <datalist id="flagKeysList">
+                        @for (fk of availableFlagKeys(); track fk) {
+                          <option [value]="fk"></option>
+                        }
+                      </datalist>
+                      <span class="equals-sign">=</span>
+                      <select class="studio-select flag-bool-select" [(ngModel)]="prec.expectedValue">
+                        <option [value]="true">true</option>
+                        <option [value]="false">false</option>
+                      </select>
+                    </div>
                   }
                 </div>
 
@@ -172,13 +185,21 @@
                     <i class="bi bi-flag-fill"></i>
                     <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
                   </div>
-                } @else {
-                  <input
-                    type="text"
-                    class="studio-input"
-                    [(ngModel)]="eff.targetValue"
-                    placeholder="Valore Flag (es. porta_aperta=true)"
-                  />
+                } @else if (eff.type === 'SET_FLAG') {
+                  <div class="set-flag-grid">
+                    <input
+                      type="text"
+                      class="studio-input"
+                      [(ngModel)]="eff.targetValue"
+                      placeholder="Nome Flag (es. porta_aperta)"
+                      list="flagKeysList"
+                    />
+                    <span class="equals-sign">=</span>
+                    <select class="studio-select flag-bool-select" [(ngModel)]="eff.flagValue">
+                      <option [value]="true">true</option>
+                      <option [value]="false">false</option>
+                    </select>
+                  </div>
                 }
               </div>
 

@@ -1,5 +1,6 @@
 package com.jadventure.backend.service.effect;
 
+import com.jadventure.backend.dto.action.GameEffectDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.item.ItemDto;
@@ -26,8 +27,8 @@ public class ChangeSceneEffectHandler implements EffectHandler{
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, String sceneCode) {
-        SceneDto scene = sceneService.getSceneByCode(adventureCode, sceneCode);
+    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+        SceneDto scene = sceneService.getSceneByCode(adventureCode, effect.getTargetValue());
         state.setCurrentScene(scene);
 
         if (scene == null || scene.getItems() == null) {

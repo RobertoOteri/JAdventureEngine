@@ -1,7 +1,7 @@
 package com.jadventure.backend.service.precondition;
 
+import com.jadventure.backend.dto.action.PreconditionDto;
 import com.jadventure.backend.dto.game.GameStateDto;
-import com.jadventure.backend.model.Precondition;
 import com.jadventure.backend.model.enums.PreconditionType;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ public class DoesNotHaveItemChecker implements PreconditionChecker {
     }
 
     @Override
-    public boolean isSatisfied(GameStateDto state, Precondition precondition) {
+    public boolean isSatisfied(GameStateDto state, PreconditionDto precondition) {
         return state.getInventory().stream()
                 .noneMatch(item -> item.getCode().equals(precondition.getRequiredKey()));
     }

@@ -420,3 +420,28 @@
   font-style: italic;
   color: #6a95a8;
 }
+.set-flag-grid,
+.flag-condition-grid {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.set-flag-grid input,
+.flag-condition-grid input {
+  flex: 1;
+}
+
+.equals-sign {
+  color: #a1a1aa;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0 0.2rem;
+}
+
+.flag-bool-select {
+  width: 100px !important;
+  flex-shrink: 0;
+}
+

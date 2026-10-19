@@ -10,6 +10,7 @@ import com.jadventure.backend.model.Action;
 import com.jadventure.backend.repository.ActionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +40,9 @@ public class ActionService {
     }
 
     @Transactional
-    public GameActionResultDto executeAction(GameActionDto actionDto) {
-        String adventureCode = actionDto.getAdventureCode();
-        GameStateDto stateDto = actionDto.getGameState();
+    public GameActionResultDto executeAction(GameActionDto gameActionDto) {
+        String adventureCode = gameActionDto.getAdventureCode();
+        GameStateDto stateDto = gameActionDto.getGameState();
 
         if (adventureCode == null || stateDto == null || stateDto.getCurrentScene() == null) {
             throw new IllegalArgumentException("Stato di gioco o codice avventura mancante");
@@ -51,14 +52,16 @@ public class ActionService {
             throw new IllegalArgumentException("L'avventura è già conclusa");
         }
 
-        Action action = actionRepository.findByCode(actionDto.getActionCode())
+        Action actionEntity = actionRepository.findByCode(gameActionDto.getActionCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Azione non trovata con codice: " + actionDto.getActionCode()
+                        "Azione non trovata con codice: " + gameActionDto.getActionCode()
                 ));
 
-        if (action.getType() != actionDto.getActionType()) {
+        ActionDto action = actionMapper.toDto(actionEntity);
+
+        if (action.getType() != gameActionDto.getActionType()) {
             throw new IllegalArgumentException(
-                    "Tipo di azione non corrispondente: atteso " + action.getType() + " ma ricevuto " + actionDto.getActionType()
+                    "Tipo di azione non corrispondente: atteso " + action.getType() + " ma ricevuto " + gameActionDto.getActionType()
             );
         }
 
@@ -78,7 +81,7 @@ public class ActionService {
             gameSaveService.updateAutoSave(adventureCode, stateDto);
         }
 
-        String successMessage = (action.getSuccessMessage() != null && !action.getSuccessMessage().isBlank())
+        String successMessage = StringUtils.hasText(action.getSuccessMessage())
                 ? action.getSuccessMessage()
                 : "Azione eseguita con successo.";
 

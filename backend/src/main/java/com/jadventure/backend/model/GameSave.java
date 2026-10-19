@@ -48,7 +48,7 @@ public class GameSave {
     @MapKeyColumn(name = "flag_key")
     @Column(name = "flag_value")
     @Builder.Default
-    private Map<String, String> adventureFlags = new HashMap<>();
+    private Map<String, Boolean> adventureFlags = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "game_save_scene_items", joinColumns = @JoinColumn(name = "game_save_id"))

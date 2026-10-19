@@ -112,10 +112,32 @@ export class ActionModalComponent {
     }));
   });
 
+  readonly availableFlagKeys = computed(() => {
+    const keys = new Set<string>();
+    const scenes = this.store.scenes();
+    for (const scene of scenes) {
+      for (const it of scene.items || []) {
+        for (const act of it.actions || []) {
+          for (const eff of act.effects || []) {
+            if (eff.type === 'SET_FLAG' && eff.targetValue) {
+              keys.add(eff.targetValue.trim());
+            }
+          }
+          for (const prec of act.preconditions || []) {
+            if (prec.type === 'FLAG_EQUALS' && prec.requiredKey) {
+              keys.add(prec.requiredKey.trim());
+            }
+          }
+        }
+      }
+    }
+    return Array.from(keys);
+  });
+
   addPrecondition(): void {
     this.actionPreconditions.update((list) => [
       ...list,
-      { type: 'HAS_ITEM', requiredKey: '', failureMessage: '' }
+      { type: 'HAS_ITEM', requiredKey: '', expectedValue: true, failureMessage: '' }
     ]);
   }
 
@@ -126,7 +148,7 @@ export class ActionModalComponent {
   addEffect(): void {
     this.actionEffects.update((list) => [
       ...list,
-      { type: 'CHANGE_SCENE', targetValue: '' }
+      { type: 'CHANGE_SCENE', targetValue: '', flagValue: true }
     ]);
   }
 
@@ -146,14 +168,15 @@ export class ActionModalComponent {
         .map((p) => ({
           type: p.type,
           requiredKey: p.requiredKey.trim(),
-          expectedValue: p.expectedValue?.trim() || undefined,
+          expectedValue: p.type === 'FLAG_EQUALS' ? Boolean(p.expectedValue) : undefined,
           failureMessage: p.failureMessage?.trim() || undefined
         })),
       effects: this.actionEffects()
-        .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue?.trim())
+        .filter((e) => e.type === 'END_ADVENTURE' || (e.type === 'SET_FLAG' ? !!e.targetValue?.trim() : !!e.targetValue?.trim()))
         .map((e) => ({
           type: e.type,
-          targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue!.trim()
+          targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue!.trim(),
+          flagValue: e.type === 'SET_FLAG' ? Boolean(e.flagValue) : undefined
         }))
     };
 

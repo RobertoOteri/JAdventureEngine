@@ -29,7 +29,7 @@ public class Precondition {
     @Column(nullable = false)
     private String requiredKey;
 
-    private String expectedValue;
+    private Boolean expectedValue;
 
     @Column(name = "failure_message")
     private String failureMessage;
