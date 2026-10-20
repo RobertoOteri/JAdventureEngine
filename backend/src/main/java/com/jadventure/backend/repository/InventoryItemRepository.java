@@ -16,7 +16,5 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     Optional<InventoryItem> findByGraphicAdventureCodeAndCode(String adventureCode, String code);
 
-    boolean existsByGraphicAdventureCodeAndCode(String adventureCode, String code);
-
     List<InventoryItem> findAllByGraphicAdventureCodeAndCodeIn(String graphicAdventureCode, Set<String> codes);
 }

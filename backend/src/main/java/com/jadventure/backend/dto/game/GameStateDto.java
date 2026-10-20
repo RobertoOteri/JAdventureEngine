@@ -4,9 +4,7 @@ import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import lombok.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -15,8 +13,15 @@ import java.util.Set;
 @AllArgsConstructor
 public class GameStateDto {
     private SceneDto currentScene;
-    private List<InventoryItemDto> inventory;
-    private Map<String, String> adventureFlags;
-    private Set<String> visibleItemCodes;
+
+    @Builder.Default
+    private List<InventoryItemDto> inventory = new ArrayList<>();
+
+    @Builder.Default
+    private Map<String, String> adventureFlags = new HashMap<>();
+
+    @Builder.Default
+    private Set<String> visibleItemCodes = new HashSet<>();
+
     private boolean completed;
 }

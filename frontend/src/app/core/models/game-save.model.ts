@@ -5,7 +5,6 @@ export interface GameSaveDto {
   id?: number;
   code: string;
   name: string;
-  currentSceneCode: string;
   savedAt: string;
   graphicAdventureDto?: GraphicAdventureDto;
   autoSave?: boolean;

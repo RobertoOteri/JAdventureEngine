@@ -343,6 +343,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     if (this.isCollectible()) {
       itemPayload.linkedInventoryItem = {
+        ...(selected?.linkedInventoryItem?.id ? { id: selected.linkedInventoryItem.id } : {}),
         code,
         name: this.invItemName() || name,
         description: this.invItemDesc() || '',
@@ -407,8 +408,8 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.editingItemCode.set(null);
 
     const size = 200;
-    this.spritePosX.set(Math.max(0, Math.min(1000 - size, drop.x - size / 2)));
-    this.spritePosY.set(Math.max(0, Math.min(1000 - size, drop.y - size / 2)));
+    this.spritePosX.set(Math.max(0, drop.x - size / 2));
+    this.spritePosY.set(Math.max(0, drop.y - size / 2));
     this.spriteWidth.set(size);
     this.spriteHeight.set(size);
 
@@ -448,47 +449,18 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveAction(actionPayload: Action): void {
-    const current = this.store.selectedItem();
-    if (!current?.id) return;
+    if (!this.store.selectedItem()?.id) return;
 
-    const actionToEdit = this.editingAction();
-    let targetActionId: number | undefined = actionToEdit?.id ?? actionPayload.id;
+    const actionId = this.editingAction()?.id;
+    const save$ = actionId
+      ? this.store.updateAction({ ...actionPayload, id: actionId })
+      : this.store.addAction(actionPayload);
 
-    if (!targetActionId && actionToEdit) {
-      const match = current.actions?.find((a) => a.type === actionToEdit.type || a.id === actionToEdit.id);
-      if (match?.id) {
-        targetActionId = match.id;
-      }
-    }
-
-    if (targetActionId) {
-      this.store.updateAction({ ...actionPayload, id: targetActionId }).subscribe({
-        next: () => this.closeActionModal(),
-        error: (err: any) => {
-          console.error('Errore aggiornamento azione:', err);
-          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
-        }
-      });
-      return;
-    }
-
-    const duplicate = current.actions?.find((a) => a.type === actionPayload.type);
-    if (duplicate?.id) {
-      this.store.updateAction({ ...actionPayload, id: duplicate.id }).subscribe({
-        next: () => this.closeActionModal(),
-        error: (err: any) => {
-          console.error('Errore aggiornamento azione:', err);
-          alert(err?.error?.message || "Impossibile aggiornare l'azione.");
-        }
-      });
-      return;
-    }
-
-    this.store.addAction(actionPayload).subscribe({
+    save$.subscribe({
       next: () => this.closeActionModal(),
       error: (err: any) => {
         console.error('Errore salvataggio azione:', err);
-        alert(err?.error?.message || "Errore durante la creazione dell'azione.");
+        alert(err?.error?.message || "Impossibile salvare l'azione.");
       }
     });
   }

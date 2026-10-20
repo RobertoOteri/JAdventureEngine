@@ -32,6 +32,7 @@ export interface GameEffect {
   id?: number;
   type: EffectType;
   targetValue?: string;
+  flagValue?: string;
 }
 
 export interface Action {

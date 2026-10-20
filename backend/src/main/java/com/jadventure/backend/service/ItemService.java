@@ -10,6 +10,7 @@ import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.InventoryItem;
 import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.Scene;
+import com.jadventure.backend.repository.ActionRepository;
 import com.jadventure.backend.repository.ItemRepository;
 import com.jadventure.backend.repository.SceneRepository;
 import com.jadventure.backend.util.FileStorageUtil;
@@ -24,6 +25,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final SceneRepository sceneRepository;
+    private final ActionRepository actionRepository;
     private final ItemMapper itemMapper;
     private final ActionMapper actionMapper;
     private final InventoryItemService inventoryItemService;
@@ -32,6 +34,7 @@ public class ItemService {
 
     public ItemService(ItemRepository itemRepository,
                        SceneRepository sceneRepository,
+                       ActionRepository actionRepository,
                        ItemMapper itemMapper,
                        ActionMapper actionMapper,
                        InventoryItemService inventoryItemService,
@@ -39,6 +42,7 @@ public class ItemService {
                        AuthService authService) {
         this.itemRepository = itemRepository;
         this.sceneRepository = sceneRepository;
+        this.actionRepository = actionRepository;
         this.itemMapper = itemMapper;
         this.actionMapper = actionMapper;
         this.inventoryItemService = inventoryItemService;
@@ -135,12 +139,16 @@ public class ItemService {
 
         authService.validateOwnership(item.getScene().getGraphicAdventure().getAuthor().getUsername());
 
+        boolean typeAlreadyUsed = item.getActions().stream()
+                .anyMatch(existing -> existing.getType() == actionDto.getType());
+        if (typeAlreadyUsed) {
+            throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
+        }
+
         Action action = actionMapper.toEntity(actionDto);
         action.setItem(item);
-        item.getActions().add(action);
 
-        itemRepository.save(item);
-        return actionMapper.toDto(action);
+        return actionMapper.toDto(actionRepository.save(action));
     }
 
     private void copyItemProperties(Item item, ItemDto dto) {

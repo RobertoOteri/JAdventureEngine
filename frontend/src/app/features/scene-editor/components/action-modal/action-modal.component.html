@@ -86,12 +86,28 @@
                       }
                     </select>
                   } @else {
-                    <input
-                      type="text"
-                      class="studio-input"
-                      [(ngModel)]="prec.requiredKey"
-                      placeholder="Nome Flag (es. leva_tirata)"
-                    />
+                    <!-- FLAG_EQUALS: Gestione Chiave + Valore atteso libero -->
+                    <div class="flag-condition-grid">
+                      <input
+                        type="text"
+                        class="studio-input"
+                        [(ngModel)]="prec.requiredKey"
+                        placeholder="Nome Flag (es. porta_aperta)"
+                        list="flagKeysList"
+                      />
+                      <datalist id="flagKeysList">
+                        @for (fk of availableFlagKeys(); track fk) {
+                          <option [value]="fk"></option>
+                        }
+                      </datalist>
+                      <span class="equals-sign">=</span>
+                      <input
+                        type="text"
+                        class="studio-input"
+                        [(ngModel)]="prec.expectedValue"
+                        placeholder="Valore atteso (es. true o 100)"
+                      />
+                    </div>
                   }
                 </div>
 
@@ -172,13 +188,23 @@
                     <i class="bi bi-flag-fill"></i>
                     <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
                   </div>
-                } @else {
-                  <input
-                    type="text"
-                    class="studio-input"
-                    [(ngModel)]="eff.targetValue"
-                    placeholder="Valore Flag (es. porta_aperta=true)"
-                  />
+                } @else if (eff.type === 'SET_FLAG') {
+                  <div class="set-flag-grid">
+                    <input
+                      type="text"
+                      class="studio-input"
+                      [(ngModel)]="eff.targetValue"
+                      placeholder="Chiave (es. punteggio)"
+                      list="flagKeysList"
+                    />
+                    <span class="equals-sign">=</span>
+                    <input
+                      type="text"
+                      class="studio-input"
+                      [(ngModel)]="eff.flagValue"
+                      placeholder="Valore (es. 100 o true)"
+                    />
+                  </div>
                 }
               </div>
 

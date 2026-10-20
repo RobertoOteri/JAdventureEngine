@@ -8,6 +8,7 @@ import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
+import com.jadventure.backend.model.GameState;
 import com.jadventure.backend.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,20 +24,17 @@ public class GamePlayService {
     private final GameSaveService gameSaveService;
     private final AuthService authService;
     private final SceneService sceneService;
-    private final InventoryItemService inventoryItemService;
     private final GameSaveMapper gameSaveMapper;
 
     public GamePlayService(GraphicAdventureService graphicAdventureService,
                            GameSaveService gameSaveService,
                            AuthService authService,
                            SceneService sceneService,
-                           InventoryItemService inventoryItemService,
                            GameSaveMapper gameSaveMapper) {
         this.graphicAdventureService = graphicAdventureService;
         this.gameSaveService = gameSaveService;
         this.authService = authService;
         this.sceneService = sceneService;
-        this.inventoryItemService = inventoryItemService;
         this.gameSaveMapper = gameSaveMapper;
     }
 
@@ -90,16 +88,15 @@ public class GamePlayService {
     @Transactional(readOnly = true)
     public GameSaveDto buildGameSaveDto(GameSave save) {
         String adventureCode = save.getGraphicAdventure().getCode();
-
-        GameStateDto state = GameStateDto.builder()
-                .currentScene(sceneService.getSceneByCode(adventureCode, save.getCurrentSceneCode()))
-                .inventory(inventoryItemService.loadPlayerInventory(adventureCode, save.getInventory()))
-                .adventureFlags(save.getAdventureFlags())
-                .visibleItemCodes(save.getVisibleItems())
-                .build();
+        GameState state = save.getGameState();
 
         GameSaveDto dto = gameSaveMapper.toDto(save);
-        dto.setGameState(state);
+
+        if (dto.getGameState() != null && state != null) {
+            SceneDto sceneDto = sceneService.getSceneByCode(adventureCode, state.getCurrentSceneCode());
+            dto.getGameState().setCurrentScene(sceneDto);
+        }
+
         return dto;
     }
 }
