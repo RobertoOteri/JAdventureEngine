@@ -14,7 +14,6 @@ public interface InventoryItemMapper {
 
     List<InventoryItemDto> toDtoList(List<InventoryItem> entities);
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "graphicAdventure", ignore = true)
     InventoryItem toEntity(InventoryItemDto dto);
 }

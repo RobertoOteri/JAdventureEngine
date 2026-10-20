@@ -34,28 +34,6 @@ public class GameSave {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "current_scene_code", nullable = false)
-    private String currentSceneCode;
-
-    @ElementCollection
-    @CollectionTable(name = "game_save_inventory", joinColumns = @JoinColumn(name = "game_save_id"))
-    @Column(name = "item_code")
-    @Builder.Default
-    private Set<String> inventory = new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(name = "game_save_world_flags", joinColumns = @JoinColumn(name = "game_save_id"))
-    @MapKeyColumn(name = "flag_key")
-    @Column(name = "flag_value")
-    @Builder.Default
-    private Map<String, String> adventureFlags = new HashMap<>();
-
-    @ElementCollection
-    @CollectionTable(name = "game_save_scene_items", joinColumns = @JoinColumn(name = "game_save_id"))
-    @Column(name = "item_code")
-    @Builder.Default
-    private Set<String> visibleItems = new HashSet<>();
-
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
 
@@ -65,6 +43,10 @@ public class GameSave {
 
     @Column(name = "is_auto_save", nullable = false)
     private boolean autoSave = false;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_state_id", nullable = false)
+    private GameState gameState;
 
     @PrePersist
     protected void onPrePersist() {

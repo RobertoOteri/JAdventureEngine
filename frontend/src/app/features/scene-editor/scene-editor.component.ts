@@ -343,6 +343,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     if (this.isCollectible()) {
       itemPayload.linkedInventoryItem = {
+        ...(selected?.linkedInventoryItem?.id ? { id: selected.linkedInventoryItem.id } : {}),
         code,
         name: this.invItemName() || name,
         description: this.invItemDesc() || '',
@@ -407,8 +408,8 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.editingItemCode.set(null);
 
     const size = 200;
-    this.spritePosX.set(Math.max(0, Math.min(1000 - size, drop.x - size / 2)));
-    this.spritePosY.set(Math.max(0, Math.min(1000 - size, drop.y - size / 2)));
+    this.spritePosX.set(Math.max(0, drop.x - size / 2));
+    this.spritePosY.set(Math.max(0, drop.y - size / 2));
     this.spriteWidth.set(size);
     this.spriteHeight.set(size);
 

@@ -79,7 +79,7 @@
                   <div class="save-info">
                     <strong class="save-title">{{ auto.name }}</strong>
                     <span class="save-meta">
-                      <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.currentSceneCode }}</strong>
+                      <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.gameState?.currentScene?.code }}</strong>
                     </span>
                   </div>
                   <button type="button" class="btn-load-slot">
@@ -101,7 +101,7 @@
                     <div class="save-info">
                       <strong class="save-title">{{ save.name }}</strong>
                       <span class="save-meta">
-                        <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.currentSceneCode }}</strong>
+                        <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.gameState?.currentScene?.code }}</strong>
                       </span>
                     </div>
                     <button type="button" class="btn-load-slot">

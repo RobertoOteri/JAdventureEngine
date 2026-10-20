@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
 
 export interface InventoryItemData {
+  id?: number | null;
   code: string;
   name: string;
   description: string;
@@ -21,6 +22,7 @@ const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
   styleUrl: './inventory-item-modal.component.css'
 })
 export class InventoryItemModalComponent implements OnInit, OnDestroy {
+  readonly itemId = input<number | null>(null);
   readonly itemCode = input<string>('');
   readonly initialName = input<string>('');
   readonly initialDescription = input<string>('');
@@ -91,6 +93,7 @@ export class InventoryItemModalComponent implements OnInit, OnDestroy {
     }
 
     this.confirmRequested.emit({
+      id: this.itemId(),
       code: this.itemCode().trim(),
       name: this.name.trim(),
       description: this.description.trim(),

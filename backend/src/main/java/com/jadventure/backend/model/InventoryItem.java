@@ -39,6 +39,6 @@ public class InventoryItem {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "graphic_adventure_id", nullable = false)
+    @JoinColumn(name = "graphic_adventure_id", nullable = false, updatable = false)
     private GraphicAdventure graphicAdventure;
 }

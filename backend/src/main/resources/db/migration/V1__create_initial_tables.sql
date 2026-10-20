@@ -7,6 +7,7 @@ CREATE SEQUENCE IF NOT EXISTS precondition_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_effect_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS inventory_item_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_save_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS game_state_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
@@ -100,39 +101,47 @@ CREATE TABLE IF NOT EXISTS game_effects (
     CONSTRAINT fk_game_effect_action FOREIGN KEY (action_id) REFERENCES actions (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS game_states (
+    id BIGINT PRIMARY KEY DEFAULT nextval('game_state_seq'),
+    current_scene_code VARCHAR(255) NOT NULL,
+    is_completed BOOLEAN NOT NULL DEFAULT FALSE
+);
+
 CREATE TABLE IF NOT EXISTS game_saves (
     id BIGINT PRIMARY KEY DEFAULT nextval('game_save_seq'),
     code VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     user_id BIGINT NOT NULL,
     graphic_adventure_id BIGINT NOT NULL,
-    current_scene_code VARCHAR(255) NOT NULL,
+    game_state_id BIGINT NOT NULL,
     is_auto_save BOOLEAN NOT NULL DEFAULT FALSE,
     saved_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     CONSTRAINT fk_game_save_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_game_save_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures(id) ON DELETE CASCADE
+    CONSTRAINT fk_game_save_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures(id) ON DELETE CASCADE,
+    CONSTRAINT fk_game_save_state FOREIGN KEY (game_state_id) REFERENCES game_states(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS game_save_inventory (
-    game_save_id BIGINT NOT NULL,
-    item_code VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_gsi_game_save FOREIGN KEY (game_save_id) REFERENCES game_saves (id) ON DELETE CASCADE,
-    CONSTRAINT pk_game_save_inventory PRIMARY KEY (game_save_id, item_code)
+CREATE TABLE IF NOT EXISTS game_state_inventory (
+    game_state_id BIGINT NOT NULL,
+    inventory_item_id BIGINT NOT NULL,
+    CONSTRAINT fk_gsi_game_state FOREIGN KEY (game_state_id) REFERENCES game_states (id) ON DELETE CASCADE,
+    CONSTRAINT fk_gsi_inventory_item FOREIGN KEY (inventory_item_id) REFERENCES inventory_items (id) ON DELETE CASCADE,
+    CONSTRAINT pk_game_state_inventory PRIMARY KEY (game_state_id, inventory_item_id)
 );
 
-CREATE TABLE IF NOT EXISTS game_save_world_flags (
-    game_save_id BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS game_state_world_flags (
+    game_state_id BIGINT NOT NULL,
     flag_key VARCHAR(255) NOT NULL,
     flag_value VARCHAR(255),
-    CONSTRAINT fk_gswf_game_save FOREIGN KEY (game_save_id) REFERENCES game_saves (id) ON DELETE CASCADE,
-    CONSTRAINT pk_game_save_world_flags PRIMARY KEY (game_save_id, flag_key)
+    CONSTRAINT fk_gswf_game_state FOREIGN KEY (game_state_id) REFERENCES game_states (id) ON DELETE CASCADE,
+    CONSTRAINT pk_game_state_world_flags PRIMARY KEY (game_state_id, flag_key)
 );
 
-CREATE TABLE IF NOT EXISTS game_save_scene_items (
-    game_save_id BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS game_state_scene_items (
+    game_state_id BIGINT NOT NULL,
     item_code VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_gssi_game_save FOREIGN KEY (game_save_id) REFERENCES game_saves (id) ON DELETE CASCADE,
-    CONSTRAINT pk_game_save_scene_items PRIMARY KEY (game_save_id, item_code)
+    CONSTRAINT fk_gssi_game_state FOREIGN KEY (game_state_id) REFERENCES game_states (id) ON DELETE CASCADE,
+    CONSTRAINT pk_game_state_scene_items PRIMARY KEY (game_state_id, item_code)
 );
 
 CREATE INDEX IF NOT EXISTS idx_graphic_adventures_author_id ON graphic_adventures (author_id);
