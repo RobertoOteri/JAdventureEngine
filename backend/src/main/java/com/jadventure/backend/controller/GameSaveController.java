@@ -37,4 +37,12 @@ public class GameSaveController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(gameSaveService.createSave(adventureCode, saveName, gameStateDto));
     }
+
+    @PutMapping("/{adventureCode}/autosave")
+    public ResponseEntity<Void> updateAutoSave(@PathVariable("adventureCode") String adventureCode,
+                                               @RequestBody GameStateDto gameStateDto) {
+        gameSaveService.updateAutoSave(adventureCode, gameStateDto);
+        return ResponseEntity.ok().build();
+    }
+
 }

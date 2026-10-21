@@ -78,16 +78,13 @@ public class GameSaveService {
 
         save.setName("Salvataggio automatico");
 
-        GameSaveDto tempDto = GameSaveDto.builder().gameState(gameStateDto).build();
-        GameSave mappedTemp = gameSaveMapper.toEntity(tempDto);
-
-        if (save.getGameState() != null && mappedTemp.getGameState() != null) {
-            mappedTemp.getGameState().setId(save.getGameState().getId());
+        if (save.getGameState() != null) {
+            save.getGameState().setCurrentSceneCode(gameStateDto.getCurrentScene().getCode());
+            save.getGameState().setCompleted(gameStateDto.isCompleted());
+            save.getGameState().setPlayTimeSeconds(gameStateDto.getPlayTimeSeconds());
         }
 
-        save.setGameState(mappedTemp.getGameState());
         save.setSavedAt(LocalDateTime.now());
-
         gameSaveRepository.save(save);
     }
 

@@ -4,6 +4,11 @@
     <span class="ending-kicker">Fine</span>
     <h2>{{ adventureTitle() }}</h2>
 
+    <div class="ending-time-card">
+      <i class="bi bi-stopwatch"></i>
+      <span>Tempo impiegato: <strong>{{ formattedFinalTime() }}</strong></span>
+    </div>
+
     @if (message()) {
       <p class="ending-message">{{ message() }}</p>
     }

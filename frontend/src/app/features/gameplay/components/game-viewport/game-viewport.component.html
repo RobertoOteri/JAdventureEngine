@@ -5,6 +5,8 @@
         <img [src]="backgroundUrl()" alt="Sfondo Scena" class="scene-background" />
       }
 
+      <app-game-timer [playTimeSeconds]="playTimeSeconds()" />
+
       <div class="scene-sprites-layer">
         @for (item of currentScene.items; track item.code) {
           @if (item.imageUrl && isItemVisible(item)) {

@@ -48,6 +48,10 @@ public class GameState {
     @Builder.Default
     private Set<String> visibleItemCodes = new HashSet<>();
 
+    @Column(name = "play_time_seconds", nullable = false)
+    @Builder.Default
+    private long playTimeSeconds = 0;
+
     @Column(name = "is_completed", nullable = false)
     private boolean completed = false;
 }

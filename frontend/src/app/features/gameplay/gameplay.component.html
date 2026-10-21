@@ -14,6 +14,7 @@
       [backgroundUrl]="store.currentSceneBackgroundUrl()"
       [visibleItemCodes]="store.visibleItemCodes()"
       [feedbackMessage]="store.feedbackMessage()"
+      [playTimeSeconds]="store.gameState()?.playTimeSeconds || 0"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
       (canvasClicked)="store.closeRadialMenu()"
     />
@@ -55,6 +56,7 @@
     <app-game-ending-modal
       [adventureTitle]="adventureDetails()?.title || 'Avventura'"
       [message]="store.endingMessage()"
+      [playTimeSeconds]="store.gameState()?.playTimeSeconds || 0"
       (continueGame)="onContinue()"
       (exit)="onExitToLobby()"
     />

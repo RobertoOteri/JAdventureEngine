@@ -1,11 +1,12 @@
-import { Component, input, output } from '@angular/core';
+import {Component, computed, input, output} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Scene, Item } from '../../../../core/models';
+import { GameTimerComponent } from '../game-timer/game-timer.component';
 
 @Component({
   selector: 'app-game-viewport',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GameTimerComponent],
   templateUrl: './game-viewport.component.html',
   styleUrl: './game-viewport.component.css'
 })
@@ -14,6 +15,7 @@ export class GameViewportComponent {
   backgroundUrl = input<string>('');
   visibleItemCodes = input<string[]>([]);
   feedbackMessage = input<string | null>(null);
+  playTimeSeconds = input<number>(0);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
   canvasClicked = output<void>();

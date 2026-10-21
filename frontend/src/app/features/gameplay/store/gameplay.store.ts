@@ -134,6 +134,9 @@ export const GameplayStore = signalStore(
     );
 
     const setPauseMenuOpen = (isOpen: boolean): void => {
+      if (isOpen) {
+        syncAutoSave();
+      }
       patchState(store, { isPauseMenuOpen: isOpen });
       const advCode = store.adventureCode();
       if (isOpen && advCode) {
@@ -362,6 +365,37 @@ export const GameplayStore = signalStore(
       )
     );
 
+    const incrementPlayTime = (): void => {
+      const state = store.gameState();
+      if (!state || state.completed || store.isPauseMenuOpen()) {
+        return;
+      }
+      patchState(store, {
+        gameState: {
+          ...state,
+          playTimeSeconds: (state.playTimeSeconds ?? 0) + 1
+        }
+      });
+    };
+
+    const syncAutoSave = rxMethod<void>(
+      pipe(
+        switchMap(() => {
+          const advCode = store.adventureCode();
+          const currentState = store.gameState();
+          if (!advCode || !currentState) {
+            return [];
+          }
+          return saveService.updateAutoSave(advCode, currentState).pipe(
+            tap({
+              error: (err) => console.error('Errore sincronizzazione autosave:', err)
+            })
+          );
+        })
+      )
+    );
+
+
     const resetStore = (): void => {
       patchState(store, initialState);
     };
@@ -381,6 +415,8 @@ export const GameplayStore = signalStore(
       fetchSaves,
       executeAction,
       saveCurrentGame,
+      syncAutoSave,
+      incrementPlayTime,
       resetStore
     };
   })

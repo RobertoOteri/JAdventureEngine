@@ -19,4 +19,8 @@ export class GameSaveService {
     const params = saveName ? new HttpParams().set('saveName', saveName) : undefined;
     return this.http.post<GameSaveDto>(`${this.apiUrl}/${adventureCode}`, gameState, { params });
   }
+
+  updateAutoSave(adventureCode: string, gameState: GameStateDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${adventureCode}/autosave`, gameState);
+  }
 }

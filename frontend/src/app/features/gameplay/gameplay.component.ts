@@ -42,6 +42,8 @@ export class GameplayComponent implements OnInit {
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
   readonly isLaunchModalOpen = signal<boolean>(true);
 
+  private timerInterval: any = null;
+
   @HostListener('window:keydown.escape')
   handleEscape(): void {
     if (this.isLaunchModalOpen() || this.store.isCompleted()) {
@@ -98,7 +100,22 @@ export class GameplayComponent implements OnInit {
         error: () => void this.router.navigate(['/adventures'])
       });
     }
+
+    this.timerInterval = setInterval(() => {
+      const state = this.store.gameState();
+      if (state && !state.completed && !this.store.isPauseMenuOpen() && !this.isLaunchModalOpen()) {
+        this.store.incrementPlayTime();
+      }
+    }, 1000);
+
   }
+
+  ngOnDestroy(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
 
   onStartNew(): void {
     const code = this.store.adventureCode();
@@ -130,6 +147,7 @@ export class GameplayComponent implements OnInit {
   }
 
   onExitToLobby(): void {
+    this.store.syncAutoSave();
     this.store.resetStore();
     void this.router.navigate(['/adventures']);
   }

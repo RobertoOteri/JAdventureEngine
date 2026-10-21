@@ -104,7 +104,8 @@ CREATE TABLE IF NOT EXISTS game_effects (
 CREATE TABLE IF NOT EXISTS game_states (
     id BIGINT PRIMARY KEY DEFAULT nextval('game_state_seq'),
     current_scene_code VARCHAR(255) NOT NULL,
-    is_completed BOOLEAN NOT NULL DEFAULT FALSE
+    is_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    play_time_seconds BIGINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS game_saves (
