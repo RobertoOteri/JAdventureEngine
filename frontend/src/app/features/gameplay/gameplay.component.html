@@ -55,6 +55,7 @@
   @if (store.isCompleted()) {
     <app-game-ending-modal
       [adventureTitle]="adventureDetails()?.title || 'Avventura'"
+      [adventureCode]="store.adventureCode() || ''"
       [message]="store.endingMessage()"
       [playTimeSeconds]="store.gameState()?.playTimeSeconds || 0"
       (continueGame)="onContinue()"

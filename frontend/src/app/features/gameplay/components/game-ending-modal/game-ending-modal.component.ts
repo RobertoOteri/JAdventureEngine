@@ -1,19 +1,23 @@
-import {Component, computed, input, output} from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
+import { LeaderboardComponent } from '../../../../features/leaderboard/leaderboard.component';
 
 @Component({
   selector: 'app-game-ending-modal',
   standalone: true,
+  imports: [LeaderboardComponent],
   templateUrl: './game-ending-modal.component.html',
   styleUrl: './game-ending-modal.component.css'
 })
 export class GameEndingModalComponent {
   adventureTitle = input<string>('Avventura');
+  adventureCode = input.required<string>();
   message = input<string | null>(null);
-
   playTimeSeconds = input<number>(0);
 
   continueGame = output<void>();
   exit = output<void>();
+
+  readonly isLeaderboardOpen = signal<boolean>(false);
 
   formattedFinalTime = computed(() => {
     const total = this.playTimeSeconds();

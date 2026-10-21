@@ -8,6 +8,7 @@ CREATE SEQUENCE IF NOT EXISTS game_effect_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS inventory_item_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_save_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_state_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS leaderboard_entry_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
@@ -143,6 +144,18 @@ CREATE TABLE IF NOT EXISTS game_state_scene_items (
     item_code VARCHAR(255) NOT NULL,
     CONSTRAINT fk_gssi_game_state FOREIGN KEY (game_state_id) REFERENCES game_states (id) ON DELETE CASCADE,
     CONSTRAINT pk_game_state_scene_items PRIMARY KEY (game_state_id, item_code)
+);
+
+CREATE TABLE IF NOT EXISTS leaderboard_entries (
+    id BIGINT NOT NULL DEFAULT nextval('leaderboard_entry_seq'),
+    user_id BIGINT NOT NULL,
+    graphic_adventure_id BIGINT NOT NULL,
+    playtime_seconds BIGINT NOT NULL,
+    completed_at TIMESTAMP NOT NULL,
+    CONSTRAINT pk_leaderboard_entries PRIMARY KEY (id),
+    CONSTRAINT fk_leaderboard_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_leaderboard_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures (id) ON DELETE CASCADE,
+    CONSTRAINT uq_leaderboard_user_adventure UNIQUE (user_id, graphic_adventure_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_graphic_adventures_author_id ON graphic_adventures (author_id);

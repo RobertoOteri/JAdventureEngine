@@ -40,6 +40,10 @@
         <button type="button" class="btn-cancel" (click)="close.emit()">
           Chiudi
         </button>
+        <button type="button" class="btn-leaderboard" (click)="isLeaderboardOpen.set(true)">
+          <i class="bi bi-trophy-fill"></i>
+          <span>Classifica</span>
+        </button>
         <button type="button" class="btn-play-game" (click)="onPlay()">
           <i class="bi bi-play-fill play-icon"></i>
           <span>Gioca Ora</span>
@@ -48,3 +52,10 @@
     </div>
   </div>
 </div>
+
+@if (isLeaderboardOpen()) {
+  <app-leaderboard
+    [adventureCode]="adventure().code"
+    (close)="isLeaderboardOpen.set(false)"
+  />
+}

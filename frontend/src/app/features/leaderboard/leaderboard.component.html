@@ -1,0 +1,77 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-card leaderboard-card">
+    <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi" aria-label="Chiudi">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="leaderboard-header">
+      <div class="header-title-group">
+        <h2 class="leaderboard-title">
+          <i class="bi bi-trophy header-icon"></i>
+          Classifica Top 15
+        </h2>
+      </div>
+    </div>
+
+    <div class="leaderboard-body">
+      @if (loading()) {
+        <div class="state-box">
+          <i class="bi bi-arrow-repeat spin-icon"></i>
+          <span>Caricamento classifica in corso...</span>
+        </div>
+      } @else if (errorMessage()) {
+        <div class="state-box error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      } @else if (entries().length > 0) {
+        <div class="table-wrapper">
+          <table class="leaderboard-table">
+            <thead>
+            <tr>
+              <th class="col-rank">Pos.</th>
+              <th class="col-player">Giocatore</th>
+              <th class="col-time">Tempo</th>
+              <th class="col-date">Completata il</th>
+            </tr>
+            </thead>
+            <tbody>
+              @for (entry of entries(); track entry.username; let i = $index) {
+                <tr class="leaderboard-row" [class.top-row]="i < 3">
+                  <td class="col-rank">
+                    <span class="rank-badge"
+                          [class.rank-1]="i === 0"
+                          [class.rank-2]="i === 1"
+                          [class.rank-3]="i === 2">
+                      @if (i < 3) {
+                        <i class="bi bi-trophy-fill"></i>
+                      }
+                      {{ i + 1 }}
+                    </span>
+                  </td>
+                  <td class="col-player">
+                    <span class="player-name">{{ entry.username }}</span>
+                  </td>
+                  <td class="col-time">
+                    <span class="time-pill">
+                      <i class="bi bi-stopwatch"></i>
+                      {{ formatTime(entry.playTimeSeconds) }}
+                    </span>
+                  </td>
+                  <td class="col-date">
+                    {{ entry.completedAt | date:'dd/MM/yyyy HH:mm' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="state-box">
+          <i class="bi bi-compass"></i>
+          <span>Ancora nessuno ha completato questa storia. Sii il primo!</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
