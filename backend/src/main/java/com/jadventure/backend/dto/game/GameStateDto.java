@@ -24,7 +24,7 @@ public class GameStateDto {
     private Set<String> visibleItemCodes = new HashSet<>();
 
     @Builder.Default
-    private long playTimeSeconds = 0;
+    private long playTime = 0;
 
     private boolean completed;
 }

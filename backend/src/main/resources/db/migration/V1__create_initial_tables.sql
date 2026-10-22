@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS game_states (
     id BIGINT PRIMARY KEY DEFAULT nextval('game_state_seq'),
     current_scene_code VARCHAR(255) NOT NULL,
     is_completed BOOLEAN NOT NULL DEFAULT FALSE,
-    play_time_seconds BIGINT NOT NULL DEFAULT 0
+    play_time BIGINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS game_saves (
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS leaderboard_entries (
     id BIGINT NOT NULL DEFAULT nextval('leaderboard_entry_seq'),
     user_id BIGINT NOT NULL,
     graphic_adventure_id BIGINT NOT NULL,
-    playtime_seconds BIGINT NOT NULL,
+    play_time BIGINT NOT NULL,
     completed_at TIMESTAMP NOT NULL,
     CONSTRAINT pk_leaderboard_entries PRIMARY KEY (id),
     CONSTRAINT fk_leaderboard_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

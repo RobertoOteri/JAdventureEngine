@@ -12,5 +12,5 @@ public interface LeaderboardEntryRepository extends JpaRepository<LeaderboardEnt
 
     boolean existsByUserUsernameAndGraphicAdventureCode(String username, String adventureCode);
 
-    List<LeaderboardEntry> findTop15ByGraphicAdventureCodeOrderByPlayTimeSecondsAscCompletedAtAsc(String adventureCode);
+    List<LeaderboardEntry> findTop15ByGraphicAdventureCodeOrderByPlayTimeAscCompletedAtAsc(String adventureCode);
 }

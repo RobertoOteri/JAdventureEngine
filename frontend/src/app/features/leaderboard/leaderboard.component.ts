@@ -17,7 +17,6 @@ export class LeaderboardComponent implements OnInit {
 
   private readonly leaderboardService = inject(LeaderboardService);
 
-  // Usiamo i signal così l'HTML si aggiorna istantaneamente senza dover cliccare!
   readonly entries = signal<LeaderboardEntryDto[]>([]);
   readonly loading = signal<boolean>(true);
   readonly errorMessage = signal<string>('');

@@ -1,6 +1,6 @@
 export interface LeaderboardEntryDto{
   username: string;
-  playTimeSeconds: number;
+  playTime: number;
   completedAt: string;
 }
 

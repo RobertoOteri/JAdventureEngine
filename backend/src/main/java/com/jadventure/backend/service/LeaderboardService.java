@@ -39,13 +39,13 @@ public class LeaderboardService {
         }
 
         List<LeaderboardEntry> entries = leaderboardEntryRepository
-                .findTop15ByGraphicAdventureCodeOrderByPlayTimeSecondsAscCompletedAtAsc(adventureCode);
+                .findTop15ByGraphicAdventureCodeOrderByPlayTimeAscCompletedAtAsc(adventureCode);
 
         return leaderboardEntryMapper.toDtoList(entries);
     }
 
     @Transactional
-    public void createLeaderboardEntry(String adventureCode, long playTimeSeconds) {
+    public void createLeaderboardEntry(String adventureCode, long playTime) {
         User currentUser = authService.getCurrentUser();
 
         boolean alreadyCompleted = leaderboardEntryRepository
@@ -61,7 +61,7 @@ public class LeaderboardService {
         LeaderboardEntry newEntry = LeaderboardEntry.builder()
                 .user(currentUser)
                 .graphicAdventure(adventure)
-                .playTimeSeconds(playTimeSeconds)
+                .playTime(playTime)
                 .completedAt(LocalDateTime.now())
                 .build();
 

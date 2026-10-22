@@ -37,8 +37,8 @@ public class LeaderboardEntry {
     @JoinColumn(name = "graphic_adventure_id", nullable = false)
     private GraphicAdventure graphicAdventure;
 
-    @Column(name = "playtime_seconds", nullable = false)
-    private Long playTimeSeconds;
+    @Column(name = "play_time", nullable = false)
+    private Long playTime;
 
     @Column(name = "completed_at", nullable = false)
     private LocalDateTime completedAt;

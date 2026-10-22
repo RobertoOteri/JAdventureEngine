@@ -81,7 +81,7 @@ public class GameSaveService {
         if (save.getGameState() != null) {
             save.getGameState().setCurrentSceneCode(gameStateDto.getCurrentScene().getCode());
             save.getGameState().setCompleted(gameStateDto.isCompleted());
-            save.getGameState().setPlayTimeSeconds(gameStateDto.getPlayTimeSeconds());
+            save.getGameState().setPlayTime(gameStateDto.getPlayTime());
         }
 
         save.setSavedAt(LocalDateTime.now());

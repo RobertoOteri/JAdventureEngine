@@ -6,6 +6,6 @@ export interface GameStateDto {
   inventory: InventoryItem[];
   adventureFlags: Record<string, string>;
   visibleItemCodes: string[];
-  playTimeSeconds: number;
+  playTime: number;
   completed?: boolean;
 }

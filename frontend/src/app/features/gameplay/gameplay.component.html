@@ -14,7 +14,7 @@
       [backgroundUrl]="store.currentSceneBackgroundUrl()"
       [visibleItemCodes]="store.visibleItemCodes()"
       [feedbackMessage]="store.feedbackMessage()"
-      [playTimeSeconds]="store.gameState()?.playTimeSeconds || 0"
+      [playTimeSeconds]="store.gameState()?.playTime || 0"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
       (canvasClicked)="store.closeRadialMenu()"
     />
@@ -57,7 +57,7 @@
       [adventureTitle]="adventureDetails()?.title || 'Avventura'"
       [adventureCode]="store.adventureCode() || ''"
       [message]="store.endingMessage()"
-      [playTimeSeconds]="store.gameState()?.playTimeSeconds || 0"
+      [playTimeSeconds]="store.gameState()?.playTime || 0"
       (continueGame)="onContinue()"
       (exit)="onExitToLobby()"
     />

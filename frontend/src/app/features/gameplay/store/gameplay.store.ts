@@ -373,7 +373,7 @@ export const GameplayStore = signalStore(
       patchState(store, {
         gameState: {
           ...state,
-          playTimeSeconds: (state.playTimeSeconds ?? 0) + 1
+          playTime: (state.playTime ?? 0) + 1
         }
       });
     };
