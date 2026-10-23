@@ -79,12 +79,11 @@ public class ItemService {
         }
 
         if (dto.getLinkedInventoryItem() != null) {
-            InventoryItem invItem = inventoryItemService.resolveInventoryItem(
+            InventoryItem invItem = inventoryItemService.upsertLinkedInventoryItem(
                     adventure,
                     null,
                     dto.getLinkedInventoryItem(),
-                    inventoryImage,
-                    item.getImageUrl()
+                    inventoryImage
             );
             item.setLinkedInventoryItem(invItem);
         }
@@ -110,12 +109,11 @@ public class ItemService {
         if (dto.getLinkedInventoryItem() == null) {
             item.setLinkedInventoryItem(null);
         } else {
-            InventoryItem invItem = inventoryItemService.resolveInventoryItem(
+            InventoryItem invItem = inventoryItemService.upsertLinkedInventoryItem(
                     adventure,
                     item.getLinkedInventoryItem(),
                     dto.getLinkedInventoryItem(),
-                    inventoryImage,
-                    item.getImageUrl()
+                    inventoryImage
             );
             item.setLinkedInventoryItem(invItem);
         }
@@ -139,16 +137,21 @@ public class ItemService {
 
         authService.validateOwnership(item.getScene().getGraphicAdventure().getAuthor().getUsername());
 
-        boolean typeAlreadyUsed = item.getActions().stream()
-                .anyMatch(existing -> existing.getType() == actionDto.getType());
-        if (typeAlreadyUsed) {
-            throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
-        }
+        validateActionUniqueness(item.getActions(), actionDto);
 
         Action action = actionMapper.toEntity(actionDto);
         action.setItem(item);
 
         return actionMapper.toDto(actionRepository.save(action));
+    }
+
+    private void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
+        boolean typeAlreadyUsed = existingActions.stream()
+                .anyMatch(existing -> existing.getType() == actionDto.getType());
+
+        if (typeAlreadyUsed) {
+            throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
+        }
     }
 
     private void copyItemProperties(Item item, ItemDto dto) {

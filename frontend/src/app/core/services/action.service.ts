@@ -27,6 +27,10 @@ export class ActionService {
     return this.http.get<Action[]>(`${this.apiUrl}/item/${itemId}`);
   }
 
+  getActionsByInventoryItem(inventoryItemId: number): Observable<Action[]> {
+    return this.http.get<Action[]>(`${this.apiUrl}/inventory-item/${inventoryItemId}`);
+  }
+
   executeAction(actionDto: GameActionDto): Observable<GameActionResultDto> {
     return this.http.post<GameActionResultDto>(`${this.apiUrl}/execute`, actionDto);
   }

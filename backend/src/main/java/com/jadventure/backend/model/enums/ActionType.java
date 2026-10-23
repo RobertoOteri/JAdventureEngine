@@ -6,5 +6,6 @@ public enum ActionType {
     PICK_UP,
     MOVE,
     USE,
-    TALK_TO
+    TALK_TO,
+    USE_WITH
 }

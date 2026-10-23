@@ -114,3 +114,11 @@
 .banner-wrapper.type-error .message-text {
   color: #fef2f2;
 }
+
+.banner-wrapper {
+  transition: bottom 0.25s ease;
+}
+
+.banner-wrapper.is-raised {
+  bottom: 210px;
+}

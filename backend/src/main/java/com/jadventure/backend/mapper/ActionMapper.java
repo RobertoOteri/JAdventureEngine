@@ -21,10 +21,12 @@ public interface ActionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "item", ignore = true)
+    @Mapping(target = "inventoryItem", ignore = true)
     void updateEntityFromDto(ActionDto dto, @MappingTarget Action entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "item", ignore = true)
+    @Mapping(target = "inventoryItem", ignore = true)
     Action toEntity(ActionDto dto);
 
     @AfterMapping

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { EditorStore } from './store/editor.store';
 import { Action, Item } from '../../core/models';
 import { EditorHeaderComponent } from './components/editor-header/editor-header.component';
@@ -51,6 +52,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   readonly spriteHeight = signal<number>(200);
 
   readonly isInventoryModalOpen = signal<boolean>(false);
+  readonly isStandaloneInventoryCreation = signal<boolean>(false);
   readonly editingInventoryItemId = signal<number | null>(null);
   readonly invItemName = signal<string>('');
   readonly invItemDesc = signal<string>('');
@@ -59,6 +61,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   readonly invCustomPreviewUrl = signal<string | null>(null);
 
   readonly isActionModalOpen = signal<boolean>(false);
+  readonly isActionForInventory = signal<boolean>(false);
   readonly editingAction = signal<Action | null>(null);
 
   readonly isAdventureModalOpen = signal<boolean>(false);
@@ -174,6 +177,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.sceneImageFile.set(null);
     this.previewSpriteUrl.set(null);
 
+    this.isStandaloneInventoryCreation.set(false);
     this.editingInventoryItemId.set(null);
     this.invItemName.set('');
     this.invItemDesc.set('');
@@ -202,7 +206,21 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     }
   }
 
+  openStandaloneInventoryModal(): void {
+    this.cancelDraft();
+    this.isStandaloneInventoryCreation.set(true);
+    this.editingInventoryItemId.set(null);
+    this.itemCode.set('');
+    this.invItemName.set('');
+    this.invItemDesc.set('');
+    this.invUseSceneImage.set(false);
+    this.invCustomFile.set(null);
+    this.invCustomPreviewUrl.set(null);
+    this.isInventoryModalOpen.set(true);
+  }
+
   openInventoryModal(): void {
+    this.isStandaloneInventoryCreation.set(false);
     this.editingInventoryItemId.set(null);
     if (!this.invItemName()) {
       this.invItemName.set(this.itemName() || 'Nuovo Oggetto');
@@ -215,13 +233,14 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     if (!item.linkedInventoryItem) return;
 
     this.store.selectItem(item);
-    this.itemCode.set(item.code);
+    this.isStandaloneInventoryCreation.set(!item.id);
+    this.itemCode.set(item.linkedInventoryItem.code || item.code);
     this.editingInventoryItemId.set(item.linkedInventoryItem.id ?? null);
     this.invItemName.set(item.linkedInventoryItem.name);
     this.invItemDesc.set(item.linkedInventoryItem.description || '');
 
     const hasDedicated = !!item.linkedInventoryItem.imageUrl && item.linkedInventoryItem.imageUrl !== item.imageUrl;
-    this.invUseSceneImage.set(!hasDedicated);
+    this.invUseSceneImage.set(item.id ? !hasDedicated : false);
     this.invCustomFile.set(null);
     this.invCustomPreviewUrl.set(hasDedicated ? this.resolveImageUrl(item.linkedInventoryItem.imageUrl) : null);
 
@@ -233,14 +252,15 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   onInventoryConfirmed(data: InventoryItemData): void {
     const invId = this.editingInventoryItemId();
 
+    // 1. Aggiornamento di un InventoryItem esistente (collegato o standalone)
     if (invId) {
       const currentItem = this.store.selectedItem();
       const invPayload = {
         id: invId,
-        code: currentItem?.code,
+        code: data.code || currentItem?.code,
         name: data.name,
         description: data.description,
-        imageUrl: data.useSceneImage ? (currentItem?.imageUrl ?? '') : ''
+        imageUrl: data.useSceneImage ? (currentItem?.imageUrl ?? '') : (currentItem?.linkedInventoryItem?.imageUrl ?? '')
       };
 
       const formData = new FormData();
@@ -254,12 +274,39 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
         next: () => {
           this.isInventoryModalOpen.set(false);
           this.editingInventoryItemId.set(null);
+          this.isStandaloneInventoryCreation.set(false);
         },
         error: (err: any) => console.error(err?.error?.message || 'Errore aggiornamento inventario.')
       });
       return;
     }
 
+    // 2. Creazione diretta di un NUOVO InventoryItem standalone
+    if (this.isStandaloneInventoryCreation()) {
+      const invPayload = {
+        code: data.code,
+        name: data.name,
+        description: data.description,
+        imageUrl: ''
+      };
+
+      const formData = new FormData();
+      formData.append('data', new Blob([JSON.stringify(invPayload)], { type: 'application/json' }));
+      if (data.customFile) {
+        formData.append('image', data.customFile);
+      }
+
+      this.store.createStandaloneInventoryItem(formData).subscribe({
+        next: () => {
+          this.isInventoryModalOpen.set(false);
+          this.isStandaloneInventoryCreation.set(false);
+        },
+        error: (err: any) => console.error(err?.error?.message || 'Errore creazione inventario standalone.')
+      });
+      return;
+    }
+
+    // 3. Configurazione inventario dentro la bozza di un Hotspot di scena
     this.invItemName.set(data.name);
     this.invItemDesc.set(data.description);
     this.invUseSceneImage.set(data.useSceneImage);
@@ -271,17 +318,22 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   onInventoryCancelled(): void {
     this.isInventoryModalOpen.set(false);
     this.editingInventoryItemId.set(null);
+    this.isStandaloneInventoryCreation.set(false);
     if (!this.invItemName()) {
       this.isCollectible.set(false);
     }
   }
 
   onDeleteInventoryItem(itemCode: string): void {
-    const currentItem = this.store.currentScene()?.items?.find((i) => i.code === itemCode);
+    const currentItem = this.store.combinedSceneList().find((i) => i.code === itemCode);
     const invId = currentItem?.linkedInventoryItem?.id;
     if (!invId) return;
 
-    if (!confirm(`Vuoi rimuovere l'oggetto dall'inventario per #${itemCode}? L'hotspot nella stanza non verrà eliminato.`)) {
+    const msg = currentItem?.id
+      ? `Vuoi rimuovere l'oggetto dall'inventario per #${itemCode}? L'hotspot nella stanza non verrà eliminato.`
+      : `Vuoi eliminare definitivamente l'oggetto inventario #${itemCode}?`;
+
+    if (!confirm(msg)) {
       return;
     }
 
@@ -434,11 +486,25 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   openAddAction(): void {
+    this.isActionForInventory.set(false);
     this.editingAction.set(null);
     this.isActionModalOpen.set(true);
   }
 
   openEditAction(action: Action): void {
+    this.isActionForInventory.set(false);
+    this.editingAction.set(action);
+    this.isActionModalOpen.set(true);
+  }
+
+  openAddInventoryAction(): void {
+    this.isActionForInventory.set(true);
+    this.editingAction.set(null);
+    this.isActionModalOpen.set(true);
+  }
+
+  openEditInventoryAction(action: Action): void {
+    this.isActionForInventory.set(true);
     this.editingAction.set(action);
     this.isActionModalOpen.set(true);
   }
@@ -449,12 +515,19 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveAction(actionPayload: Action): void {
-    if (!this.store.selectedItem()?.id) return;
+    const selected = this.store.selectedItem();
+    if (!selected) return;
 
     const actionId = this.editingAction()?.id;
-    const save$ = actionId
-      ? this.store.updateAction({ ...actionPayload, id: actionId })
-      : this.store.addAction(actionPayload);
+    let save$: Observable<Action>;
+
+    if (actionId) {
+      save$ = this.store.updateAction({ ...actionPayload, id: actionId });
+    } else if (this.isActionForInventory() || !selected.id) {
+      save$ = this.store.addInventoryAction(actionPayload);
+    } else {
+      save$ = this.store.addAction(actionPayload);
+    }
 
     save$.subscribe({
       next: () => this.closeActionModal(),
@@ -468,7 +541,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   onDeleteAction(actionId: number): void {
     if (!actionId) return;
 
-    if (confirm("Vuoi rimuovere questa azione dall'hotspot?")) {
+    if (confirm("Vuoi rimuovere questa azione?")) {
       this.store.deleteAction(actionId).subscribe({
         error: (err: any) => console.error('Errore eliminazione azione:', err)
       });

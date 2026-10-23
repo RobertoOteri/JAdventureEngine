@@ -15,6 +15,8 @@ export class GameMessageBannerComponent implements OnDestroy {
   type = input<BannerMessageType>('info');
   duration = input<number>(4000);
 
+  raised = input<boolean>(false);
+
   visible = signal<boolean>(false);
   currentText = signal<string>('');
   isFadingOut = signal<boolean>(false);

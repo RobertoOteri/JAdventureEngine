@@ -1,6 +1,7 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
+import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GraphicAdventureMapper;
@@ -23,17 +24,20 @@ public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
     private final GraphicAdventureMapper graphicAdventureMapper;
+    private final InventoryItemService inventoryItemService;
     private final SceneMapper sceneMapper;
     private final AuthService authService;
     private final FileStorageUtil fileStorageUtil;
 
     public GraphicAdventureService(GraphicAdventureRepository graphicAdventureRepository,
                                    GraphicAdventureMapper graphicAdventureMapper,
+                                   InventoryItemService inventoryItemService,
                                    SceneMapper sceneMapper,
                                    AuthService authService,
                                    FileStorageUtil fileStorageUtil) {
         this.graphicAdventureRepository = graphicAdventureRepository;
         this.graphicAdventureMapper = graphicAdventureMapper;
+        this.inventoryItemService = inventoryItemService;
         this.sceneMapper = sceneMapper;
         this.authService = authService;
         this.fileStorageUtil = fileStorageUtil;
@@ -175,5 +179,14 @@ public class GraphicAdventureService {
         return normalized.toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
+    }
+
+    public InventoryItemDto addInventoryItem(Long adventureId, InventoryItemDto dto, MultipartFile image) {
+        GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId));
+
+        authService.validateOwnership(adventure.getAuthor().getUsername());
+
+        return inventoryItemService.createInventoryItem(adventure, dto, image);
     }
 }

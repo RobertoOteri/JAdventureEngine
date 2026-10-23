@@ -22,6 +22,7 @@ const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
   styleUrl: './inventory-item-modal.component.css'
 })
 export class InventoryItemModalComponent implements OnInit, OnDestroy {
+  readonly isStandalone = input<boolean>(false);
   readonly itemId = input<number | null>(null);
   readonly itemCode = input<string>('');
   readonly initialName = input<string>('');
@@ -35,6 +36,7 @@ export class InventoryItemModalComponent implements OnInit, OnDestroy {
   readonly cancelRequested = output<void>();
 
   name = '';
+  code = '';
   description = '';
   useSceneImage = true;
   customFile: File | null = null;
@@ -45,8 +47,9 @@ export class InventoryItemModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.name = this.initialName();
+    this.code = this.itemCode();
     this.description = this.initialDescription();
-    this.useSceneImage = this.initialUseSceneImage();
+    this.useSceneImage = this.isStandalone() ? false : this.initialUseSceneImage();
     this.customFile = this.initialCustomFile();
 
     if (this.customFile) {
@@ -65,6 +68,17 @@ export class InventoryItemModalComponent implements OnInit, OnDestroy {
     if (this.activeBlobUrl) {
       URL.revokeObjectURL(this.activeBlobUrl);
       this.activeBlobUrl = null;
+    }
+  }
+
+  onNameInput(val: string): void {
+    this.name = val;
+    if (this.isStandalone() && !this.itemId()) {
+      this.code = val
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9_]/g, '_')
+        .replace(/_+/g, '_');
     }
   }
 
@@ -92,13 +106,19 @@ export class InventoryItemModalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const finalCode = (this.isStandalone() ? this.code : this.itemCode()).trim();
+    if (!finalCode) {
+      this.errorMessage.set("Il codice univoco dell'oggetto inventario è obbligatorio.");
+      return;
+    }
+
     this.confirmRequested.emit({
       id: this.itemId(),
-      code: this.itemCode().trim(),
+      code: finalCode,
       name: this.name.trim(),
       description: this.description.trim(),
-      useSceneImage: this.useSceneImage,
-      customFile: this.useSceneImage ? null : this.customFile
+      useSceneImage: this.isStandalone() ? false : this.useSceneImage,
+      customFile: this.isStandalone() || !this.useSceneImage ? this.customFile : null
     });
   }
 

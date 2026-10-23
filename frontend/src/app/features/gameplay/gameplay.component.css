@@ -23,3 +23,8 @@
   overflow: hidden;
   position: relative;
 }
+
+:host(.is-dragging-item),
+:host(.is-dragging-item) ::ng-deep * {
+  cursor: none !important;
+}

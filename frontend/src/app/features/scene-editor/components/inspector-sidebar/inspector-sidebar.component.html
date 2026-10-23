@@ -3,21 +3,32 @@
     <div class="properties-header">
       <div class="header-title">
         <i class="bi bi-bounding-box-circles icon-header"></i>
-        <h2>Hotspot ({{ store.itemsCount() }})</h2>
+        <h2>Elementi ({{ store.itemsCount() }})</h2>
       </div>
-      <button
-        type="button"
-        class="btn-new-hotspot"
-        (click)="startCreateRequested.emit()"
-        title="Crea nuovo hotspot"
-      >
-        <i class="bi bi-plus-lg"></i>
-        <span>Nuovo</span>
-      </button>
+      <div class="header-buttons">
+        <button
+          type="button"
+          class="btn-new-inventory"
+          (click)="startCreateStandaloneInventoryRequested.emit()"
+          title="Crea nuovo oggetto solo inventario (es. per combinazioni)"
+        >
+          <i class="bi bi-briefcase-fill"></i>
+          <span>+ Inv</span>
+        </button>
+        <button
+          type="button"
+          class="btn-new-hotspot"
+          (click)="startCreateRequested.emit()"
+          title="Crea nuovo hotspot nella scena"
+        >
+          <i class="bi bi-plus-lg"></i>
+          <span>Hotspot</span>
+        </button>
+      </div>
     </div>
 
     <div class="hotspots-list custom-scroll">
-      @for (item of store.currentScene()?.items; track item.code) {
+      @for (item of store.combinedSceneList(); track item.code) {
         <div
           class="hotspot-item-card"
           [class.active]="store.selectedItem()?.code === item.code"
@@ -29,7 +40,7 @@
               <div class="hotspot-item-code">
                 <span>#{{ item.code }}</span>
 
-                @if (item.imageUrl) {
+                @if (item.id && item.imageUrl) {
                   <span class="indicator-badge badge-item">item</span>
                 }
 
@@ -49,7 +60,7 @@
                   </span>
                 }
 
-                @if (!item.initiallyVisible) {
+                @if (item.id && !item.initiallyVisible) {
                   <span class="indicator-badge muted">nascosto</span>
                 }
               </div>
@@ -90,9 +101,11 @@
                 } @else if (item.imageUrl) {
                   <img
                     [src]="resolveImageUrl(item.imageUrl)"
-                    alt="Sprite Scena (Fallback)"
+                    alt="Sprite Scena"
                     class="accordion-thumb"
                   />
+                } @else {
+                  <div class="accordion-thumb fallback-emoji">🎒</div>
                 }
                 <div class="accordion-texts">
                   <strong class="accordion-item-name">{{ item.linkedInventoryItem.name }}</strong>
@@ -107,7 +120,7 @@
       } @empty {
         <div class="hotspots-empty">
           <i class="bi bi-inbox icon-empty"></i>
-          <span>Nessun hotspot in questa stanza</span>
+          <span>Nessun elemento in questa stanza</span>
         </div>
       }
     </div>
@@ -208,91 +221,208 @@
           </button>
         </div>
       </div>
-    } @else if (store.selectedItem()) {
-      <div class="selected-details">
-        <div class="details-top">
-          <span class="section-tag">Hotspot Selezionato</span>
-          <div class="details-top-actions">
-            <button
-              type="button"
-              class="btn-edit-header"
-              (click)="editItemRequested.emit(store.selectedItem()!)"
-              title="Modifica Hotspot"
-            >
-              <i class="bi bi-pencil"></i>
-              <span>Modifica</span>
-            </button>
-            <button
-              type="button"
-              class="btn-delete-header"
-              (click)="deleteItemRequested.emit(store.selectedItem()!.code)"
-              title="Elimina Hotspot"
-            >
-              <i class="bi bi-trash3"></i>
-            </button>
-          </div>
-        </div>
+    } @else {
+      @if (store.selectedItem(); as selected) {
+        <div class="selected-details">
+          <span class="section-tag">
+            {{ selected.id ? 'Hotspot selezionato' : 'Oggetto Inventario selezionato' }}
+          </span>
 
-        <div class="field-group">
-          <label>Nome</label>
-          <input type="text" class="studio-input" [value]="store.selectedItem()?.name" readonly />
-        </div>
+          <div class="hotspot-summary">
+            <div class="summary-thumb">
+              @if (selected.imageUrl) {
+                <img [src]="resolveImageUrl(selected.imageUrl)" [alt]="selected.name" />
+              } @else if (selected.linkedInventoryItem?.imageUrl) {
+                <img [src]="resolveImageUrl(selected.linkedInventoryItem!.imageUrl)" [alt]="selected.name" />
+              } @else {
+                <i class="bi" [ngClass]="selected.id ? 'bi-bounding-box' : 'bi-briefcase-fill'"></i>
+              }
+            </div>
 
-        <div class="field-group">
-          <label>Codice Univoco</label>
-          <input type="text" class="studio-input" [value]="store.selectedItem()?.code" readonly />
-        </div>
-
-        <div class="panel-divider" style="margin: 1.25rem 0;"></div>
-
-        <div class="actions-management">
-          <div class="actions-header">
-            <h3>Azioni ({{ store.selectedItem()?.actions?.length || 0 }})</h3>
-            <button type="button" class="btn-open-action-modal" (click)="openAddActionRequested.emit()">
-              <i class="bi bi-plus-lg"></i>
-              <span>Aggiungi</span>
-            </button>
-          </div>
-
-          @for (action of store.selectedItem()?.actions; track action.id ?? $index) {
-            <div class="action-card-item">
-              <div class="action-card-info">
-                <span class="action-badge">{{ action.type }}</span>
-                @if (action.successMessage) {
-                  <span class="action-card-desc" [title]="action.successMessage">
-                    {{ action.successMessage }}
+            <div class="summary-texts">
+              <strong class="summary-name">{{ selected.name }}</strong>
+              <span class="summary-code">#{{ selected.code }}</span>
+              <div class="summary-badges">
+                @if (selected.id && selected.imageUrl) {
+                  <span class="indicator-badge badge-item">item</span>
+                }
+                @if (selected.linkedInventoryItem) {
+                  <span class="indicator-badge badge-inventory static">
+                    <i class="bi bi-briefcase-fill"></i>
+                    <span>{{ selected.id ? 'raccoglibile' : 'inventory' }}</span>
                   </span>
                 }
+                @if (selected.id && !selected.initiallyVisible) {
+                  <span class="indicator-badge muted">nascosto</span>
+                }
               </div>
-              <div class="action-item-buttons">
+            </div>
+
+            <div class="summary-actions">
+              @if (selected.id) {
                 <button
                   type="button"
-                  class="btn-action-icon edit"
-                  (click)="editActionRequested.emit(action)"
-                  title="Modifica azione"
+                  class="summary-btn"
+                  (click)="editItemRequested.emit(selected)"
+                  title="Modifica hotspot"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button
                   type="button"
-                  class="btn-action-icon delete"
-                  (click)="onDeleteAction($event, action.id)"
-                  title="Elimina azione"
+                  class="summary-btn danger"
+                  (click)="deleteItemRequested.emit(selected.code)"
+                  title="Elimina hotspot"
                 >
                   <i class="bi bi-trash3"></i>
                 </button>
-              </div>
+              } @else {
+                <button
+                  type="button"
+                  class="summary-btn"
+                  (click)="editInventoryItemRequested.emit(selected)"
+                  title="Modifica oggetto inventario"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  type="button"
+                  class="summary-btn danger"
+                  (click)="deleteInventoryItemRequested.emit(selected.code)"
+                  title="Elimina oggetto inventario"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              }
             </div>
-          } @empty {
-            <div class="actions-empty-note">Nessuna azione collegata a questo hotspot.</div>
+          </div>
+
+          @if (selected.id) {
+            <section class="action-block scene-block">
+              <header class="action-block-header">
+                <div class="block-icon"><i class="bi bi-bounding-box"></i></div>
+                <div class="block-titles">
+                  <h3>Azioni sulla scena</h3>
+                  <p>Cosa può fare il giocatore con questo hotspot, nella stanza.</p>
+                </div>
+                <span class="block-count">{{ selected.actions?.length || 0 }}</span>
+              </header>
+
+              <div class="action-block-body">
+                @for (action of selected.actions; track action.id ?? $index) {
+                  <ng-container
+                    *ngTemplateOutlet="actionRow; context: { $implicit: action, kind: 'scene' }"
+                  />
+                } @empty {
+                  <div class="action-empty">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Nessuna azione sulla scena.</span>
+                  </div>
+                }
+              </div>
+
+              <div class="action-block-footer">
+                <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
+                  <i class="bi bi-plus-lg"></i>
+                  <span>Aggiungi azione sulla scena</span>
+                </button>
+              </div>
+            </section>
+          }
+
+          @if (selected.linkedInventoryItem; as invItem) {
+            <section class="action-block inventory-block">
+              <header class="action-block-header">
+                <div class="block-icon"><i class="bi bi-backpack4-fill"></i></div>
+                <div class="block-titles">
+                  <h3>Azioni nello zaino</h3>
+                  <p>Cosa può fare il giocatore con «{{ invItem.name }}» nello zaino.</p>
+                </div>
+                <span class="block-count">{{ invItem.actions?.length || 0 }}</span>
+              </header>
+
+              <div class="action-block-body">
+                @for (invAction of invItem.actions; track invAction.id ?? $index) {
+                  <ng-container
+                    *ngTemplateOutlet="actionRow; context: { $implicit: invAction, kind: 'inventory' }"
+                  />
+                } @empty {
+                  <div class="action-empty">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Nessuna azione nello zaino (es. Usa con un altro oggetto).</span>
+                  </div>
+                }
+              </div>
+
+              <div class="action-block-footer">
+                <button
+                  type="button"
+                  class="btn-add-action"
+                  (click)="openAddInventoryActionRequested.emit()"
+                >
+                  <i class="bi bi-plus-lg"></i>
+                  <span>Aggiungi azione nello zaino</span>
+                </button>
+              </div>
+            </section>
+          } @else {
+            <div class="inventory-hint">
+              <i class="bi bi-backpack4"></i>
+              <p>
+                Questo hotspot <strong>non è raccoglibile</strong>, quindi non ha azioni nello zaino.
+                Premi <strong>Modifica</strong> e attiva «È un oggetto raccoglibile» per aggiungerle.
+              </p>
+            </div>
           }
         </div>
-      </div>
-    } @else {
-      <div class="properties-empty">
-        <i class="bi bi-bounding-box empty-icon"></i>
-        <p>Seleziona un hotspot sulla scena o clicca su <strong>+ Nuovo</strong> per crearne uno.</p>
-      </div>
+      } @else {
+        <div class="properties-empty">
+          <i class="bi bi-bounding-box empty-icon"></i>
+          <p>Seleziona un elemento o clicca su <strong>+ Hotspot</strong> / <strong>+ Inv</strong> per crearne uno.</p>
+        </div>
+      }
     }
   </div>
+
+  <ng-template #actionRow let-action let-kind="kind">
+    <div class="action-row">
+      <div class="action-glyph">
+        <i class="bi" [ngClass]="actionIcon(action.type)"></i>
+      </div>
+
+      <div class="action-main">
+        <div class="action-title-line">
+          <span class="action-name">{{ actionLabel(action.type) }}</span>
+          @if (action.type === 'USE_WITH' && action.withInventoryItemCode) {
+            <span class="with-chip" [title]="'#' + action.withInventoryItemCode">
+              <i class="bi bi-link-45deg"></i>
+              {{ inventoryItemName(action.withInventoryItemCode) }}
+            </span>
+          }
+        </div>
+        <span class="action-message" [class.is-empty]="!action.successMessage" [title]="action.successMessage || ''">
+          {{ action.successMessage || 'Nessun messaggio' }}
+        </span>
+      </div>
+
+      <div class="action-buttons">
+        <button
+          type="button"
+          class="action-btn"
+          (click)="onEditAction(action, kind)"
+          title="Modifica azione"
+        >
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button
+          type="button"
+          class="action-btn delete"
+          (click)="onDeleteAction($event, action.id)"
+          title="Elimina azione"
+        >
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    </div>
+  </ng-template>
 </aside>

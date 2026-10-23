@@ -6,6 +6,18 @@ import { environment } from '../../../../../environments/environment';
 
 const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 
+export type ActionKind = 'scene' | 'inventory';
+
+const ACTION_ICONS: Record<string, string> = {
+  LOOK_AT: 'bi-eye',
+  PICK_UP: 'bi-hand-index-thumb',
+  USE: 'bi-gear',
+  OPEN: 'bi-unlock',
+  TALK_TO: 'bi-chat-dots',
+  MOVE: 'bi-arrows-move',
+  USE_WITH: 'bi-link-45deg'
+};
+
 @Component({
   selector: 'app-inspector-sidebar',
   standalone: true,
@@ -30,6 +42,7 @@ export class InspectorSidebarComponent {
   readonly previewSpriteUrl = input<string | null>(null);
 
   readonly startCreateRequested = output<void>();
+  readonly startCreateStandaloneInventoryRequested = output<void>();
   readonly editItemRequested = output<Item>();
   readonly cancelDraftRequested = output<void>();
   readonly saveDraftRequested = output<void>();
@@ -47,6 +60,8 @@ export class InspectorSidebarComponent {
 
   readonly openAddActionRequested = output<void>();
   readonly editActionRequested = output<Action>();
+  readonly openAddInventoryActionRequested = output<void>();
+  readonly editInventoryActionRequested = output<Action>();
   readonly deleteActionRequested = output<number>();
 
   selectItem(item: Item): void {
@@ -96,12 +111,41 @@ export class InspectorSidebarComponent {
     return `${BACKEND_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
+  actionLabel(type: string): string {
+    return type;
+  }
+
+  actionIcon(type: string): string {
+    return ACTION_ICONS[type] ?? 'bi-lightning-charge';
+  }
+
+  inventoryItemName(code: string): string {
+    const foundGlobal = this.store.inventoryItems().find((i) => i.code === code);
+    if (foundGlobal) return foundGlobal.name;
+
+    for (const scene of this.store.scenes()) {
+      for (const item of scene.items ?? []) {
+        const inv = item.linkedInventoryItem;
+        if (inv && (inv.code === code || item.code === code)) {
+          return inv.name;
+        }
+      }
+    }
+    return `#${code}`;
+  }
+
+  onEditAction(action: Action, kind: ActionKind): void {
+    if (kind === 'inventory') {
+      this.editInventoryActionRequested.emit(action);
+    } else {
+      this.editActionRequested.emit(action);
+    }
+  }
+
   onDeleteAction(event: Event, actionId?: number): void {
     event.stopPropagation();
     if (actionId) {
       this.deleteActionRequested.emit(actionId);
-    } else {
-      console.warn("Impossibile eliminare l'azione: ID mancante");
     }
   }
 }

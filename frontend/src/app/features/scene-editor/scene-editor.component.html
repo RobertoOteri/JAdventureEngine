@@ -34,6 +34,7 @@
       [previewSpriteUrl]="previewSpriteUrl()"
       (startCreateRequested)="startNewHotspot()"
       (editItemRequested)="editExistingItem($event)"
+      (startCreateStandaloneInventoryRequested)="openStandaloneInventoryModal()"
       (cancelDraftRequested)="cancelDraft()"
       (saveDraftRequested)="saveDraft()"
       (deleteItemRequested)="deleteItem($event)"
@@ -47,6 +48,8 @@
       (deleteInventoryItemRequested)="onDeleteInventoryItem($event)"
       (openAddActionRequested)="openAddAction()"
       (editActionRequested)="openEditAction($event)"
+      (openAddInventoryActionRequested)="openAddInventoryAction()"
+      (editInventoryActionRequested)="openEditInventoryAction($event)"
       (deleteActionRequested)="onDeleteAction($event)"
     />
   </div>
@@ -54,6 +57,7 @@
   @if (isActionModalOpen() && store.selectedItem()) {
     <app-action-modal
       [itemCode]="store.selectedItem()!.code"
+      [isInventoryContext]="isActionForInventory()"
       [actionToEdit]="editingAction()"
       (saveRequested)="onSaveAction($event)"
       (closeRequested)="closeActionModal()"
@@ -62,6 +66,8 @@
 
   @if (isInventoryModalOpen()) {
     <app-inventory-item-modal
+      [isStandalone]="isStandaloneInventoryCreation()"
+      [itemId]="editingInventoryItemId()"
       [itemCode]="itemCode()"
       [initialName]="invItemName()"
       [initialDescription]="invItemDesc()"

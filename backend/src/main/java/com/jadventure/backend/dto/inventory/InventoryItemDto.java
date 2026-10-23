@@ -1,11 +1,15 @@
 package com.jadventure.backend.dto.inventory;
 
+import com.jadventure.backend.dto.action.ActionDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,4 +31,7 @@ public class InventoryItemDto {
     private String description;
 
     private String imageUrl;
+
+    @Builder.Default
+    private List<ActionDto> actions = new ArrayList<>();
 }

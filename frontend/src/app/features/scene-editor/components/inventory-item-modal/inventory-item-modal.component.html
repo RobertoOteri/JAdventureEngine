@@ -6,8 +6,10 @@
           <i class="bi bi-briefcase-fill"></i>
         </div>
         <div>
-          <h3>Oggetto Inventario</h3>
-          <span class="modal-subtitle">Configura come l'oggetto apparirà nella borsa del giocatore</span>
+          <h3>{{ isStandalone() ? 'Nuovo Oggetto Inventario' : 'Oggetto Inventario' }}</h3>
+          <span class="modal-subtitle">
+            {{ isStandalone() ? 'Crea un oggetto globale (es. per combinazioni nello zaino)' : "Configura come l'oggetto apparirà nella borsa del giocatore" }}
+          </span>
         </div>
       </div>
       <button type="button" class="btn-close" (click)="cancelRequested.emit()" title="Chiudi finestra">
@@ -29,10 +31,25 @@
           id="invItemNameInput"
           type="text"
           class="studio-input"
-          [(ngModel)]="name"
+          [ngModel]="name"
+          (ngModelChange)="onNameInput($event)"
           placeholder="Es. Chiave d'Ottone"
         />
       </div>
+
+      @if (isStandalone()) {
+        <div class="field-group">
+          <label for="invItemCodeInput">Codice Univoco (ID) *</label>
+          <input
+            id="invItemCodeInput"
+            type="text"
+            class="studio-input"
+            [(ngModel)]="code"
+            [disabled]="!!itemId()"
+            placeholder="Es. chiave_ottone"
+          />
+        </div>
+      }
 
       <div class="field-group">
         <label for="invItemDescInput">Descrizione / Esame (opzionale)</label>
@@ -52,20 +69,22 @@
           <span>Immagine dell'Icona Inventario</span>
         </div>
 
-        <div class="toggle-card">
-          <label class="toggle-label">
-            <input
-              type="checkbox"
-              class="toggle-checkbox"
-              [(ngModel)]="useSceneImage"
-            />
-            <span class="toggle-text">
-              L'immagine è la stessa che appare nella scena?
-            </span>
-          </label>
-        </div>
+        @if (!isStandalone()) {
+          <div class="toggle-card">
+            <label class="toggle-label">
+              <input
+                type="checkbox"
+                class="toggle-checkbox"
+                [(ngModel)]="useSceneImage"
+              />
+              <span class="toggle-text">
+                L'immagine è la stessa che appare nella scena?
+              </span>
+            </label>
+          </div>
+        }
 
-        @if (useSceneImage) {
+        @if (!isStandalone() && useSceneImage) {
           <div class="preview-box">
             @if (scenePreviewUrl()) {
               <div class="preview-item">
@@ -78,7 +97,7 @@
             } @else {
               <div class="preview-warning">
                 <i class="bi bi-info-circle"></i>
-                <span>Nessuna immagine sprite impostata nella stanza: verrà usata l'immagine predefinita se disponibile.</span>
+                <span>Nessuna immagine sprite impostata nella stanza: verrà usata l'icona predefinita se non carichi un file.</span>
               </div>
             }
           </div>
@@ -94,7 +113,7 @@
             <label for="invIconModalInput" class="file-custom-btn" [class.highlight]="customFile || customPreviewUrl()">
               <i class="bi bi-file-earmark-image icon-file"></i>
               <span class="file-btn-text">
-                {{ customFile ? customFile.name : 'Scegli icona dedicata dal computer...' }}
+                {{ customFile ? customFile.name : 'Scegli icona dedicata dal computer (opzionale)...' }}
               </span>
             </label>
 
@@ -115,7 +134,7 @@
       </button>
       <button type="button" class="btn-confirm" (click)="onConfirm()">
         <i class="bi bi-check-lg"></i>
-        <span>Conferma e Torna all'Hotspot</span>
+        <span>{{ isStandalone() ? 'Salva Oggetto Inventario' : "Conferma e Torna all'Hotspot" }}</span>
       </button>
     </footer>
   </div>

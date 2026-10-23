@@ -1,10 +1,14 @@
 package com.jadventure.backend.service;
 
+import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
+import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.mapper.InventoryItemMapper;
+import com.jadventure.backend.model.Action;
 import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.InventoryItem;
+import com.jadventure.backend.repository.ActionRepository;
 import com.jadventure.backend.repository.InventoryItemRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
@@ -20,15 +24,21 @@ public class InventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryItemMapper inventoryItemMapper;
+    private final ActionMapper actionMapper;
+    private final ActionRepository actionRepository;
     private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
     public InventoryItemService(InventoryItemRepository inventoryItemRepository,
                                 InventoryItemMapper inventoryItemMapper,
+                                ActionMapper actionMapper,
+                                ActionRepository actionRepository,
                                 FileStorageUtil fileStorageUtil,
                                 AuthService authService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryItemMapper = inventoryItemMapper;
+        this.actionMapper = actionMapper;
+        this.actionRepository = actionRepository;
         this.fileStorageUtil = fileStorageUtil;
         this.authService = authService;
     }
@@ -77,16 +87,28 @@ public class InventoryItemService {
     }
 
     @Transactional
-    public InventoryItem resolveInventoryItem(GraphicAdventure adventure,
-                                              InventoryItem existingLinkedItem,
-                                              InventoryItemDto dto,
-                                              MultipartFile dedicatedImage,
-                                              String fallbackImageUrl) {
+    public InventoryItemDto createInventoryItem(GraphicAdventure adventure, InventoryItemDto dto, MultipartFile image) {
+        InventoryItem item = saveOrUpdateEntity(adventure, null, dto, image);
+        return inventoryItemMapper.toDto(item);
+    }
+
+    @Transactional
+    public InventoryItem upsertLinkedInventoryItem(GraphicAdventure adventure,
+                                                   InventoryItem existingLinkedItem,
+                                                   InventoryItemDto dto,
+                                                   MultipartFile image) {
         if (dto == null) {
             return null;
         }
+        return saveOrUpdateEntity(adventure, existingLinkedItem, dto, image);
+    }
 
-        InventoryItem item = existingLinkedItem;
+    private InventoryItem saveOrUpdateEntity(GraphicAdventure adventure,
+                                             InventoryItem existingItem,
+                                             InventoryItemDto dto,
+                                             MultipartFile image) {
+        InventoryItem item = existingItem;
+
         if (item == null) {
             item = inventoryItemRepository
                     .findByGraphicAdventureCodeAndCode(adventure.getCode(), dto.getCode())
@@ -101,18 +123,51 @@ public class InventoryItemService {
         item.setName(dto.getName() != null && !dto.getName().isBlank() ? dto.getName() : dto.getCode());
         item.setDescription(dto.getDescription());
 
-        if (dedicatedImage != null && !dedicatedImage.isEmpty()) {
+        if (image != null && !image.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_INVENTORY_ITEM, adventure.getCode(), item.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, dedicatedImage));
+            item.setImageUrl(fileStorageUtil.storeFile(path, image));
         } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
             item.setImageUrl(dto.getImageUrl());
-        } else if (fallbackImageUrl != null && !fallbackImageUrl.isBlank()) {
-            item.setImageUrl(fallbackImageUrl);
         } else if (item.getImageUrl() == null) {
             item.setImageUrl("");
         }
 
         return inventoryItemRepository.save(item);
+    }
+
+    @Transactional
+    public ActionDto addAction(Long inventoryItemId, ActionDto actionDto) {
+        InventoryItem invItem = inventoryItemRepository.findById(inventoryItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto inventario non trovato con ID: " + inventoryItemId));
+
+        authService.validateOwnership(invItem.getGraphicAdventure().getAuthor().getUsername());
+
+        validateActionUniqueness(invItem.getActions(), actionDto);
+
+        Action action = actionMapper.toEntity(actionDto);
+        action.setInventoryItem(invItem);
+
+        return actionMapper.toDto(actionRepository.save(action));
+    }
+
+    private void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
+        if (actionDto.getType() == com.jadventure.backend.model.enums.ActionType.USE_WITH) {
+            if (actionDto.getWithInventoryItemCode() == null || actionDto.getWithInventoryItemCode().isBlank()) {
+                throw new IllegalArgumentException("Per l'azione USE_WITH è obbligatorio specificare withInventoryItemCode");
+            }
+            boolean duplicateUseWith = existingActions.stream()
+                    .anyMatch(a -> a.getType() == com.jadventure.backend.model.enums.ActionType.USE_WITH
+                            && actionDto.getWithInventoryItemCode().equalsIgnoreCase(a.getWithInventoryItemCode()));
+            if (duplicateUseWith) {
+                throw new IllegalArgumentException("Esiste già un'azione USE_WITH per l'oggetto: " + actionDto.getWithInventoryItemCode());
+            }
+        } else {
+            boolean typeAlreadyUsed = existingActions.stream()
+                    .anyMatch(existing -> existing.getType() == actionDto.getType());
+            if (typeAlreadyUsed) {
+                throw new IllegalArgumentException("L'oggetto inventario ha già un'azione di tipo " + actionDto.getType());
+            }
+        }
     }
 
     @Transactional(readOnly = true)

@@ -13,6 +13,8 @@ public interface ActionRepository extends JpaRepository<Action, Long> {
 
     List<Action> findAllByItemId(Long itemId);
 
+    List<Action> findAllByInventoryItemId(Long inventoryItemId);
+
     Optional<Action> findByCode(String code);
 
 }

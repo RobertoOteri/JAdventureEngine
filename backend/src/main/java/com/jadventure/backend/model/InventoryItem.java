@@ -3,6 +3,9 @@ package com.jadventure.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -41,4 +44,8 @@ public class InventoryItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graphic_adventure_id", nullable = false, updatable = false)
     private GraphicAdventure graphicAdventure;
+
+    @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Action> actions = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject, signal } from '@angular/core';
+import { Component, OnInit, HostListener, HostBinding, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
@@ -13,6 +13,7 @@ import { GamePauseModalComponent } from './components/game-pause-modal/game-paus
 import { GameEndingModalComponent } from './components/game-ending-modal/game-ending-modal.component';
 import { GameLaunchModalComponent } from '../../shared/ui/game-launch-modal/game-launch-modal.component';
 import { GameMessageBannerComponent } from './components/game-message-banner/game-message-banner.component';
+import { GameDragCursorComponent } from './components/game-drag-cursor/game-drag-cursor.component';
 
 @Component({
   selector: 'app-gameplay',
@@ -26,7 +27,8 @@ import { GameMessageBannerComponent } from './components/game-message-banner/gam
     GamePauseModalComponent,
     GameEndingModalComponent,
     GameLaunchModalComponent,
-    GameMessageBannerComponent
+    GameMessageBannerComponent,
+    GameDragCursorComponent
   ],
   providers: [GameplayStore],
   templateUrl: './gameplay.component.html',
@@ -43,6 +45,11 @@ export class GameplayComponent implements OnInit {
   readonly isLaunchModalOpen = signal<boolean>(true);
 
   private timerInterval: any = null;
+
+  @HostBinding('class.is-dragging-item')
+  get isDraggingItem(): boolean {
+    return this.store.draggedItem.isDragging();
+  }
 
   @HostListener('window:keydown.escape')
   handleEscape(): void {
@@ -150,5 +157,19 @@ export class GameplayComponent implements OnInit {
     this.store.syncAutoSave();
     this.store.resetStore();
     void this.router.navigate(['/adventures']);
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  onGlobalMouseMove(event: MouseEvent): void {
+    if (this.store.draggedItem.isDragging()) {
+      this.store.updateDragPosition(event.clientX, event.clientY);
+    }
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  onGlobalMouseUp(event: MouseEvent): void {
+    if (this.store.draggedItem.isDragging()) {
+      this.store.cancelDrag();
+    }
   }
 }

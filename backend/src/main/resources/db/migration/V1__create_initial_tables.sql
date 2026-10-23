@@ -76,9 +76,11 @@ CREATE TABLE IF NOT EXISTS actions (
     id BIGINT PRIMARY KEY DEFAULT nextval('action_seq'),
     code VARCHAR(255) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
+    with_inventory_item_code VARCHAR(50),
     success_message TEXT,
     default_failure_message TEXT,
-    item_id BIGINT NOT NULL,
+    item_id BIGINT,
+    inventory_item_id BIGINT,
     CONSTRAINT uq_action_item_type UNIQUE (item_id, type),
     CONSTRAINT fk_action_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
@@ -162,6 +164,7 @@ CREATE INDEX IF NOT EXISTS idx_graphic_adventures_author_id ON graphic_adventure
 CREATE INDEX IF NOT EXISTS idx_scenes_adventure_id ON scenes (graphic_adventure_id);
 CREATE INDEX IF NOT EXISTS idx_items_scene_id ON items (scene_id);
 CREATE INDEX IF NOT EXISTS idx_actions_item_id ON actions (item_id);
+CREATE INDEX IF NOT EXISTS idx_actions_inventory_item_id ON actions (inventory_item_id);
 CREATE INDEX IF NOT EXISTS idx_preconditions_action_id ON preconditions (action_id);
 CREATE INDEX IF NOT EXISTS idx_game_effects_action_id ON game_effects (action_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_items_adventure_id ON inventory_items (graphic_adventure_id);

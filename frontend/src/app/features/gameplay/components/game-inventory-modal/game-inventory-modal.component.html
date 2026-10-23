@@ -1,67 +1,76 @@
-<div class="modal-backdrop" (click)="close.emit()">
-  <div class="parchment-container" (click)="$event.stopPropagation()">
+<section
+  class="inventory-tray"
+  [class.is-closed]="!open()"
+  [class.is-collapsed]="isDragging() && !isPeekingExpanded()"
+  [attr.aria-hidden]="!open()"
+  role="dialog"
+  aria-label="Inventario"
+>
+  @if (isDragging()) {
+    <div class="mini-bar" (mouseenter)="onMiniBarEnter()">
+      <i class="bi bi-backpack4-fill"></i>
+      <span>Zaino</span>
+      <span class="mini-count">{{ items().length }}</span>
+      <i class="bi bi-chevron-up"></i>
+    </div>
+  }
 
-    <div class="parchment-backpack-badge" title="Zaino del protagonista">
-      <i class="bi bi-backpack4 backpack-icon"></i>
+  @if (!isDragging() && focusedItem(); as focused) {
+    <div class="caption-plate">
+      <span class="caption-title">{{ focused.name }}</span>
+      @if (focused.code === selectedItem()?.code) {
+        <p class="caption-desc">
+          {{ focused.description || 'Nessun dettaglio particolare su quest\'oggetto.' }}
+        </p>
+      }
+    </div>
+  } @else if (!isDragging() && !items().length) {
+    <div class="caption-plate">
+      <span class="caption-hint">Il borsello è completamente vuoto...</span>
+    </div>
+  }
+
+  <div class="tray-frame" (mouseleave)="onFrameMouseLeave()">
+    <div class="tray-medallion" title="Zaino del protagonista">
+      <i class="bi bi-backpack4"></i>
+      <span class="tray-count">{{ items().length }}</span>
     </div>
 
-    <button type="button" class="btn-parchment-close" (click)="close.emit()" title="Chiudi inventario">
-      <i class="bi bi-x-lg"></i>
-    </button>
-
-    <div class="parchment-header">
-      <h3 class="parchment-title">Inventario</h3>
-    </div>
-
-    <div class="parchment-body custom-scroll">
-      <div class="inventory-grid">
-        @for (item of items(); track item.code) {
-          <div
-            class="item-pocket"
-            [class.active]="selectedItem?.code === item.code"
-            (click)="selectItem(item)"
+    <div class="slots-rail">
+      @for (slot of slots(); track slot?.code ?? 'empty-' + $index) {
+        @if (slot; as item) {
+          <button
+            type="button"
+            class="slot slot-filled"
+            [class.is-selected]="selectedItem()?.code === item.code"
+            [class.is-drag-source]="draggedItemCode() === item.code"
+            [style.--i]="$index"
+            [attr.aria-label]="item.name"
+            [attr.aria-pressed]="selectedItem()?.code === item.code"
+            (mousedown)="onSlotMouseDown($event, item)"
+            (click)="toggleSelect(item)"
+            (mouseenter)="onSlotMouseEnter(item)"
+            (mouseleave)="onSlotMouseLeave()"
+            (mouseup)="onSlotMouseUp(item)"
+            (focus)="hoveredCode.set(item.code)"
+            (blur)="hoveredCode.set(null)"
           >
-            <div class="pocket-placeholder">
-              @if (item.imageUrl) {
-                <img [src]="item.imageUrl" [alt]="item.name" class="pocket-thumb" />
-              } @else {
-                <i class="bi bi-box-seam pocket-item-icon"></i>
-              }
-            </div>
-            <span class="pocket-label">{{ item.name }}</span>
-          </div>
-        } @empty {
-          <div class="empty-parchment">
-            <i class="bi bi-inbox empty-icon"></i>
-            <p>Il tuo borsello è completamente vuoto...</p>
-          </div>
-        }
-      </div>
-
-      @if (selectedItem) {
-        <div class="inspector-plate">
-          <div class="inspector-plate-header">
-            <span class="inspector-item-title">{{ selectedItem.name }}</span>
-            <span class="inspector-item-code">#{{ selectedItem.code }}</span>
-          </div>
-          <div class="inspector-body">
-            @if (selectedItem.imageUrl) {
-              <img [src]="selectedItem.imageUrl" [alt]="selectedItem.name" class="inspector-thumb" />
+            @if (item.imageUrl) {
+              <img class="slot-img" [src]="item.imageUrl" [alt]="item.name" draggable="false" />
+            } @else {
+              <i class="bi bi-box-seam slot-fallback"></i>
             }
-            <p class="inspector-item-desc">
-              {{ selectedItem.description || 'Nessun dettaglio particolare su quest\'oggetto.' }}
-            </p>
-          </div>
-        </div>
+          </button>
+        } @else {
+          <div class="slot slot-empty"></div>
+        }
       }
     </div>
 
-    <div class="parchment-footer">
-      <button type="button" class="btn-roll-up" (click)="close.emit()">
-        <i class="bi bi-box-arrow-left"></i>
-        <span>Chiudi lo zaino</span>
+    @if (!isDragging()) {
+      <button type="button" class="tray-close" (click)="close.emit()" title="Chiudi lo zaino">
+        <i class="bi bi-chevron-down"></i>
       </button>
-    </div>
-
+    }
   </div>
-</div>
+</section>

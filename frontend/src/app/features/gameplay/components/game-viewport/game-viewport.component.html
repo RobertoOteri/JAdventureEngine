@@ -30,6 +30,9 @@
               [attr.points]="item.points"
               class="hotspot-polygon"
               (mousedown)="onHotspotMouseDown($event, item)"
+              (mouseenter)="onHotspotEnter(item)"
+              (mouseleave)="onHotspotLeave()"
+              (mouseup)="onHotspotMouseUp(item)"
             >
               <title>{{ item.name }}</title>
             </polygon>

@@ -22,25 +22,25 @@ export class ActionModalComponent {
   readonly store = inject(EditorStore);
 
   readonly itemCode = input.required<string>();
+  readonly isInventoryContext = input<boolean>(false);
   readonly actionToEdit = input<Action | null>(null);
 
   readonly saveRequested = output<Action>();
   readonly closeRequested = output<void>();
 
   actionType: ActionType = 'LOOK_AT';
+  withInventoryItemCode = '';
   actionSuccessMsg = '';
   actionFailureMsg = '';
   readonly actionPreconditions = signal<Precondition[]>([]);
   readonly actionEffects = signal<GameEffect[]>([]);
 
-  readonly availableActionTypes: readonly ActionType[] = [
-    'LOOK_AT',
-    'OPEN',
-    'PICK_UP',
-    'MOVE',
-    'USE',
-    'TALK_TO'
-  ];
+  readonly availableActionTypes = computed<readonly ActionType[]>(() => {
+    if (this.isInventoryContext()) {
+      return ['LOOK_AT', 'USE', 'USE_WITH'];
+    }
+    return ['LOOK_AT', 'OPEN', 'PICK_UP', 'MOVE', 'USE', 'TALK_TO', 'USE_WITH'];
+  });
 
   readonly preconditionTypes: readonly PreconditionType[] = [
     'HAS_ITEM',
@@ -63,6 +63,7 @@ export class ActionModalComponent {
       const existing = this.actionToEdit();
       if (existing) {
         this.actionType = existing.type;
+        this.withInventoryItemCode = existing.withInventoryItemCode || '';
         this.actionSuccessMsg = existing.successMessage || '';
         this.actionFailureMsg = existing.defaultFailureMessage || '';
         this.actionPreconditions.set(
@@ -73,6 +74,7 @@ export class ActionModalComponent {
         );
       } else {
         this.actionType = 'LOOK_AT';
+        this.withInventoryItemCode = '';
         this.actionSuccessMsg = '';
         this.actionFailureMsg = '';
         this.actionPreconditions.set([]);
@@ -105,6 +107,43 @@ export class ActionModalComponent {
     return Array.from(itemMap.entries()).map(([code, name]) => ({ code, name }));
   });
 
+  readonly availableInventoryItems = computed(() => {
+    const invMap = new Map<string, string>();
+
+    for (const inv of this.store.inventoryItems()) {
+      if (inv.code) {
+        invMap.set(inv.code, inv.name || inv.code);
+      }
+    }
+
+    for (const scene of this.store.scenes()) {
+      for (const it of scene.items || []) {
+        if (it.linkedInventoryItem?.code) {
+          invMap.set(it.linkedInventoryItem.code, it.linkedInventoryItem.name || it.name);
+        }
+      }
+    }
+
+    return Array.from(invMap.entries()).map(([code, name]) => ({ code, name }));
+  });
+
+  readonly availableUseWithOptions = computed(() => {
+    const currentCode = this.itemCode();
+
+    const sceneTargets = this.availableItemOptions().filter(
+      (it) => it.code !== currentCode
+    );
+
+    const inventoryTargets = this.availableInventoryItems().filter(
+      (inv) => inv.code !== currentCode
+    );
+
+    return {
+      sceneItems: sceneTargets,
+      inventoryItems: inventoryTargets
+    };
+  });
+
   readonly availableSceneOptions = computed(() => {
     return this.store.scenes().map((s) => ({
       code: s.code,
@@ -117,7 +156,8 @@ export class ActionModalComponent {
     const scenes = this.store.scenes();
     for (const scene of scenes) {
       for (const it of scene.items || []) {
-        for (const act of it.actions || []) {
+        const allActions = [...(it.actions || []), ...(it.linkedInventoryItem?.actions || [])];
+        for (const act of allActions) {
           for (const eff of act.effects || []) {
             if (eff.type === 'SET_FLAG' && eff.targetValue) {
               keys.add(eff.targetValue);
@@ -157,10 +197,16 @@ export class ActionModalComponent {
   }
 
   onSubmit(): void {
+    if (this.actionType === 'USE_WITH' && !this.withInventoryItemCode) {
+      alert("Seleziona l'elemento bersaglio con cui interagire.");
+      return;
+    }
+
     const existing = this.actionToEdit();
     const actionPayload: Action = {
       ...(existing?.id ? { id: existing.id } : {}),
       type: this.actionType,
+      withInventoryItemCode: this.actionType === 'USE_WITH' ? this.withInventoryItemCode : undefined,
       successMessage: this.actionSuccessMsg || undefined,
       defaultFailureMessage: this.actionFailureMsg || undefined,
       preconditions: this.actionPreconditions()

@@ -1,8 +1,10 @@
 package com.jadventure.backend.controller;
 
+import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.service.InventoryItemService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,4 +47,13 @@ public class InventoryItemController {
         inventoryItemService.deleteInventoryItemById(inventoryItemId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{inventoryItemId}/addAction")
+    public ResponseEntity<ActionDto> addAction(
+            @PathVariable Long inventoryItemId,
+            @Valid @RequestBody ActionDto actionDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(inventoryItemService.addAction(inventoryItemId, actionDto));
+    }
+
 }

@@ -22,6 +22,15 @@ export interface RadialMenuState {
   item: Item | null;
 }
 
+export interface DraggedItemState {
+  isDragging: boolean;
+  item: InventoryItem | null;
+  x: number;
+  y: number;
+  targetHoveredName: string | null;
+  targetHoveredCode: string | null;
+}
+
 export interface GameplayState {
   adventureCode: string | null;
   currentSaveCode: string | null;
@@ -33,6 +42,7 @@ export interface GameplayState {
   isInventoryOpen: boolean;
   isPauseMenuOpen: boolean;
   radialMenu: RadialMenuState;
+  draggedItem: DraggedItemState;
 }
 
 const initialRadialState: RadialMenuState = {
@@ -40,6 +50,15 @@ const initialRadialState: RadialMenuState = {
   x: 0,
   y: 0,
   item: null
+};
+
+const initialDraggedState: DraggedItemState = {
+  isDragging: false,
+  item: null,
+  x: 0,
+  y: 0,
+  targetHoveredName: null,
+  targetHoveredCode: null
 };
 
 const initialState: GameplayState = {
@@ -52,7 +71,8 @@ const initialState: GameplayState = {
   endingMessage: null,
   isInventoryOpen: false,
   isPauseMenuOpen: false,
-  radialMenu: initialRadialState
+  radialMenu: initialRadialState,
+  draggedItem: initialDraggedState
 };
 
 export const GameplayStore = signalStore(
@@ -120,6 +140,45 @@ export const GameplayStore = signalStore(
       patchState(store, { adventureCode: code });
     };
 
+    const startDragItem = (item: InventoryItem, x: number, y: number): void => {
+      patchState(store, {
+        draggedItem: {
+          isDragging: true,
+          item,
+          x,
+          y,
+          targetHoveredName: null,
+          targetHoveredCode: null
+        }
+      });
+    };
+
+    const updateDragPosition = (x: number, y: number): void => {
+      if (!store.draggedItem.isDragging()) return;
+      patchState(store, {
+        draggedItem: {
+          ...store.draggedItem(),
+          x,
+          y
+        }
+      });
+    };
+
+    const setDragTarget = (name: string | null, code: string | null): void => {
+      if (!store.draggedItem.isDragging()) return;
+      patchState(store, {
+        draggedItem: {
+          ...store.draggedItem(),
+          targetHoveredName: name,
+          targetHoveredCode: code
+        }
+      });
+    };
+
+    const cancelDrag = (): void => {
+      patchState(store, { draggedItem: initialDraggedState });
+    };
+
     const fetchSaves = rxMethod<string>(
       pipe(
         switchMap((adventureCode) =>
@@ -130,6 +189,23 @@ export const GameplayStore = signalStore(
             })
           )
         )
+      )
+    );
+
+    const syncAutoSave = rxMethod<void>(
+      pipe(
+        switchMap(() => {
+          const advCode = store.adventureCode();
+          const currentState = store.gameState();
+          if (!advCode || !currentState) {
+            return [];
+          }
+          return saveService.updateAutoSave(advCode, currentState).pipe(
+            tap({
+              error: (err) => console.error('Errore sincronizzazione autosave:', err)
+            })
+          );
+        })
       )
     );
 
@@ -338,6 +414,57 @@ export const GameplayStore = signalStore(
       )
     );
 
+    const dropOnSceneTarget = (targetItemCode: string): void => {
+      const drag = store.draggedItem();
+      if (!drag.isDragging || !drag.item) return;
+
+      const sourceCode = drag.item.code;
+      const sourceItem = drag.item;
+      cancelDrag();
+
+      const scene = store.gameState()?.currentScene;
+      const targetHotspot = scene?.items?.find((i) => i.code === targetItemCode);
+
+      let action = sourceItem?.actions?.find(
+        (a) => a.type === 'USE_WITH' && a.withInventoryItemCode === targetItemCode
+      );
+
+      if (!action) {
+        action = targetHotspot?.actions?.find(
+          (a) => a.type === 'USE_WITH' && a.withInventoryItemCode === sourceCode
+        );
+      }
+
+      const actionIdentifier = action?.code || (action?.id ? String(action.id) : null);
+
+      if (action && actionIdentifier) {
+        executeAction({ actionCode: actionIdentifier, actionType: 'USE_WITH' });
+      } else {
+        setFeedbackMessage('Non sembra avere alcun effetto.');
+      }
+    };
+    const dropOnInventoryTarget = (targetItemCode: string): void => {
+      const drag = store.draggedItem();
+      if (!drag.isDragging || !drag.item) return;
+
+      const sourceCode = drag.item.code;
+      cancelDrag();
+
+      const inventory = store.gameState()?.inventory ?? [];
+      const sourceItem = inventory.find((i) => i.code === sourceCode);
+      const targetItem = inventory.find((i) => i.code === targetItemCode);
+
+      const action =
+        sourceItem?.actions?.find((a) => a.type === 'USE_WITH' && a.withInventoryItemCode === targetItemCode) ||
+        targetItem?.actions?.find((a) => a.type === 'USE_WITH' && a.withInventoryItemCode === sourceCode);
+
+      if (action?.code) {
+        executeAction({ actionCode: action.code, actionType: 'USE_WITH' });
+      } else {
+        setFeedbackMessage('Non puoi combinare questi due oggetti.');
+      }
+    };
+
     const saveCurrentGame = rxMethod<string | undefined>(
       pipe(
         switchMap((saveName) => {
@@ -378,24 +505,6 @@ export const GameplayStore = signalStore(
       });
     };
 
-    const syncAutoSave = rxMethod<void>(
-      pipe(
-        switchMap(() => {
-          const advCode = store.adventureCode();
-          const currentState = store.gameState();
-          if (!advCode || !currentState) {
-            return [];
-          }
-          return saveService.updateAutoSave(advCode, currentState).pipe(
-            tap({
-              error: (err) => console.error('Errore sincronizzazione autosave:', err)
-            })
-          );
-        })
-      )
-    );
-
-
     const resetStore = (): void => {
       patchState(store, initialState);
     };
@@ -406,6 +515,12 @@ export const GameplayStore = signalStore(
       closeRadialMenu,
       toggleInventory,
       setInventoryOpen,
+      startDragItem,
+      updateDragPosition,
+      setDragTarget,
+      cancelDrag,
+      dropOnSceneTarget,
+      dropOnInventoryTarget,
       togglePauseMenu,
       setPauseMenuOpen,
       setAdventureCode,

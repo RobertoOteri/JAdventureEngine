@@ -4,7 +4,8 @@ export type ActionType =
   | 'PICK_UP'
   | 'MOVE'
   | 'USE'
-  | 'TALK_TO';
+  | 'TALK_TO'
+  | 'USE_WITH';
 
 export type PreconditionType =
   | 'HAS_ITEM'
@@ -39,6 +40,7 @@ export interface Action {
   id?: number;
   code?: string;
   type: ActionType;
+  withInventoryItemCode?: string;
   successMessage?: string;
   defaultFailureMessage?: string;
   preconditions?: Precondition[];

@@ -15,15 +15,27 @@
       [visibleItemCodes]="store.visibleItemCodes()"
       [feedbackMessage]="store.feedbackMessage()"
       [playTimeSeconds]="store.gameState()?.playTime || 0"
+      [isDragging]="store.draggedItem.isDragging()"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
       (canvasClicked)="store.closeRadialMenu()"
+      (hotspotHover)="store.setDragTarget($event?.name ?? null, $event?.code ?? null)"
+      (hotspotDrop)="store.dropOnSceneTarget($event)"
     />
 
     <app-game-message-banner
       [message]="store.feedbackMessage()"
+      [raised]="store.isInventoryOpen()"
     />
-
   </div>
+
+  @if (store.draggedItem.isDragging()) {
+    <app-game-drag-cursor
+      [x]="store.draggedItem.x()"
+      [y]="store.draggedItem.y()"
+      [item]="store.draggedItem.item()"
+      [targetName]="store.draggedItem.targetHoveredName()"
+    />
+  }
 
   @if (store.radialMenu.isOpen()) {
     <app-game-radial-menu
@@ -35,12 +47,16 @@
     />
   }
 
-  @if (store.isInventoryOpen()) {
-    <app-game-inventory-modal
-      [items]="store.inventory()"
-      (close)="store.setInventoryOpen(false)"
-    />
-  }
+  <app-game-inventory-modal
+    [open]="store.isInventoryOpen()"
+    [items]="store.inventory()"
+    [isDragging]="store.draggedItem.isDragging()"
+    [draggedItemCode]="store.draggedItem.item()?.code ?? null"
+    (itemDragStart)="store.startDragItem($event.item, $event.x, $event.y)"
+    (slotHover)="store.setDragTarget($event?.name ?? null, $event?.code ?? null)"
+    (slotDrop)="store.dropOnInventoryTarget($event)"
+    (close)="store.setInventoryOpen(false)"
+  />
 
   @if (store.isPauseMenuOpen()) {
     <app-game-pause-modal

@@ -1,4 +1,5 @@
 import { GraphicAdventureDto } from './adventure.model';
+import { Action } from './action.model';
 
 export interface InventoryItem {
   id?: number;
@@ -7,4 +8,5 @@ export interface InventoryItem {
   description?: string;
   imageUrl?: string;
   graphicAdventureDto?: GraphicAdventureDto;
+  actions?: Action[];
 }

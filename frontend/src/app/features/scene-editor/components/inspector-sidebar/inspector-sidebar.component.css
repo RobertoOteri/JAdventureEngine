@@ -24,7 +24,8 @@
   flex-direction: column;
 }
 
-/* 1. Lista Hotspot in alto */
+/* ================== 1. Lista hotspot in alto ================== */
+
 .list-section {
   max-height: 42%;
   flex-shrink: 0;
@@ -67,7 +68,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.35rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -95,13 +96,12 @@
 
 .hotspots-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
+  border-radius: 2px;
 }
 
-/* Card Hotspot Singola */
 .hotspot-item-card {
   padding: 0.65rem 0.8rem;
-  border-radius: 8px;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
@@ -153,11 +153,12 @@
   flex-wrap: wrap;
 }
 
-/* Badges */
+/* ---------- Badge ---------- */
+
 .indicator-badge {
   font-size: 0.62rem;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 2px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-weight: 600;
@@ -194,17 +195,28 @@
   margin-left: 1px;
 }
 
+.badge-inventory.static {
+  cursor: default;
+}
+
+.badge-inventory.static:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
 .indicator-badge.muted {
   color: #71717a;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Pannello Dettagli Inventario */
+/* ---------- Pannello dettagli inventario (nella lista) ---------- */
+
 .inventory-accordion-panel {
   background: #12151e;
   border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 0.65rem 0.75rem;
   display: flex;
   flex-direction: column;
@@ -251,7 +263,7 @@
   font-size: 0.75rem;
   cursor: pointer;
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,7 +291,7 @@
   height: 34px;
   object-fit: contain;
   background: rgba(0, 0, 0, 0.4);
-  border-radius: 5px;
+  border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 2px;
   flex-shrink: 0;
@@ -330,7 +342,8 @@
   flex-shrink: 0;
 }
 
-/* 2. Dettaglio e Form Hotspot */
+/* ================== 2. Dettaglio e form hotspot ================== */
+
 .detail-section {
   flex: 1;
   padding: 1.15rem;
@@ -345,7 +358,7 @@
 
 .detail-section::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
+  border-radius: 2px;
 }
 
 .creation-box {
@@ -375,7 +388,7 @@
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .field-group {
@@ -394,7 +407,7 @@
 .studio-input {
   background: #141720;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 0.55rem 0.75rem;
   color: #ffffff;
   font-size: 0.85rem;
@@ -413,7 +426,8 @@
   cursor: not-allowed;
 }
 
-/* File Picker */
+/* ---------- Selettore file ---------- */
+
 .file-field-group {
   margin-bottom: 0.95rem;
 }
@@ -432,7 +446,7 @@
   gap: 0.5rem;
   background: #141720;
   border: 1px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 0.6rem 0.8rem;
   color: #d4d4d8;
   font-size: 0.8rem;
@@ -460,11 +474,12 @@
   text-overflow: ellipsis;
 }
 
-/* Toggle Checkboxes */
+/* ---------- Interruttori ---------- */
+
 .toggle-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 0.65rem 0.8rem;
   margin-bottom: 0.75rem;
 }
@@ -482,6 +497,7 @@
   height: 16px;
   accent-color: #ffffff;
   cursor: pointer;
+  border-radius: 0px;
 }
 
 .toggle-text {
@@ -493,7 +509,8 @@
   gap: 0.45rem;
 }
 
-/* Pulsanti Salva / Annulla Bozza */
+/* ---------- Pulsanti salva / annulla ---------- */
+
 .actions-row {
   display: flex;
   gap: 0.5rem;
@@ -504,7 +521,7 @@
   flex: 1;
   background: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 3px;
   color: #09090b;
   font-size: 0.82rem;
   font-weight: 600;
@@ -524,7 +541,7 @@
 .btn-cancel-draft {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
+  border-radius: 3px;
   color: #a1a1aa;
   font-size: 0.82rem;
   font-weight: 500;
@@ -538,168 +555,7 @@
   color: #ffffff;
 }
 
-/* Dettagli Item Selezionato */
-.details-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.9rem;
-}
-
-.details-top-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-edit-header {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: background 0.15s ease;
-}
-
-.btn-edit-header:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.btn-delete-header {
-  background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 0.25rem 0.45rem;
-  font-size: 0.75rem;
-  transition: background 0.15s ease;
-}
-
-.btn-delete-header:hover {
-  background: rgba(239, 68, 68, 0.15);
-}
-
-/* Azioni Hotspot */
-.actions-management {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.actions-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.actions-header h3 {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #a1a1aa;
-  margin: 0;
-}
-
-.btn-open-action-modal {
-  background: #ffffff;
-  color: #09090b;
-  border: none;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.25rem 0.65rem;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  transition: background 0.15s ease;
-}
-
-.btn-open-action-modal:hover {
-  background: #e4e4e7;
-}
-
-.action-card-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #141720;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 0.5rem 0.65rem;
-  border-radius: 6px;
-  gap: 0.5rem;
-}
-
-.action-card-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.action-badge {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.action-card-desc {
-  font-size: 0.72rem;
-  color: #a1a1aa;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.action-item-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-.btn-action-icon {
-  background: transparent;
-  border: none;
-  color: #71717a;
-  cursor: pointer;
-  padding: 3px 5px;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.btn-action-icon:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
-.btn-action-icon.delete:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.actions-empty-note {
-  font-size: 0.75rem;
-  color: #52525b;
-  font-style: italic;
-  padding: 0.4rem 0;
-}
+/* ---------- Nessuna selezione ---------- */
 
 .properties-empty {
   display: flex;
@@ -716,4 +572,408 @@
 .empty-icon {
   font-size: 2rem;
   color: #3f3f46;
+}
+
+/* ================== Hotspot selezionato: riepilogo ================== */
+
+.selected-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.hotspot-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-thumb {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #52525b;
+  font-size: 1.4rem;
+  overflow: hidden;
+}
+
+.summary-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.summary-texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-code {
+  font-size: 0.72rem;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.summary-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.summary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.summary-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: all 0.15s ease;
+}
+
+.summary-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.summary-btn.danger {
+  color: #ef4444;
+  background: transparent;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.summary-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* ================== Schede delle azioni (Stile Squadrato & Netto) ================== */
+
+.action-block {
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --accent-line: rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  background: #11141c;
+  border: 1px solid var(--accent-line);
+  overflow: hidden;
+}
+
+.action-block.inventory-block {
+  --accent: #34d399;
+  --accent-soft: rgba(16, 185, 129, 0.13);
+  --accent-line: rgba(16, 185, 129, 0.38);
+}
+
+.action-block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--accent-line);
+}
+
+.block-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.block-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.block-titles h3 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f4f4f5;
+}
+
+.block-titles p {
+  margin: 0.2rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: #8b92a0;
+}
+
+.block-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.45rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  background: var(--accent);
+  color: #06120e;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.action-block-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem;
+}
+
+/* ---------- Riga azione (Squadrata con linea di separazione netta) ---------- */
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 3px;
+  background: #161a24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--accent);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.action-row:hover {
+  background: #1a1f2b;
+  border-color: rgba(255, 255, 255, 0.18);
+  border-left-color: var(--accent);
+}
+
+.action-glyph {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.92rem;
+  border: 1px solid var(--accent-line);
+}
+
+.action-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-title-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.action-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.with-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 100%;
+  padding: 0.08rem 0.45rem;
+  border-radius: 2px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.66rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-message {
+  font-size: 0.72rem;
+  color: #8b92a0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-message.is-empty {
+  font-style: italic;
+  color: #52525b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 2px;
+  background: transparent;
+  color: #71717a;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.action-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px dashed var(--accent-line);
+  border-radius: 3px;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.action-block-footer {
+  padding: 0 0.6rem 0.65rem;
+}
+
+.btn-add-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 3px;
+  border: 1px dashed var(--accent-line);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-add-action:hover {
+  background: var(--accent-soft);
+  border-style: solid;
+}
+
+.inventory-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 3px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.inventory-hint i {
+  margin-top: 1px;
+  font-size: 1.15rem;
+  color: #52525b;
+}
+
+.inventory-hint p {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #8b92a0;
+}
+
+.inventory-hint strong {
+  color: #d4d4d8;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-new-inventory {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.btn-new-inventory:hover {
+  background: rgba(16, 185, 129, 0.28);
+  color: #ffffff;
+}
+
+.fallback-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
 }
