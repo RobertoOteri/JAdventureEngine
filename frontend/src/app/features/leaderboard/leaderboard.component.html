@@ -1,23 +1,26 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
-  <div class="modal-card leaderboard-card">
+  <div class="leaderboard-card" role="dialog" aria-label="Classifica">
     <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi" aria-label="Chiudi">
       <i class="bi bi-x-lg"></i>
     </button>
 
-    <div class="leaderboard-header">
-      <div class="header-title-group">
-        <h2 class="leaderboard-title">
-          <i class="bi bi-trophy header-icon"></i>
-          Classifica Top 15
-        </h2>
+    <header class="leaderboard-header">
+      <div class="header-badge">
+        <i class="bi bi-trophy-fill"></i>
       </div>
-    </div>
+      <div class="header-texts">
+        <span class="header-kicker">Classifica</span>
+        <h2 class="leaderboard-title">{{ adventureTitle() || 'Migliori tempi' }}</h2>
+        <p class="header-sub">Il miglior tempo di completamento di ogni giocatore</p>
+      </div>
+    </header>
 
     <div class="leaderboard-body">
       @if (loading()) {
-        <div class="state-box">
-          <i class="bi bi-arrow-repeat spin-icon"></i>
-          <span>Caricamento classifica in corso...</span>
+        <div class="skeleton-list" aria-hidden="true">
+          @for (n of skeletonRows; track n) {
+            <div class="skeleton-row"></div>
+          }
         </div>
       } @else if (errorMessage()) {
         <div class="state-box error">
@@ -25,47 +28,55 @@
           <span>{{ errorMessage() }}</span>
         </div>
       } @else if (entries().length > 0) {
-        <div class="table-wrapper">
-          <table class="leaderboard-table">
-            <thead>
-            <tr>
-              <th class="col-rank">Pos.</th>
-              <th class="col-player">Giocatore</th>
-              <th class="col-time">Tempo</th>
-              <th class="col-date">Completata il</th>
-            </tr>
-            </thead>
-            <tbody>
-              @for (entry of entries(); track entry.username; let i = $index) {
-                <tr class="leaderboard-row" [class.top-row]="i < 3">
-                  <td class="col-rank">
-                    <span class="rank-badge"
-                          [class.rank-1]="i === 0"
-                          [class.rank-2]="i === 1"
-                          [class.rank-3]="i === 2">
-                      @if (i < 3) {
-                        <i class="bi bi-trophy-fill"></i>
-                      }
-                      {{ i + 1 }}
-                    </span>
-                  </td>
-                  <td class="col-player">
-                    <span class="player-name">{{ entry.username }}</span>
-                  </td>
-                  <td class="col-time">
-                    <span class="time-pill">
-                      <i class="bi bi-stopwatch"></i>
-                      {{ formatTime(entry.playTime) }}
-                    </span>
-                  </td>
-                  <td class="col-date">
-                    {{ entry.completedAt | date:'dd/MM/yyyy HH:mm' }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <div class="podium">
+          @for (item of podium(); track item.entry.username) {
+            <div
+              class="podium-col"
+              [class.rank-1]="item.rank === 1"
+              [class.rank-2]="item.rank === 2"
+              [class.rank-3]="item.rank === 3"
+            >
+              <div class="podium-player">
+                @if (item.rank === 1) {
+                  <i class="bi bi-trophy-fill crown"></i>
+                }
+                <div class="avatar" [style.--hue]="hue(item.entry.username)">
+                  {{ initial(item.entry.username) }}
+                </div>
+                <span class="podium-name">{{ item.entry.username }}</span>
+                <span class="podium-time">{{ formatTime(item.entry.playTime) }}</span>
+                <span class="podium-date">{{ item.entry.completedAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="podium-step">
+                <span class="step-rank">{{ item.rank }}</span>
+              </div>
+            </div>
+          }
         </div>
+
+        @if (rest().length > 0) {
+          <ol class="rank-list">
+            @for (item of rest(); track item.entry.username) {
+              <li class="rank-row" [style.--i]="$index">
+                <span class="row-rank">{{ item.rank }}</span>
+                <span class="avatar small" [style.--hue]="hue(item.entry.username)">
+                  {{ initial(item.entry.username) }}
+                </span>
+                <span class="row-name">{{ item.entry.username }}</span>
+                <span class="row-delta">{{ formatDelta(item.entry.playTime) }}</span>
+                <span class="row-time">
+                  <i class="bi bi-stopwatch"></i>
+                  {{ formatTime(item.entry.playTime) }}
+                </span>
+                <span class="row-date">{{ item.entry.completedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </li>
+            }
+          </ol>
+        }
+
+        <p class="list-footer">
+          {{ entries().length === 1 ? '1 giocatore in classifica' : entries().length + ' giocatori in classifica' }}
+        </p>
       } @else {
         <div class="state-box">
           <i class="bi bi-compass"></i>

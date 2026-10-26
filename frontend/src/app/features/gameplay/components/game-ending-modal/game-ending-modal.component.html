@@ -1,12 +1,32 @@
 <div class="ending-backdrop">
-  <div class="ending-box">
-    <i class="bi bi-trophy-fill ending-icon"></i>
-    <span class="ending-kicker">Fine</span>
-    <h2>{{ adventureTitle() }}</h2>
+  <div class="confetti" aria-hidden="true">
+    @for (piece of confetti; track $index) {
+      <span
+        class="confetti-piece"
+        [style.left.%]="piece.left"
+        [style.animation-delay.s]="piece.delay"
+        [style.animation-duration.s]="piece.duration"
+        [style.--w]="piece.size + 'px'"
+        [style.--drift]="piece.drift + 'px'"
+        [style.--c]="piece.color"
+      ></span>
+    }
+  </div>
 
-    <div class="ending-time-card">
-      <i class="bi bi-stopwatch"></i>
-      <span>Tempo impiegato: <strong>{{ formattedFinalTime() }}</strong></span>
+  <div class="ending-box" role="dialog" aria-label="Fine dell'avventura">
+    <div class="ending-badge">
+      <i class="bi bi-trophy-fill"></i>
+    </div>
+
+    <span class="ending-kicker">Avventura completata</span>
+    <h2 class="ending-title">{{ adventureTitle() }}</h2>
+
+    <div class="time-card">
+      <span class="time-label">
+        <i class="bi bi-stopwatch"></i>
+        Tempo impiegato
+      </span>
+      <span class="time-value">{{ formattedFinalTime() }}</span>
     </div>
 
     @if (message()) {
@@ -14,15 +34,15 @@
     }
 
     <div class="ending-actions">
-      <button type="button" class="btn-ending leaderboard-btn" (click)="isLeaderboardOpen.set(true)">
+      <button type="button" class="btn primary" (click)="isLeaderboardOpen.set(true)">
         <i class="bi bi-trophy-fill"></i>
-        <span>Visualizza Classifica</span>
+        <span>Visualizza la classifica</span>
       </button>
-      <button type="button" class="btn-ending primary" (click)="continueGame.emit()">
+      <button type="button" class="btn secondary" (click)="continueGame.emit()">
         <i class="bi bi-arrow-counterclockwise"></i>
         <span>Riprendi dall'ultimo salvataggio</span>
       </button>
-      <button type="button" class="btn-ending" (click)="exit.emit()">
+      <button type="button" class="btn ghost" (click)="exit.emit()">
         <i class="bi bi-box-arrow-left"></i>
         <span>Torna alle avventure</span>
       </button>
@@ -33,6 +53,7 @@
 @if (isLeaderboardOpen()) {
   <app-leaderboard
     [adventureCode]="adventureCode()"
+    [adventureTitle]="adventureTitle()"
     (close)="isLeaderboardOpen.set(false)"
   />
 }

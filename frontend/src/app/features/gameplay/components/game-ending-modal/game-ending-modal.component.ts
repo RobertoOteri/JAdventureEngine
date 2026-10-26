@@ -1,5 +1,17 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { LeaderboardComponent } from '../../../../features/leaderboard/leaderboard.component';
+import { formatPlayTime } from '../../../../core/utils/time.util';
+
+interface ConfettiPiece {
+  left: number;
+  delay: number;
+  duration: number;
+  size: number;
+  drift: number;
+  color: string;
+}
+
+const CONFETTI_COLORS = ['#ffffff', '#fbbf24', '#e2c05c', '#38bdf8', '#a1a1aa'];
 
 @Component({
   selector: 'app-game-ending-modal',
@@ -19,11 +31,14 @@ export class GameEndingModalComponent {
 
   readonly isLeaderboardOpen = signal<boolean>(false);
 
-  formattedFinalTime = computed(() => {
-    const total = this.playTimeSeconds();
-    const mins = Math.floor(total / 60).toString().padStart(2, '0');
-    const secs = (total % 60).toString().padStart(2, '0');
-    const hours = Math.floor(total / 3600);
-    return hours > 0 ? `${hours} ore e ${mins} min` : `${mins} minuti e ${secs} secondi`;
-  });
+  readonly formattedFinalTime = computed(() => formatPlayTime(this.playTimeSeconds()));
+
+  readonly confetti: ConfettiPiece[] = Array.from({ length: 28 }, () => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 8,
+    duration: 7 + Math.random() * 6,
+    size: 5 + Math.random() * 5,
+    drift: -40 + Math.random() * 80,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
+  }));
 }
