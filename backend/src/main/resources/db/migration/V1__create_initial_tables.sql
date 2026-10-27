@@ -5,7 +5,6 @@ CREATE SEQUENCE IF NOT EXISTS items_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS action_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS precondition_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_effect_seq START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS inventory_item_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_save_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_state_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS leaderboard_entry_seq START WITH 1 INCREMENT BY 1;
@@ -42,45 +41,35 @@ CREATE TABLE IF NOT EXISTS scenes (
     CONSTRAINT fk_scene_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS inventory_items (
-    id BIGINT PRIMARY KEY DEFAULT nextval('inventory_item_seq'),
-    code VARCHAR(50) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(1000),
-    image_url VARCHAR(255) NOT NULL,
-    graphic_adventure_id BIGINT NOT NULL,
-    CONSTRAINT uk_inventory_item_adventure_code UNIQUE (graphic_adventure_id, code),
-    CONSTRAINT fk_inventory_item_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures (id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS items (
     id BIGINT PRIMARY KEY DEFAULT nextval('items_seq'),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
+    description VARCHAR(1000),
     image_url VARCHAR(255),
+    graphic_adventure_id BIGINT NOT NULL,
+    scene_id BIGINT,
     pos_x INTEGER,
     pos_y INTEGER,
-    points VARCHAR(1000) NOT NULL,
+    points VARCHAR(1000),
     width INTEGER,
     height INTEGER,
-    initially_visible BOOLEAN NOT NULL DEFAULT TRUE,
-    scene_id BIGINT NOT NULL,
-    inventory_item_id BIGINT,
-    CONSTRAINT uk_item_scene_code UNIQUE (scene_id, code),
-    CONSTRAINT uk_item_inventory_item UNIQUE (inventory_item_id),
-    CONSTRAINT fk_item_scene FOREIGN KEY (scene_id) REFERENCES scenes (id) ON DELETE CASCADE,
-    CONSTRAINT fk_item_inventory_item FOREIGN KEY (inventory_item_id) REFERENCES inventory_items (id) ON DELETE SET NULL
+    initially_visible BOOLEAN DEFAULT TRUE,
+
+    CONSTRAINT uk_item_adventure_code UNIQUE (graphic_adventure_id, code),
+    CONSTRAINT fk_item_adventure FOREIGN KEY (graphic_adventure_id) REFERENCES graphic_adventures (id) ON DELETE CASCADE,
+    CONSTRAINT fk_item_scene FOREIGN KEY (scene_id) REFERENCES scenes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS actions (
     id BIGINT PRIMARY KEY DEFAULT nextval('action_seq'),
     code VARCHAR(255) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
-    with_inventory_item_code VARCHAR(50),
+    target_item_code VARCHAR(50),
     success_message TEXT,
     default_failure_message TEXT,
-    item_id BIGINT,
-    inventory_item_id BIGINT,
+    item_id BIGINT NOT NULL,
+
     CONSTRAINT uq_action_item_type UNIQUE (item_id, type),
     CONSTRAINT fk_action_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
@@ -93,7 +82,7 @@ CREATE TABLE IF NOT EXISTS preconditions (
     failure_message TEXT,
     action_id BIGINT NOT NULL,
     CONSTRAINT fk_precondition_action FOREIGN KEY (action_id) REFERENCES actions (id) ON DELETE CASCADE
-    );
+);
 
 CREATE TABLE IF NOT EXISTS game_effects (
     id BIGINT PRIMARY KEY DEFAULT nextval('game_effect_seq'),
@@ -127,10 +116,10 @@ CREATE TABLE IF NOT EXISTS game_saves (
 
 CREATE TABLE IF NOT EXISTS game_state_inventory (
     game_state_id BIGINT NOT NULL,
-    inventory_item_id BIGINT NOT NULL,
+    item_id BIGINT NOT NULL,
+    CONSTRAINT pk_game_state_inventory PRIMARY KEY (game_state_id, item_id),
     CONSTRAINT fk_gsi_game_state FOREIGN KEY (game_state_id) REFERENCES game_states (id) ON DELETE CASCADE,
-    CONSTRAINT fk_gsi_inventory_item FOREIGN KEY (inventory_item_id) REFERENCES inventory_items (id) ON DELETE CASCADE,
-    CONSTRAINT pk_game_state_inventory PRIMARY KEY (game_state_id, inventory_item_id)
+    CONSTRAINT fk_gsi_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS game_state_world_flags (
@@ -164,10 +153,9 @@ CREATE INDEX IF NOT EXISTS idx_graphic_adventures_author_id ON graphic_adventure
 CREATE INDEX IF NOT EXISTS idx_scenes_adventure_id ON scenes (graphic_adventure_id);
 CREATE INDEX IF NOT EXISTS idx_items_scene_id ON items (scene_id);
 CREATE INDEX IF NOT EXISTS idx_actions_item_id ON actions (item_id);
-CREATE INDEX IF NOT EXISTS idx_actions_inventory_item_id ON actions (inventory_item_id);
 CREATE INDEX IF NOT EXISTS idx_preconditions_action_id ON preconditions (action_id);
 CREATE INDEX IF NOT EXISTS idx_game_effects_action_id ON game_effects (action_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_items_adventure_id ON inventory_items (graphic_adventure_id);
 CREATE INDEX IF NOT EXISTS idx_game_saves_user_adv_auto_date ON game_saves (user_id, graphic_adventure_id, is_auto_save, saved_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_saves_code_user ON game_saves (code, user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_game_saves_one_auto ON game_saves (user_id, graphic_adventure_id) WHERE is_auto_save = TRUE;
+CREATE INDEX IF NOT EXISTS idx_items_adventure_id ON items (graphic_adventure_id);

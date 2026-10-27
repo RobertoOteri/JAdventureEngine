@@ -31,7 +31,7 @@ public class GraphicAdventure {
     @Column(nullable = false, unique = true, length = 150)
     private String title;
 
-    @Column(columnDefinition =  "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(length = 100)
@@ -55,7 +55,7 @@ public class GraphicAdventure {
 
     @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<InventoryItem> inventoryItems = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
     @OneToMany(mappedBy = "graphicAdventure", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -71,5 +71,4 @@ public class GraphicAdventure {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }

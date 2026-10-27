@@ -1,7 +1,6 @@
 package com.jadventure.backend.dto.item;
 
 import com.jadventure.backend.dto.action.ActionDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -28,21 +27,12 @@ public class ItemDto {
     @Size(max = 100, message = "Il nome dell'item non può superare i 100 caratteri")
     private String name;
 
+    @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")
+    private String description;
+
     private String imageUrl;
-    private Integer posX;
-    private Integer posY;
 
-    @NotBlank(message = "I punti dell'area interattiva sono obbligatori")
-    @Size(max = 1000, message = "I punti non possono superare i 1000 caratteri")
-    private String points;
-
-    private Integer width;
-    private Integer height;
-
-    @Builder.Default
-    private boolean initiallyVisible = true;
-
-    private InventoryItemDto linkedInventoryItem;
+    private HotspotDto hotspot;
 
     @Builder.Default
     private List<ActionDto> actions = new ArrayList<>();

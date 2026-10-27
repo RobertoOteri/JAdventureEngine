@@ -15,7 +15,7 @@ import java.util.List;
 @Table(
         name = "items",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"scene_id", "code"})
+                @UniqueConstraint(columnNames = {"graphic_adventure_id", "code"})
         }
 )
 public class Item {
@@ -35,35 +35,22 @@ public class Item {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(length = 1000)
+    private String description;
+
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "pos_x")
-    private Integer posX;
+    @Embedded
+    private Hotspot hotspot;
 
-    @Column(name = "pos_y")
-    private Integer posY;
-
-    @Column(nullable = false, length = 1000)
-    private String points;
-
-    private Integer width;
-    private Integer height;
-
-    @Builder.Default
-    @Column(name = "initially_visible", nullable = false)
-    private boolean initiallyVisible = true;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "graphic_adventure_id", nullable = false, updatable = false)
+    private GraphicAdventure graphicAdventure;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Action> actions = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scene_id", nullable = false)
-    private Scene scene;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inventory_item_id")
-    private InventoryItem linkedInventoryItem;
 
 }

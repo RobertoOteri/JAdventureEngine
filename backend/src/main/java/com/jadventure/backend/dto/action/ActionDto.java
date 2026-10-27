@@ -28,7 +28,7 @@ public class ActionDto {
     private String successMessage;
     private String defaultFailureMessage;
 
-    private String withInventoryItemCode;
+    private String targetItemCode;
 
     @Builder.Default
     private List<PreconditionDto> preconditions = new ArrayList<>();

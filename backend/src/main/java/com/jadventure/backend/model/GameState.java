@@ -30,10 +30,10 @@ public class GameState {
     @JoinTable(
             name = "game_state_inventory",
             joinColumns = @JoinColumn(name = "game_state_id"),
-            inverseJoinColumns = @JoinColumn(name = "inventory_item_id")
+            inverseJoinColumns = @JoinColumn(name = "item_id")
     )
     @Builder.Default
-    private List<InventoryItem> inventory = new ArrayList<>();
+    private List<Item> inventory = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "game_state_world_flags", joinColumns = @JoinColumn(name = "game_state_id"))

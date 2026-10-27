@@ -19,8 +19,7 @@ public class FileStorageUtil {
 
     public static final String PATH_ADVENTURE_COVER = "%s/cover";
     public static final String PATH_SCENE_BACKGROUND = "%s/scenes/%s";
-    public static final String PATH_ITEM_IMAGE = "%s/scenes/%s/items/%s";
-    public static final String PATH_INVENTORY_ITEM = "%s/inventory-items/%s";
+    public static final String PATH_ITEM_IMAGE = "%s/items/%s";
 
     private final Path rootUploadPath;
     private final String publicUrlBase;

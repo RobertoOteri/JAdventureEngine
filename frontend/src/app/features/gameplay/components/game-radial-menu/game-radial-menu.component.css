@@ -102,7 +102,6 @@
   height: 52px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  /* Fondo sobrio, non accecante */
   background: radial-gradient(circle at 40% 30%, #2f2014 0%, #1c130b 65%, #0e0905 100%);
   border: 2px solid #8f642d;
   box-shadow:

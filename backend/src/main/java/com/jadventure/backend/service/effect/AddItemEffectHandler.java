@@ -3,7 +3,7 @@ package com.jadventure.backend.service.effect;
 import com.jadventure.backend.dto.action.GameEffectDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.model.enums.EffectType;
-import com.jadventure.backend.service.InventoryItemService;
+import com.jadventure.backend.service.ItemService;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -11,10 +11,10 @@ import java.util.Set;
 @Component
 public class AddItemEffectHandler implements EffectHandler {
 
-    private final InventoryItemService inventoryItemService;
+    private final ItemService itemService;
 
-    public AddItemEffectHandler(InventoryItemService inventoryItemService) {
-        this.inventoryItemService = inventoryItemService;
+    public AddItemEffectHandler(ItemService itemService) {
+        this.itemService = itemService;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AddItemEffectHandler implements EffectHandler {
             return;
         }
 
-        inventoryItemService.loadPlayerInventory(adventureCode, Set.of(itemCode))
+        itemService.loadPlayerInventory(adventureCode, Set.of(itemCode))
                 .stream()
                 .findFirst()
                 .ifPresent(state.getInventory()::add);

@@ -22,24 +22,40 @@ export class ActionModalComponent {
   readonly store = inject(EditorStore);
 
   readonly itemCode = input.required<string>();
-  readonly isInventoryContext = input<boolean>(false);
   readonly actionToEdit = input<Action | null>(null);
 
   readonly saveRequested = output<Action>();
   readonly closeRequested = output<void>();
 
   actionType: ActionType = 'LOOK_AT';
-  withInventoryItemCode = '';
+  targetItemCode = '';
   actionSuccessMsg = '';
   actionFailureMsg = '';
   readonly actionPreconditions = signal<Precondition[]>([]);
   readonly actionEffects = signal<GameEffect[]>([]);
 
-  readonly availableActionTypes = computed<readonly ActionType[]>(() => {
-    if (this.isInventoryContext()) {
-      return ['LOOK_AT', 'USE', 'USE_WITH'];
-    }
-    return ['LOOK_AT', 'OPEN', 'PICK_UP', 'MOVE', 'USE', 'TALK_TO', 'USE_WITH'];
+  readonly availableActionTypes = computed(() => {
+    const allTypes: readonly ActionType[] = [
+      'LOOK_AT',
+      'OPEN',
+      'PICK_UP',
+      'MOVE',
+      'USE',
+      'TALK_TO',
+      'USE_WITH'
+    ];
+
+    const editingAction = this.actionToEdit();
+    const currentItem = this.store.selectedItem() ?? this.store.combinedSceneList().find(i => i.code === this.itemCode());
+    const existingActions = currentItem?.actions ?? [];
+
+    const usedTypes = new Set(
+      existingActions
+        .filter(a => !editingAction || a.id !== editingAction.id)
+        .map(a => a.type)
+    );
+
+    return allTypes.filter(type => !usedTypes.has(type));
   });
 
   readonly preconditionTypes: readonly PreconditionType[] = [
@@ -63,7 +79,7 @@ export class ActionModalComponent {
       const existing = this.actionToEdit();
       if (existing) {
         this.actionType = existing.type;
-        this.withInventoryItemCode = existing.withInventoryItemCode || '';
+        this.targetItemCode = existing.targetItemCode || '';
         this.actionSuccessMsg = existing.successMessage || '';
         this.actionFailureMsg = existing.defaultFailureMessage || '';
         this.actionPreconditions.set(
@@ -74,7 +90,7 @@ export class ActionModalComponent {
         );
       } else {
         this.actionType = 'LOOK_AT';
-        this.withInventoryItemCode = '';
+        this.targetItemCode = '';
         this.actionSuccessMsg = '';
         this.actionFailureMsg = '';
         this.actionPreconditions.set([]);
@@ -86,7 +102,14 @@ export class ActionModalComponent {
   readonly availableItemOptions = computed(() => {
     const scenes = this.store.scenes();
     const currentScene = this.store.currentScene();
+    const adventureItems = this.store.adventureItems();
     const itemMap = new Map<string, string>();
+
+    for (const it of adventureItems || []) {
+      if (!itemMap.has(it.code)) {
+        itemMap.set(it.code, it.name);
+      }
+    }
 
     for (const scene of scenes) {
       for (const it of scene.items || []) {
@@ -108,39 +131,33 @@ export class ActionModalComponent {
   });
 
   readonly availableInventoryItems = computed(() => {
-    const invMap = new Map<string, string>();
+    return this.availableItemOptions();
+  });
 
-    for (const inv of this.store.inventoryItems()) {
-      if (inv.code) {
-        invMap.set(inv.code, inv.name || inv.code);
-      }
-    }
+  readonly sceneItemsWithHotspot = computed(() => {
+    const scenes = this.store.scenes();
+    const currentScene = this.store.currentScene();
+    const map = new Map<string, string>();
 
-    for (const scene of this.store.scenes()) {
+    const allScenes = scenes.length > 0 ? scenes : (currentScene ? [currentScene] : []);
+
+    for (const scene of allScenes) {
       for (const it of scene.items || []) {
-        if (it.linkedInventoryItem?.code) {
-          invMap.set(it.linkedInventoryItem.code, it.linkedInventoryItem.name || it.name);
+        if (it.hotspot && !map.has(it.code)) {
+          map.set(it.code, it.name);
         }
       }
     }
 
-    return Array.from(invMap.entries()).map(([code, name]) => ({ code, name }));
+    return Array.from(map.entries()).map(([code, name]) => ({ code, name }));
   });
 
   readonly availableUseWithOptions = computed(() => {
     const currentCode = this.itemCode();
-
-    const sceneTargets = this.availableItemOptions().filter(
-      (it) => it.code !== currentCode
-    );
-
-    const inventoryTargets = this.availableInventoryItems().filter(
-      (inv) => inv.code !== currentCode
-    );
-
+    const targets = this.availableItemOptions().filter((it) => it.code !== currentCode);
     return {
-      sceneItems: sceneTargets,
-      inventoryItems: inventoryTargets
+      sceneItems: targets,
+      inventoryItems: targets
     };
   });
 
@@ -156,8 +173,7 @@ export class ActionModalComponent {
     const scenes = this.store.scenes();
     for (const scene of scenes) {
       for (const it of scene.items || []) {
-        const allActions = [...(it.actions || []), ...(it.linkedInventoryItem?.actions || [])];
-        for (const act of allActions) {
+        for (const act of it.actions || []) {
           for (const eff of act.effects || []) {
             if (eff.type === 'SET_FLAG' && eff.targetValue) {
               keys.add(eff.targetValue);
@@ -197,7 +213,7 @@ export class ActionModalComponent {
   }
 
   onSubmit(): void {
-    if (this.actionType === 'USE_WITH' && !this.withInventoryItemCode) {
+    if (this.actionType === 'USE_WITH' && !this.targetItemCode) {
       alert("Seleziona l'elemento bersaglio con cui interagire.");
       return;
     }
@@ -206,7 +222,7 @@ export class ActionModalComponent {
     const actionPayload: Action = {
       ...(existing?.id ? { id: existing.id } : {}),
       type: this.actionType,
-      withInventoryItemCode: this.actionType === 'USE_WITH' ? this.withInventoryItemCode : undefined,
+      targetItemCode: this.actionType === 'USE_WITH' ? this.targetItemCode : undefined,
       successMessage: this.actionSuccessMsg || undefined,
       defaultFailureMessage: this.actionFailureMsg || undefined,
       preconditions: this.actionPreconditions()
@@ -218,7 +234,7 @@ export class ActionModalComponent {
           failureMessage: p.failureMessage || undefined
         })),
       effects: this.actionEffects()
-        .filter((e) => e.type === 'END_ADVENTURE' || (e.type === 'SET_FLAG' ? !!e.targetValue : !!e.targetValue))
+        .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue)
         .map((e) => ({
           type: e.type,
           targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue,

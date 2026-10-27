@@ -9,7 +9,6 @@ import { ScenesSidebarComponent } from './components/scenes-sidebar/scenes-sideb
 import { Point2D, SceneCanvasComponent } from './components/scene-canvas/scene-canvas.component';
 import { InspectorSidebarComponent } from './components/inspector-sidebar/inspector-sidebar.component';
 import { ActionModalComponent } from './components/action-modal/action-modal.component';
-import { InventoryItemData, InventoryItemModalComponent } from './components/inventory-item-modal/inventory-item-modal.component';
 import { AdventureCreateComponent } from '../adventures/pages/adventure-create/adventure-create.component';
 
 @Component({
@@ -22,7 +21,6 @@ import { AdventureCreateComponent } from '../adventures/pages/adventure-create/a
     SceneCanvasComponent,
     InspectorSidebarComponent,
     ActionModalComponent,
-    InventoryItemModalComponent,
     AdventureCreateComponent
   ],
   templateUrl: './scene-editor.component.html',
@@ -40,6 +38,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
   readonly itemName = signal<string>('');
   readonly itemCode = signal<string>('');
+  readonly itemDescription = signal<string>('');
   readonly isCollectible = signal<boolean>(false);
   readonly isInitiallyVisible = signal<boolean>(true);
 
@@ -50,15 +49,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   readonly spritePosY = signal<number>(350);
   readonly spriteWidth = signal<number>(200);
   readonly spriteHeight = signal<number>(200);
-
-  readonly isInventoryModalOpen = signal<boolean>(false);
-  readonly isStandaloneInventoryCreation = signal<boolean>(false);
-  readonly editingInventoryItemId = signal<number | null>(null);
-  readonly invItemName = signal<string>('');
-  readonly invItemDesc = signal<string>('');
-  readonly invUseSceneImage = signal<boolean>(true);
-  readonly invCustomFile = signal<File | null>(null);
-  readonly invCustomPreviewUrl = signal<string | null>(null);
 
   readonly isActionModalOpen = signal<boolean>(false);
   readonly isActionForInventory = signal<boolean>(false);
@@ -102,10 +92,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resolveImageUrl(url?: string | null): string {
-    return url ?? '';
-  }
-
   startNewHotspot(): void {
     this.cancelDraft();
     this.isEditingOrCreating.set(true);
@@ -121,30 +107,19 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     this.itemName.set(item.name);
     this.itemCode.set(item.code);
-    this.spritePosX.set(item.posX ?? 350);
-    this.spritePosY.set(item.posY ?? 350);
-    this.spriteWidth.set(item.width && item.width > 0 ? item.width : 200);
-    this.spriteHeight.set(item.height && item.height > 0 ? item.height : 200);
+    this.itemDescription.set(item.description ?? '');
+    this.spritePosX.set(item.hotspot?.posX ?? 350);
+    this.spritePosY.set(item.hotspot?.posY ?? 350);
+    this.spriteWidth.set(item.hotspot?.width && item.hotspot.width > 0 ? item.hotspot.width : 200);
+    this.spriteHeight.set(item.hotspot?.height && item.hotspot.height > 0 ? item.hotspot.height : 200);
 
-    const hasInv = !!item.linkedInventoryItem;
-    this.isCollectible.set(hasInv);
-    if (hasInv && item.linkedInventoryItem) {
-      this.editingInventoryItemId.set(item.linkedInventoryItem.id ?? null);
-      this.invItemName.set(item.linkedInventoryItem.name || item.name);
-      this.invItemDesc.set(item.linkedInventoryItem.description || '');
-
-      const hasDedicated = !!item.linkedInventoryItem.imageUrl && item.linkedInventoryItem.imageUrl !== item.imageUrl;
-      this.invUseSceneImage.set(!hasDedicated);
-      this.invCustomPreviewUrl.set(hasDedicated ? this.resolveImageUrl(item.linkedInventoryItem.imageUrl) : null);
-    } else {
-      this.invCustomPreviewUrl.set(null);
-    }
-
-    this.isInitiallyVisible.set(item.initiallyVisible !== undefined ? Boolean(item.initiallyVisible) : true);
+    this.isInitiallyVisible.set(
+      item.hotspot?.initiallyVisible !== undefined ? Boolean(item.hotspot.initiallyVisible) : true
+    );
 
     this.revokeCurrentBlob();
     if (item.imageUrl) {
-      this.previewSpriteUrl.set(this.resolveImageUrl(item.imageUrl));
+      this.previewSpriteUrl.set(item.imageUrl);
       this.canvasRef?.setTool('MOVE');
     } else {
       this.previewSpriteUrl.set(null);
@@ -152,8 +127,8 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     }
 
     this.canvasRef?.clearDraftPoints();
-    if (item.points && item.points.trim().length > 0) {
-      const parsedPoints: Point2D[] = item.points
+    if (item.hotspot?.points && item.hotspot.points.trim().length > 0) {
+      const parsedPoints: Point2D[] = item.hotspot.points
         .trim()
         .split(/\s+/)
         .map((pair) => {
@@ -172,19 +147,11 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.editingItemCode.set(null);
     this.itemName.set('');
     this.itemCode.set('');
+    this.itemDescription.set('');
     this.isCollectible.set(false);
     this.isInitiallyVisible.set(true);
     this.sceneImageFile.set(null);
     this.previewSpriteUrl.set(null);
-
-    this.isStandaloneInventoryCreation.set(false);
-    this.editingInventoryItemId.set(null);
-    this.invItemName.set('');
-    this.invItemDesc.set('');
-    this.invUseSceneImage.set(true);
-    this.invCustomFile.set(null);
-    this.invCustomPreviewUrl.set(null);
-    this.isInventoryModalOpen.set(false);
 
     this.canvasRef?.clearDraftPoints();
     this.canvasRef?.setTool('SELECT');
@@ -199,176 +166,22 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
         .replace(/[^a-z0-9_]/g, '_')
         .replace(/_+/g, '_');
       this.itemCode.set(slug);
-
-      if (!this.invItemName()) {
-        this.invItemName.set(val);
-      }
     }
-  }
-
-  openStandaloneInventoryModal(): void {
-    this.cancelDraft();
-    this.isStandaloneInventoryCreation.set(true);
-    this.editingInventoryItemId.set(null);
-    this.itemCode.set('');
-    this.invItemName.set('');
-    this.invItemDesc.set('');
-    this.invUseSceneImage.set(false);
-    this.invCustomFile.set(null);
-    this.invCustomPreviewUrl.set(null);
-    this.isInventoryModalOpen.set(true);
-  }
-
-  openInventoryModal(): void {
-    this.isStandaloneInventoryCreation.set(false);
-    this.editingInventoryItemId.set(null);
-    if (!this.invItemName()) {
-      this.invItemName.set(this.itemName() || 'Nuovo Oggetto');
-    }
-    this.invCustomPreviewUrl.set(null);
-    this.isInventoryModalOpen.set(true);
-  }
-
-  onEditInventoryItem(item: Item): void {
-    if (!item.linkedInventoryItem) return;
-
-    this.store.selectItem(item);
-    this.isStandaloneInventoryCreation.set(!item.id);
-    this.itemCode.set(item.linkedInventoryItem.code || item.code);
-    this.editingInventoryItemId.set(item.linkedInventoryItem.id ?? null);
-    this.invItemName.set(item.linkedInventoryItem.name);
-    this.invItemDesc.set(item.linkedInventoryItem.description || '');
-
-    const hasDedicated = !!item.linkedInventoryItem.imageUrl && item.linkedInventoryItem.imageUrl !== item.imageUrl;
-    this.invUseSceneImage.set(item.id ? !hasDedicated : false);
-    this.invCustomFile.set(null);
-    this.invCustomPreviewUrl.set(hasDedicated ? this.resolveImageUrl(item.linkedInventoryItem.imageUrl) : null);
-
-    this.previewSpriteUrl.set(item.imageUrl ? this.resolveImageUrl(item.imageUrl) : null);
-
-    this.isInventoryModalOpen.set(true);
-  }
-
-  onInventoryConfirmed(data: InventoryItemData): void {
-    const invId = this.editingInventoryItemId();
-
-    // 1. Aggiornamento di un InventoryItem esistente (collegato o standalone)
-    if (invId) {
-      const currentItem = this.store.selectedItem();
-      const invPayload = {
-        id: invId,
-        code: data.code || currentItem?.code,
-        name: data.name,
-        description: data.description,
-        imageUrl: data.useSceneImage ? (currentItem?.imageUrl ?? '') : (currentItem?.linkedInventoryItem?.imageUrl ?? '')
-      };
-
-      const formData = new FormData();
-      formData.append('data', new Blob([JSON.stringify(invPayload)], { type: 'application/json' }));
-
-      if (!data.useSceneImage && data.customFile) {
-        formData.append('image', data.customFile);
-      }
-
-      this.store.updateInventoryItem(formData).subscribe({
-        next: () => {
-          this.isInventoryModalOpen.set(false);
-          this.editingInventoryItemId.set(null);
-          this.isStandaloneInventoryCreation.set(false);
-        },
-        error: (err: any) => console.error(err?.error?.message || 'Errore aggiornamento inventario.')
-      });
-      return;
-    }
-
-    // 2. Creazione diretta di un NUOVO InventoryItem standalone
-    if (this.isStandaloneInventoryCreation()) {
-      const invPayload = {
-        code: data.code,
-        name: data.name,
-        description: data.description,
-        imageUrl: ''
-      };
-
-      const formData = new FormData();
-      formData.append('data', new Blob([JSON.stringify(invPayload)], { type: 'application/json' }));
-      if (data.customFile) {
-        formData.append('image', data.customFile);
-      }
-
-      this.store.createStandaloneInventoryItem(formData).subscribe({
-        next: () => {
-          this.isInventoryModalOpen.set(false);
-          this.isStandaloneInventoryCreation.set(false);
-        },
-        error: (err: any) => console.error(err?.error?.message || 'Errore creazione inventario standalone.')
-      });
-      return;
-    }
-
-    // 3. Configurazione inventario dentro la bozza di un Hotspot di scena
-    this.invItemName.set(data.name);
-    this.invItemDesc.set(data.description);
-    this.invUseSceneImage.set(data.useSceneImage);
-    this.invCustomFile.set(data.customFile);
-    this.isCollectible.set(true);
-    this.isInventoryModalOpen.set(false);
-  }
-
-  onInventoryCancelled(): void {
-    this.isInventoryModalOpen.set(false);
-    this.editingInventoryItemId.set(null);
-    this.isStandaloneInventoryCreation.set(false);
-    if (!this.invItemName()) {
-      this.isCollectible.set(false);
-    }
-  }
-
-  onDeleteInventoryItem(itemCode: string): void {
-    const currentItem = this.store.combinedSceneList().find((i) => i.code === itemCode);
-    const invId = currentItem?.linkedInventoryItem?.id;
-    if (!invId) return;
-
-    const msg = currentItem?.id
-      ? `Vuoi rimuovere l'oggetto dall'inventario per #${itemCode}? L'hotspot nella stanza non verrà eliminato.`
-      : `Vuoi eliminare definitivamente l'oggetto inventario #${itemCode}?`;
-
-    if (!confirm(msg)) {
-      return;
-    }
-
-    this.store.deleteInventoryItem(invId).subscribe({
-      next: () => {
-        if (this.editingItemCode() === itemCode) {
-          this.isCollectible.set(false);
-        }
-      },
-      error: (err: any) => console.error(err?.error?.message || 'Errore rimozione inventario.')
-    });
   }
 
   saveDraft(): void {
     const name = this.itemName().trim();
     const code = this.itemCode().trim();
+    const description = this.itemDescription().trim() || name;
 
     if (!name || !code) return;
 
     let points = this.canvasRef?.draftPolygonPoints() || '';
     const selected = this.store.selectedItem();
 
-    if (!points && this.editingItemCode() && selected?.points) {
-      points = selected.points;
+    if (!points && this.editingItemCode() && selected?.hotspot?.points) {
+      points = selected.hotspot.points;
     }
-
-    if (!points && (this.sceneImageFile() || this.previewSpriteUrl())) {
-      const x = Math.round(this.spritePosX());
-      const y = Math.round(this.spritePosY());
-      const w = Math.round(this.spriteWidth());
-      const h = Math.round(this.spriteHeight());
-      points = `${x},${y} ${x + w},${y} ${x + w},${y + h} ${x},${y + h}`;
-    }
-
-    if (!points || points.split(/\s+/).length < 3) return;
 
     const isEdit = !!this.editingItemCode();
     const targetItemId = selected?.id;
@@ -378,35 +191,30 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const hasValidHotspot = Boolean(points && points.split(/\s+/).length >= 3);
+
     const itemPayload: any = {
       ...(isEdit ? { id: targetItemId } : {}),
       name,
       code,
-      points,
-      posX: Math.round(this.spritePosX()),
-      posY: Math.round(this.spritePosY()),
-      width: Math.round(this.spriteWidth()),
-      height: Math.round(this.spriteHeight()),
-      initiallyVisible: this.isInitiallyVisible()
+      description,
+      ...(hasValidHotspot
+        ? {
+          hotspot: {
+            points,
+            posX: Math.round(this.spritePosX()),
+            posY: Math.round(this.spritePosY()),
+            width: Math.round(this.spriteWidth()),
+            height: Math.round(this.spriteHeight()),
+            initiallyVisible: this.isInitiallyVisible()
+          }
+        }
+        : {
+          hotspot: null
+        })
     };
 
     const sceneFile = this.sceneImageFile();
-    const invCustomFile = this.invCustomFile();
-
-    if (this.isCollectible()) {
-      itemPayload.linkedInventoryItem = {
-        ...(selected?.linkedInventoryItem?.id ? { id: selected.linkedInventoryItem.id } : {}),
-        code,
-        name: this.invItemName() || name,
-        description: this.invItemDesc() || '',
-        imageUrl: (!this.invUseSceneImage() && !invCustomFile && this.invCustomPreviewUrl())
-          ? this.invCustomPreviewUrl()
-          : ''
-      };
-    } else {
-      itemPayload.linkedInventoryItem = null;
-    }
-
     const formData = new FormData();
     formData.append(
       'data',
@@ -417,13 +225,14 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       formData.append('image', sceneFile);
     }
 
-    if (!this.invUseSceneImage() && invCustomFile) {
-      formData.append('inventoryImage', invCustomFile);
+    let save$: Observable<Item>;
+    if (isEdit) {
+      save$ = this.store.updateItem(formData);
+    } else if (hasValidHotspot) {
+      save$ = this.store.saveItem(formData);
+    } else {
+      save$ = this.store.saveInventoryItem(formData);
     }
-
-    const save$ = isEdit
-      ? this.store.updateItem(formData)
-      : this.store.saveItem(formData);
 
     save$.subscribe({
       next: () => this.cancelDraft(),
@@ -432,10 +241,10 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   deleteItem(itemCode: string): void {
-    const item = this.store.currentScene()?.items?.find((i) => i.code === itemCode);
+    const item = this.store.findItemEverywhere(itemCode);
     if (!item?.id) return;
 
-    if (confirm(`Sei sicuro di voler eliminare l'hotspot #${itemCode}?`)) {
+    if (confirm(`Sei sicuro di voler eliminare l'oggetto #${itemCode}?`)) {
       this.store.deleteItem(item.id).subscribe({
         next: () => {
           if (this.editingItemCode() === itemCode) {
@@ -460,10 +269,20 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.editingItemCode.set(null);
 
     const size = 200;
-    this.spritePosX.set(Math.max(0, drop.x - size / 2));
-    this.spritePosY.set(Math.max(0, drop.y - size / 2));
+    const x = Math.max(0, Math.round(drop.x - size / 2));
+    const y = Math.max(0, Math.round(drop.y - size / 2));
+
+    this.spritePosX.set(x);
+    this.spritePosY.set(y);
     this.spriteWidth.set(size);
     this.spriteHeight.set(size);
+
+    this.canvasRef?.setDraftPoints([
+      { x, y },
+      { x: x + size, y },
+      { x: x + size, y: y + size },
+      { x, y: y + size }
+    ]);
 
     this.sceneImageFile.set(drop.file);
     this.revokeCurrentBlob();
@@ -497,18 +316,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     this.isActionModalOpen.set(true);
   }
 
-  openAddInventoryAction(): void {
-    this.isActionForInventory.set(true);
-    this.editingAction.set(null);
-    this.isActionModalOpen.set(true);
-  }
-
-  openEditInventoryAction(action: Action): void {
-    this.isActionForInventory.set(true);
-    this.editingAction.set(action);
-    this.isActionModalOpen.set(true);
-  }
-
   closeActionModal(): void {
     this.isActionModalOpen.set(false);
     this.editingAction.set(null);
@@ -523,8 +330,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     if (actionId) {
       save$ = this.store.updateAction({ ...actionPayload, id: actionId });
-    } else if (this.isActionForInventory() || !selected.id) {
-      save$ = this.store.addInventoryAction(actionPayload);
     } else {
       save$ = this.store.addAction(actionPayload);
     }
@@ -541,7 +346,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   onDeleteAction(actionId: number): void {
     if (!actionId) return;
 
-    if (confirm("Vuoi rimuovere questa azione?")) {
+    if (confirm('Vuoi rimuovere questa azione?')) {
       this.store.deleteAction(actionId).subscribe({
         error: (err: any) => console.error('Errore eliminazione azione:', err)
       });
@@ -549,8 +354,9 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   }
 
   goToAddScene(): void {
-    const advId = this.store.adventure()?.id
-      || Number(this.route.snapshot.paramMap.get('adventureId') || this.route.snapshot.paramMap.get('id'));
+    const advId =
+      this.store.adventure()?.id ||
+      Number(this.route.snapshot.paramMap.get('adventureId') || this.route.snapshot.paramMap.get('id'));
 
     if (advId) {
       void this.router.navigate(['/adventures', advId, 'scenes', 'new']);

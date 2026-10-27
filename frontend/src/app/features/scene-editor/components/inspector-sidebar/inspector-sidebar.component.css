@@ -24,8 +24,6 @@
   flex-direction: column;
 }
 
-/* ================== 1. Lista hotspot in alto ================== */
-
 .list-section {
   max-height: 42%;
   flex-shrink: 0;
@@ -59,6 +57,32 @@
   text-transform: uppercase;
   color: #a1a1aa;
   margin: 0;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-new-inventory {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.btn-new-inventory:hover {
+  background: rgba(16, 185, 129, 0.28);
+  color: #ffffff;
 }
 
 .btn-new-hotspot {
@@ -153,8 +177,6 @@
   flex-wrap: wrap;
 }
 
-/* ---------- Badge ---------- */
-
 .indicator-badge {
   font-size: 0.62rem;
   padding: 2px 6px;
@@ -174,152 +196,10 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.badge-inventory {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.badge-inventory:hover {
-  background: rgba(16, 185, 129, 0.25);
-  border-color: rgba(16, 185, 129, 0.5);
-  color: #ffffff;
-}
-
-.badge-inventory .bi-chevron-down,
-.badge-inventory .bi-chevron-up {
-  font-size: 0.6rem;
-  margin-left: 1px;
-}
-
-.badge-inventory.static {
-  cursor: default;
-}
-
-.badge-inventory.static:hover {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.35);
-  color: #34d399;
-}
-
 .indicator-badge.muted {
   color: #71717a;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* ---------- Pannello dettagli inventario (nella lista) ---------- */
-
-.inventory-accordion-panel {
-  background: #12151e;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 3px;
-  padding: 0.65rem 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  animation: slideDownFade 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-top: 0.15rem;
-}
-
-@keyframes slideDownFade {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.accordion-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.accordion-tag {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #34d399;
-}
-
-.accordion-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.btn-accordion-action {
-  background: transparent;
-  border: none;
-  color: #a1a1aa;
-  font-size: 0.75rem;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.btn-accordion-action:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
-.btn-accordion-action.delete:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.accordion-body-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.accordion-thumb {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 2px;
-  flex-shrink: 0;
-}
-
-.accordion-texts {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-}
-
-.accordion-item-name {
-  font-size: 0.78rem;
-  color: #fafafa;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.accordion-item-desc {
-  font-size: 0.7rem;
-  color: #8b92a0;
-  margin: 0;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .hotspots-empty {
@@ -341,8 +221,6 @@
   background: rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
-
-/* ================== 2. Dettaglio e form hotspot ================== */
 
 .detail-section {
   flex: 1;
@@ -426,8 +304,6 @@
   cursor: not-allowed;
 }
 
-/* ---------- Selettore file ---------- */
-
 .file-field-group {
   margin-bottom: 0.95rem;
 }
@@ -474,8 +350,6 @@
   text-overflow: ellipsis;
 }
 
-/* ---------- Interruttori ---------- */
-
 .toggle-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -508,8 +382,6 @@
   align-items: center;
   gap: 0.45rem;
 }
-
-/* ---------- Pulsanti salva / annulla ---------- */
 
 .actions-row {
   display: flex;
@@ -555,8 +427,6 @@
   color: #ffffff;
 }
 
-/* ---------- Nessuna selezione ---------- */
-
 .properties-empty {
   display: flex;
   flex-direction: column;
@@ -573,8 +443,6 @@
   font-size: 2rem;
   color: #3f3f46;
 }
-
-/* ================== Hotspot selezionato: riepilogo ================== */
 
 .selected-details {
   display: flex;
@@ -637,13 +505,6 @@
   margin-top: 2px;
 }
 
-.summary-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.45rem;
-}
-
 .summary-actions {
   display: flex;
   flex-direction: column;
@@ -681,8 +542,6 @@
   background: rgba(239, 68, 68, 0.15);
 }
 
-/* ================== Schede delle azioni (Stile Squadrato & Netto) ================== */
-
 .action-block {
   --accent: #38bdf8;
   --accent-soft: rgba(56, 189, 248, 0.12);
@@ -691,12 +550,6 @@
   background: #11141c;
   border: 1px solid var(--accent-line);
   overflow: hidden;
-}
-
-.action-block.inventory-block {
-  --accent: #34d399;
-  --accent-soft: rgba(16, 185, 129, 0.13);
-  --accent-line: rgba(16, 185, 129, 0.38);
 }
 
 .action-block-header {
@@ -764,8 +617,6 @@
   gap: 0.5rem;
   padding: 0.6rem;
 }
-
-/* ---------- Riga azione (Squadrata con linea di separazione netta) ---------- */
 
 .action-row {
   display: flex;
@@ -918,62 +769,52 @@
   border-style: solid;
 }
 
-.inventory-hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
-  padding: 0.85rem 0.9rem;
-  border-radius: 3px;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.inventory-hint i {
-  margin-top: 1px;
-  font-size: 1.15rem;
-  color: #52525b;
-}
-
-.inventory-hint p {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: #8b92a0;
-}
-
-.inventory-hint strong {
-  color: #d4d4d8;
-}
-
-.header-buttons {
+.row-tags {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  margin-top: 3px;
 }
 
-.btn-new-inventory {
-  background: rgba(16, 185, 129, 0.16);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  font-size: 0.73rem;
-  font-weight: 600;
-  padding: 0.35rem 0.6rem;
-  border-radius: 3px;
-  cursor: pointer;
+.tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: all 0.15s ease;
+  padding: 0.08rem 0.42rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  line-height: 1.3;
 }
 
-.btn-new-inventory:hover {
-  background: rgba(16, 185, 129, 0.28);
-  color: #ffffff;
+.tag-inventory {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
-.fallback-emoji {
+.tag-hidden {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+}
+.selected-header-line {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
+
+.tag-global {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.tag-points-count.global-hint {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+

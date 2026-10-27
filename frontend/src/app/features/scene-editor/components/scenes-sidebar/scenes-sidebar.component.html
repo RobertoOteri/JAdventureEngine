@@ -1,40 +1,103 @@
-<aside class="sidebar-scenes">
-  <div class="sidebar-header">
-    <div class="header-title">
-      <i class="bi bi-grid-1x2 icon-header"></i>
-      <h2>Stanze</h2>
+<aside class="sidebar-left">
+  <div class="sidebar-section scenes-section">
+    <div class="sidebar-header">
+      <div class="header-title">
+        <i class="bi bi-grid-1x2 icon-header"></i>
+        <h2>Scene ({{ store.scenes().length }})</h2>
+      </div>
+      <button type="button" class="btn-add-square" (click)="goToAddScene()" title="Aggiungi Nuova Stanza">
+        <i class="bi bi-plus-lg"></i>
+      </button>
     </div>
-    <button type="button" class="btn-add-scene" (click)="goToAddScene()" title="Aggiungi Nuova Stanza">
-      <i class="bi bi-plus-lg"></i>
-    </button>
+
+    <nav class="scenes-list custom-scroll">
+      @for (scene of store.scenes(); track scene.id ?? scene.code) {
+        <div
+          class="scene-item"
+          [class.active]="scene.id === store.currentScene()?.id || scene.code === store.currentScene()?.code"
+          (click)="switchScene(scene)"
+        >
+          <div class="scene-dot"></div>
+          <div class="scene-info">
+            <span class="scene-title">{{ scene.name }}</span>
+            <span class="scene-code">#{{ scene.code }}</span>
+          </div>
+          <button
+            type="button"
+            class="btn-delete-scene"
+            (click)="deleteScene($event, scene)"
+            title="Elimina stanza"
+          >
+            <i class="bi bi-trash3"></i>
+          </button>
+        </div>
+      } @empty {
+        <div class="sidebar-empty">
+          <i class="bi bi-inbox icon-empty"></i>
+          <span>Nessuna stanza presente</span>
+        </div>
+      }
+    </nav>
   </div>
 
-  <nav class="scenes-list custom-scroll">
-    @for (scene of store.scenes(); track scene.id ?? scene.code) {
-      <div
-        class="scene-item"
-        [class.active]="scene.id === store.currentScene()?.id || scene.code === store.currentScene()?.code"
-        (click)="switchScene(scene)"
+  <div class="sidebar-major-divider"></div>
+
+  <div class="sidebar-section objects-section">
+    <div class="sidebar-header">
+      <div class="header-title">
+        <i class="bi bi-box-seam icon-header"></i>
+        <h2>Oggetti ({{ totalItemsCount() }})</h2>
+      </div>
+      <button
+        type="button"
+        class="btn-add-square"
+        (click)="onAddObjectClick()"
+        title="Aggiungi Nuovo Oggetto (di scena o globale)"
       >
-        <div class="scene-dot"></div>
-        <div class="scene-info">
-          <span class="scene-title">{{ scene.name }}</span>
-          <span class="scene-code">#{{ scene.code }}</span>
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <div class="objects-list custom-scroll">
+      @for (group of itemGroups(); track group.code) {
+        <div class="object-group" [class.is-global]="group.isGlobal" [class.collapsed]="isCollapsed(group.code)">
+          <div class="group-header" (click)="toggleGroup(group.code, $event)">
+            <div class="group-header-left">
+              <i class="bi bi-chevron-down toggle-arrow"></i>
+              <span class="group-name">{{ group.name }}</span>
+            </div>
+            <span class="group-count">{{ group.items.length }}</span>
+          </div>
+
+          @if (!isCollapsed(group.code)) {
+            <ul class="group-bullet-list">
+              @for (entry of group.items; track entry.item.code) {
+                <li
+                  class="bullet-item"
+                  [class.active]="store.selectedItem()?.code === entry.item.code"
+                  (click)="selectSidebarItem(entry)"
+                >
+                  <span
+                    class="bullet-dot"
+                    [class.dot-global]="entry.isGlobal"
+                    [class.dot-inventory]="entry.isInventory"
+                    [class.dot-hidden]="entry.isHidden"
+                  ></span>
+                  <span class="bullet-name">{{ entry.item.name }}</span>
+
+                  @if (entry.isGlobal) {
+                    <span class="mini-tag tag-global">GLOBAL</span>
+                  } @else if (entry.isInventory) {
+                    <span class="mini-tag tag-inventory">INV</span>
+                  }
+                </li>
+              } @empty {
+                <li class="group-empty">Nessun oggetto</li>
+              }
+            </ul>
+          }
         </div>
-        <button
-          type="button"
-          class="btn-delete-scene"
-          (click)="deleteScene($event, scene)"
-          title="Elimina stanza"
-        >
-          <i class="bi bi-trash3"></i>
-        </button>
-      </div>
-    } @empty {
-      <div class="scenes-empty">
-        <i class="bi bi-inbox icon-empty"></i>
-        <span>Nessuna stanza presente</span>
-      </div>
-    }
-  </nav>
+      }
+    </div>
+  </div>
 </aside>

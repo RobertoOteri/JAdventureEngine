@@ -1,8 +1,23 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorStore } from '../../store/editor.store';
-import { Scene } from '../../../../core/models';
+import { Item, Scene } from '../../../../core/models';
+
+export interface SidebarItemEntry {
+  item: Item;
+  sceneCode: string | null;
+  isGlobal: boolean;
+  isInventory: boolean;
+  isHidden: boolean;
+}
+
+export interface SidebarItemGroup {
+  code: string;
+  name: string;
+  isGlobal: boolean;
+  items: SidebarItemEntry[];
+}
 
 @Component({
   selector: 'app-scenes-sidebar',
@@ -15,6 +30,68 @@ export class ScenesSidebarComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly store = inject(EditorStore);
+
+  readonly startCreateItemRequested = output<void>();
+
+  readonly collapsedGroups = signal<Record<string, boolean>>({});
+
+  toggleGroup(code: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.collapsedGroups.update((current) => ({
+      ...current,
+      [code]: !current[code]
+    }));
+  }
+
+  isCollapsed(code: string): boolean {
+    return !!this.collapsedGroups()[code];
+  }
+
+  readonly itemGroups = computed<SidebarItemGroup[]>(() => {
+    const scenes = this.store.scenes() ?? [];
+    const allAdventureItems = this.store.adventureItems() ?? [];
+
+    const sceneGroups: SidebarItemGroup[] = scenes.map((scene) => {
+      const items = (scene.items ?? []).map((item) => ({
+        item,
+        sceneCode: scene.code,
+        isGlobal: false,
+        isInventory: (item.actions ?? []).some((a) => a.type === 'PICK_UP'),
+        isHidden: item.hotspot?.initiallyVisible === false
+      }));
+
+      return {
+        code: scene.code,
+        name: scene.name,
+        isGlobal: false,
+        items
+      };
+    });
+
+    const globalItems = allAdventureItems
+      .filter((i) => !i.hotspot)
+      .map((item) => ({
+        item,
+        sceneCode: null,
+        isGlobal: true,
+        isInventory: (item.actions ?? []).some((a) => a.type === 'PICK_UP'),
+        isHidden: false
+      }));
+
+    return [
+      ...sceneGroups,
+      {
+        code: '__global__',
+        name: 'Inventario Globale',
+        isGlobal: true,
+        items: globalItems
+      }
+    ];
+  });
+
+  readonly totalItemsCount = computed(() =>
+    this.itemGroups().reduce((acc, g) => acc + g.items.length, 0)
+  );
 
   private getAdventureId(): number | null {
     const fromStore = this.store.adventure()?.id;
@@ -31,6 +108,23 @@ export class ScenesSidebarComponent {
     if (advId && scene.code && scene.code !== currentScene?.code) {
       void this.router.navigate(['/editor', advId, scene.code]);
     }
+  }
+
+  selectSidebarItem(entry: SidebarItemEntry): void {
+    const advId = this.getAdventureId();
+    const currentScene = this.store.currentScene();
+
+    if (entry.sceneCode && advId && currentScene?.code !== entry.sceneCode) {
+      void this.router.navigate(['/editor', advId, entry.sceneCode]).then(() => {
+        this.store.selectItem(entry.item);
+      });
+    } else {
+      this.store.selectItem(entry.item);
+    }
+  }
+
+  onAddObjectClick(): void {
+    this.startCreateItemRequested.emit();
   }
 
   goToAddScene(): void {

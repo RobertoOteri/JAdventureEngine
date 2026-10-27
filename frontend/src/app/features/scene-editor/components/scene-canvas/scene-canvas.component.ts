@@ -14,14 +14,11 @@ import { CommonModule } from '@angular/common';
 import { EditorStore } from '../../store/editor.store';
 import { Item } from '../../../../core/models';
 import { SceneGizmoToolbarComponent, UnityGizmoTool } from '../scene-gizmo-toolbar/scene-gizmo-toolbar.component';
-import { environment } from '../../../../../environments/environment';
 
 export interface Point2D {
   x: number;
   y: number;
 }
-
-const BACKEND_BASE_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 
 @Component({
   selector: 'app-scene-canvas',
@@ -88,14 +85,6 @@ export class SceneCanvasComponent {
 
   setTool(tool: UnityGizmoTool): void {
     this.activeTool.set(tool);
-  }
-
-  resolveImageUrl(url?: string | null): string {
-    if (!url) return '';
-    if (/^https?:\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) {
-      return url;
-    }
-    return `${BACKEND_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
   onSvgClick(event: MouseEvent): void {

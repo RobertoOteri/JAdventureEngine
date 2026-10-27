@@ -10,7 +10,6 @@ import {
   GameActionDto,
   GameSaveDto,
   Item,
-  InventoryItem,
   ActionType,
   GameActionResultDto
 } from '../../../core/models';
@@ -24,7 +23,7 @@ export interface RadialMenuState {
 
 export interface DraggedItemState {
   isDragging: boolean;
-  item: InventoryItem | null;
+  item: Item | null;
   x: number;
   y: number;
   targetHoveredName: string | null;
@@ -80,7 +79,7 @@ export const GameplayStore = signalStore(
 
   withComputed((store) => ({
     currentScene: computed(() => store.gameState()?.currentScene ?? null),
-    inventory: computed<InventoryItem[]>(() => store.gameState()?.inventory ?? []),
+    inventory: computed<Item[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
     visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
     adventureFlags: computed(() => store.gameState()?.adventureFlags ?? {}),
@@ -140,7 +139,7 @@ export const GameplayStore = signalStore(
       patchState(store, { adventureCode: code });
     };
 
-    const startDragItem = (item: InventoryItem, x: number, y: number): void => {
+    const startDragItem = (item: Item, x: number, y: number): void => {
       patchState(store, {
         draggedItem: {
           isDragging: true,
@@ -426,12 +425,12 @@ export const GameplayStore = signalStore(
       const targetHotspot = scene?.items?.find((i) => i.code === targetItemCode);
 
       let action = sourceItem?.actions?.find(
-        (a) => a.type === 'USE_WITH' && a.withInventoryItemCode === targetItemCode
+        (a) => a.type === 'USE_WITH' && a.targetItemCode === targetItemCode
       );
 
       if (!action) {
         action = targetHotspot?.actions?.find(
-          (a) => a.type === 'USE_WITH' && a.withInventoryItemCode === sourceCode
+          (a) => a.type === 'USE_WITH' && a.targetItemCode === sourceCode
         );
       }
 
@@ -443,6 +442,7 @@ export const GameplayStore = signalStore(
         setFeedbackMessage('Non sembra avere alcun effetto.');
       }
     };
+
     const dropOnInventoryTarget = (targetItemCode: string): void => {
       const drag = store.draggedItem();
       if (!drag.isDragging || !drag.item) return;
@@ -455,8 +455,8 @@ export const GameplayStore = signalStore(
       const targetItem = inventory.find((i) => i.code === targetItemCode);
 
       const action =
-        sourceItem?.actions?.find((a) => a.type === 'USE_WITH' && a.withInventoryItemCode === targetItemCode) ||
-        targetItem?.actions?.find((a) => a.type === 'USE_WITH' && a.withInventoryItemCode === sourceCode);
+        sourceItem?.actions?.find((a) => a.type === 'USE_WITH' && a.targetItemCode === targetItemCode) ||
+        targetItem?.actions?.find((a) => a.type === 'USE_WITH' && a.targetItemCode === sourceCode);
 
       if (action?.code) {
         executeAction({ actionCode: action.code, actionType: 'USE_WITH' });

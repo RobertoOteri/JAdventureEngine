@@ -3,32 +3,12 @@
     <div class="properties-header">
       <div class="header-title">
         <i class="bi bi-bounding-box-circles icon-header"></i>
-        <h2>Elementi ({{ store.itemsCount() }})</h2>
-      </div>
-      <div class="header-buttons">
-        <button
-          type="button"
-          class="btn-new-inventory"
-          (click)="startCreateStandaloneInventoryRequested.emit()"
-          title="Crea nuovo oggetto solo inventario (es. per combinazioni)"
-        >
-          <i class="bi bi-briefcase-fill"></i>
-          <span>+ Inv</span>
-        </button>
-        <button
-          type="button"
-          class="btn-new-hotspot"
-          (click)="startCreateRequested.emit()"
-          title="Crea nuovo hotspot nella scena"
-        >
-          <i class="bi bi-plus-lg"></i>
-          <span>Hotspot</span>
-        </button>
+        <h2>Hotspot ({{ store.currentScene()?.items?.length || 0 }})</h2>
       </div>
     </div>
 
     <div class="hotspots-list custom-scroll">
-      @for (item of store.combinedSceneList(); track item.code) {
+      @for (item of store.currentScene()?.items; track item.code) {
         <div
           class="hotspot-item-card"
           [class.active]="store.selectedItem()?.code === item.code"
@@ -40,87 +20,22 @@
               <div class="hotspot-item-code">
                 <span>#{{ item.code }}</span>
 
-                @if (item.id && item.imageUrl) {
-                  <span class="indicator-badge badge-item">item</span>
-                }
-
-                @if (item.linkedInventoryItem) {
-                  <span
-                    class="indicator-badge badge-inventory"
-                    (click)="toggleInventoryDropdown(item.code, $event)"
-                    title="Mostra / Nascondi dettagli inventario"
-                  >
-                    <i class="bi bi-briefcase-fill"></i>
-                    <span>inventory</span>
-                    <i
-                      class="bi"
-                      [class.bi-chevron-down]="expandedInventoryItemCode() !== item.code"
-                      [class.bi-chevron-up]="expandedInventoryItemCode() === item.code"
-                    ></i>
-                  </span>
-                }
-
-                @if (item.id && !item.initiallyVisible) {
-                  <span class="indicator-badge muted">nascosto</span>
-                }
+                <div class="row-tags">
+                  @if (hasPickUp(item)) {
+                    <span class="tag tag-inventory">INVENTORY</span>
+                  }
+                  @if (item.hotspot && item.hotspot.initiallyVisible === false) {
+                    <span class="tag tag-hidden">NASCOSTO</span>
+                  }
+                </div>
               </div>
             </div>
           </div>
-
-          @if (item.linkedInventoryItem && expandedInventoryItemCode() === item.code) {
-            <div class="inventory-accordion-panel" (click)="$event.stopPropagation()">
-              <div class="accordion-header-row">
-                <span class="accordion-tag">Dettagli Inventario</span>
-                <div class="accordion-actions">
-                  <button
-                    type="button"
-                    class="btn-accordion-action"
-                    (click)="editInventoryItemRequested.emit(item)"
-                    title="Modifica Oggetto Inventario"
-                  >
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn-accordion-action delete"
-                    (click)="deleteInventoryItemRequested.emit(item.code)"
-                    title="Rimuovi da Inventario"
-                  >
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="accordion-body-row">
-                @if (item.linkedInventoryItem.imageUrl) {
-                  <img
-                    [src]="resolveImageUrl(item.linkedInventoryItem.imageUrl)"
-                    alt="Icona Inventario"
-                    class="accordion-thumb"
-                  />
-                } @else if (item.imageUrl) {
-                  <img
-                    [src]="resolveImageUrl(item.imageUrl)"
-                    alt="Sprite Scena"
-                    class="accordion-thumb"
-                  />
-                } @else {
-                  <div class="accordion-thumb fallback-emoji">🎒</div>
-                }
-                <div class="accordion-texts">
-                  <strong class="accordion-item-name">{{ item.linkedInventoryItem.name }}</strong>
-                  <p class="accordion-item-desc">
-                    {{ item.linkedInventoryItem.description || 'Nessuna descrizione impostata.' }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          }
         </div>
       } @empty {
         <div class="hotspots-empty">
           <i class="bi bi-inbox icon-empty"></i>
-          <span>Nessun elemento in questa stanza</span>
+          <span>Nessun hotspot in questa stanza</span>
         </div>
       }
     </div>
@@ -133,22 +48,24 @@
       <div class="creation-box">
         <div class="creation-box-header">
           <span class="section-tag">
-            {{ editingItemCode() ? 'Modifica Hotspot' : 'Nuovo Hotspot' }}
+            {{ editingItemCode() ? 'Modifica Oggetto' : 'Nuovo Oggetto' }}
           </span>
           @if (draftPointsCount() > 0) {
             <span class="tag-points-count">{{ draftPointsCount() }} vertici</span>
+          } @else {
+            <span class="tag-points-count global-hint">Senza vertici = Globale</span>
           }
         </div>
 
         <div class="field-group">
-          <label for="hotspotNameInput">Nome Hotspot *</label>
+          <label for="hotspotNameInput">Nome Oggetto *</label>
           <input
             id="hotspotNameInput"
             type="text"
             class="studio-input"
             [value]="itemName()"
             (input)="onNameInput($event)"
-            placeholder="Es. Baule Rinforzato"
+            placeholder="Es. Baule Rinforzato o Chiave Dorata"
           />
         </div>
 
@@ -161,12 +78,24 @@
             [value]="itemCode()"
             (input)="onCodeInput($event)"
             [disabled]="!!editingItemCode()"
-            placeholder="Es. baule_rinforzato"
+            placeholder="Es. chiave_dorata"
           />
         </div>
 
+        <div class="field-group">
+          <label for="hotspotDescriptionInput">Descrizione</label>
+          <textarea
+            id="hotspotDescriptionInput"
+            class="studio-input studio-textarea"
+            [value]="itemDescription()"
+            (input)="onDescriptionInput($event)"
+            placeholder="Descrizione dell'oggetto..."
+            rows="2"
+          ></textarea>
+        </div>
+
         <div class="field-group file-field-group">
-          <label>Sprite nella Stanza (opzionale)</label>
+          <label>Sprite / Icona (opzionale)</label>
           <div class="file-picker-wrap">
             <input
               type="file"
@@ -178,38 +107,28 @@
             <label for="sceneSpriteInput" class="file-custom-btn highlight-picker">
               <i class="bi bi-image icon-file"></i>
               <span class="file-btn-text">
-                {{ sceneImageFile() ? sceneImageFile()?.name : (previewSpriteUrl() ? 'Cambia immagine sprite...' : 'Scegli sprite dal computer...') }}
+                {{ sceneImageFile() ? sceneImageFile()?.name : (previewSpriteUrl() ? 'Cambia immagine...' : 'Scegli immagine dal computer...') }}
               </span>
             </label>
           </div>
         </div>
 
-        <div class="toggle-card">
-          <label class="toggle-label">
-            <input
-              type="checkbox"
-              class="toggle-checkbox"
-              [checked]="isCollectible()"
-              (change)="onCollectibleCheckboxChange($event)"
-            />
-            <span class="toggle-text">È un oggetto raccoglibile?</span>
-          </label>
-        </div>
-
-        <div class="toggle-card">
-          <label class="toggle-label">
-            <input
-              type="checkbox"
-              class="toggle-checkbox"
-              [checked]="isInitiallyVisible()"
-              (change)="onVisibleToggle($event)"
-            />
-            <span class="toggle-text">
-              <i class="bi" [class.bi-eye]="isInitiallyVisible()" [class.bi-eye-slash]="!isInitiallyVisible()"></i>
-              <span>{{ isInitiallyVisible() ? 'Visibile all\'inizio' : 'Nascosto all\'inizio' }}</span>
-            </span>
-          </label>
-        </div>
+        @if (draftPointsCount() > 0) {
+          <div class="toggle-card">
+            <label class="toggle-label">
+              <input
+                type="checkbox"
+                class="toggle-checkbox"
+                [checked]="isInitiallyVisible()"
+                (change)="onVisibleToggle($event)"
+              />
+              <span class="toggle-text">
+                <i class="bi" [class.bi-eye]="isInitiallyVisible()" [class.bi-eye-slash]="!isInitiallyVisible()"></i>
+                <span>{{ isInitiallyVisible() ? 'Visibile all\'inizio' : 'Nascosto all\'inizio' }}</span>
+              </span>
+            </label>
+          </div>
+        }
 
         <div class="actions-row">
           <button type="button" class="btn-save-draft" (click)="saveDraftRequested.emit()">
@@ -224,167 +143,96 @@
     } @else {
       @if (store.selectedItem(); as selected) {
         <div class="selected-details">
-          <span class="section-tag">
-            {{ selected.id ? 'Hotspot selezionato' : 'Oggetto Inventario selezionato' }}
-          </span>
+          <div class="selected-header-line">
+            <span class="section-tag">Inspector Oggetto</span>
+            <div class="row-tags">
+              @if (!selected.hotspot) {
+                <span class="tag tag-global">GLOBAL</span>
+              }
+              @if (hasPickUp(selected)) {
+                <span class="tag tag-inventory">INVENTORY</span>
+              }
+              @if (selected.hotspot && selected.hotspot.initiallyVisible === false) {
+                <span class="tag tag-hidden">NASCOSTO</span>
+              }
+            </div>
+          </div>
 
           <div class="hotspot-summary">
             <div class="summary-thumb">
               @if (selected.imageUrl) {
-                <img [src]="resolveImageUrl(selected.imageUrl)" [alt]="selected.name" />
-              } @else if (selected.linkedInventoryItem?.imageUrl) {
-                <img [src]="resolveImageUrl(selected.linkedInventoryItem!.imageUrl)" [alt]="selected.name" />
+                <img [src]="selected.imageUrl" [alt]="selected.name" />
               } @else {
-                <i class="bi" [ngClass]="selected.id ? 'bi-bounding-box' : 'bi-briefcase-fill'"></i>
+                <i class="bi" [class.bi-key]="!selected.hotspot" [class.bi-bounding-box]="!!selected.hotspot"></i>
               }
             </div>
 
             <div class="summary-texts">
               <strong class="summary-name">{{ selected.name }}</strong>
               <span class="summary-code">#{{ selected.code }}</span>
-              <div class="summary-badges">
-                @if (selected.id && selected.imageUrl) {
-                  <span class="indicator-badge badge-item">item</span>
-                }
-                @if (selected.linkedInventoryItem) {
-                  <span class="indicator-badge badge-inventory static">
-                    <i class="bi bi-briefcase-fill"></i>
-                    <span>{{ selected.id ? 'raccoglibile' : 'inventory' }}</span>
-                  </span>
-                }
-                @if (selected.id && !selected.initiallyVisible) {
-                  <span class="indicator-badge muted">nascosto</span>
-                }
-              </div>
             </div>
 
             <div class="summary-actions">
-              @if (selected.id) {
-                <button
-                  type="button"
-                  class="summary-btn"
-                  (click)="editItemRequested.emit(selected)"
-                  title="Modifica hotspot"
-                >
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button
-                  type="button"
-                  class="summary-btn danger"
-                  (click)="deleteItemRequested.emit(selected.code)"
-                  title="Elimina hotspot"
-                >
-                  <i class="bi bi-trash3"></i>
-                </button>
-              } @else {
-                <button
-                  type="button"
-                  class="summary-btn"
-                  (click)="editInventoryItemRequested.emit(selected)"
-                  title="Modifica oggetto inventario"
-                >
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button
-                  type="button"
-                  class="summary-btn danger"
-                  (click)="deleteInventoryItemRequested.emit(selected.code)"
-                  title="Elimina oggetto inventario"
-                >
-                  <i class="bi bi-trash3"></i>
-                </button>
-              }
+              <button
+                type="button"
+                class="summary-btn"
+                (click)="editItemRequested.emit(selected)"
+                title="Modifica oggetto"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                type="button"
+                class="summary-btn danger"
+                (click)="deleteItemRequested.emit(selected.code)"
+                title="Elimina oggetto"
+              >
+                <i class="bi bi-trash3"></i>
+              </button>
             </div>
           </div>
 
-          @if (selected.id) {
-            <section class="action-block scene-block">
-              <header class="action-block-header">
-                <div class="block-icon"><i class="bi bi-bounding-box"></i></div>
-                <div class="block-titles">
-                  <h3>Azioni sulla scena</h3>
-                  <p>Cosa può fare il giocatore con questo hotspot, nella stanza.</p>
+          <section class="action-block scene-block">
+            <header class="action-block-header">
+              <div class="block-icon"><i class="bi bi-lightning-charge"></i></div>
+              <div class="block-titles">
+                <h3>Azioni dell'Oggetto</h3>
+                <p>Cosa può fare il giocatore interagendo con questo elemento.</p>
+              </div>
+              <span class="block-count">{{ selected.actions?.length || 0 }}</span>
+            </header>
+
+            <div class="action-block-body">
+              @for (action of selected.actions; track action.id ?? $index) {
+                <ng-container
+                  *ngTemplateOutlet="actionRow; context: { $implicit: action }"
+                />
+              } @empty {
+                <div class="action-empty">
+                  <i class="bi bi-info-circle"></i>
+                  <span>Nessuna azione impostata.</span>
                 </div>
-                <span class="block-count">{{ selected.actions?.length || 0 }}</span>
-              </header>
-
-              <div class="action-block-body">
-                @for (action of selected.actions; track action.id ?? $index) {
-                  <ng-container
-                    *ngTemplateOutlet="actionRow; context: { $implicit: action, kind: 'scene' }"
-                  />
-                } @empty {
-                  <div class="action-empty">
-                    <i class="bi bi-info-circle"></i>
-                    <span>Nessuna azione sulla scena.</span>
-                  </div>
-                }
-              </div>
-
-              <div class="action-block-footer">
-                <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
-                  <i class="bi bi-plus-lg"></i>
-                  <span>Aggiungi azione sulla scena</span>
-                </button>
-              </div>
-            </section>
-          }
-
-          @if (selected.linkedInventoryItem; as invItem) {
-            <section class="action-block inventory-block">
-              <header class="action-block-header">
-                <div class="block-icon"><i class="bi bi-backpack4-fill"></i></div>
-                <div class="block-titles">
-                  <h3>Azioni nello zaino</h3>
-                  <p>Cosa può fare il giocatore con «{{ invItem.name }}» nello zaino.</p>
-                </div>
-                <span class="block-count">{{ invItem.actions?.length || 0 }}</span>
-              </header>
-
-              <div class="action-block-body">
-                @for (invAction of invItem.actions; track invAction.id ?? $index) {
-                  <ng-container
-                    *ngTemplateOutlet="actionRow; context: { $implicit: invAction, kind: 'inventory' }"
-                  />
-                } @empty {
-                  <div class="action-empty">
-                    <i class="bi bi-info-circle"></i>
-                    <span>Nessuna azione nello zaino (es. Usa con un altro oggetto).</span>
-                  </div>
-                }
-              </div>
-
-              <div class="action-block-footer">
-                <button
-                  type="button"
-                  class="btn-add-action"
-                  (click)="openAddInventoryActionRequested.emit()"
-                >
-                  <i class="bi bi-plus-lg"></i>
-                  <span>Aggiungi azione nello zaino</span>
-                </button>
-              </div>
-            </section>
-          } @else {
-            <div class="inventory-hint">
-              <i class="bi bi-backpack4"></i>
-              <p>
-                Questo hotspot <strong>non è raccoglibile</strong>, quindi non ha azioni nello zaino.
-                Premi <strong>Modifica</strong> e attiva «È un oggetto raccoglibile» per aggiungerle.
-              </p>
+              }
             </div>
-          }
+
+            <div class="action-block-footer">
+              <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Aggiungi azione</span>
+              </button>
+            </div>
+          </section>
         </div>
       } @else {
         <div class="properties-empty">
           <i class="bi bi-bounding-box empty-icon"></i>
-          <p>Seleziona un elemento o clicca su <strong>+ Hotspot</strong> / <strong>+ Inv</strong> per crearne uno.</p>
+          <p>Seleziona un oggetto dalla colonna di sinistra o creane uno nuovo con il tasto <strong>+</strong>.</p>
         </div>
       }
     }
   </div>
 
-  <ng-template #actionRow let-action let-kind="kind">
+  <ng-template #actionRow let-action>
     <div class="action-row">
       <div class="action-glyph">
         <i class="bi" [ngClass]="actionIcon(action.type)"></i>
@@ -393,10 +241,10 @@
       <div class="action-main">
         <div class="action-title-line">
           <span class="action-name">{{ actionLabel(action.type) }}</span>
-          @if (action.type === 'USE_WITH' && action.withInventoryItemCode) {
-            <span class="with-chip" [title]="'#' + action.withInventoryItemCode">
+          @if (action.type === 'USE_WITH' && action.targetItemCode) {
+            <span class="with-chip" [title]="'#' + action.targetItemCode">
               <i class="bi bi-link-45deg"></i>
-              {{ inventoryItemName(action.withInventoryItemCode) }}
+              {{ action.targetItemCode }}
             </span>
           }
         </div>
@@ -409,7 +257,7 @@
         <button
           type="button"
           class="action-btn"
-          (click)="onEditAction(action, kind)"
+          (click)="onEditAction(action)"
           title="Modifica azione"
         >
           <i class="bi bi-pencil"></i>

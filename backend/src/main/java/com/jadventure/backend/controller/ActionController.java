@@ -46,9 +46,4 @@ public class ActionController {
         actionService.deleteActionById(actionId);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/inventory-item/{inventoryItemId}")
-    public ResponseEntity<List<ActionDto>> getActionsByInventoryItemId(@PathVariable Long inventoryItemId) {
-        return ResponseEntity.ok(actionService.getActionsByInventoryItemId(inventoryItemId));
-    }
 }

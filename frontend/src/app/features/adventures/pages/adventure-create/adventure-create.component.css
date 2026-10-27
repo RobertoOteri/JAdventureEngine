@@ -20,7 +20,6 @@
   box-sizing: border-box;
 }
 
-/* TOPBAR */
 .workspace-topbar {
   height: 56px;
   background: #0f1117;
@@ -117,7 +116,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* BODY */
 .workspace-body {
   flex: 1;
   padding: 2rem 2.5rem;
@@ -140,7 +138,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* STUDIO 2 COLONNE */
 .studio-layout {
   flex: 1;
   display: grid;
@@ -249,9 +246,6 @@ label {
   height: 100%;
 }
 
-/* ========================================================= */
-/* --- MODAL WRAPPER (QUANDO isModal() === true) --- */
-/* ========================================================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;

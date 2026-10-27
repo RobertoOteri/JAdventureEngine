@@ -55,7 +55,7 @@ public class GamePlayService {
         Set<String> visibleItems = (initialScene.getItems() == null)
                 ? Collections.emptySet()
                 : initialScene.getItems().stream()
-                .filter(ItemDto::isInitiallyVisible)
+                .filter(item -> item.getHotspot() != null && Boolean.TRUE.equals(item.getHotspot().getInitiallyVisible()))
                 .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 

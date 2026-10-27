@@ -98,11 +98,6 @@ public class ActionService {
     }
 
     @Transactional(readOnly = true)
-    public List<ActionDto> getActionsByInventoryItemId(Long inventoryItemId) {
-        return actionMapper.toDtoList(actionRepository.findAllByInventoryItemId(inventoryItemId));
-    }
-
-    @Transactional(readOnly = true)
     public ActionDto getActionById(Long actionId) {
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
@@ -114,11 +109,7 @@ public class ActionService {
         Action action = actionRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + dto.getId()));
 
-        if (action.getItem() != null) {
-            authService.validateOwnership(action.getItem().getScene().getGraphicAdventure().getAuthor().getUsername());
-        } else if (action.getInventoryItem() != null) {
-            authService.validateOwnership(action.getInventoryItem().getGraphicAdventure().getAuthor().getUsername());
-        }
+        authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
 
         actionMapper.updateEntityFromDto(dto, action);
 
@@ -130,13 +121,8 @@ public class ActionService {
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
 
-        if (action.getItem() != null) {
-            authService.validateOwnership(action.getItem().getScene().getGraphicAdventure().getAuthor().getUsername());
-            action.getItem().getActions().remove(action);
-        } else if (action.getInventoryItem() != null) {
-            authService.validateOwnership(action.getInventoryItem().getGraphicAdventure().getAuthor().getUsername());
-            action.getInventoryItem().getActions().remove(action);
-        }
+        authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
+        action.getItem().getActions().remove(action);
 
         actionRepository.delete(action);
     }

@@ -23,8 +23,8 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getItems(@RequestParam Long sceneId) {
-        return ResponseEntity.ok(itemService.getItemsBySceneId(sceneId));
+    public ResponseEntity<List<ItemDto>> getAdventureItems(@RequestParam String adventureCode) {
+        return ResponseEntity.ok(itemService.getAdventureItems(adventureCode));
     }
 
     @GetMapping("/{itemId}")
@@ -35,10 +35,8 @@ public class ItemController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemDto> updateItem(
             @Valid @RequestPart("data") ItemDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "inventoryImage", required = false) MultipartFile inventoryImage) {
-
-        return ResponseEntity.ok(itemService.updateItem(dto, image, inventoryImage));
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        return ResponseEntity.ok(itemService.updateItem(dto, image));
     }
 
     @DeleteMapping("/{itemId}")
@@ -51,7 +49,6 @@ public class ItemController {
     public ResponseEntity<ActionDto> addAction(
             @PathVariable Long itemId,
             @Valid @RequestBody ActionDto actionDto) {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemService.addAction(itemId, actionDto));
     }

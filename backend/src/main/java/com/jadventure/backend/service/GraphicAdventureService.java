@@ -1,12 +1,14 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GraphicAdventureMapper;
+import com.jadventure.backend.mapper.ItemMapper;
 import com.jadventure.backend.mapper.SceneMapper;
 import com.jadventure.backend.model.GraphicAdventure;
+import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.Scene;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
@@ -24,21 +26,24 @@ public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
     private final GraphicAdventureMapper graphicAdventureMapper;
-    private final InventoryItemService inventoryItemService;
     private final SceneMapper sceneMapper;
+    private final ItemMapper itemMapper;
+    private final ItemService itemService;
     private final AuthService authService;
     private final FileStorageUtil fileStorageUtil;
 
     public GraphicAdventureService(GraphicAdventureRepository graphicAdventureRepository,
                                    GraphicAdventureMapper graphicAdventureMapper,
-                                   InventoryItemService inventoryItemService,
                                    SceneMapper sceneMapper,
+                                   ItemMapper itemMapper,
+                                   ItemService itemService,
                                    AuthService authService,
                                    FileStorageUtil fileStorageUtil) {
         this.graphicAdventureRepository = graphicAdventureRepository;
         this.graphicAdventureMapper = graphicAdventureMapper;
-        this.inventoryItemService = inventoryItemService;
         this.sceneMapper = sceneMapper;
+        this.itemMapper = itemMapper;
+        this.itemService = itemService;
         this.authService = authService;
         this.fileStorageUtil = fileStorageUtil;
     }
@@ -138,9 +143,29 @@ public class GraphicAdventureService {
             adventure.setInitialSceneCode(scene.getCode());
         }
 
-        graphicAdventureRepository.save(adventure);
+        graphicAdventureRepository.saveAndFlush(adventure);
 
         return sceneMapper.toDto(scene);
+    }
+
+    @Transactional
+    public ItemDto addItem(Long adventureId, ItemDto itemDto, MultipartFile image) {
+        GraphicAdventure adventure = findAdventureById(adventureId);
+        authService.validateOwnership(adventure.getAuthor().getUsername());
+
+        Item item = itemMapper.toEntity(itemDto);
+        item.setHotspot(null);
+        item.setGraphicAdventure(adventure);
+
+        if (image != null && !image.isEmpty()) {
+            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), itemDto.getCode());
+            item.setImageUrl(fileStorageUtil.storeFile(path, image));
+        }
+
+        adventure.getItems().add(item);
+        graphicAdventureRepository.saveAndFlush(adventure);
+
+        return itemMapper.toDto(item);
     }
 
     private GraphicAdventure findAdventureById(Long id) {
@@ -179,14 +204,5 @@ public class GraphicAdventureService {
         return normalized.toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
-    }
-
-    public InventoryItemDto addInventoryItem(Long adventureId, InventoryItemDto dto, MultipartFile image) {
-        GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId));
-
-        authService.validateOwnership(adventure.getAuthor().getUsername());
-
-        return inventoryItemService.createInventoryItem(adventure, dto, image);
     }
 }

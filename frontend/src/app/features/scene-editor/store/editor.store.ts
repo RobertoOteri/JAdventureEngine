@@ -2,18 +2,17 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { forkJoin, Observable, of, pipe, switchMap, tap } from 'rxjs';
-import { Action, GraphicAdventureDto, InventoryItem, Item, Scene } from '../../../core/models';
+import { Action, GraphicAdventureDto, Item, Scene } from '../../../core/models';
 import { AdventureService } from '../../../core/services/adventure.service';
 import { SceneService } from '../../../core/services/scene.service';
 import { ItemService } from '../../../core/services/item.service';
 import { ActionService } from '../../../core/services/action.service';
-import { InventoryItemService } from '../../../core/services/inventory-item.service';
 
 export interface EditorState {
   adventure: GraphicAdventureDto | null;
   scenes: Scene[];
-  inventoryItems: InventoryItem[];
   currentScene: Scene | null;
+  adventureItems: Item[];
   selectedItem: Item | null;
   isLoading: boolean;
   isSaving: boolean;
@@ -23,8 +22,8 @@ export interface EditorState {
 const initialState: EditorState = {
   adventure: null,
   scenes: [],
-  inventoryItems: [],
   currentScene: null,
+  adventureItems: [],
   selectedItem: null,
   isLoading: false,
   isSaving: false,
@@ -36,39 +35,23 @@ export const EditorStore = signalStore(
   withState(initialState),
 
   withComputed((store) => {
-    const standaloneInventoryAsItems = computed<Item[]>(() => {
-      const linkedCodes = new Set<string>();
-      for (const scene of store.scenes()) {
-        for (const item of scene.items ?? []) {
-          if (item.linkedInventoryItem?.code) {
-            linkedCodes.add(item.linkedInventoryItem.code);
-          }
-        }
-      }
-
-      return store.inventoryItems()
-        .filter((inv) => !linkedCodes.has(inv.code))
-        .map((inv) => ({
-          id: undefined, // Nessun ID di Item di scena: identifica che è un InventoryItem puro
-          code: inv.code,
-          name: inv.name,
-          imageUrl: '',
-          initiallyVisible: true,
-          actions: [],
-          linkedInventoryItem: inv
-        }));
-    });
-
     const combinedSceneList = computed<Item[]>(() => {
       const sceneItems = store.currentScene()?.items ?? [];
-      return [...sceneItems, ...standaloneInventoryAsItems()];
+      const allSceneItems = (store.scenes() ?? []).flatMap((s) => s.items ?? []);
+      const advItems = store.adventureItems() ?? [];
+
+      const map = new Map<string, Item>();
+      [...advItems, ...allSceneItems, ...sceneItems].forEach((item) => {
+        const key = item.id ? String(item.id) : item.code;
+        map.set(key, item);
+      });
+      return Array.from(map.values());
     });
 
     return {
       adventureTitle: computed(() => store.adventure()?.title ?? ''),
-      standaloneInventoryAsItems,
       combinedSceneList,
-      itemsCount: computed(() => combinedSceneList().length),
+      itemsCount: computed(() => (store.currentScene()?.items ?? []).length),
       backgroundUrl: computed(() => store.currentScene()?.backgroundImageUrl ?? '')
     };
   }),
@@ -78,8 +61,7 @@ export const EditorStore = signalStore(
     adventureService = inject(AdventureService),
     sceneService = inject(SceneService),
     itemService = inject(ItemService),
-    actionService = inject(ActionService),
-    inventoryItemService = inject(InventoryItemService)
+    actionService = inject(ActionService)
   ) => {
 
     const resetState = (): void => {
@@ -91,58 +73,65 @@ export const EditorStore = signalStore(
       items: scene.items ?? []
     });
 
-    const updateItemInState = (updatedItem: Item): void => {
-      if (!updatedItem.id && updatedItem.linkedInventoryItem) {
-        const updatedInv = updatedItem.linkedInventoryItem;
-        const invList = store.inventoryItems();
-        const exists = invList.some((i) => i.id === updatedInv.id || i.code === updatedInv.code);
-        const nextInvList = exists
-          ? invList.map((i) => (i.id === updatedInv.id || i.code === updatedInv.code ? updatedInv : i))
-          : [...invList, updatedInv];
+    const matchesItem = (a: Item, b: Item): boolean =>
+      Boolean((a.id && b.id && a.id === b.id) || a.code === b.code);
 
-        patchState(store, {
-          inventoryItems: nextInvList,
-          selectedItem: {
-            ...updatedItem,
-            name: updatedInv.name,
-            code: updatedInv.code,
-            linkedInventoryItem: updatedInv
+    const updateItemInState = (updatedItem: Item): void => {
+      let foundInScenes = false;
+
+      const updatedScenes = store.scenes().map((scene) => {
+        const items = scene.items ?? [];
+        const idx = items.findIndex((i) => matchesItem(i, updatedItem));
+        if (idx >= 0) {
+          foundInScenes = true;
+          const nextItems = items.map((it, i) => (i === idx ? updatedItem : it));
+          return { ...scene, items: nextItems };
+        }
+        return scene;
+      });
+
+      const current = store.currentScene();
+      let updatedCurrentScene = current
+        ? updatedScenes.find((s) => s.id === current.id || s.code === current.code) ?? current
+        : null;
+
+      if (!foundInScenes && updatedItem.hotspot && updatedCurrentScene) {
+        const nextItems = [...(updatedCurrentScene.items ?? []), updatedItem];
+        updatedCurrentScene = { ...updatedCurrentScene, items: nextItems };
+        for (let i = 0; i < updatedScenes.length; i++) {
+          if (updatedScenes[i].id === updatedCurrentScene.id || updatedScenes[i].code === updatedCurrentScene.code) {
+            updatedScenes[i] = updatedCurrentScene;
           }
-        });
-        return;
+        }
       }
 
-      const scene = store.currentScene();
-      if (!scene) return;
-
-      const items = scene.items ?? [];
-      const index = items.findIndex((i) => (updatedItem.id && i.id === updatedItem.id) || i.code === updatedItem.code);
-      const updatedItems = index >= 0
-        ? items.map((i, idx) => (idx === index ? updatedItem : i))
-        : [...items, updatedItem];
-
-      const updatedCurrentScene: Scene = { ...scene, items: updatedItems };
-
-      const updatedScenes = store.scenes().map((s) =>
-        s.id === updatedCurrentScene.id || s.code === updatedCurrentScene.code ? updatedCurrentScene : s
-      );
-
-      // Sincronizza anche nella lista globale inventoryItems se ha un linkedInventoryItem
-      let nextInvList = store.inventoryItems();
-      if (updatedItem.linkedInventoryItem) {
-        const inv = updatedItem.linkedInventoryItem;
-        const invIdx = nextInvList.findIndex((i) => i.id === inv.id || i.code === inv.code);
-        nextInvList = invIdx >= 0
-          ? nextInvList.map((i, idx) => (idx === invIdx ? inv : i))
-          : [...nextInvList, inv];
+      const advItems = store.adventureItems() ?? [];
+      const advIdx = advItems.findIndex((i) => matchesItem(i, updatedItem));
+      let updatedAdvItems = advItems;
+      if (advIdx >= 0) {
+        updatedAdvItems = advItems.map((it, i) => (i === advIdx ? updatedItem : it));
+      } else if (!updatedItem.hotspot) {
+        updatedAdvItems = [...advItems, updatedItem];
       }
 
       patchState(store, {
         scenes: updatedScenes,
-        inventoryItems: nextInvList,
         currentScene: updatedCurrentScene,
+        adventureItems: updatedAdvItems,
         selectedItem: updatedItem
       });
+    };
+
+    const findItemEverywhere = (codeOrId: string | number): Item | undefined => {
+      for (const s of store.scenes()) {
+        for (const it of s.items ?? []) {
+          if (it.code === codeOrId || it.id === codeOrId) return it;
+        }
+      }
+      for (const it of store.adventureItems()) {
+        if (it.code === codeOrId || it.id === codeOrId) return it;
+      }
+      return undefined;
     };
 
     const loadAdventureAndScenes = rxMethod<{
@@ -158,8 +147,8 @@ export const EditorStore = signalStore(
             feedbackMessage: null,
             adventure: null,
             scenes: [],
-            inventoryItems: [],
             currentScene: null,
+            adventureItems: [],
             selectedItem: null
           })
         ),
@@ -191,11 +180,10 @@ export const EditorStore = signalStore(
               if (!adventure) return of(null);
 
               return forkJoin({
-                rawScenes: sceneService.getScenes(adventure.code),
-                invItems: inventoryItemService.getAdventureInventoryItems(adventure.code)
+                rawScenes: sceneService.getScenes(adventure.code)
               }).pipe(
                 tap({
-                  next: ({ rawScenes, invItems }) => {
+                  next: ({ rawScenes }) => {
                     const scenes = (rawScenes ?? []).map(normalizeScene);
                     let active: Scene | null = null;
 
@@ -210,14 +198,21 @@ export const EditorStore = signalStore(
                     patchState(store, {
                       adventure,
                       scenes,
-                      inventoryItems: invItems ?? [],
                       currentScene: active,
                       selectedItem: null,
                       isLoading: false
                     });
+
+                    const currentAdvCode = adventure.code;
+                    if (currentAdvCode) {
+                      itemService.getItemsByAdventure(currentAdvCode).subscribe({
+                        next: (allItems) => patchState(store, { adventureItems: allItems }),
+                        error: (err) => console.error('Errore caricamento oggetti avventura:', err)
+                      });
+                    }
                   },
                   error: (err: any) => {
-                    console.error('Errore caricamento scene/inventario:', err);
+                    console.error('Errore caricamento scene:', err);
                     patchState(store, {
                       isLoading: false,
                       feedbackMessage: 'Impossibile caricare i dati delle scene.'
@@ -243,37 +238,18 @@ export const EditorStore = signalStore(
     return {
       resetState,
       loadAdventureAndScenes,
+      findItemEverywhere,
 
-      createScene(formData: FormData): Observable<Scene> {
-        const adventureId = store.adventure()?.id;
-        if (!adventureId) {
-          throw new Error('Nessuna avventura caricata.');
-        }
+      loadInventoryCatalog(): void {
+        const advCode = store.adventure()?.code;
+        if (!advCode) return;
 
-        patchState(store, { isSaving: true, feedbackMessage: null });
-
-        return adventureService.addScene(adventureId, formData).pipe(
-          tap({
-            next: (createdScene) => {
-              const normalized = normalizeScene(createdScene);
-              const updatedScenes = [...store.scenes(), normalized];
-              patchState(store, {
-                scenes: updatedScenes,
-                currentScene: normalized,
-                selectedItem: null,
-                isSaving: false,
-                feedbackMessage: `Scena "${normalized.name}" creata con successo!`
-              });
-            },
-            error: (err: any) => {
-              console.error('Errore creazione scena:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: err?.error?.message || 'Errore durante la creazione della scena.'
-              });
-            }
-          })
-        );
+        itemService.getItemsByAdventure(advCode).subscribe({
+          next: (allItems) => {
+            patchState(store, { adventureItems: allItems });
+          },
+          error: (err) => console.error('Errore caricamento oggetti:', err)
+        });
       },
 
       deleteScene(sceneId: number): Observable<void> {
@@ -356,6 +332,36 @@ export const EditorStore = signalStore(
         );
       },
 
+      saveInventoryItem(formData: FormData): Observable<Item> {
+        const adventureId = store.adventure()?.id;
+        if (!adventureId) {
+          throw new Error('Nessuna avventura selezionata.');
+        }
+
+        patchState(store, { isSaving: true, feedbackMessage: null });
+
+        return adventureService.addItem(adventureId, formData).pipe(
+          tap({
+            next: (savedItem) => {
+              const currentList = store.adventureItems() ?? [];
+              patchState(store, {
+                adventureItems: [...currentList, savedItem],
+                selectedItem: savedItem,
+                isSaving: false,
+                feedbackMessage: `Oggetto globale "${savedItem.name}" salvato con successo!`
+              });
+            },
+            error: (err: any) => {
+              console.error('Errore salvataggio oggetto inventario:', err);
+              patchState(store, {
+                isSaving: false,
+                feedbackMessage: err?.error?.message || "Errore durante il salvataggio dell'oggetto."
+              });
+            }
+          })
+        );
+      },
+
       updateItem(formData: FormData): Observable<Item> {
         patchState(store, { isSaving: true, feedbackMessage: null });
 
@@ -385,22 +391,25 @@ export const EditorStore = signalStore(
         return itemService.deleteItem(itemId).pipe(
           tap({
             next: () => {
+              const updatedScenes = store.scenes().map((s) => ({
+                ...s,
+                items: (s.items ?? []).filter((i) => i.id !== itemId)
+              }));
+
               const current = store.currentScene();
-              if (current) {
-                const remaining = (current.items ?? []).filter((i) => i.id !== itemId);
-                const updatedCurrentScene = { ...current, items: remaining };
+              const updatedCurrentScene = current
+                ? updatedScenes.find((s) => s.id === current.id || s.code === current.code) ?? null
+                : null;
 
-                const updatedScenes = store.scenes().map((s) =>
-                  s.id === updatedCurrentScene.id ? updatedCurrentScene : s
-                );
+              const updatedAdventureItems = store.adventureItems().filter((i) => i.id !== itemId);
 
-                patchState(store, {
-                  scenes: updatedScenes,
-                  currentScene: updatedCurrentScene,
-                  selectedItem: store.selectedItem()?.id === itemId ? null : store.selectedItem(),
-                  isSaving: false
-                });
-              }
+              patchState(store, {
+                scenes: updatedScenes,
+                currentScene: updatedCurrentScene,
+                adventureItems: updatedAdventureItems,
+                selectedItem: store.selectedItem()?.id === itemId ? null : store.selectedItem(),
+                isSaving: false
+              });
             },
             error: (err: any) => {
               console.error('Errore eliminazione item:', err);
@@ -410,164 +419,27 @@ export const EditorStore = signalStore(
         );
       },
 
-      createStandaloneInventoryItem(formData: FormData): Observable<InventoryItem> {
-        const adventureId = store.adventure()?.id;
-        if (!adventureId) {
-          throw new Error('Nessuna avventura caricata.');
-        }
-
-        patchState(store, { isSaving: true, feedbackMessage: null });
-
-        return adventureService.addInventoryItem(adventureId, formData).pipe(
-          tap({
-            next: (createdInv) => {
-              const nextInvList = [...store.inventoryItems(), createdInv];
-              const virtualItem: Item = {
-                id: undefined,
-                code: createdInv.code,
-                name: createdInv.name,
-                imageUrl: '',
-                initiallyVisible: true,
-                actions: [],
-                linkedInventoryItem: createdInv
-              };
-
-              patchState(store, {
-                inventoryItems: nextInvList,
-                selectedItem: virtualItem,
-                isSaving: false,
-                feedbackMessage: `Oggetto inventario "${createdInv.name}" creato!`
-              });
-            },
-            error: (err: any) => {
-              console.error('Errore creazione inventory item:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: err?.error?.message || 'Errore creazione oggetto inventario.'
-              });
-            }
-          })
-        );
-      },
-
-      updateInventoryItem(formData: FormData): Observable<InventoryItem> {
-        patchState(store, { isSaving: true, feedbackMessage: null });
-
-        return inventoryItemService.updateInventoryItem(formData).pipe(
-          tap({
-            next: (updatedInv) => {
-              const nextInvList = store.inventoryItems().map((i) =>
-                i.id === updatedInv.id ? updatedInv : i
-              );
-
-              const current = store.currentScene();
-              let updatedScenes = store.scenes();
-              let updatedCurrentScene = current;
-
-              if (current) {
-                const updatedItems = (current.items ?? []).map((it) =>
-                  it.linkedInventoryItem?.id === updatedInv.id
-                    ? { ...it, linkedInventoryItem: updatedInv }
-                    : it
-                );
-                updatedCurrentScene = { ...current, items: updatedItems };
-                updatedScenes = store.scenes().map((s) =>
-                  s.id === updatedCurrentScene!.id ? updatedCurrentScene! : s
-                );
-              }
-
-              const selected = store.selectedItem();
-              const nextSelected = (selected && selected.linkedInventoryItem?.id === updatedInv.id)
-                ? {
-                  ...selected,
-                  name: selected.id ? selected.name : updatedInv.name,
-                  linkedInventoryItem: updatedInv
-                }
-                : selected;
-
-              patchState(store, {
-                inventoryItems: nextInvList,
-                scenes: updatedScenes,
-                currentScene: updatedCurrentScene,
-                selectedItem: nextSelected,
-                isSaving: false,
-                feedbackMessage: 'Oggetto inventario aggiornato!'
-              });
-            },
-            error: (err: any) => {
-              console.error('Errore aggiornamento inventory item:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: err?.error?.message || 'Errore aggiornamento inventario.'
-              });
-            }
-          })
-        );
-      },
-
-      deleteInventoryItem(inventoryItemId: number): Observable<void> {
-        patchState(store, { isSaving: true });
-
-        return inventoryItemService.deleteInventoryItem(inventoryItemId).pipe(
-          tap({
-            next: () => {
-              const nextInvList = store.inventoryItems().filter((i) => i.id !== inventoryItemId);
-              const current = store.currentScene();
-              let updatedScenes = store.scenes();
-              let updatedCurrentScene = current;
-
-              if (current) {
-                const updatedItems = (current.items ?? []).map((it) =>
-                  it.linkedInventoryItem?.id === inventoryItemId
-                    ? { ...it, linkedInventoryItem: undefined }
-                    : it
-                );
-                updatedCurrentScene = { ...current, items: updatedItems };
-                updatedScenes = store.scenes().map((s) =>
-                  s.id === updatedCurrentScene!.id ? updatedCurrentScene! : s
-                );
-              }
-
-              const selected = store.selectedItem();
-              const isStandaloneDeleted = !selected?.id && selected?.linkedInventoryItem?.id === inventoryItemId;
-
-              patchState(store, {
-                inventoryItems: nextInvList,
-                scenes: updatedScenes,
-                currentScene: updatedCurrentScene,
-                selectedItem: isStandaloneDeleted
-                  ? null
-                  : selected?.linkedInventoryItem?.id === inventoryItemId
-                    ? { ...selected, linkedInventoryItem: undefined }
-                    : selected,
-                isSaving: false,
-                feedbackMessage: "Oggetto rimosso dall'inventario."
-              });
-            },
-            error: (err: any) => {
-              console.error('Errore eliminazione inventory item:', err);
-              patchState(store, { isSaving: false });
-            }
-          })
-        );
-      },
-
       addAction(action: Action): Observable<Action> {
         const currentItem = store.selectedItem();
-        if (!currentItem || !currentItem.id) {
-          throw new Error('Nessun item di scena valido selezionato');
+        const itemId = currentItem?.id ?? (currentItem?.code ? findItemEverywhere(currentItem.code)?.id : undefined);
+
+        if (!itemId) {
+          throw new Error("Nessun item valido selezionato o l'elemento non è ancora stato salvato sul database.");
         }
 
         patchState(store, { isSaving: true });
 
-        return itemService.addAction(currentItem.id, action).pipe(
+        return itemService.addAction(itemId, action).pipe(
           tap({
             next: (savedAction) => {
-              const updatedActions = [...(currentItem.actions ?? []), savedAction];
-              updateItemInState({ ...currentItem, actions: updatedActions });
+              const itemToUpdate = currentItem ?? findItemEverywhere(itemId);
+              if (itemToUpdate) {
+                const updatedActions = [...(itemToUpdate.actions ?? []), savedAction];
+                updateItemInState({ ...itemToUpdate, actions: updatedActions });
+              }
               patchState(store, {
                 isSaving: false,
-                feedbackMessage: `Azione "${savedAction.type}" aggiunta all'hotspot!`
+                feedbackMessage: `Azione "${savedAction.type}" aggiunta!`
               });
             },
             error: (err: any) => {
@@ -575,37 +447,6 @@ export const EditorStore = signalStore(
               patchState(store, {
                 isSaving: false,
                 feedbackMessage: err?.error?.message || 'Errore salvataggio azione.'
-              });
-            }
-          })
-        );
-      },
-
-      addInventoryAction(action: Action): Observable<Action> {
-        const currentItem = store.selectedItem();
-        const invItem = currentItem?.linkedInventoryItem;
-        if (!currentItem || !invItem?.id) {
-          throw new Error('Nessun oggetto inventario valido selezionato');
-        }
-
-        patchState(store, { isSaving: true });
-
-        return inventoryItemService.addActionToInventoryItem(invItem.id, action).pipe(
-          tap({
-            next: (savedAction) => {
-              const updatedInvActions = [...(invItem.actions ?? []), savedAction];
-              const updatedInvItem: InventoryItem = { ...invItem, actions: updatedInvActions };
-              updateItemInState({ ...currentItem, linkedInventoryItem: updatedInvItem });
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: `Azione inventario "${savedAction.type}" aggiunta!`
-              });
-            },
-            error: (err: any) => {
-              console.error('Errore aggiunta azione inventario:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: err?.error?.message || 'Errore salvataggio azione inventario.'
               });
             }
           })
@@ -627,18 +468,9 @@ export const EditorStore = signalStore(
                 a.id === updatedAction.id ? updatedAction : a
               );
 
-              let updatedInv = currentItem.linkedInventoryItem;
-              if (updatedInv) {
-                const updatedInvActions = (updatedInv.actions ?? []).map((a) =>
-                  a.id === updatedAction.id ? updatedAction : a
-                );
-                updatedInv = { ...updatedInv, actions: updatedInvActions };
-              }
-
               updateItemInState({
                 ...currentItem,
-                actions: updatedItemActions,
-                linkedInventoryItem: updatedInv
+                actions: updatedItemActions
               });
 
               patchState(store, {
@@ -666,17 +498,9 @@ export const EditorStore = signalStore(
               const current = store.selectedItem();
               if (current) {
                 const updatedItemActions = (current.actions ?? []).filter((a) => a.id !== actionId);
-                let updatedInv = current.linkedInventoryItem;
-                if (updatedInv) {
-                  updatedInv = {
-                    ...updatedInv,
-                    actions: (updatedInv.actions ?? []).filter((a) => a.id !== actionId)
-                  };
-                }
                 updateItemInState({
                   ...current,
-                  actions: updatedItemActions,
-                  linkedInventoryItem: updatedInv
+                  actions: updatedItemActions
                 });
               }
               patchState(store, { isSaving: false });

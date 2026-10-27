@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {GraphicAdventureDto, InventoryItem, Scene} from '../models';
+import { GraphicAdventureDto, Item, Scene } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -38,8 +38,9 @@ export class AdventureService {
   addScene(adventureId: number, formData: FormData): Observable<Scene> {
     return this.http.post<Scene>(`${this.apiUrl}/${adventureId}/addScene`, formData);
   }
-  addInventoryItem(adventureId: number, formData: FormData): Observable<InventoryItem> {
-    return this.http.post<InventoryItem>(`${this.apiUrl}/${adventureId}/inventory-item`, formData);
+
+  addItem(adventureId: number, formData: FormData): Observable<Item> {
+    return this.http.post<Item>(`${this.apiUrl}/${adventureId}/addItem`, formData);
   }
 
 }

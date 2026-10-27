@@ -136,7 +136,6 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
 }
 
-/* Password wrapper & eye icon */
 .password-input-wrapper {
   position: relative;
   display: flex;
@@ -169,7 +168,6 @@
   font-size: 1.1rem;
 }
 
-/* Feedback di validazione */
 .field-feedback {
   display: flex;
   align-items: center;

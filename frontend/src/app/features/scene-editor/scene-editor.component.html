@@ -6,7 +6,9 @@
   />
 
   <div class="editor-workspace">
-    <app-scenes-sidebar />
+    <app-scenes-sidebar
+      (startCreateItemRequested)="startNewHotspot()"
+    />
 
     <app-scene-canvas
       #canvasRef
@@ -28,28 +30,23 @@
       [draftPointsCount]="canvasRef?.draftPoints()?.length || 0"
       [itemName]="itemName()"
       [itemCode]="itemCode()"
+      [itemDescription]="itemDescription()"
       [isCollectible]="isCollectible()"
       [isInitiallyVisible]="isInitiallyVisible()"
       [sceneImageFile]="sceneImageFile()"
       [previewSpriteUrl]="previewSpriteUrl()"
       (startCreateRequested)="startNewHotspot()"
       (editItemRequested)="editExistingItem($event)"
-      (startCreateStandaloneInventoryRequested)="openStandaloneInventoryModal()"
       (cancelDraftRequested)="cancelDraft()"
       (saveDraftRequested)="saveDraft()"
       (deleteItemRequested)="deleteItem($event)"
       (itemNameChange)="onNameChange($event)"
       (itemCodeChange)="itemCode.set($event)"
-      (isCollectibleChange)="isCollectible.set($event)"
+      (itemDescriptionChange)="itemDescription.set($event)"
       (isInitiallyVisibleChange)="isInitiallyVisible.set($event)"
       (sceneImageSelected)="onSceneFileSelected($event)"
-      (openInventoryModalRequested)="openInventoryModal()"
-      (editInventoryItemRequested)="onEditInventoryItem($event)"
-      (deleteInventoryItemRequested)="onDeleteInventoryItem($event)"
       (openAddActionRequested)="openAddAction()"
       (editActionRequested)="openEditAction($event)"
-      (openAddInventoryActionRequested)="openAddInventoryAction()"
-      (editInventoryActionRequested)="openEditInventoryAction($event)"
       (deleteActionRequested)="onDeleteAction($event)"
     />
   </div>
@@ -57,26 +54,9 @@
   @if (isActionModalOpen() && store.selectedItem()) {
     <app-action-modal
       [itemCode]="store.selectedItem()!.code"
-      [isInventoryContext]="isActionForInventory()"
       [actionToEdit]="editingAction()"
       (saveRequested)="onSaveAction($event)"
       (closeRequested)="closeActionModal()"
-    />
-  }
-
-  @if (isInventoryModalOpen()) {
-    <app-inventory-item-modal
-      [isStandalone]="isStandaloneInventoryCreation()"
-      [itemId]="editingInventoryItemId()"
-      [itemCode]="itemCode()"
-      [initialName]="invItemName()"
-      [initialDescription]="invItemDesc()"
-      [initialUseSceneImage]="invUseSceneImage()"
-      [scenePreviewUrl]="previewSpriteUrl()"
-      [initialCustomFile]="invCustomFile()"
-      [initialCustomPreviewUrl]="invCustomPreviewUrl()"
-      (confirmRequested)="onInventoryConfirmed($event)"
-      (cancelRequested)="onInventoryCancelled()"
     />
   }
 

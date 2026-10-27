@@ -33,15 +33,11 @@ public class Action {
     private ActionType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inventory_item_id")
-    private InventoryItem inventoryItem;
-
-    @Column(name = "with_inventory_item_code", length = 50)
-    private String withInventoryItemCode;
+    @Column(name = "target_item_code", length = 50)
+    private String targetItemCode;
 
     private String successMessage;
     private String defaultFailureMessage;

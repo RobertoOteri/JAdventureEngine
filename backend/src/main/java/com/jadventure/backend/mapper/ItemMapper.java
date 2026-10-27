@@ -14,9 +14,7 @@ public interface ItemMapper {
 
     List<ItemDto> toDtoList(List<Item> entities);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "scene", ignore = true)
+    @Mapping(target = "graphicAdventure", ignore = true)
     @Mapping(target = "actions", ignore = true)
-    @Mapping(target = "linkedInventoryItem", ignore = true)
     Item toEntity(ItemDto dto);
 }

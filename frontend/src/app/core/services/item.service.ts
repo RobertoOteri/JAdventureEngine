@@ -11,8 +11,8 @@ export class ItemService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/items`;
 
-  getItemsBySceneId(sceneId: number): Observable<Item[]> {
-    const params = new HttpParams().set('sceneId', sceneId.toString());
+  getItemsByAdventure(adventureCode: string): Observable<Item[]> {
+    const params = new HttpParams().set('adventureCode', adventureCode);
     return this.http.get<Item[]>(this.apiUrl, { params });
   }
 

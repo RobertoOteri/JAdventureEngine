@@ -1,58 +1,50 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.action.ActionDto;
+import com.jadventure.backend.dto.item.HotspotDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.mapper.ItemMapper;
 import com.jadventure.backend.model.Action;
 import com.jadventure.backend.model.GraphicAdventure;
-import com.jadventure.backend.model.InventoryItem;
+import com.jadventure.backend.model.Hotspot;
 import com.jadventure.backend.model.Item;
-import com.jadventure.backend.model.Scene;
-import com.jadventure.backend.repository.ActionRepository;
+import com.jadventure.backend.model.enums.ActionType;
 import com.jadventure.backend.repository.ItemRepository;
-import com.jadventure.backend.repository.SceneRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class ItemService {
 
     private final ItemRepository itemRepository;
-    private final SceneRepository sceneRepository;
-    private final ActionRepository actionRepository;
     private final ItemMapper itemMapper;
     private final ActionMapper actionMapper;
-    private final InventoryItemService inventoryItemService;
     private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
     public ItemService(ItemRepository itemRepository,
-                       SceneRepository sceneRepository,
-                       ActionRepository actionRepository,
                        ItemMapper itemMapper,
                        ActionMapper actionMapper,
-                       InventoryItemService inventoryItemService,
                        FileStorageUtil fileStorageUtil,
                        AuthService authService) {
         this.itemRepository = itemRepository;
-        this.sceneRepository = sceneRepository;
-        this.actionRepository = actionRepository;
         this.itemMapper = itemMapper;
         this.actionMapper = actionMapper;
-        this.inventoryItemService = inventoryItemService;
         this.fileStorageUtil = fileStorageUtil;
         this.authService = authService;
     }
 
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsBySceneId(Long sceneId) {
-        return itemMapper.toDtoList(itemRepository.findAllBySceneId(sceneId));
+    public List<ItemDto> getAdventureItems(String adventureCode) {
+        return itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureCode(adventureCode));
     }
 
     @Transactional(readOnly = true)
@@ -63,59 +55,20 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemDto createItem(Long sceneId, ItemDto dto, MultipartFile sceneImage, MultipartFile inventoryImage) {
-        Scene scene = sceneRepository.findById(sceneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
-
-        GraphicAdventure adventure = scene.getGraphicAdventure();
-        authService.validateOwnership(adventure.getAuthor().getUsername());
-
-        Item item = itemMapper.toEntity(dto);
-        item.setScene(scene);
-
-        if (sceneImage != null && !sceneImage.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), scene.getCode(), dto.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, sceneImage));
-        }
-
-        if (dto.getLinkedInventoryItem() != null) {
-            InventoryItem invItem = inventoryItemService.upsertLinkedInventoryItem(
-                    adventure,
-                    null,
-                    dto.getLinkedInventoryItem(),
-                    inventoryImage
-            );
-            item.setLinkedInventoryItem(invItem);
-        }
-
-        return itemMapper.toDto(itemRepository.save(item));
-    }
-
-    @Transactional
-    public ItemDto updateItem(ItemDto dto, MultipartFile sceneImage, MultipartFile inventoryImage) {
+    public ItemDto updateItem(ItemDto dto, MultipartFile image) {
         Item item = itemRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + dto.getId()));
 
-        GraphicAdventure adventure = item.getScene().getGraphicAdventure();
+        GraphicAdventure adventure = item.getGraphicAdventure();
         authService.validateOwnership(adventure.getAuthor().getUsername());
 
         copyItemProperties(item, dto);
 
-        if (sceneImage != null && !sceneImage.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), item.getScene().getCode(), item.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, sceneImage));
-        }
-
-        if (dto.getLinkedInventoryItem() == null) {
-            item.setLinkedInventoryItem(null);
-        } else {
-            InventoryItem invItem = inventoryItemService.upsertLinkedInventoryItem(
-                    adventure,
-                    item.getLinkedInventoryItem(),
-                    dto.getLinkedInventoryItem(),
-                    inventoryImage
-            );
-            item.setLinkedInventoryItem(invItem);
+        if (image != null && !image.isEmpty()) {
+            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), item.getCode());
+            item.setImageUrl(fileStorageUtil.storeFile(path, image));
+        } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
+            item.setImageUrl(dto.getImageUrl());
         }
 
         return itemMapper.toDto(itemRepository.save(item));
@@ -126,41 +79,76 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
 
-        authService.validateOwnership(item.getScene().getGraphicAdventure().getAuthor().getUsername());
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
         itemRepository.delete(item);
     }
 
     @Transactional
     public ActionDto addAction(Long itemId, ActionDto actionDto) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item non trovato con ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
 
-        authService.validateOwnership(item.getScene().getGraphicAdventure().getAuthor().getUsername());
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
 
         validateActionUniqueness(item.getActions(), actionDto);
 
         Action action = actionMapper.toEntity(actionDto);
         action.setItem(item);
+        item.getActions().add(action);
 
-        return actionMapper.toDto(actionRepository.save(action));
+        itemRepository.saveAndFlush(item);
+
+        return actionMapper.toDto(action);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemDto> loadPlayerInventory(String adventureCode, Collection<String> itemCodes) {
+        if (itemCodes == null || itemCodes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return itemMapper.toDtoList(
+                itemRepository.findAllByGraphicAdventureCodeAndCodeIn(adventureCode, itemCodes)
+        );
     }
 
     private void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
-        boolean typeAlreadyUsed = existingActions.stream()
-                .anyMatch(existing -> existing.getType() == actionDto.getType());
-
-        if (typeAlreadyUsed) {
-            throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
+        if (actionDto.getType() == ActionType.USE_WITH) {
+            if (actionDto.getTargetItemCode() == null || actionDto.getTargetItemCode().isBlank()) {
+                throw new IllegalArgumentException("Per l'azione USE_WITH è obbligatorio specificare targetItemCode");
+            }
+            boolean duplicateUseWith = existingActions.stream()
+                    .anyMatch(a -> a.getType() == ActionType.USE_WITH
+                            && actionDto.getTargetItemCode().equalsIgnoreCase(a.getTargetItemCode()));
+            if (duplicateUseWith) {
+                throw new IllegalArgumentException("Esiste già un'azione USE_WITH verso l'oggetto: " + actionDto.getTargetItemCode());
+            }
+        } else {
+            boolean typeAlreadyUsed = existingActions.stream()
+                    .anyMatch(existing -> existing.getType() == actionDto.getType());
+            if (typeAlreadyUsed) {
+                throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
+            }
         }
     }
 
     private void copyItemProperties(Item item, ItemDto dto) {
         item.setName(dto.getName());
-        item.setPosX(dto.getPosX());
-        item.setPosY(dto.getPosY());
-        item.setPoints(dto.getPoints());
-        item.setWidth(dto.getWidth());
-        item.setHeight(dto.getHeight());
-        item.setInitiallyVisible(dto.isInitiallyVisible());
+        item.setDescription(dto.getDescription());
+
+        HotspotDto hotspotDto = dto.getHotspot();
+        if (hotspotDto != null) {
+            Hotspot hotspot = item.getHotspot() != null ? item.getHotspot() : new Hotspot();
+            hotspot.setPoints(hotspotDto.getPoints());
+            hotspot.setPosX(hotspotDto.getPosX());
+            hotspot.setPosY(hotspotDto.getPosY());
+            hotspot.setWidth(hotspotDto.getWidth());
+            hotspot.setHeight(hotspotDto.getHeight());
+            hotspot.setInitiallyVisible(
+                    hotspotDto.getInitiallyVisible() != null ? hotspotDto.getInitiallyVisible() : true
+            );
+            item.setHotspot(hotspot);
+        } else {
+            item.setHotspot(null);
+        }
     }
 }

@@ -38,7 +38,8 @@ public class Scene {
     @Column(name = "background_image_url", nullable = false, length = 255)
     private String backgroundImageUrl;
 
-    @OneToMany(mappedBy = "scene", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "scene_id")
     @Builder.Default
     private List<Item> items = new ArrayList<>();
 

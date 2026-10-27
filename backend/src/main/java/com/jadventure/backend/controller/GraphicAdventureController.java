@@ -1,8 +1,9 @@
 package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
+import com.jadventure.backend.model.Item;
 import com.jadventure.backend.service.GraphicAdventureService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -72,12 +73,12 @@ public class GraphicAdventureController {
                 .body(graphicAdventureService.addScene(adventureId, sceneDto, backgroundImage));
     }
 
-    @PostMapping(value = "/{adventureId}/inventory-item", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<InventoryItemDto> addInventoryItem(
+    @PostMapping(value = "/{adventureId}/addItem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemDto> addItem(
             @PathVariable Long adventureId,
-            @Valid @RequestPart("data") InventoryItemDto dto,
+            @Valid @RequestPart("data") ItemDto itemDto,
             @RequestPart(value = "image", required = false) MultipartFile image) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(graphicAdventureService.addInventoryItem(adventureId, dto, image));
+                .body(graphicAdventureService.addItem(adventureId, itemDto, image));
     }
 }

@@ -2,7 +2,6 @@ package com.jadventure.backend.service.effect;
 
 import com.jadventure.backend.dto.action.GameEffectDto;
 import com.jadventure.backend.dto.game.GameStateDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.model.enums.EffectType;
@@ -36,14 +35,13 @@ public class ChangeSceneEffectHandler implements EffectHandler{
         }
 
         Set<String> inventoryCodes = state.getInventory().stream()
-                .map(InventoryItemDto::getCode)
+                .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 
         scene.getItems().stream()
-                .filter(ItemDto::isInitiallyVisible)
+                .filter(item -> item.getHotspot() != null && Boolean.TRUE.equals(item.getHotspot().getInitiallyVisible()))
                 .map(ItemDto::getCode)
                 .filter(code -> !inventoryCodes.contains(code))
                 .forEach(state.getVisibleItemCodes()::add);
     }
-
 }

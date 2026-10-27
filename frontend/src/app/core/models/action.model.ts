@@ -40,7 +40,7 @@ export interface Action {
   id?: number;
   code?: string;
   type: ActionType;
-  withInventoryItemCode?: string;
+  targetItemCode?: string;
   successMessage?: string;
   defaultFailureMessage?: string;
   preconditions?: Precondition[];

@@ -1,9 +1,9 @@
-import { InventoryItem } from './inventory-item.model';
+import { Item } from './item.model';
 import { Scene } from './scene.model';
 
 export interface GameStateDto {
   currentScene: Scene;
-  inventory: InventoryItem[];
+  inventory: Item[];
   adventureFlags: Record<string, string>;
   visibleItemCodes: string[];
   playTime: number;

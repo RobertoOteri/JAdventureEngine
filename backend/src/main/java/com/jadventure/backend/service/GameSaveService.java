@@ -3,22 +3,23 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.game.GameSaveDto;
 import com.jadventure.backend.dto.game.GameStateDto;
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.model.GraphicAdventure;
-import com.jadventure.backend.model.InventoryItem;
+import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GameSaveRepository;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
-import com.jadventure.backend.repository.InventoryItemRepository;
+import com.jadventure.backend.repository.ItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GameSaveService {
@@ -26,7 +27,7 @@ public class GameSaveService {
     private final GameSaveRepository gameSaveRepository;
     private final GraphicAdventureService graphicAdventureService;
     private final GraphicAdventureRepository graphicAdventureRepository;
-    private final InventoryItemRepository inventoryItemRepository;
+    private final ItemRepository itemRepository;
     private final GameSaveMapper gameSaveMapper;
     private final AuthService authService;
 
@@ -34,14 +35,14 @@ public class GameSaveService {
             GameSaveRepository gameSaveRepository,
             GraphicAdventureService graphicAdventureService,
             GraphicAdventureRepository graphicAdventureRepository,
-            InventoryItemRepository inventoryItemRepository,
+            ItemRepository itemRepository,
             GameSaveMapper gameSaveMapper,
             AuthService authService
     ) {
         this.gameSaveRepository = gameSaveRepository;
         this.graphicAdventureService = graphicAdventureService;
         this.graphicAdventureRepository = graphicAdventureRepository;
-        this.inventoryItemRepository = inventoryItemRepository;
+        this.itemRepository = itemRepository;
         this.gameSaveMapper = gameSaveMapper;
         this.authService = authService;
     }
@@ -95,11 +96,6 @@ public class GameSaveService {
                 save.getGameState().getAdventureFlags().putAll(gameStateDto.getAdventureFlags());
             }
 
-            if (gameStateDto.getAdventureFlags() != null) {
-                save.getGameState().getAdventureFlags().clear();
-                save.getGameState().getAdventureFlags().putAll(gameStateDto.getAdventureFlags());
-            }
-
             if (gameStateDto.getVisibleItemCodes() != null) {
                 save.getGameState().getVisibleItemCodes().clear();
                 save.getGameState().getVisibleItemCodes().addAll(gameStateDto.getVisibleItemCodes());
@@ -107,10 +103,10 @@ public class GameSaveService {
 
             if (gameStateDto.getInventory() != null && !gameStateDto.getInventory().isEmpty()) {
                 Set<String> codes = gameStateDto.getInventory().stream()
-                        .map(InventoryItemDto::getCode)
-                        .collect(java.util.stream.Collectors.toSet());
+                        .map(ItemDto::getCode)
+                        .collect(Collectors.toSet());
 
-                List<InventoryItem> items = inventoryItemRepository
+                List<Item> items = itemRepository
                         .findAllByGraphicAdventureCodeAndCodeIn(adventureCode, codes);
 
                 save.getGameState().setInventory(items);

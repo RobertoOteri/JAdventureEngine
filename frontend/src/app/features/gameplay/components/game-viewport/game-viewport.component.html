@@ -9,15 +9,15 @@
 
       <div class="scene-sprites-layer">
         @for (item of currentScene.items; track item.code) {
-          @if (item.imageUrl && isItemVisible(item)) {
+          @if (item.imageUrl && isItemVisible(item) && item.hotspot) {
             <img
               [src]="item.imageUrl"
               [alt]="item.name"
               class="item-sprite"
-              [style.left.%]="(item.posX != null ? item.posX : 0) / 10"
-              [style.top.%]="(item.posY != null ? item.posY : 0) / 10"
-              [style.width.%]="(item.width && item.width > 0 ? item.width : 120) / 10"
-              [style.height.%]="(item.height && item.height > 0 ? item.height : 120) / 10"
+              [style.left.%]="getHotspotPosX(item) / 10"
+              [style.top.%]="getHotspotPosY(item) / 10"
+              [style.width.%]="getHotspotWidth(item) / 10"
+              [style.height.%]="getHotspotHeight(item) / 10"
             />
           }
         }
@@ -25,9 +25,9 @@
 
       <svg class="scene-hotspot-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
         @for (item of currentScene.items; track item.code) {
-          @if (isItemVisible(item)) {
+          @if (isItemVisible(item) && item.hotspot?.points) {
             <polygon
-              [attr.points]="item.points"
+              [attr.points]="item.hotspot!.points"
               class="hotspot-polygon"
               (mousedown)="onHotspotMouseDown($event, item)"
               (mouseenter)="onHotspotEnter(item)"

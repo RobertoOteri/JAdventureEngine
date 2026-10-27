@@ -5,7 +5,7 @@ import com.jadventure.backend.model.GameState;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {InventoryItemMapper.class})
+@Mapper(componentModel = "spring", uses = {ItemMapper.class})
 public interface GameStateMapper {
 
     @Mapping(target = "currentScene.code", source = "currentSceneCode")

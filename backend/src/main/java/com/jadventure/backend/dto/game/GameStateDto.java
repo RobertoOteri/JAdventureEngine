@@ -1,6 +1,6 @@
 package com.jadventure.backend.dto.game;
 
-import com.jadventure.backend.dto.inventory.InventoryItemDto;
+import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import lombok.*;
 
@@ -15,7 +15,7 @@ public class GameStateDto {
     private SceneDto currentScene;
 
     @Builder.Default
-    private List<InventoryItemDto> inventory = new ArrayList<>();
+    private List<ItemDto> inventory = new ArrayList<>();
 
     @Builder.Default
     private Map<String, String> adventureFlags = new HashMap<>();

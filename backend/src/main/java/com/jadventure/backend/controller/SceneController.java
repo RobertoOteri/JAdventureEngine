@@ -42,9 +42,8 @@ public class SceneController {
     public ResponseEntity<ItemDto> addItem(
             @PathVariable Long sceneId,
             @Valid @RequestPart("data") ItemDto itemDto,
-            @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "inventoryImage", required = false) MultipartFile inventoryImage) {
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(sceneService.addItem(sceneId, itemDto, image, inventoryImage));
+                .body(sceneService.addItem(sceneId, itemDto, image));
     }
 }

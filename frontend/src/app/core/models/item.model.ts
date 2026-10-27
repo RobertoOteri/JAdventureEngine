@@ -1,19 +1,12 @@
 import { Action } from './action.model';
-import { InventoryItem } from './inventory-item.model';
-import { Scene } from './scene.model';
+import { Hotspot } from './hotspot.model';
 
 export interface Item {
   id?: number;
   code: string;
   name: string;
+  description?: string;
   imageUrl?: string;
-  posX?: number;
-  posY?: number;
-  points?: string;
-  width?: number;
-  height?: number;
-  initiallyVisible: boolean;
+  hotspot?: Hotspot | null;
   actions?: Action[];
-  linkedInventoryItem?: InventoryItem | null;
-  sceneDto?: Scene;
 }
