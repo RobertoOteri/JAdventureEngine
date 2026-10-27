@@ -14,6 +14,7 @@ export interface EditorState {
   currentScene: Scene | null;
   adventureItems: Item[];
   selectedItem: Item | null;
+  pendingItemCode: string | null;
   isLoading: boolean;
   isSaving: boolean;
   feedbackMessage: string | null;
@@ -25,6 +26,7 @@ const initialState: EditorState = {
   currentScene: null,
   adventureItems: [],
   selectedItem: null,
+  pendingItemCode: null,
   isLoading: false,
   isSaving: false,
   feedbackMessage: null
@@ -195,18 +197,48 @@ export const EditorStore = signalStore(
                       active = scenes.find((s) => s.code === adventure.initialSceneCode) || scenes[0] || null;
                     }
 
+                    // Recuperiamo l'eventuale pending code dallo store o dalla session di sicurezza
+                    const pendingCode = store.pendingItemCode() || sessionStorage.getItem('pending_selected_item');
+                    let resolvedItem: Item | null = null;
+
+                    if (pendingCode) {
+                      for (const s of scenes) {
+                        const found = (s.items ?? []).find(i => i.code === pendingCode);
+                        if (found) {
+                          resolvedItem = found;
+                          break;
+                        }
+                      }
+                    }
+
+                    if (resolvedItem) {
+                      sessionStorage.removeItem('pending_selected_item');
+                    }
+
                     patchState(store, {
                       adventure,
                       scenes,
                       currentScene: active,
-                      selectedItem: null,
+                      selectedItem: resolvedItem,
+                      pendingItemCode: resolvedItem ? null : pendingCode,
                       isLoading: false
                     });
 
                     const currentAdvCode = adventure.code;
                     if (currentAdvCode) {
                       itemService.getItemsByAdventure(currentAdvCode).subscribe({
-                        next: (allItems) => patchState(store, { adventureItems: allItems }),
+                        next: (allItems) => {
+                          patchState(store, { adventureItems: allItems });
+
+                          const codeToResolve = store.pendingItemCode() || sessionStorage.getItem('pending_selected_item');
+                          if (codeToResolve) {
+                            sessionStorage.removeItem('pending_selected_item');
+                            const foundLater = findItemEverywhere(codeToResolve);
+                            if (foundLater) {
+                              patchState(store, { selectedItem: foundLater, pendingItemCode: null });
+                            }
+                          }
+                        },
                         error: (err) => console.error('Errore caricamento oggetti avventura:', err)
                       });
                     }
@@ -278,7 +310,18 @@ export const EditorStore = signalStore(
       },
 
       selectItem(item: Item | null): void {
-        patchState(store, { selectedItem: item });
+        sessionStorage.removeItem('pending_selected_item');
+        patchState(store, { selectedItem: item, pendingItemCode: null });
+      },
+
+      selectItemByCode(code: string): void {
+        sessionStorage.setItem('pending_selected_item', code);
+        const found = findItemEverywhere(code);
+        if (found) {
+          patchState(store, { selectedItem: found, pendingItemCode: null });
+        } else {
+          patchState(store, { pendingItemCode: code });
+        }
       },
 
       updateAdventureDetails(formData: FormData): Observable<GraphicAdventureDto> {

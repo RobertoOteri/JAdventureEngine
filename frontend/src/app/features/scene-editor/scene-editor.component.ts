@@ -64,7 +64,9 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       const sceneIdParam = params.get('sceneId');
       const sceneCode = params.get('sceneCode') || undefined;
 
-      this.cancelDraft();
+      if (!this.store.pendingItemCode()) {
+        this.cancelDraft();
+      }
 
       const numericId = rawAdventure && !isNaN(Number(rawAdventure)) ? Number(rawAdventure) : undefined;
       const stringCode = !numericId && rawAdventure ? rawAdventure : undefined;

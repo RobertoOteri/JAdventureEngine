@@ -114,12 +114,11 @@ export class ScenesSidebarComponent {
     const advId = this.getAdventureId();
     const currentScene = this.store.currentScene();
 
+    sessionStorage.setItem('pending_selected_item', entry.item.code);
+    this.store.selectItemByCode(entry.item.code);
+
     if (entry.sceneCode && advId && currentScene?.code !== entry.sceneCode) {
-      void this.router.navigate(['/editor', advId, entry.sceneCode]).then(() => {
-        this.store.selectItem(entry.item);
-      });
-    } else {
-      this.store.selectItem(entry.item);
+      void this.router.navigate(['/editor', advId, entry.sceneCode]);
     }
   }
 
