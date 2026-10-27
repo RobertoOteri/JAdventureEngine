@@ -4,6 +4,7 @@
 >
   <div
     class="radial-container"
+    [class.flip-up]="isNearBottom()"
     [style.left.px]="x()"
     [style.top.px]="y()"
   >
@@ -26,8 +27,8 @@
     </div>
 
     <div class="actions-ring">
-      @for (action of item()?.actions; track action.type; let idx = $index) {
-        @let slot = getSlotStyle(idx, (item()?.actions?.length || 1));
+      @for (action of filteredActions(); track action.type) {
+        @let slot = getSlotStyle(action.type);
         <div
           class="btn-radial-action"
           [attr.data-action-type]="action.type"
@@ -45,7 +46,7 @@
       }
     </div>
 
-    <div class="tombstone-plaque">
+    <div class="tombstone-plaque" [class.has-open]="hasOpenAction()">
       <div class="target-title">{{ item()?.name }}</div>
       @if (actionSentence()) {
         <div class="action-banner-text">{{ actionSentence() }}</div>

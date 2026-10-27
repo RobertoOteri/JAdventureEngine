@@ -5,16 +5,6 @@ import { Action, Item } from '../../../../core/models';
 
 export type ActionKind = 'scene' | 'inventory';
 
-const ACTION_ICONS: Record<string, string> = {
-  LOOK_AT: 'bi-eye',
-  PICK_UP: 'bi-hand-index-thumb',
-  USE: 'bi-gear',
-  OPEN: 'bi-unlock',
-  TALK_TO: 'bi-chat-dots',
-  MOVE: 'bi-arrows-move',
-  USE_WITH: 'bi-link-45deg'
-};
-
 @Component({
   selector: 'app-inspector-sidebar',
   standalone: true,
@@ -58,6 +48,11 @@ export class InspectorSidebarComponent {
     return (item?.actions ?? []).some((a) => a.type === 'PICK_UP');
   }
 
+  vertexCount(item: Item): number {
+    const points = item.hotspot?.points?.trim();
+    return points ? points.split(/\s+/).length : 0;
+  }
+
   selectItem(item: Item): void {
     this.store.selectItem(item);
   }
@@ -98,8 +93,9 @@ export class InspectorSidebarComponent {
     return type;
   }
 
-  actionIcon(type: string): string {
-    return ACTION_ICONS[type] ?? 'bi-lightning-charge';
+  actionIconPath(type: string): string | null {
+    if (!type || type === 'USE_WITH') return null;
+    return `/icons/actions/${type.toLowerCase()}.svg`;
   }
 
   onEditAction(action: Action): void {

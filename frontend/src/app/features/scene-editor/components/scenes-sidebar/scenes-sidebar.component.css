@@ -36,47 +36,52 @@
   background: rgba(0, 0, 0, 0.15);
 }
 
+/* Divisore pulito tra le sezioni identico allo stile destro */
 .sidebar-major-divider {
-  height: 6px;
-  background: #08090d;
+  height: 16px;
+  background: #0b0d12;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
+/* Intestazioni con riquadro tratteggiato elegante identico all'inspector */
 .sidebar-header {
-  padding: 0.85rem 1rem;
+  margin: 0.6rem 0.6rem 0.4rem 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
   flex-shrink: 0;
 }
 
 .header-title {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
 }
 
 .icon-header {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #71717a;
 }
 
 .sidebar-header h2 {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #d4d4d8;
+  color: #a1a1aa;
   margin: 0;
 }
 
 .btn-add-square {
-  width: 25px;
-  height: 25px;
-  border-radius: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
   background: #ffffff;
   border: none;
   color: #09090b;
@@ -84,7 +89,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
@@ -94,7 +99,7 @@
 }
 
 .scenes-list {
-  padding: 0.6rem;
+  padding: 0 0.6rem 0.6rem 0.6rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -107,7 +112,7 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.55rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.15s ease;
@@ -118,7 +123,7 @@
 }
 
 .scene-item.active {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.18);
 }
 
@@ -143,7 +148,7 @@
 }
 
 .scene-title {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: #f4f4f5;
   white-space: nowrap;
@@ -152,7 +157,7 @@
 }
 
 .scene-code {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #71717a;
 }
 
@@ -178,10 +183,10 @@
 }
 
 .objects-list {
-  padding: 0.65rem;
+  padding: 0 0.6rem 0.6rem 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
   overflow-y: auto;
   flex: 1;
 }
@@ -263,7 +268,7 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0.4rem 0.6rem;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 0.12s ease, border-color 0.12s ease;
@@ -274,7 +279,7 @@
 }
 
 .bullet-item.active {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
@@ -306,7 +311,7 @@
 .bullet-name {
   flex: 1;
   min-width: 0;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: #e4e4e7;
   white-space: nowrap;

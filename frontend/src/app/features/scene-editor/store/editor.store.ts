@@ -313,14 +313,32 @@ export const EditorStore = signalStore(
         patchState(store, { isSaving: true, feedbackMessage: null });
 
         return sceneService.addItemToScene(sceneId, formData).pipe(
+          switchMap((savedItem) => {
+            if (!savedItem.id) {
+              const currentAdvCode = store.adventure()?.code;
+              if (currentAdvCode) {
+                return itemService.getItemsByAdventure(currentAdvCode).pipe(
+                  tap((allItems) => {
+                    const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
+                    updateItemInState(freshItem);
+                    patchState(store, {
+                      isSaving: false,
+                      feedbackMessage: `Oggetto "${freshItem.name}" salvato!`
+                    });
+                  }),
+                  switchMap(() => of(savedItem))
+                );
+              }
+            }
+
+            updateItemInState(savedItem);
+            patchState(store, {
+              isSaving: false,
+              feedbackMessage: `Oggetto "${savedItem.name}" salvato!`
+            });
+            return of(savedItem);
+          }),
           tap({
-            next: (savedItem) => {
-              updateItemInState(savedItem);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: `Oggetto "${savedItem.name}" salvato!`
-              });
-            },
             error: (err: any) => {
               console.error('Errore salvataggio item:', err);
               patchState(store, {
@@ -341,16 +359,36 @@ export const EditorStore = signalStore(
         patchState(store, { isSaving: true, feedbackMessage: null });
 
         return adventureService.addItem(adventureId, formData).pipe(
+          switchMap((savedItem) => {
+            if (!savedItem.id) {
+              const currentAdvCode = store.adventure()?.code;
+              if (currentAdvCode) {
+                return itemService.getItemsByAdventure(currentAdvCode).pipe(
+                  tap((allItems) => {
+                    const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
+                    const currentList = store.adventureItems() ?? [];
+                    patchState(store, {
+                      adventureItems: [...currentList.filter(i => i.code !== freshItem.code), freshItem],
+                      selectedItem: freshItem,
+                      isSaving: false,
+                      feedbackMessage: `Oggetto globale "${freshItem.name}" salvato con successo!`
+                    });
+                  }),
+                  switchMap(() => of(savedItem))
+                );
+              }
+            }
+
+            const currentList = store.adventureItems() ?? [];
+            patchState(store, {
+              adventureItems: [...currentList, savedItem],
+              selectedItem: savedItem,
+              isSaving: false,
+              feedbackMessage: `Oggetto globale "${savedItem.name}" salvato con successo!`
+            });
+            return of(savedItem);
+          }),
           tap({
-            next: (savedItem) => {
-              const currentList = store.adventureItems() ?? [];
-              patchState(store, {
-                adventureItems: [...currentList, savedItem],
-                selectedItem: savedItem,
-                isSaving: false,
-                feedbackMessage: `Oggetto globale "${savedItem.name}" salvato con successo!`
-              });
-            },
             error: (err: any) => {
               console.error('Errore salvataggio oggetto inventario:', err);
               patchState(store, {

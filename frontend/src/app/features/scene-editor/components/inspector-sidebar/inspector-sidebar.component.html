@@ -1,4 +1,5 @@
 <aside class="sidebar-properties">
+  <!-- Sezione Superiore: Lista Hotspot della Stanza -->
   <div class="panel-section list-section">
     <div class="properties-header">
       <div class="header-title">
@@ -41,11 +42,13 @@
     </div>
   </div>
 
-  <div class="panel-divider"></div>
+  <!-- Stacco netto tra lista e inspector inferiore -->
+  <div class="inspector-major-divider"></div>
 
-  <div class="panel-section detail-section custom-scroll">
+  <!-- Sezione Inferiore: Dettaglio / Inspector dell'Oggetto Selezionato -->
+  <div class="panel-section detail-section">
     @if (isEditingOrCreating()) {
-      <div class="creation-box">
+      <div class="creation-box custom-scroll">
         <div class="creation-box-header">
           <span class="section-tag">
             {{ editingItemCode() ? 'Modifica Oggetto' : 'Nuovo Oggetto' }}
@@ -53,7 +56,7 @@
           @if (draftPointsCount() > 0) {
             <span class="tag-points-count">{{ draftPointsCount() }} vertici</span>
           } @else {
-            <span class="tag-points-count global-hint">Senza vertici = Globale</span>
+            <span class="tag-points-count">Senza vertici = Globale</span>
           }
         </div>
 
@@ -142,24 +145,21 @@
       </div>
     } @else {
       @if (store.selectedItem(); as selected) {
-        <div class="selected-details">
-          <div class="selected-header-line">
-            <span class="section-tag">Inspector Oggetto</span>
-            <div class="row-tags">
-              @if (!selected.hotspot) {
-                <span class="tag tag-global">GLOBAL</span>
-              }
-              @if (hasPickUp(selected)) {
-                <span class="tag tag-inventory">INVENTORY</span>
-              }
-              @if (selected.hotspot && selected.hotspot.initiallyVisible === false) {
-                <span class="tag tag-hidden">NASCOSTO</span>
-              }
-            </div>
-          </div>
 
-          <div class="hotspot-summary">
-            <div class="summary-thumb">
+        <!-- Header Fisso solido (NON scorre) -->
+        <div class="inspector-fixed-header">
+          <div class="header-title">
+            <i class="bi bi-sliders icon-header"></i>
+            <h2>Inspector</h2>
+          </div>
+        </div>
+
+        <!-- Contenuto scrollabile indipendente -->
+        <div class="item-detail-scrollable custom-scroll">
+          <article class="item-detail-inner">
+
+            <!-- Riquadro Immagine -->
+            <div class="detail-hero-compact">
               @if (selected.imageUrl) {
                 <img [src]="selected.imageUrl" [alt]="selected.name" />
               } @else {
@@ -167,61 +167,110 @@
               }
             </div>
 
-            <div class="summary-texts">
-              <strong class="summary-name">{{ selected.name }}</strong>
-              <span class="summary-code">#{{ selected.code }}</span>
-            </div>
-
-            <div class="summary-actions">
-              <button
-                type="button"
-                class="summary-btn"
-                (click)="editItemRequested.emit(selected)"
-                title="Modifica oggetto"
-              >
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button
-                type="button"
-                class="summary-btn danger"
-                (click)="deleteItemRequested.emit(selected.code)"
-                title="Elimina oggetto"
-              >
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-          </div>
-
-          <section class="action-block scene-block">
-            <header class="action-block-header">
-              <div class="block-icon"><i class="bi bi-lightning-charge"></i></div>
-              <div class="block-titles">
-                <h3>Azioni dell'Oggetto</h3>
-                <p>Cosa può fare il giocatore interagendo con questo elemento.</p>
+            <!-- Nome, codice e strumenti affiancati -->
+            <header class="detail-title">
+              <div class="title-top-row">
+                <h3>{{ selected.name }}</h3>
+                <div class="hero-tools">
+                  <button
+                    type="button"
+                    class="tool-btn"
+                    (click)="editItemRequested.emit(selected)"
+                    title="Modifica oggetto"
+                    aria-label="Modifica oggetto"
+                  >
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="tool-btn danger"
+                    (click)="deleteItemRequested.emit(selected.code)"
+                    title="Elimina oggetto"
+                    aria-label="Elimina oggetto"
+                  >
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
               </div>
-              <span class="block-count">{{ selected.actions?.length || 0 }}</span>
+              <span class="title-code">#{{ selected.code }}</span>
             </header>
 
-            <div class="action-block-body">
-              @for (action of selected.actions; track action.id ?? $index) {
-                <ng-container
-                  *ngTemplateOutlet="actionRow; context: { $implicit: action }"
-                />
-              } @empty {
-                <div class="action-empty">
-                  <i class="bi bi-info-circle"></i>
-                  <span>Nessuna azione impostata.</span>
-                </div>
+            <!-- Descrizione -->
+            <section class="detail-block">
+              <h4>Descrizione</h4>
+              @if (selected.description) {
+                <p class="description">{{ selected.description }}</p>
+              } @else {
+                <p class="description is-empty">Nessuna descrizione.</p>
               }
-            </div>
+            </section>
 
-            <div class="action-block-footer">
-              <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
-                <i class="bi bi-plus-lg"></i>
-                <span>Aggiungi azione</span>
-              </button>
-            </div>
-          </section>
+            <!-- Sezione Azioni -->
+            <section class="detail-block actions-block">
+              <div class="block-head">
+                <h4>Azioni <span class="count">{{ selected.actions?.length || 0 }}</span></h4>
+                <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
+                  <i class="bi bi-plus-lg"></i>
+                  <span>Aggiungi</span>
+                </button>
+              </div>
+
+              <ul class="action-list">
+                @for (action of selected.actions; track action.id ?? $index) {
+                  <li class="action-item">
+                    <span class="action-icon">
+                      @if (action.type === 'USE_WITH') {
+                        <i class="bi bi-link-45deg"></i>
+                      } @else if (actionIconPath(action.type); as icon) {
+                        <img [src]="icon" alt="" class="action-icon-img" />
+                      }
+                    </span>
+
+                    <div class="action-body">
+                      <div class="action-line">
+                        <span class="action-type">{{ action.type }}</span>
+                        @if (action.type === 'USE_WITH' && action.targetItemCode) {
+                          <span class="action-target">con #{{ action.targetItemCode }}</span>
+                        }
+                      </div>
+
+                      <span
+                        class="action-message"
+                        [class.is-empty]="!action.successMessage"
+                        [title]="action.successMessage || ''"
+                      >
+                        {{ action.successMessage || 'Nessun messaggio' }}
+                      </span>
+                    </div>
+
+                    <div class="action-buttons">
+                      <button
+                        type="button"
+                        class="action-btn"
+                        (click)="onEditAction(action)"
+                        title="Modifica azione"
+                        aria-label="Modifica azione"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn delete"
+                        (click)="onDeleteAction($event, action.id)"
+                        title="Elimina azione"
+                        aria-label="Elimina azione"
+                      >
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
+                  </li>
+                } @empty {
+                  <li class="action-empty">Nessuna azione impostata.</li>
+                }
+              </ul>
+            </section>
+
+          </article>
         </div>
       } @else {
         <div class="properties-empty">
@@ -231,46 +280,4 @@
       }
     }
   </div>
-
-  <ng-template #actionRow let-action>
-    <div class="action-row">
-      <div class="action-glyph">
-        <i class="bi" [ngClass]="actionIcon(action.type)"></i>
-      </div>
-
-      <div class="action-main">
-        <div class="action-title-line">
-          <span class="action-name">{{ actionLabel(action.type) }}</span>
-          @if (action.type === 'USE_WITH' && action.targetItemCode) {
-            <span class="with-chip" [title]="'#' + action.targetItemCode">
-              <i class="bi bi-link-45deg"></i>
-              {{ action.targetItemCode }}
-            </span>
-          }
-        </div>
-        <span class="action-message" [class.is-empty]="!action.successMessage" [title]="action.successMessage || ''">
-          {{ action.successMessage || 'Nessun messaggio' }}
-        </span>
-      </div>
-
-      <div class="action-buttons">
-        <button
-          type="button"
-          class="action-btn"
-          (click)="onEditAction(action)"
-          title="Modifica azione"
-        >
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button
-          type="button"
-          class="action-btn delete"
-          (click)="onDeleteAction($event, action.id)"
-          title="Elimina azione"
-        >
-          <i class="bi bi-trash3"></i>
-        </button>
-      </div>
-    </div>
-  </ng-template>
 </aside>

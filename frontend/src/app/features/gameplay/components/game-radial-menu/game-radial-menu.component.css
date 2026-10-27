@@ -130,7 +130,6 @@
   transition: transform 0.12s ease, filter 0.12s ease;
 }
 
-
 .btn-radial-action.active {
   background: radial-gradient(circle at 40% 30%, #442d19 0%, #291a0c 65%, #130a04 100%);
   border-color: #f3cf7a;
@@ -152,10 +151,9 @@
   transform: scale(1.08);
 }
 
-
 .tombstone-plaque {
   position: absolute;
-  top: 108%;
+  top: 76%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -164,6 +162,10 @@
   pointer-events: none;
   white-space: nowrap;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.9);
+}
+
+.tombstone-plaque.has-open {
+  top: 98%;
 }
 
 .target-title {
@@ -183,4 +185,9 @@
   color: #ecd48d;
   letter-spacing: 0.02em;
   margin-top: 4px;
+}
+
+.radial-container.flip-up .tombstone-plaque {
+  top: auto;
+  bottom: 105%;
 }

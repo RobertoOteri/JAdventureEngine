@@ -2,6 +2,15 @@ import { Component, HostListener, computed, input, output, signal } from '@angul
 import { CommonModule } from '@angular/common';
 import { ActionType, Item } from '../../../../core/models';
 
+const ACTION_POSITIONS: Record<string, number> = {
+  LOOK_AT: 0,
+  PICK_UP: 60,
+  USE: 120,
+  OPEN: 180,
+  TALK_TO: 240,
+  MOVE: 300
+};
+
 @Component({
   selector: 'app-game-radial-menu',
   standalone: true,
@@ -19,6 +28,20 @@ export class GameRadialMenuComponent {
 
   hoveredAction = signal<ActionType | null>(null);
   needleAngle = signal<number>(0);
+
+  filteredActions = computed(() => {
+    const rawActions = this.item()?.actions ?? [];
+    return rawActions.filter((a) => a.type !== 'USE_WITH');
+  });
+
+  hasOpenAction = computed(() => {
+    return this.filteredActions().some((a) => a.type === 'OPEN');
+  });
+
+  isNearBottom = computed(() => {
+    if (typeof window === 'undefined') return false;
+    return this.y() > window.innerHeight - 160;
+  });
 
   actionSentence = computed(() => {
     const act = this.hoveredAction();
@@ -69,9 +92,9 @@ export class GameRadialMenuComponent {
     this.close.emit();
   }
 
-  getSlotStyle(index: number, total: number): { top: string; left: string; angle: number } {
-    const angleStep = 360 / Math.max(total, 1);
-    const angleDeg = -90 + index * angleStep;
+  getSlotStyle(actionType: string): { top: string; left: string; angle: number } {
+    const baseAngle = ACTION_POSITIONS[actionType] ?? 0;
+    const angleDeg = -90 + baseAngle;
     const angleRad = (angleDeg * Math.PI) / 180;
     const radius = 68;
 
