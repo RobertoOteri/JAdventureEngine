@@ -36,7 +36,6 @@
   background: rgba(0, 0, 0, 0.15);
 }
 
-/* Divisore pulito tra le sezioni identico allo stile destro */
 .sidebar-major-divider {
   height: 16px;
   background: #0b0d12;
@@ -45,7 +44,6 @@
   flex-shrink: 0;
 }
 
-/* Intestazioni con riquadro tratteggiato elegante identico all'inspector */
 .sidebar-header {
   margin: 0.6rem 0.6rem 0.4rem 0.6rem;
   padding: 0.75rem 0.9rem;

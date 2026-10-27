@@ -24,7 +24,6 @@
   flex-direction: column;
 }
 
-/* Divisore tra le sezioni */
 .inspector-major-divider {
   height: 16px;
   background: #0b0d12;
@@ -33,7 +32,6 @@
   flex-shrink: 0;
 }
 
-/* ================== LISTA HOTSPOT IN ALTO ================== */
 .list-section {
   max-height: 38%;
   flex-shrink: 0;
@@ -156,8 +154,6 @@
   color: #52525b;
 }
 
-/* ---------- Tag ---------- */
-
 .row-tags {
   display: flex;
   align-items: center;
@@ -198,19 +194,16 @@
   border-color: rgba(245, 158, 11, 0.3);
 }
 
-/* ================== ZONA DETTAGLIO INFERIORE (INSPECTOR) ================== */
-
 .detail-section {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Blocchiamo l'overflow qui per gestirlo sotto */
+  overflow: hidden;
   background: #0f1117;
   padding: 0 !important;
 }
 
-/* Header Fisso solido (NON si muove, non traspare) */
 .inspector-fixed-header {
   flex-shrink: 0;
   margin: 0.6rem 0.6rem 0.4rem 0.6rem;
@@ -233,7 +226,6 @@
   color: #a1a1aa;
 }
 
-/* Area scrollabile indipendente sotto l'header fisso */
 .item-detail-scrollable {
   flex: 1;
   min-height: 0;
@@ -258,8 +250,7 @@
   overflow: hidden;
   font-size: 2.2rem;
   color: #3f3f46;
-  background-color: #12141c; /* Sfondo base leggermente più chiaro */
-  /* Scacchiera trasparenza più definita */
+  background-color: #12141c;
   background-image:
     linear-gradient(45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%),
     linear-gradient(-45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%),
@@ -278,8 +269,6 @@
   box-sizing: border-box;
   object-fit: contain;
 }
-
-/* ---------- Titolo e strumenti affiancati ---------- */
 
 .detail-title {
   display: flex;
@@ -347,8 +336,6 @@
   color: #71717a;
 }
 
-/* ---------- Sezioni interne ---------- */
-
 .detail-block {
   padding: 0.95rem 0.6rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -377,8 +364,6 @@
   font-style: italic;
   color: #52525b;
 }
-
-/* ---------- Sezione Azioni ---------- */
 
 .detail-block.actions-block {
   padding: 0;
@@ -554,8 +539,6 @@
   color: #6b7280;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
-
-/* ================== Form di creazione e modifica ================== */
 
 .creation-box {
   flex: 1;

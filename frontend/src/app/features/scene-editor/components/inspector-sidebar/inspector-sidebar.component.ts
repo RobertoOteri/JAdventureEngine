@@ -48,11 +48,6 @@ export class InspectorSidebarComponent {
     return (item?.actions ?? []).some((a) => a.type === 'PICK_UP');
   }
 
-  vertexCount(item: Item): number {
-    const points = item.hotspot?.points?.trim();
-    return points ? points.split(/\s+/).length : 0;
-  }
-
   selectItem(item: Item): void {
     this.store.selectItem(item);
   }
@@ -72,11 +67,6 @@ export class InspectorSidebarComponent {
     this.itemDescriptionChange.emit(val);
   }
 
-  onCollectibleCheckboxChange(event: Event): void {
-    const isChecked = (event.target as HTMLInputElement).checked;
-    this.isCollectibleChange.emit(isChecked);
-  }
-
   onVisibleToggle(event: Event): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     this.isInitiallyVisibleChange.emit(isChecked);
@@ -87,10 +77,6 @@ export class InspectorSidebarComponent {
     if (input.files && input.files[0]) {
       this.sceneImageSelected.emit(input.files[0]);
     }
-  }
-
-  actionLabel(type: string): string {
-    return type;
   }
 
   actionIconPath(type: string): string | null {

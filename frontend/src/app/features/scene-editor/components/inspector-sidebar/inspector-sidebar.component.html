@@ -1,5 +1,4 @@
 <aside class="sidebar-properties">
-  <!-- Sezione Superiore: Lista Hotspot della Stanza -->
   <div class="panel-section list-section">
     <div class="properties-header">
       <div class="header-title">
@@ -42,10 +41,8 @@
     </div>
   </div>
 
-  <!-- Stacco netto tra lista e inspector inferiore -->
   <div class="inspector-major-divider"></div>
 
-  <!-- Sezione Inferiore: Dettaglio / Inspector dell'Oggetto Selezionato -->
   <div class="panel-section detail-section">
     @if (isEditingOrCreating()) {
       <div class="creation-box custom-scroll">
@@ -146,7 +143,6 @@
     } @else {
       @if (store.selectedItem(); as selected) {
 
-        <!-- Header Fisso solido (NON scorre) -->
         <div class="inspector-fixed-header">
           <div class="header-title">
             <i class="bi bi-sliders icon-header"></i>
@@ -154,11 +150,9 @@
           </div>
         </div>
 
-        <!-- Contenuto scrollabile indipendente -->
         <div class="item-detail-scrollable custom-scroll">
           <article class="item-detail-inner">
 
-            <!-- Riquadro Immagine -->
             <div class="detail-hero-compact">
               @if (selected.imageUrl) {
                 <img [src]="selected.imageUrl" [alt]="selected.name" />
@@ -167,7 +161,6 @@
               }
             </div>
 
-            <!-- Nome, codice e strumenti affiancati -->
             <header class="detail-title">
               <div class="title-top-row">
                 <h3>{{ selected.name }}</h3>
@@ -195,7 +188,6 @@
               <span class="title-code">#{{ selected.code }}</span>
             </header>
 
-            <!-- Descrizione -->
             <section class="detail-block">
               <h4>Descrizione</h4>
               @if (selected.description) {
@@ -205,7 +197,6 @@
               }
             </section>
 
-            <!-- Sezione Azioni -->
             <section class="detail-block actions-block">
               <div class="block-head">
                 <h4>Azioni <span class="count">{{ selected.actions?.length || 0 }}</span></h4>
