@@ -17,7 +17,7 @@
       [playTimeSeconds]="store.gameState()?.playTime || 0"
       [isDragging]="store.draggedItem.isDragging()"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
-      (touchActionTriggered)="onExecuteAction($event)"
+      (singleActionTriggered)="onExecuteAction($event)"
       (canvasClicked)="store.closeRadialMenu()"
       (hotspotHover)="store.setDragTarget($event?.name ?? null, $event?.code ?? null)"
       (hotspotDrop)="store.dropOnSceneTarget($event)"

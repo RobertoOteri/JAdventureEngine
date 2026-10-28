@@ -42,8 +42,7 @@ export class ActionModalComponent {
       'MOVE',
       'USE',
       'TALK_TO',
-      'USE_WITH',
-      'TOUCH'
+      'USE_WITH'
     ];
 
     const editingAction = this.actionToEdit();
@@ -51,20 +50,8 @@ export class ActionModalComponent {
     const existingActions = currentItem?.actions ?? [];
 
     const otherActions = existingActions.filter(a => !editingAction || a.id !== editingAction.id);
-
-    const hasTouch = otherActions.some(a => a.type === 'TOUCH');
-    if (hasTouch && !editingAction) {
-      return [];
-    }
-
-    const hasAnyOtherAction = otherActions.some(a => a.type !== 'TOUCH');
-    if (hasAnyOtherAction && !editingAction) {
-      const usedTypes = new Set(otherActions.map(a => a.type));
-      usedTypes.add('TOUCH');
-      return allTypes.filter(type => !usedTypes.has(type));
-    }
-
     const usedTypes = new Set(otherActions.map(a => a.type));
+
     return allTypes.filter(type => !usedTypes.has(type));
   });
 

@@ -19,7 +19,7 @@ export class GameViewportComponent {
   isDragging = input<boolean>(false);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
-  touchActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
+  singleActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
   canvasClicked = output<void>();
   hotspotHover = output<{ name: string; code: string } | null>();
   hotspotDrop = output<string>();
@@ -36,12 +36,12 @@ export class GameViewportComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    const touchAction = item.actions?.find((a) => a.type === 'TOUCH');
+    const actions = item.actions ?? [];
 
-    if (touchAction && touchAction.code) {
-      this.touchActionTriggered.emit({
-        actionCode: touchAction.code,
-        actionType: 'TOUCH'
+    if (actions.length === 1 && actions[0].type !== 'USE_WITH' && actions[0].code) {
+      this.singleActionTriggered.emit({
+        actionCode: actions[0].code,
+        actionType: actions[0].type
       });
     } else {
       this.itemClicked.emit({

@@ -85,18 +85,6 @@ export class InspectorSidebarComponent {
   }
 
   onAddActionClick(): void {
-    const selected = this.store.selectedItem();
-    if (selected && selected.actions && selected.actions.length > 0) {
-      const hasTouch = selected.actions.some((a) => a.type === 'TOUCH');
-
-      if (hasTouch) {
-        alert(
-          "Essendo già presente un'azione di tipo TOUCH configurata su questo oggetto, non è possibile aggiungerne altre. Rimuovi prima l'azione TOUCH se desideri cambiare comportamento."
-        );
-        return;
-      }
-    }
-
     this.openAddActionRequested.emit();
   }
 

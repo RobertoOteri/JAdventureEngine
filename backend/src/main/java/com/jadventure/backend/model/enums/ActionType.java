@@ -7,6 +7,5 @@ public enum ActionType {
     MOVE,
     USE,
     TALK_TO,
-    USE_WITH,
-    TOUCH
+    USE_WITH
 }

@@ -5,8 +5,7 @@ export type ActionType =
   | 'MOVE'
   | 'USE'
   | 'TALK_TO'
-  | 'USE_WITH'
-  | 'TOUCH';
+  | 'USE_WITH';
 
 export type PreconditionType =
   | 'HAS_ITEM'
