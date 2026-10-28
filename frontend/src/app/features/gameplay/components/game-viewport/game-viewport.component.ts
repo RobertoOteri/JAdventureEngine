@@ -1,6 +1,6 @@
-import {Component, computed, input, output} from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Scene, Item } from '../../../../core/models';
+import { Scene, Item, ActionType } from '../../../../core/models';
 import { GameTimerComponent } from '../game-timer/game-timer.component';
 
 @Component({
@@ -19,6 +19,7 @@ export class GameViewportComponent {
   isDragging = input<boolean>(false);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
+  touchActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
   canvasClicked = output<void>();
   hotspotHover = output<{ name: string; code: string } | null>();
   hotspotDrop = output<string>();
@@ -34,11 +35,21 @@ export class GameViewportComponent {
   onHotspotMouseDown(event: MouseEvent, item: Item): void {
     event.preventDefault();
     event.stopPropagation();
-    this.itemClicked.emit({
-      item,
-      mouseX: event.clientX,
-      mouseY: event.clientY
-    });
+
+    const touchAction = item.actions?.find((a) => a.type === 'TOUCH');
+
+    if (touchAction && touchAction.code) {
+      this.touchActionTriggered.emit({
+        actionCode: touchAction.code,
+        actionType: 'TOUCH'
+      });
+    } else {
+      this.itemClicked.emit({
+        item,
+        mouseX: event.clientX,
+        mouseY: event.clientY
+      });
+    }
   }
 
   onHotspotEnter(item: Item): void {

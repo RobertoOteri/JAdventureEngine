@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, input, output, signal } from '@angular/core';
+import {Component, computed, HostListener, input, output, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActionType, Item } from '../../../../core/models';
 
@@ -31,7 +31,7 @@ export class GameRadialMenuComponent {
 
   filteredActions = computed(() => {
     const rawActions = this.item()?.actions ?? [];
-    return rawActions.filter((a) => a.type !== 'USE_WITH');
+    return rawActions.filter((a) => a.type !== 'USE_WITH' && a.type !== 'TOUCH');
   });
 
   hasOpenAction = computed(() => {

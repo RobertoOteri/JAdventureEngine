@@ -42,19 +42,29 @@ export class ActionModalComponent {
       'MOVE',
       'USE',
       'TALK_TO',
-      'USE_WITH'
+      'USE_WITH',
+      'TOUCH'
     ];
 
     const editingAction = this.actionToEdit();
     const currentItem = this.store.selectedItem() ?? this.store.combinedSceneList().find(i => i.code === this.itemCode());
     const existingActions = currentItem?.actions ?? [];
 
-    const usedTypes = new Set(
-      existingActions
-        .filter(a => !editingAction || a.id !== editingAction.id)
-        .map(a => a.type)
-    );
+    const otherActions = existingActions.filter(a => !editingAction || a.id !== editingAction.id);
 
+    const hasTouch = otherActions.some(a => a.type === 'TOUCH');
+    if (hasTouch && !editingAction) {
+      return [];
+    }
+
+    const hasAnyOtherAction = otherActions.some(a => a.type !== 'TOUCH');
+    if (hasAnyOtherAction && !editingAction) {
+      const usedTypes = new Set(otherActions.map(a => a.type));
+      usedTypes.add('TOUCH');
+      return allTypes.filter(type => !usedTypes.has(type));
+    }
+
+    const usedTypes = new Set(otherActions.map(a => a.type));
     return allTypes.filter(type => !usedTypes.has(type));
   });
 

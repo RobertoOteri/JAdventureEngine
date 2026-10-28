@@ -80,8 +80,24 @@ export class InspectorSidebarComponent {
   }
 
   actionIconPath(type: string): string | null {
-    if (!type || type === 'USE_WITH') return null;
+    if (!type) return null;
     return `/icons/actions/${type.toLowerCase()}.svg`;
+  }
+
+  onAddActionClick(): void {
+    const selected = this.store.selectedItem();
+    if (selected && selected.actions && selected.actions.length > 0) {
+      const hasTouch = selected.actions.some((a) => a.type === 'TOUCH');
+
+      if (hasTouch) {
+        alert(
+          "Essendo già presente un'azione di tipo TOUCH configurata su questo oggetto, non è possibile aggiungerne altre. Rimuovi prima l'azione TOUCH se desideri cambiare comportamento."
+        );
+        return;
+      }
+    }
+
+    this.openAddActionRequested.emit();
   }
 
   onEditAction(action: Action): void {

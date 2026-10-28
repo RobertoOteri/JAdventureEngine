@@ -27,6 +27,13 @@
               <option [value]="type">{{ type }}</option>
             }
           </select>
+
+          @if (actionType === 'TOUCH') {
+            <div class="touch-warning-banner">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span><strong>Attenzione:</strong> L'azione di tipo <strong>TOUCH</strong> è un'interazione diretta al click. Configurando questa azione, l'oggetto risponderà esclusivamente con questo comportamento e non potrà combinare altre azioni standard.</span>
+            </div>
+          }
         </div>
 
         @if (actionType === 'USE_WITH') {

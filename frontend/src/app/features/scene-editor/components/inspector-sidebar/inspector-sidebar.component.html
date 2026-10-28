@@ -200,7 +200,7 @@
             <section class="detail-block actions-block">
               <div class="block-head">
                 <h4>Azioni <span class="count">{{ selected.actions?.length || 0 }}</span></h4>
-                <button type="button" class="btn-add-action" (click)="openAddActionRequested.emit()">
+                <button type="button" class="btn-add-action" (click)="onAddActionClick()">
                   <i class="bi bi-plus-lg"></i>
                   <span>Aggiungi</span>
                 </button>
@@ -210,9 +210,7 @@
                 @for (action of selected.actions; track action.id ?? $index) {
                   <li class="action-item">
                     <span class="action-icon">
-                      @if (action.type === 'USE_WITH') {
-                        <i class="bi bi-link-45deg"></i>
-                      } @else if (actionIconPath(action.type); as icon) {
+                      @if (actionIconPath(action.type); as icon) {
                         <img [src]="icon" alt="" class="action-icon-img" />
                       }
                     </span>
