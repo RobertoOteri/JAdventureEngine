@@ -80,6 +80,13 @@ CREATE TABLE IF NOT EXISTS preconditions (
     required_key VARCHAR(255) NOT NULL,
     expected_value VARCHAR(255),
     failure_message TEXT,
+    pos_x INTEGER,
+    pos_y INTEGER,
+    width INTEGER,
+    height INTEGER,
+    font_family VARCHAR(100),
+    font_size VARCHAR(50),
+    color VARCHAR(20),
     action_id BIGINT NOT NULL,
     CONSTRAINT fk_precondition_action FOREIGN KEY (action_id) REFERENCES actions (id) ON DELETE CASCADE
 );

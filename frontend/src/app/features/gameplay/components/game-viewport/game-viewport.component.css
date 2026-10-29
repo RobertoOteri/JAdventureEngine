@@ -27,6 +27,7 @@
   max-height: none;
   background: #000000;
   overflow: hidden;
+  container-type: inline-size;
 }
 
 .scene-background {

@@ -23,4 +23,6 @@ public class GameActionDto {
 
     @NotNull(message = "Il tipo di azione è obbligatorio")
     private ActionType actionType;
+
+    private String input;
 }

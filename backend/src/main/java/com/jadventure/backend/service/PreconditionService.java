@@ -26,15 +26,15 @@ public class PreconditionService {
                 .collect(Collectors.toMap(PreconditionChecker::type, Function.identity()));
     }
 
-    public Optional<String> validatePreconditions(GameStateDto state, ActionDto action) {
+    public Optional<String> validatePreconditions(GameStateDto state, ActionDto action, String input) {
         return action.getPreconditions().stream()
-                .filter(precondition -> !isSatisfied(state, precondition))
+                .filter(precondition -> !isSatisfied(state, precondition, input))
                 .findFirst()
                 .map(precondition -> failureMessage(precondition, action));
     }
 
-    public boolean isSatisfied(GameStateDto state, PreconditionDto precondition) {
-        return checkers.get(precondition.getType()).isSatisfied(state, precondition);
+    public boolean isSatisfied(GameStateDto state, PreconditionDto precondition, String input) {
+        return checkers.get(precondition.getType()).isSatisfied(state, precondition, input);
     }
 
     private String failureMessage(PreconditionDto precondition, ActionDto action) {

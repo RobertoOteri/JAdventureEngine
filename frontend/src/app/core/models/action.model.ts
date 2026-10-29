@@ -1,3 +1,5 @@
+import {TextBoxDetail} from './textbox-detail.model';
+
 export type ActionType =
   | 'LOOK_AT'
   | 'OPEN'
@@ -10,7 +12,8 @@ export type ActionType =
 export type PreconditionType =
   | 'HAS_ITEM'
   | 'DOES_NOT_HAVE_ITEM'
-  | 'FLAG_EQUALS';
+  | 'FLAG_EQUALS'
+  | 'INPUT_EQUALS';
 
 export type EffectType =
   | 'CHANGE_SCENE'
@@ -27,6 +30,7 @@ export interface Precondition {
   requiredKey: string;
   expectedValue?: string;
   failureMessage?: string;
+  textBoxDetail?: TextBoxDetail;
 }
 
 export interface GameEffect {

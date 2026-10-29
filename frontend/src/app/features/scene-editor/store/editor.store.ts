@@ -197,7 +197,6 @@ export const EditorStore = signalStore(
                       active = scenes.find((s) => s.code === adventure.initialSceneCode) || scenes[0] || null;
                     }
 
-                    // Recuperiamo l'eventuale pending code dallo store o dalla session di sicurezza
                     const pendingCode = store.pendingItemCode() || sessionStorage.getItem('pending_selected_item');
                     let resolvedItem: Item | null = null;
 
@@ -271,6 +270,7 @@ export const EditorStore = signalStore(
       resetState,
       loadAdventureAndScenes,
       findItemEverywhere,
+      updateItemInState,
 
       loadInventoryCatalog(): void {
         const advCode = store.adventure()?.code;
@@ -515,7 +515,14 @@ export const EditorStore = signalStore(
             next: (savedAction) => {
               const itemToUpdate = currentItem ?? findItemEverywhere(itemId);
               if (itemToUpdate) {
-                const updatedActions = [...(itemToUpdate.actions ?? []), savedAction];
+                const currentActions = itemToUpdate.actions ?? [];
+                const existingIndex = currentActions.findIndex(
+                  (a) => (savedAction.id && a.id === savedAction.id) || a.type === savedAction.type
+                );
+                const updatedActions = existingIndex >= 0
+                  ? currentActions.map((a, i) => (i === existingIndex ? savedAction : a))
+                  : [...currentActions, savedAction];
+
                 updateItemInState({ ...itemToUpdate, actions: updatedActions });
               }
               patchState(store, {
@@ -545,9 +552,12 @@ export const EditorStore = signalStore(
         return actionService.updateAction(action).pipe(
           tap({
             next: (updatedAction) => {
-              const updatedItemActions = (currentItem.actions ?? []).map((a) =>
-                a.id === updatedAction.id ? updatedAction : a
-              );
+              const currentActions = currentItem.actions ?? [];
+              const updatedItemActions = currentActions.map((a) => {
+                if (action.id && a.id === action.id) return updatedAction;
+                if (a.type === action.type) return updatedAction;
+                return a;
+              });
 
               updateItemInState({
                 ...currentItem,

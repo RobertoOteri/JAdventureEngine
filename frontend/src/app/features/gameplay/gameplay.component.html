@@ -16,11 +16,15 @@
       [feedbackMessage]="store.feedbackMessage()"
       [playTimeSeconds]="store.gameState()?.playTime || 0"
       [isDragging]="store.draggedItem.isDragging()"
+      [inputOverlay]="store.inputOverlay()"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
       (singleActionTriggered)="onExecuteAction($event)"
       (canvasClicked)="store.closeRadialMenu()"
       (hotspotHover)="store.setDragTarget($event?.name ?? null, $event?.code ?? null)"
       (hotspotDrop)="store.dropOnSceneTarget($event)"
+      (inputValueChange)="store.setInputValue($event)"
+      (inputSubmitted)="store.submitInput()"
+      (inputDismissed)="store.closeInputOverlay()"
     />
 
     <app-game-message-banner

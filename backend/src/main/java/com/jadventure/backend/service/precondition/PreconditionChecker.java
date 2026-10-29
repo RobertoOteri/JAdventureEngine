@@ -9,4 +9,8 @@ public interface PreconditionChecker {
     PreconditionType type();
 
     boolean isSatisfied(GameStateDto state, PreconditionDto precondition);
+
+    default boolean isSatisfied(GameStateDto state, PreconditionDto precondition, String input) {
+        return isSatisfied(state, precondition);
+    }
 }

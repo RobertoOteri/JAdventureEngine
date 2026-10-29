@@ -1,0 +1,14 @@
+:host {
+  display: contents;
+}
+
+.overlay-input {
+  position: absolute;
+  z-index: 20;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 0.3em;
+  background: transparent;
+  border: none;
+  outline: none;
+}

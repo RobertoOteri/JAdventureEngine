@@ -40,6 +40,16 @@
         }
       </svg>
 
+      @if (inputOverlay(); as overlay) {
+        <app-game-input-overlay
+          [box]="overlay.box"
+          [value]="overlay.value"
+          (valueChange)="inputValueChange.emit($event)"
+          (submitted)="inputSubmitted.emit()"
+          (dismissed)="inputDismissed.emit()"
+        />
+      }
+
       @if (feedbackMessage(); as msg) {
         <div class="feedback-banner" (click)="$event.stopPropagation()">
           <div class="feedback-icon">

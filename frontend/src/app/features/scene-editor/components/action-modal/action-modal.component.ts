@@ -1,5 +1,4 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EditorStore } from '../../store/editor.store';
 import {
@@ -10,11 +9,16 @@ import {
   Precondition,
   PreconditionType
 } from '../../../../core/models';
+import {
+  DEFAULT_TEXTBOX_DETAIL,
+  TextBoxPlacerComponent
+} from '../textbox-placer/textbox-placer.component';
+import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
 
 @Component({
   selector: 'app-action-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, TextBoxPlacerComponent],
   templateUrl: './action-modal.component.html',
   styleUrl: './action-modal.component.css'
 })
@@ -34,6 +38,27 @@ export class ActionModalComponent {
   readonly actionPreconditions = signal<Precondition[]>([]);
   readonly actionEffects = signal<GameEffect[]>([]);
 
+  readonly backgroundUrl = this.store.backgroundUrl;
+
+  readonly fonts: readonly string[] = [
+    'Arial',
+    'Courier New',
+    'monospace',
+    'Georgia',
+    'Verdana',
+    'Trebuchet MS'
+  ];
+
+  readonly textColors: readonly { label: string; value: string }[] = [
+    { label: 'Bianco', value: '#ffffff' },
+    { label: 'Nero', value: '#000000' },
+    { label: 'Giallo', value: '#facc15' },
+    { label: 'Rosso', value: '#ef4444' },
+    { label: 'Verde', value: '#22c55e' },
+    { label: 'Azzurro', value: '#38bdf8' },
+    { label: 'Arancione', value: '#f97316' }
+  ];
+
   readonly availableActionTypes = computed(() => {
     const allTypes: readonly ActionType[] = [
       'LOOK_AT',
@@ -49,16 +74,21 @@ export class ActionModalComponent {
     const currentItem = this.store.selectedItem() ?? this.store.combinedSceneList().find(i => i.code === this.itemCode());
     const existingActions = currentItem?.actions ?? [];
 
-    const otherActions = existingActions.filter(a => !editingAction || a.id !== editingAction.id);
+    const otherActions = existingActions.filter(a => {
+      if (!editingAction) return true;
+      if (a.id && editingAction.id) return a.id !== editingAction.id;
+      return a.type !== editingAction.type;
+    });
     const usedTypes = new Set(otherActions.map(a => a.type));
 
-    return allTypes.filter(type => !usedTypes.has(type));
+    return allTypes.filter(type => !usedTypes.has(type) || (editingAction && type === editingAction.type));
   });
 
   readonly preconditionTypes: readonly PreconditionType[] = [
     'HAS_ITEM',
     'DOES_NOT_HAVE_ITEM',
-    'FLAG_EQUALS'
+    'FLAG_EQUALS',
+    'INPUT_EQUALS'
   ];
 
   readonly effectTypes: readonly EffectType[] = [
@@ -79,9 +109,14 @@ export class ActionModalComponent {
         this.targetItemCode = existing.targetItemCode || '';
         this.actionSuccessMsg = existing.successMessage || '';
         this.actionFailureMsg = existing.defaultFailureMessage || '';
-        this.actionPreconditions.set(
-          existing.preconditions ? structuredClone(existing.preconditions) : []
-        );
+
+        const clonedPreconditions = existing.preconditions ? structuredClone(existing.preconditions) : [];
+        const processedPreconditions = clonedPreconditions.map((p: any) => ({
+          ...p,
+          textBoxDetail: this.normalizeBox(p.textBoxDetail)
+        }));
+
+        this.actionPreconditions.set(processedPreconditions);
         this.actionEffects.set(
           existing.effects ? structuredClone(existing.effects) : []
         );
@@ -190,11 +225,18 @@ export class ActionModalComponent {
   addPrecondition(): void {
     this.actionPreconditions.update((list) => [
       ...list,
-      { type: 'HAS_ITEM', requiredKey: '', expectedValue: '', failureMessage: '' }
+      {
+        type: 'HAS_ITEM',
+        requiredKey: '',
+        expectedValue: '',
+        failureMessage: '',
+        textBoxDetail: { ...DEFAULT_TEXTBOX_DETAIL }
+      }
     ]);
   }
 
   removePrecondition(index: number): void {
+    this.closeColorMenu();
     this.actionPreconditions.update((list) => list.filter((_, i) => i !== index));
   }
 
@@ -207,6 +249,56 @@ export class ActionModalComponent {
 
   removeEffect(index: number): void {
     this.actionEffects.update((list) => list.filter((_, i) => i !== index));
+  }
+  private normalizeBox(raw?: Partial<TextBoxDetail> | null): TextBoxDetail {
+    const d = DEFAULT_TEXTBOX_DETAIL;
+    return {
+      posX: raw?.posX ?? d.posX,
+      posY: raw?.posY ?? d.posY,
+      width: raw?.width ?? d.width,
+      height: raw?.height ?? d.height,
+      fontFamily: raw?.fontFamily ?? d.fontFamily,
+      fontSize: raw?.fontSize ?? d.fontSize,
+      color: raw?.color ?? '#ffffff'
+    };
+  }
+
+  patchBox(prec: Precondition, patch: Partial<TextBoxDetail>): void {
+    prec.textBoxDetail = { ...this.normalizeBox(prec.textBoxDetail), ...patch };
+  }
+
+  stepFont(prec: Precondition, delta: number): void {
+    const current = parseInt(prec.textBoxDetail?.fontSize ?? '16', 10) || 16;
+    const next = Math.max(10, Math.min(72, current + delta));
+    this.patchBox(prec, { fontSize: `${next}px` });
+  }
+
+  centerBox(prec: Precondition): void {
+    const box = this.normalizeBox(prec.textBoxDetail);
+    this.patchBox(prec, {
+      posX: Math.round((1000 - box.width) / 2),
+      posY: Math.round((1000 - box.height) / 2)
+    });
+  }
+
+  readonly openColorMenu = signal<number | null>(null);
+
+  toggleColorMenu(index: number): void {
+    this.openColorMenu.update((current) => (current === index ? null : index));
+  }
+
+  closeColorMenu(): void {
+    this.openColorMenu.set(null);
+  }
+
+  pickColor(prec: Precondition, color: string): void {
+    this.patchBox(prec, { color });
+    this.closeColorMenu();
+  }
+
+  colorLabel(value?: string): string {
+    const current = value ?? '#ffffff';
+    return this.textColors.find((c) => c.value === current)?.label ?? 'Personalizzato';
   }
 
   onSubmit(): void {
@@ -223,12 +315,13 @@ export class ActionModalComponent {
       successMessage: this.actionSuccessMsg || undefined,
       defaultFailureMessage: this.actionFailureMsg || undefined,
       preconditions: this.actionPreconditions()
-        .filter((p) => p.requiredKey && p.requiredKey.length > 0)
+        .filter((p) => p.requiredKey || p.type === 'INPUT_EQUALS')
         .map((p) => ({
           type: p.type,
-          requiredKey: p.requiredKey,
-          expectedValue: p.type === 'FLAG_EQUALS' ? (p.expectedValue || undefined) : undefined,
-          failureMessage: p.failureMessage || undefined
+          requiredKey: p.type === 'INPUT_EQUALS' ? 'INPUT' : p.requiredKey,
+          expectedValue: (p.type === 'FLAG_EQUALS' || p.type === 'INPUT_EQUALS') ? (p.expectedValue || undefined) : undefined,
+          failureMessage: p.failureMessage || undefined,
+          textBoxDetail: p.type === 'INPUT_EQUALS' ? (p.textBoxDetail || undefined) : undefined
         })),
       effects: this.actionEffects()
         .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue)

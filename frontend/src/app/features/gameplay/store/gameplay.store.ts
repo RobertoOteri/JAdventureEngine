@@ -13,6 +13,7 @@ import {
   ActionType,
   GameActionResultDto
 } from '../../../core/models';
+import { TextBoxDetail } from '../../../core/models/textbox-detail.model';
 
 export interface RadialMenuState {
   isOpen: boolean;
@@ -30,6 +31,13 @@ export interface DraggedItemState {
   targetHoveredCode: string | null;
 }
 
+export interface InputOverlayState {
+  actionCode: string;
+  actionType: ActionType;
+  box: TextBoxDetail;
+  value: string;
+}
+
 export interface GameplayState {
   adventureCode: string | null;
   currentSaveCode: string | null;
@@ -40,6 +48,7 @@ export interface GameplayState {
   endingMessage: string | null;
   isInventoryOpen: boolean;
   isPauseMenuOpen: boolean;
+  inputOverlay: InputOverlayState | null;
   radialMenu: RadialMenuState;
   draggedItem: DraggedItemState;
 }
@@ -60,6 +69,15 @@ const initialDraggedState: DraggedItemState = {
   targetHoveredCode: null
 };
 
+const FALLBACK_TEXTBOX: TextBoxDetail = {
+  posX: 350,
+  posY: 450,
+  width: 300,
+  height: 80,
+  fontFamily: 'Arial',
+  fontSize: '32px'
+};
+
 const initialState: GameplayState = {
   adventureCode: null,
   currentSaveCode: null,
@@ -70,6 +88,7 @@ const initialState: GameplayState = {
   endingMessage: null,
   isInventoryOpen: false,
   isPauseMenuOpen: false,
+  inputOverlay: null,
   radialMenu: initialRadialState,
   draggedItem: initialDraggedState
 };
@@ -102,18 +121,18 @@ export const GameplayStore = signalStore(
         clearTimeout(feedbackTimer);
         feedbackTimer = null;
       }
-      patchState(store, { feedbackMessage: message });
+      patchState(store, {feedbackMessage: message});
 
       if (message) {
         feedbackTimer = setTimeout(() => {
-          patchState(store, { feedbackMessage: null });
+          patchState(store, {feedbackMessage: null});
           feedbackTimer = null;
         }, durationMs);
       }
     };
 
     const closeRadialMenu = (): void => {
-      patchState(store, { radialMenu: initialRadialState });
+      patchState(store, {radialMenu: initialRadialState});
     };
 
     const openRadialMenu = (item: Item, x: number, y: number): void => {
@@ -127,16 +146,45 @@ export const GameplayStore = signalStore(
       });
     };
 
+    const openInputOverlay = (
+      actionCode: string,
+      actionType: ActionType,
+      box?: TextBoxDetail | null
+    ): void => {
+      patchState(store, {
+        inputOverlay: {
+          actionCode,
+          actionType,
+          box: box ?? FALLBACK_TEXTBOX,
+          value: ''
+        }
+      });
+      closeRadialMenu();
+    };
+
+    const closeInputOverlay = (): void => {
+      if (store.inputOverlay()) {
+        patchState(store, {inputOverlay: null});
+      }
+    };
+
+    const setInputValue = (value: string): void => {
+      const overlay = store.inputOverlay();
+      if (overlay) {
+        patchState(store, {inputOverlay: {...overlay, value}});
+      }
+    };
+
     const toggleInventory = (): void => {
-      patchState(store, (state) => ({ isInventoryOpen: !state.isInventoryOpen }));
+      patchState(store, (state) => ({isInventoryOpen: !state.isInventoryOpen}));
     };
 
     const setInventoryOpen = (isOpen: boolean): void => {
-      patchState(store, { isInventoryOpen: isOpen });
+      patchState(store, {isInventoryOpen: isOpen});
     };
 
     const setAdventureCode = (code: string): void => {
-      patchState(store, { adventureCode: code });
+      patchState(store, {adventureCode: code});
     };
 
     const startDragItem = (item: Item, x: number, y: number): void => {
@@ -175,7 +223,7 @@ export const GameplayStore = signalStore(
     };
 
     const cancelDrag = (): void => {
-      patchState(store, { draggedItem: initialDraggedState });
+      patchState(store, {draggedItem: initialDraggedState});
     };
 
     const fetchSaves = rxMethod<string>(
@@ -183,7 +231,7 @@ export const GameplayStore = signalStore(
         switchMap((adventureCode) =>
           saveService.getSavesForAdventure(adventureCode).pipe(
             tap({
-              next: (savesList) => patchState(store, { savesList }),
+              next: (savesList) => patchState(store, {savesList}),
               error: (err) => console.error('Errore recupero lista salvataggi:', err)
             })
           )
@@ -212,7 +260,7 @@ export const GameplayStore = signalStore(
       if (isOpen) {
         syncAutoSave();
       }
-      patchState(store, { isPauseMenuOpen: isOpen });
+      patchState(store, {isPauseMenuOpen: isOpen});
       const advCode = store.adventureCode();
       if (isOpen && advCode) {
         fetchSaves(advCode);
@@ -232,6 +280,7 @@ export const GameplayStore = signalStore(
             feedbackMessage: null,
             endingMessage: null,
             isPauseMenuOpen: false,
+            inputOverlay: null,
             savesList: []
           })
         ),
@@ -264,7 +313,7 @@ export const GameplayStore = signalStore(
             tap({
               error: (err) => {
                 console.error('Errore avvio nuova partita:', err);
-                patchState(store, { isLoading: false });
+                patchState(store, {isLoading: false});
                 setFeedbackMessage('Impossibile avviare la partita.');
               }
             })
@@ -281,7 +330,8 @@ export const GameplayStore = signalStore(
             isLoading: true,
             feedbackMessage: null,
             endingMessage: null,
-            isPauseMenuOpen: false
+            isPauseMenuOpen: false,
+            inputOverlay: null
           })
         ),
         switchMap((adventureCode) =>
@@ -313,7 +363,7 @@ export const GameplayStore = signalStore(
             tap({
               error: (err) => {
                 console.error('Errore ripresa partita:', err);
-                patchState(store, { isLoading: false });
+                patchState(store, {isLoading: false});
                 setFeedbackMessage('Nessun salvataggio trovato per continuare.');
               }
             })
@@ -329,7 +379,8 @@ export const GameplayStore = signalStore(
             isLoading: true,
             feedbackMessage: null,
             endingMessage: null,
-            isPauseMenuOpen: false
+            isPauseMenuOpen: false,
+            inputOverlay: null
           })
         ),
         switchMap((saveCode) =>
@@ -349,7 +400,7 @@ export const GameplayStore = signalStore(
               },
               error: (err) => {
                 console.error('Errore caricamento partita:', err);
-                patchState(store, { isLoading: false });
+                patchState(store, {isLoading: false});
                 setFeedbackMessage('Errore nel caricamento del salvataggio.');
               }
             })
@@ -358,9 +409,9 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const executeAction = rxMethod<{ actionCode: string; actionType: ActionType }>(
+    const executeAction = rxMethod<{ actionCode: string; actionType: ActionType; input?: string }>(
       pipe(
-        exhaustMap(({ actionCode, actionType }) => {
+        exhaustMap(({actionCode, actionType, input}) => {
           const adventureCode = store.adventureCode();
           const gameState = store.gameState();
 
@@ -368,6 +419,7 @@ export const GameplayStore = signalStore(
             console.error('Nessuna partita attiva nello store');
             setFeedbackMessage('Errore: sessione di gioco non valida.');
             closeRadialMenu();
+            closeInputOverlay();
             return [];
           }
 
@@ -375,7 +427,8 @@ export const GameplayStore = signalStore(
             adventureCode,
             gameState,
             actionCode,
-            actionType
+            actionType,
+            input
           };
 
           return actionService.executeAction(payload).pipe(
@@ -396,6 +449,14 @@ export const GameplayStore = signalStore(
                   );
                 }
                 closeRadialMenu();
+
+                if (store.inputOverlay()) {
+                  if (result.success || completed) {
+                    closeInputOverlay();
+                  } else {
+                    setInputValue('');
+                  }
+                }
               },
               error: (err: any) => {
                 console.error('Errore durante l\'esecuzione dell\'azione:', err);
@@ -406,12 +467,28 @@ export const GameplayStore = signalStore(
                   'Non puoi fare questa azione qui.';
                 setFeedbackMessage(msg);
                 closeRadialMenu();
+
+                if (store.inputOverlay()) {
+                  setInputValue('');
+                }
               }
             })
           );
         })
       )
     );
+
+    const submitInput = (): void => {
+      const overlay = store.inputOverlay();
+      if (!overlay || !overlay.value.trim()) {
+        return;
+      }
+      executeAction({
+        actionCode: overlay.actionCode,
+        actionType: overlay.actionType,
+        input: overlay.value
+      });
+    };
 
     const dropOnSceneTarget = (targetItemCode: string): void => {
       const drag = store.draggedItem();
@@ -437,7 +514,7 @@ export const GameplayStore = signalStore(
       const actionIdentifier = action?.code || (action?.id ? String(action.id) : null);
 
       if (action && actionIdentifier) {
-        executeAction({ actionCode: actionIdentifier, actionType: 'USE_WITH' });
+        executeAction({actionCode: actionIdentifier, actionType: 'USE_WITH'});
       } else {
         setFeedbackMessage('Non sembra avere alcun effetto.');
       }
@@ -459,7 +536,7 @@ export const GameplayStore = signalStore(
         targetItem?.actions?.find((a) => a.type === 'USE_WITH' && a.targetItemCode === sourceCode);
 
       if (action?.code) {
-        executeAction({ actionCode: action.code, actionType: 'USE_WITH' });
+        executeAction({actionCode: action.code, actionType: 'USE_WITH'});
       } else {
         setFeedbackMessage('Non puoi combinare questi due oggetti.');
       }
@@ -513,6 +590,10 @@ export const GameplayStore = signalStore(
       setFeedbackMessage,
       openRadialMenu,
       closeRadialMenu,
+      openInputOverlay,
+      closeInputOverlay,
+      setInputValue,
+      submitInput,
       toggleInventory,
       setInventoryOpen,
       startDragItem,

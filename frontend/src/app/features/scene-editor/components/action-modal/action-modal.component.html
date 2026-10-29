@@ -104,6 +104,15 @@
                         <option [value]="inv.code">{{ inv.name }} (#{{ inv.code }})</option>
                       }
                     </select>
+                  } @else if (prec.type === 'INPUT_EQUALS') {
+                    <input
+                      type="text"
+                      class="studio-input code-input"
+                      [(ngModel)]="prec.expectedValue"
+                      placeholder="Soluzione esatta (es. 1234)"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
                   } @else {
                     <div class="flag-condition-grid">
                       <input
@@ -138,6 +147,115 @@
                   <i class="bi bi-trash3"></i>
                 </button>
               </div>
+
+              @if (prec.type === 'INPUT_EQUALS') {
+                @if (prec.textBoxDetail; as tb) {
+                  <div class="input-box-panel">
+                    <div class="panel-head">
+                      <div class="panel-title">
+                        <i class="bi bi-input-cursor-text"></i>
+                        <span>Dove appare il campo di testo</span>
+                      </div>
+                      <span class="panel-hint">
+                        Trascina il box per spostarlo, l'angolo per ridimensionarlo, o disegna un nuovo rettangolo sullo sfondo.
+                      </span>
+                    </div>
+
+                    @if (backgroundUrl()) {
+                      <app-textbox-placer
+                        [backgroundUrl]="backgroundUrl()"
+                        [box]="tb"
+                        [sampleText]="prec.expectedValue ?? ''"
+                        (boxChange)="prec.textBoxDetail = $event"
+                      />
+                    } @else {
+                      <div class="empty-rules amber">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Seleziona una scena con uno sfondo per posizionare il box.</span>
+                      </div>
+                    }
+
+                    <div class="panel-controls">
+                      <select
+                        class="studio-select"
+                        [ngModel]="tb.fontFamily"
+                        (ngModelChange)="patchBox(prec, { fontFamily: $event })"
+                      >
+                        @for (f of fonts; track f) {
+                          <option [value]="f">{{ f }}</option>
+                        }
+                      </select>
+
+                      <div class="font-stepper">
+                        <button type="button" (click)="stepFont(prec, -2)" title="Riduci dimensione">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <span>{{ tb.fontSize }}</span>
+                        <button type="button" (click)="stepFont(prec, 2)" title="Aumenta dimensione">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </div>
+
+                      <div class="color-select">
+                        <button
+                          type="button"
+                          class="color-trigger"
+                          title="Colore del testo"
+                          (click)="toggleColorMenu($index)"
+                        >
+                          <span class="color-dot" [style.background]="tb.color ?? '#ffffff'"></span>
+                          <span>{{ colorLabel(tb.color) }}</span>
+                          <i class="bi bi-chevron-down"></i>
+                        </button>
+
+                        @if (openColorMenu() === $index) {
+                          <div class="color-menu-backdrop" (click)="closeColorMenu()"></div>
+                          <ul class="color-menu">
+                            @for (c of textColors; track c.value) {
+                              <li>
+                                <button
+                                  type="button"
+                                  class="color-option"
+                                  [class.active]="(tb.color ?? '#ffffff') === c.value"
+                                  (click)="pickColor(prec, c.value)"
+                                >
+                                  <span class="color-dot" [style.background]="c.value"></span>
+                                  <span>{{ c.label }}</span>
+                                  @if ((tb.color ?? '#ffffff') === c.value) {
+                                    <i class="bi bi-check2 color-check"></i>
+                                  }
+                                </button>
+                              </li>
+                            }
+                          </ul>
+                        }
+                      </div>
+                    </div>
+
+                    <details class="precise-values">
+                      <summary>Valori precisi</summary>
+                      <div class="textbox-config-grid">
+                        <div class="config-field">
+                          <label>X</label>
+                          <input type="number" class="studio-input" [ngModel]="tb.posX" (ngModelChange)="patchBox(prec, { posX: $event })" />
+                        </div>
+                        <div class="config-field">
+                          <label>Y</label>
+                          <input type="number" class="studio-input" [ngModel]="tb.posY" (ngModelChange)="patchBox(prec, { posY: $event })" />
+                        </div>
+                        <div class="config-field">
+                          <label>Larghezza</label>
+                          <input type="number" class="studio-input" [ngModel]="tb.width" (ngModelChange)="patchBox(prec, { width: $event })" />
+                        </div>
+                        <div class="config-field">
+                          <label>Altezza</label>
+                          <input type="number" class="studio-input" [ngModel]="tb.height" (ngModelChange)="patchBox(prec, { height: $event })" />
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                }
+              }
 
               <div class="precondition-failure-msg-row">
                 <div class="msg-input-wrapper">

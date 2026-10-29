@@ -6,6 +6,7 @@ export interface GameActionDto {
   gameState: GameStateDto;
   actionCode: string;
   actionType: ActionType;
+  input?: string;
 }
 
 export interface GameActionResultDto {

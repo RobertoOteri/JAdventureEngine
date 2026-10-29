@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { EditorStore } from './store/editor.store';
@@ -15,7 +14,6 @@ import { AdventureCreateComponent } from '../adventures/pages/adventure-create/a
   selector: 'app-scene-editor',
   standalone: true,
   imports: [
-    CommonModule,
     EditorHeaderComponent,
     ScenesSidebarComponent,
     SceneCanvasComponent,

@@ -1,0 +1,33 @@
+<div
+  class="stage"
+  #stage
+  (pointerdown)="beginDraw($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp()"
+  (pointercancel)="onPointerUp()"
+>
+  <img class="bg" [src]="backgroundUrl()" alt="" draggable="false" />
+  <div class="grid"></div>
+
+  @let b = box();
+  <div
+    class="box"
+    [class.on-light]="isDarkText()"
+    [style.left.%]="b.posX / 10"
+    [style.top.%]="b.posY / 10"
+    [style.width.%]="b.width / 10"
+    [style.height.%]="b.height / 10"
+    (pointerdown)="beginMove($event)"
+  >
+    <span
+      class="label"
+      [class.is-placeholder]="isPlaceholder()"
+      [style.font-family]="b.fontFamily || 'Arial'"
+      [style.font-size]="'calc(' + fontPx() + ' * 0.1cqw)'"
+      [style.color]="textColor()"
+    >{{ displayText() }}</span>
+    <div class="handle" (pointerdown)="beginResize($event)"></div>
+  </div>
+
+  <div class="readout">{{ b.posX }}, {{ b.posY }} · {{ b.width }}×{{ b.height }}</div>
+</div>

@@ -1,12 +1,14 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Scene, Item, ActionType } from '../../../../core/models';
 import { GameTimerComponent } from '../game-timer/game-timer.component';
+import { GameInputOverlayComponent } from '../game-input-overlay/game-input-overlay.component';
+import { InputOverlayState } from '../../store/gameplay.store';
 
 @Component({
   selector: 'app-game-viewport',
   standalone: true,
-  imports: [CommonModule, GameTimerComponent],
+  imports: [CommonModule, GameTimerComponent, GameInputOverlayComponent],
   templateUrl: './game-viewport.component.html',
   styleUrl: './game-viewport.component.css'
 })
@@ -17,12 +19,16 @@ export class GameViewportComponent {
   feedbackMessage = input<string | null>(null);
   playTimeSeconds = input<number>(0);
   isDragging = input<boolean>(false);
+  inputOverlay = input<InputOverlayState | null>(null);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
   singleActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
   canvasClicked = output<void>();
   hotspotHover = output<{ name: string; code: string } | null>();
   hotspotDrop = output<string>();
+  inputValueChange = output<string>();
+  inputSubmitted = output<void>();
+  inputDismissed = output<void>();
 
   isItemVisible(item: Item): boolean {
     const visibleCodes = this.visibleItemCodes();

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +66,7 @@ public class ActionService {
             );
         }
 
-        Optional<String> failureMessage = preconditionService.validatePreconditions(stateDto, action);
+        Optional<String> failureMessage = preconditionService.validatePreconditions(stateDto, action, gameActionDto.getInput());
 
         if (failureMessage.isPresent()) {
             return GameActionResultDto.builder()

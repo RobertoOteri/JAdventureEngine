@@ -177,18 +177,15 @@ export class SceneCanvasComponent {
 
   @HostListener('window:mousemove', ['$event'])
   onWindowMouseMove(event: MouseEvent): void {
-    if (!this.isInteractingGizmo || !this.dragAxis || !this.gizmoAction) return;
+    if (!this.isInteractingGizmo || !this.gizmoAction || !this.dragAxis) return;
 
     const svg = this.svgCanvasRef?.nativeElement;
-    const gizmo = this.gizmoBoxRef?.nativeElement;
-    if (!svg || !gizmo) return;
+    const targetEl = this.gizmoBoxRef?.nativeElement;
+    if (!svg || !targetEl) return;
 
     const rect = svg.getBoundingClientRect();
-    const pixelDx = event.clientX - this.startMouse.x;
-    const pixelDy = event.clientY - this.startMouse.y;
-
-    const deltaX = Math.round((pixelDx / rect.width) * 1000);
-    const deltaY = Math.round((pixelDy / rect.height) * 1000);
+    const deltaX = Math.round(((event.clientX - this.startMouse.x) / rect.width) * 1000);
+    const deltaY = Math.round(((event.clientY - this.startMouse.y) / rect.height) * 1000);
 
     if (this.gizmoAction === 'MOVE') {
       this.currentDelta.x = (this.dragAxis === 'X' || this.dragAxis === 'BOTH') ? deltaX : 0;
@@ -196,25 +193,23 @@ export class SceneCanvasComponent {
 
       const pxX = (this.currentDelta.x / 1000) * rect.width;
       const pxY = (this.currentDelta.y / 1000) * rect.height;
-      gizmo.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
-    } else if (this.gizmoAction === 'SCALE') {
+      targetEl.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+    } else {
       let factorX = 1;
       let factorY = 1;
 
-      if (this.dragAxis === 'X') {
+      if (this.dragAxis === 'X' || this.dragAxis === 'BOTH') {
         factorX = Math.max(0.05, (this.startDimensions.w + deltaX) / this.startDimensions.w);
-      } else if (this.dragAxis === 'Y') {
-        factorY = Math.max(0.05, (this.startDimensions.h - deltaY) / this.startDimensions.h);
-      } else if (this.dragAxis === 'BOTH') {
-        factorX = Math.max(0.05, (this.startDimensions.w + deltaX) / this.startDimensions.w);
-        factorY = Math.max(0.05, (this.startDimensions.h - deltaY) / this.startDimensions.h);
+      }
+      if (this.dragAxis === 'Y' || this.dragAxis === 'BOTH') {
+        factorY = Math.max(0.05, (this.startDimensions.h + deltaY) / this.startDimensions.h);
       }
 
       this.currentDelta.x = Math.round(this.startDimensions.w * factorX) - this.startDimensions.w;
       this.currentDelta.y = Math.round(this.startDimensions.h * factorY) - this.startDimensions.h;
 
-      gizmo.style.transform = `scale(${factorX}, ${factorY})`;
-      gizmo.style.transformOrigin = 'bottom left';
+      targetEl.style.transform = `scale(${factorX}, ${factorY})`;
+      targetEl.style.transformOrigin = 'top left';
     }
   }
 
@@ -222,6 +217,12 @@ export class SceneCanvasComponent {
   onWindowMouseUp(): void {
     if (!this.isInteractingGizmo) return;
     this.isInteractingGizmo = false;
+
+    const targetEl = this.gizmoBoxRef?.nativeElement;
+    if (targetEl) {
+      targetEl.style.transform = '';
+      targetEl.style.transformOrigin = '';
+    }
 
     let nextPosX = this.spritePosX();
     let nextPosY = this.spritePosY();
@@ -233,14 +234,7 @@ export class SceneCanvasComponent {
       nextPosY = Math.max(0, Math.min(1000 - nextH, this.startPos.y + this.currentDelta.y));
     } else if (this.gizmoAction === 'SCALE') {
       nextW = Math.max(20, Math.min(1000 - this.startPos.x, this.startDimensions.w + this.currentDelta.x));
-      nextH = Math.max(20, Math.min(1000, this.startDimensions.h + this.currentDelta.y));
-      const diffH = nextH - this.startDimensions.h;
-      nextPosY = Math.max(0, this.startPos.y - diffH);
-    }
-
-    if (this.gizmoBoxRef?.nativeElement) {
-      this.gizmoBoxRef.nativeElement.style.transform = '';
-      this.gizmoBoxRef.nativeElement.style.transformOrigin = '';
+      nextH = Math.max(20, Math.min(1000 - this.startPos.y, this.startDimensions.h + this.currentDelta.y));
     }
 
     this.gizmoAction = null;

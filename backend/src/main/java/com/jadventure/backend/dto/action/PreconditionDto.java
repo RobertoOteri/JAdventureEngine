@@ -23,4 +23,6 @@ public class PreconditionDto {
 
     private String expectedValue;
     private String failureMessage;
+
+    private TextBoxDetailDto textBoxDetail;
 }

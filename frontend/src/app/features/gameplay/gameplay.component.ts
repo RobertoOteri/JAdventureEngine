@@ -1,9 +1,9 @@
-import { Component, OnInit, HostListener, HostBinding, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, HostBinding, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
-import { ActionType, GraphicAdventureDto } from '../../core/models';
+import { Action, ActionType, GraphicAdventureDto } from '../../core/models';
 
 import { GameTopbarComponent } from './components/game-topbar/game-topbar.component';
 import { GameViewportComponent } from './components/game-viewport/game-viewport.component';
@@ -34,7 +34,7 @@ import { GameDragCursorComponent } from './components/game-drag-cursor/game-drag
   templateUrl: './gameplay.component.html',
   styleUrl: './gameplay.component.css'
 })
-export class GameplayComponent implements OnInit {
+export class GameplayComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly adventureService = inject(AdventureService);
@@ -54,6 +54,10 @@ export class GameplayComponent implements OnInit {
   @HostListener('window:keydown.escape')
   handleEscape(): void {
     if (this.isLaunchModalOpen() || this.store.isCompleted()) {
+      return;
+    }
+    if (this.store.inputOverlay()) {
+      this.store.closeInputOverlay();
       return;
     }
     if (this.store.radialMenu.isOpen()) {
@@ -114,7 +118,6 @@ export class GameplayComponent implements OnInit {
         this.store.incrementPlayTime();
       }
     }, 1000);
-
   }
 
   ngOnDestroy(): void {
@@ -122,7 +125,6 @@ export class GameplayComponent implements OnInit {
       clearInterval(this.timerInterval);
     }
   }
-
 
   onStartNew(): void {
     const code = this.store.adventureCode();
@@ -145,8 +147,29 @@ export class GameplayComponent implements OnInit {
     this.isLaunchModalOpen.set(false);
   }
 
-  onExecuteAction(action: { actionCode: string; actionType: ActionType }): void {
-    this.store.executeAction(action);
+  onExecuteAction(actionData: { actionCode: string; actionType: ActionType }): void {
+    const sources = [...(this.store.currentScene()?.items ?? []), ...this.store.inventory()];
+    let foundAction: Action | undefined;
+
+    for (const item of sources) {
+      foundAction = item.actions?.find((a) => a.code === actionData.actionCode);
+      if (foundAction) {
+        break;
+      }
+    }
+
+    const inputPrecondition = foundAction?.preconditions?.find((p) => p.type === 'INPUT_EQUALS');
+
+    if (inputPrecondition) {
+      this.store.openInputOverlay(
+        actionData.actionCode,
+        actionData.actionType,
+        inputPrecondition.textBoxDetail
+      );
+      return;
+    }
+
+    this.store.executeAction(actionData);
   }
 
   onSaveGame(name: string): void {
@@ -166,8 +189,8 @@ export class GameplayComponent implements OnInit {
     }
   }
 
-  @HostListener('window:mouseup', ['$event'])
-  onGlobalMouseUp(event: MouseEvent): void {
+  @HostListener('window:mouseup')
+  onGlobalMouseUp(): void {
     if (this.store.draggedItem.isDragging()) {
       this.store.cancelDrag();
     }

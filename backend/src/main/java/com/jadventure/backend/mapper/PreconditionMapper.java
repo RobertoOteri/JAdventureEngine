@@ -1,7 +1,9 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.action.PreconditionDto;
+import com.jadventure.backend.dto.action.TextBoxDetailDto;
 import com.jadventure.backend.model.Precondition;
+import com.jadventure.backend.model.TextBoxDetail;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,4 +19,8 @@ public interface PreconditionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "action", ignore = true)
     Precondition toEntity(PreconditionDto dto);
+
+    TextBoxDetailDto toDto(TextBoxDetail entity);
+
+    TextBoxDetail toEntity(TextBoxDetailDto dto);
 }

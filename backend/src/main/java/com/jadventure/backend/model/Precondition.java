@@ -38,4 +38,6 @@ public class Precondition {
     @JoinColumn(name = "action_id", nullable = false)
     private Action action;
 
+    @Embedded
+    private TextBoxDetail textBoxDetail;
 }

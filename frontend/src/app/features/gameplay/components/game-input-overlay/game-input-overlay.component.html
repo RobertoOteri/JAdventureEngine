@@ -1,0 +1,22 @@
+<input
+  #field
+  class="overlay-input"
+  type="text"
+  autocomplete="off"
+  autocapitalize="off"
+  spellcheck="false"
+  [value]="value()"
+  [style.left.%]="box().posX / 10"
+  [style.top.%]="box().posY / 10"
+  [style.width.%]="box().width / 10"
+  [style.height.%]="box().height / 10"
+  [style.font-family]="fontFamily()"
+  [style.font-size]="fontSize()"
+  [style.color]="color()"
+  [style.caret-color]="color()"
+  (input)="valueChange.emit(field.value)"
+  (keydown.enter)="submitted.emit()"
+  (blur)="dismissed.emit()"
+  (mousedown)="$event.stopPropagation()"
+  (click)="$event.stopPropagation()"
+/>
