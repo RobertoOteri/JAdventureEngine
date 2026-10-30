@@ -1,5 +1,6 @@
 <div
   class="radial-menu-backdrop"
+  (click)="onBackdropClicked($event)"
   (contextmenu)="$event.preventDefault(); close.emit()"
 >
   <div
@@ -7,6 +8,7 @@
     [class.flip-up]="isNearBottom()"
     [style.left.px]="x()"
     [style.top.px]="y()"
+    (click)="$event.stopPropagation()"
   >
     <div class="compass-casing">
       <div class="compass-dial">
@@ -36,6 +38,7 @@
           [class.active]="hoveredAction() === action.type"
           [style.left]="slot.left"
           [style.top]="slot.top"
+          (click)="onActionClicked($event, action)"
         >
           <img
             [src]="'/icons/actions/' + action.type.toLowerCase() + '.svg'"

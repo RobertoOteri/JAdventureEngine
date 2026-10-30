@@ -34,7 +34,6 @@ export class ActionModalComponent {
   actionType: ActionType = 'LOOK_AT';
   targetItemCode = '';
   actionSuccessMsg = '';
-  actionFailureMsg = '';
   readonly actionPreconditions = signal<Precondition[]>([]);
   readonly actionEffects = signal<GameEffect[]>([]);
 
@@ -79,9 +78,10 @@ export class ActionModalComponent {
       if (a.id && editingAction.id) return a.id !== editingAction.id;
       return a.type !== editingAction.type;
     });
-    const usedTypes = new Set(otherActions.map(a => a.type));
 
-    return allTypes.filter(type => !usedTypes.has(type) || (editingAction && type === editingAction.type));
+    const usedTypes = new Set(otherActions.map(a => a.type).filter(type => type !== 'USE_WITH'));
+
+    return allTypes.filter(type => type === 'USE_WITH' || !usedTypes.has(type) || (editingAction && type === editingAction.type));
   });
 
   readonly preconditionTypes: readonly PreconditionType[] = [
@@ -108,7 +108,6 @@ export class ActionModalComponent {
         this.actionType = existing.type;
         this.targetItemCode = existing.targetItemCode || '';
         this.actionSuccessMsg = existing.successMessage || '';
-        this.actionFailureMsg = existing.defaultFailureMessage || '';
 
         const clonedPreconditions = existing.preconditions ? structuredClone(existing.preconditions) : [];
         const processedPreconditions = clonedPreconditions.map((p: any) => ({
@@ -124,7 +123,6 @@ export class ActionModalComponent {
         this.actionType = 'LOOK_AT';
         this.targetItemCode = '';
         this.actionSuccessMsg = '';
-        this.actionFailureMsg = '';
         this.actionPreconditions.set([]);
         this.actionEffects.set([]);
       }
@@ -250,6 +248,7 @@ export class ActionModalComponent {
   removeEffect(index: number): void {
     this.actionEffects.update((list) => list.filter((_, i) => i !== index));
   }
+
   private normalizeBox(raw?: Partial<TextBoxDetail> | null): TextBoxDetail {
     const d = DEFAULT_TEXTBOX_DETAIL;
     return {
@@ -313,7 +312,7 @@ export class ActionModalComponent {
       type: this.actionType,
       targetItemCode: this.actionType === 'USE_WITH' ? this.targetItemCode : undefined,
       successMessage: this.actionSuccessMsg || undefined,
-      defaultFailureMessage: this.actionFailureMsg || undefined,
+      defaultFailureMessage: undefined,
       preconditions: this.actionPreconditions()
         .filter((p) => p.requiredKey || p.type === 'INPUT_EQUALS')
         .map((p) => ({

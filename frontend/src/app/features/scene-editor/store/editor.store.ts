@@ -516,9 +516,14 @@ export const EditorStore = signalStore(
               const itemToUpdate = currentItem ?? findItemEverywhere(itemId);
               if (itemToUpdate) {
                 const currentActions = itemToUpdate.actions ?? [];
-                const existingIndex = currentActions.findIndex(
-                  (a) => (savedAction.id && a.id === savedAction.id) || a.type === savedAction.type
-                );
+                const existingIndex = currentActions.findIndex((a) => {
+                  if (savedAction.id && a.id === savedAction.id) return true;
+                  if (savedAction.type === 'USE_WITH') {
+                    return a.type === 'USE_WITH' && a.targetItemCode === savedAction.targetItemCode;
+                  }
+                  return a.type === savedAction.type;
+                });
+
                 const updatedActions = existingIndex >= 0
                   ? currentActions.map((a, i) => (i === existingIndex ? savedAction : a))
                   : [...currentActions, savedAction];
@@ -555,7 +560,7 @@ export const EditorStore = signalStore(
               const currentActions = currentItem.actions ?? [];
               const updatedItemActions = currentActions.map((a) => {
                 if (action.id && a.id === action.id) return updatedAction;
-                if (a.type === action.type) return updatedAction;
+                if (action.type !== 'USE_WITH' && a.type === action.type) return updatedAction;
                 return a;
               });
 

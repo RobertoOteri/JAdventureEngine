@@ -1,6 +1,6 @@
 import { Component, computed, HostListener, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActionType, Item } from '../../../../core/models';
+import { Action, ActionType, Item } from '../../../../core/models';
 
 const ACTION_POSITIONS: Record<string, number> = {
   LOOK_AT: 0,
@@ -28,6 +28,9 @@ export class GameRadialMenuComponent {
 
   hoveredAction = signal<ActionType | null>(null);
   needleAngle = signal<number>(0);
+
+  private startDragPos: { x: number; y: number } | null = null;
+  private hasMovedSignificantly = false;
 
   filteredActions = computed(() => {
     const rawActions = this.item()?.actions ?? [];
@@ -61,6 +64,15 @@ export class GameRadialMenuComponent {
 
   @HostListener('window:mousemove', ['$event'])
   onWindowMouseMove(event: MouseEvent): void {
+    if (!this.startDragPos) {
+      this.startDragPos = { x: event.clientX, y: event.clientY };
+    } else {
+      const distFromStart = Math.hypot(event.clientX - this.startDragPos.x, event.clientY - this.startDragPos.y);
+      if (distFromStart > 10) {
+        this.hasMovedSignificantly = true;
+      }
+    }
+
     const el = document.elementFromPoint(event.clientX, event.clientY);
     const actionBtn = el?.closest('.btn-radial-action');
 
@@ -74,14 +86,30 @@ export class GameRadialMenuComponent {
     const dy = event.clientY - this.y();
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 26 || dist > 130) {
+    if (dist < 26 || dist > 140) {
       this.hoveredAction.set(null);
     }
   }
 
   @HostListener('window:mouseup')
   onWindowMouseUp(): void {
-    const type = this.hoveredAction();
+    if (this.hasMovedSignificantly && this.hoveredAction()) {
+      this.triggerSelectedAction(this.hoveredAction()!);
+    }
+  }
+
+  // Secondo click esplicito su un'icona specifica
+  onActionClicked(event: MouseEvent, action: Action): void {
+    event.stopPropagation();
+    this.triggerSelectedAction(action.type);
+  }
+
+  onBackdropClicked(event: MouseEvent): void {
+    event.stopPropagation();
+    this.close.emit();
+  }
+
+  private triggerSelectedAction(type: ActionType): void {
     const action = this.item()?.actions?.find((a) => a.type === type);
 
     if (action?.code) {

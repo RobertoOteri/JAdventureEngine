@@ -22,6 +22,7 @@ public class ActionService {
     private final ActionRepository actionRepository;
     private final ActionMapper actionMapper;
     private final PreconditionService preconditionService;
+    private final ItemService itemService;
     private final GameEffectService gameEffectService;
     private final GameSaveService gameSaveService;
     private final AuthService authService;
@@ -29,12 +30,14 @@ public class ActionService {
     public ActionService(ActionRepository actionRepository,
                          ActionMapper actionMapper,
                          PreconditionService preconditionService,
+                         ItemService itemService,
                          GameEffectService gameEffectService,
                          GameSaveService gameSaveService,
                          AuthService authService) {
         this.actionRepository = actionRepository;
         this.actionMapper = actionMapper;
         this.preconditionService = preconditionService;
+        this.itemService = itemService;
         this.gameEffectService = gameEffectService;
         this.gameSaveService = gameSaveService;
         this.authService = authService;
@@ -111,6 +114,8 @@ public class ActionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + dto.getId()));
 
         authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
+
+        itemService.validateActionUniqueness(action.getItem().getActions(), dto);
 
         actionMapper.updateEntityFromDto(dto, action);
 

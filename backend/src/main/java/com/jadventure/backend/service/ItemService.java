@@ -111,7 +111,7 @@ public class ItemService {
         );
     }
 
-    private void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
+    public void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
         if (actionDto.getType() == ActionType.USE_WITH) {
             if (actionDto.getTargetItemCode() == null || actionDto.getTargetItemCode().isBlank()) {
                 throw new IllegalArgumentException("Per l'azione USE_WITH è obbligatorio specificare targetItemCode");
