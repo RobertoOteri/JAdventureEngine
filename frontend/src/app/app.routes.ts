@@ -70,6 +70,14 @@ export const routes: Routes = [
   },
 
   {
+    path: 'adventures/:adventureId/items/:itemId/dialogues',
+    loadComponent: () =>
+      import('./features/dialogue-editor/dialogue-editor.component').then(
+        (m) => m.DialogueEditorComponent
+      )
+  },
+
+  {
     path: '',
     redirectTo: 'auth',
     pathMatch: 'full'

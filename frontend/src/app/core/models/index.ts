@@ -10,3 +10,5 @@ export * from './game-action.model';
 export * from './game-state.model';
 export * from './leaderboard-entry.model';
 export * from './textbox-detail.model';
+export * from './dialogue-choice.model';
+export * from './dialogue-node.model'

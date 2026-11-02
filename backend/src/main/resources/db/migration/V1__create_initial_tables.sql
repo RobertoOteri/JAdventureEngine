@@ -8,6 +8,8 @@ CREATE SEQUENCE IF NOT EXISTS game_effect_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_save_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS game_state_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS leaderboard_entry_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS dialogue_node_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS dialogue_choice_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
@@ -61,6 +63,26 @@ CREATE TABLE IF NOT EXISTS items (
     CONSTRAINT fk_item_scene FOREIGN KEY (scene_id) REFERENCES scenes (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS dialogue_nodes (
+    id BIGINT PRIMARY KEY DEFAULT nextval('dialogue_node_seq'),
+    code VARCHAR(36) NOT NULL,
+    text VARCHAR(3000),
+    item_id BIGINT NOT NULL,
+
+    CONSTRAINT uq_dialogue_nodes_code UNIQUE (code),
+    CONSTRAINT fk_dialogue_node_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS dialogue_choices (
+    id BIGINT PRIMARY KEY DEFAULT nextval('dialogue_choice_seq'),
+    text VARCHAR(1000),
+    source_node_id BIGINT NOT NULL,
+    next_node_id BIGINT,
+
+    CONSTRAINT fk_dialogue_choice_source FOREIGN KEY (source_node_id) REFERENCES dialogue_nodes (id) ON DELETE CASCADE,
+    CONSTRAINT fk_dialogue_choice_next FOREIGN KEY (next_node_id) REFERENCES dialogue_nodes (id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS actions (
     id BIGINT PRIMARY KEY DEFAULT nextval('action_seq'),
     code VARCHAR(255) NOT NULL UNIQUE,
@@ -86,7 +108,8 @@ CREATE TABLE IF NOT EXISTS preconditions (
     font_family VARCHAR(100),
     font_size VARCHAR(50),
     color VARCHAR(20),
-    action_id BIGINT NOT NULL,
+    action_id BIGINT,
+    choice_id BIGINT,
     CONSTRAINT fk_precondition_action FOREIGN KEY (action_id) REFERENCES actions (id) ON DELETE CASCADE
 );
 
@@ -95,7 +118,9 @@ CREATE TABLE IF NOT EXISTS game_effects (
     type VARCHAR(50) NOT NULL,
     target_value VARCHAR(255),
     flag_value VARCHAR(255),
-    action_id BIGINT NOT NULL,
+    action_id BIGINT,
+    node_id BIGINT,
+    choice_id BIGINT,
     CONSTRAINT fk_game_effect_action FOREIGN KEY (action_id) REFERENCES actions (id) ON DELETE CASCADE
 );
 
@@ -158,10 +183,13 @@ CREATE TABLE IF NOT EXISTS leaderboard_entries (
 CREATE INDEX IF NOT EXISTS idx_graphic_adventures_author_id ON graphic_adventures (author_id);
 CREATE INDEX IF NOT EXISTS idx_scenes_adventure_id ON scenes (graphic_adventure_id);
 CREATE INDEX IF NOT EXISTS idx_items_scene_id ON items (scene_id);
+CREATE INDEX IF NOT EXISTS idx_items_adventure_id ON items (graphic_adventure_id);
 CREATE INDEX IF NOT EXISTS idx_actions_item_id ON actions (item_id);
 CREATE INDEX IF NOT EXISTS idx_preconditions_action_id ON preconditions (action_id);
 CREATE INDEX IF NOT EXISTS idx_game_effects_action_id ON game_effects (action_id);
+CREATE INDEX IF NOT EXISTS idx_dialogue_nodes_item_id ON dialogue_nodes (item_id);
+CREATE INDEX IF NOT EXISTS idx_dialogue_choices_source_node_id ON dialogue_choices (source_node_id);
+CREATE INDEX IF NOT EXISTS idx_dialogue_choices_next_node_id ON dialogue_choices (next_node_id);
 CREATE INDEX IF NOT EXISTS idx_game_saves_user_adv_auto_date ON game_saves (user_id, graphic_adventure_id, is_auto_save, saved_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_saves_code_user ON game_saves (code, user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_game_saves_one_auto ON game_saves (user_id, graphic_adventure_id) WHERE is_auto_save = TRUE;
-CREATE INDEX IF NOT EXISTS idx_items_adventure_id ON items (graphic_adventure_id);

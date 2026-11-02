@@ -1,0 +1,16 @@
+package com.jadventure.backend.repository;
+
+import com.jadventure.backend.model.DialogueNode;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface DialogueNodeRepository extends JpaRepository<DialogueNode, Long> {
+
+    List<DialogueNode> findByItemIdOrderById(Long itemId);
+
+    Optional<DialogueNode> findByCode(String code);
+}

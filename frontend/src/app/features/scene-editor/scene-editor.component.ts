@@ -375,4 +375,11 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       error: (err: any) => console.error(err?.error?.message || 'Errore modifica avventura.')
     });
   }
+
+  openDialogues(item: Item): void {
+    const advId = this.store.adventure()?.id;
+    if (!advId || !item.id) return;
+
+    void this.router.navigate(['/adventures', advId, 'items', item.id, 'dialogues']);
+  }
 }

@@ -2,11 +2,12 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { forkJoin, Observable, of, pipe, switchMap, tap } from 'rxjs';
-import { Action, GraphicAdventureDto, Item, Scene } from '../../../core/models';
+import { Action, GraphicAdventureDto, Item, Scene, DialogueNode } from '../../../core/models';
 import { AdventureService } from '../../../core/services/adventure.service';
 import { SceneService } from '../../../core/services/scene.service';
 import { ItemService } from '../../../core/services/item.service';
 import { ActionService } from '../../../core/services/action.service';
+import { DialogueService } from '../../../core/services/dialogue.service';
 
 export interface EditorState {
   adventure: GraphicAdventureDto | null;
@@ -63,7 +64,8 @@ export const EditorStore = signalStore(
     adventureService = inject(AdventureService),
     sceneService = inject(SceneService),
     itemService = inject(ItemService),
-    actionService = inject(ActionService)
+    actionService = inject(ActionService),
+    dialogueService = inject(DialogueService)
   ) => {
 
     const resetState = (): void => {
@@ -282,6 +284,10 @@ export const EditorStore = signalStore(
           },
           error: (err) => console.error('Errore caricamento oggetti:', err)
         });
+      },
+
+      loadDialogueNodes(itemId: number): Observable<DialogueNode[]> {
+        return dialogueService.findByItem(itemId);
       },
 
       deleteScene(sceneId: number): Observable<void> {

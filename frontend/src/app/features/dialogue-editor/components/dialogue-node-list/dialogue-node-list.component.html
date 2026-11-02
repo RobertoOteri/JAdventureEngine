@@ -1,0 +1,49 @@
+<aside class="node-list">
+  <div class="list-header">
+    <div class="header-title">
+      <i class="bi bi-diagram-3 icon-header"></i>
+      <h2>Nodi ({{ store.nodes().length }})</h2>
+    </div>
+    <button type="button" class="btn-add-node" (click)="store.addNode()">
+      <i class="bi bi-plus-lg"></i>
+      <span>Nodo</span>
+    </button>
+  </div>
+
+  <div class="nodes">
+    @for (node of store.nodes(); track node.code) {
+      <div
+        class="node-card"
+        [class.active]="store.selectedNodeCode() === node.code"
+        (click)="store.selectNode(node.code)"
+      >
+        <div class="node-card-main">
+          <span class="node-card-text" [class.is-empty]="!node.text.trim()">
+            {{ nodeLabel(node) }}
+          </span>
+          <span class="node-card-meta">
+            @if (node.choices.length === 0) {
+              fine dialogo
+            } @else {
+              {{ node.choices.length }} {{ node.choices.length === 1 ? 'scelta' : 'scelte' }}
+            }
+          </span>
+        </div>
+        <button
+          type="button"
+          class="btn-del-node"
+          title="Elimina nodo"
+          aria-label="Elimina nodo"
+          (click)="onRemove($event, node.code)"
+        >
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    } @empty {
+      <div class="nodes-empty">
+        <i class="bi bi-inbox icon-empty"></i>
+        <span>Nessun nodo. Crea il primo con il tasto "Nodo".</span>
+      </div>
+    }
+  </div>
+</aside>

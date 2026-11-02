@@ -7,13 +7,15 @@ import {
   EffectType,
   GameEffect,
   Precondition,
-  PreconditionType
+  PreconditionType,
+  DialogueNode
 } from '../../../../core/models';
 import {
   DEFAULT_TEXTBOX_DETAIL,
   TextBoxPlacerComponent
 } from '../textbox-placer/textbox-placer.component';
 import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
+import { nodeLabel } from '../../../../core/utils/node-label';
 
 @Component({
   selector: 'app-action-modal',
@@ -36,6 +38,13 @@ export class ActionModalComponent {
   actionSuccessMsg = '';
   readonly actionPreconditions = signal<Precondition[]>([]);
   readonly actionEffects = signal<GameEffect[]>([]);
+
+  readonly dialogueNodes = signal<DialogueNode[]>([]);
+  readonly nodeLabel = nodeLabel;
+
+  readonly currentItemId = computed(
+    () => this.store.combinedSceneList().find((i) => i.code === this.itemCode())?.id ?? null
+  );
 
   readonly backgroundUrl = this.store.backgroundUrl;
 
@@ -98,7 +107,8 @@ export class ActionModalComponent {
     'SET_FLAG',
     'SHOW_SCENE_ITEM',
     'HIDE_SCENE_ITEM',
-    'END_ADVENTURE'
+    'END_ADVENTURE',
+    'START_DIALOGUE'
   ];
 
   constructor() {
@@ -126,6 +136,20 @@ export class ActionModalComponent {
         this.actionPreconditions.set([]);
         this.actionEffects.set([]);
       }
+    });
+
+    effect((onCleanup) => {
+      const itemId = this.currentItemId();
+      this.dialogueNodes.set([]);
+      if (!itemId) {
+        return;
+      }
+
+      const sub = this.store.loadDialogueNodes(itemId).subscribe({
+        next: (nodes) => this.dialogueNodes.set(nodes),
+        error: () => this.dialogueNodes.set([])
+      });
+      onCleanup(() => sub.unsubscribe());
     });
   }
 
@@ -247,6 +271,12 @@ export class ActionModalComponent {
 
   removeEffect(index: number): void {
     this.actionEffects.update((list) => list.filter((_, i) => i !== index));
+  }
+
+  onEffectTypeChange(eff: GameEffect, type: EffectType): void {
+    eff.type = type;
+    eff.targetValue = '';
+    eff.flagValue = '';
   }
 
   private normalizeBox(raw?: Partial<TextBoxDetail> | null): TextBoxDetail {

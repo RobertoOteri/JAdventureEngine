@@ -35,7 +35,7 @@ public class Precondition {
     private String failureMessage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "action_id", nullable = false)
+    @JoinColumn(name = "action_id")
     private Action action;
 
     @Embedded

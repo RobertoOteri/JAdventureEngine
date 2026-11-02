@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EditorStore } from '../../store/editor.store';
 import { Action, Item } from '../../../../core/models';
@@ -14,6 +14,8 @@ export type ActionKind = 'scene' | 'inventory';
 })
 export class InspectorSidebarComponent {
   readonly store = inject(EditorStore);
+
+  readonly dialogueNodeCount = signal<number | null>(null);
 
   readonly isEditingOrCreating = input<boolean>(false);
   readonly editingItemCode = input<string | null>(null);
@@ -43,6 +45,25 @@ export class InspectorSidebarComponent {
   readonly openAddActionRequested = output<void>();
   readonly editActionRequested = output<Action>();
   readonly deleteActionRequested = output<number>();
+
+  readonly openDialoguesRequested = output<Item>();
+
+  constructor() {
+    effect((onCleanup) => {
+      const item = this.store.selectedItem();
+      this.dialogueNodeCount.set(null);
+
+      if (!item?.id) {
+        return;
+      }
+
+      const sub = this.store.loadDialogueNodes(item.id).subscribe({
+        next: (nodes) => this.dialogueNodeCount.set(nodes.length),
+        error: () => this.dialogueNodeCount.set(null)
+      });
+      onCleanup(() => sub.unsubscribe());
+    });
+  }
 
   hasPickUp(item: Item | null | undefined): boolean {
     return (item?.actions ?? []).some((a) => a.type === 'PICK_UP');

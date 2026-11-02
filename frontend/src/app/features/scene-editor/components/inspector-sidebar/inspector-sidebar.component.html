@@ -259,6 +259,29 @@
               </ul>
             </section>
 
+            <section class="detail-block dialogues-block">
+              <h4>
+                Dialoghi
+                @if (dialogueNodeCount() !== null) {
+                  <span class="count">{{ dialogueNodeCount() }}</span>
+                }
+              </h4>
+
+              <p class="dialogues-hint">Conversazioni a scelta multipla con questo personaggio.</p>
+
+              <button
+                type="button"
+                class="btn-manage-dialogues"
+                (click)="openDialoguesRequested.emit(selected)"
+              >
+    <span class="btn-manage-left">
+      <i class="bi bi-chat-quote"></i>
+      <span>Gestisci dialoghi</span>
+    </span>
+                <i class="bi bi-arrow-right btn-manage-arrow"></i>
+              </button>
+            </section>
+
           </article>
         </div>
       } @else {

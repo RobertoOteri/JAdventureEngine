@@ -1,0 +1,47 @@
+<div class="dialogue-shell">
+  <header class="dialogue-header">
+    <div class="header-left">
+      <button type="button" class="btn-back" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i>
+        <span>Torna all'editor</span>
+      </button>
+      <div class="header-title">
+        <i class="bi bi-chat-quote icon-header"></i>
+        <h1>Dialoghi di {{ item()?.name ?? 'oggetto' }}</h1>
+        @if (item(); as it) {
+          <span class="header-code">#{{ it.code }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="header-right">
+      @if (store.feedbackMessage(); as message) {
+        <span class="feedback">{{ message }}</span>
+      }
+      @if (store.isDirty()) {
+        <span class="dirty-badge">Modifiche non salvate</span>
+      }
+      <button
+        type="button"
+        class="btn-save"
+        [disabled]="!store.isDirty() || store.isSaving()"
+        (click)="save()"
+      >
+        <i class="bi bi-check2"></i>
+        <span>{{ store.isSaving() ? 'Salvataggio...' : 'Salva' }}</span>
+      </button>
+    </div>
+  </header>
+
+  @if (store.isLoading()) {
+    <div class="dialogue-loading">
+      <div class="spinner"></div>
+      <p>Caricamento dialoghi...</p>
+    </div>
+  } @else {
+    <div class="dialogue-workspace">
+      <app-dialogue-node-list />
+      <app-dialogue-node-form />
+    </div>
+  }
+</div>

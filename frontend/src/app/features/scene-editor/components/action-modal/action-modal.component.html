@@ -286,7 +286,11 @@
           @for (eff of actionEffects(); track $index) {
             <div class="rule-row cyan-border">
               <div class="rule-type-col">
-                <select class="studio-select" [(ngModel)]="eff.type">
+                <select
+                  class="studio-select"
+                  [ngModel]="eff.type"
+                  (ngModelChange)="onEffectTypeChange(eff, $event)"
+                >
                   @for (et of effectTypes; track et) {
                     <option [value]="et">{{ et }}</option>
                   }
@@ -320,6 +324,20 @@
                     <i class="bi bi-flag-fill"></i>
                     <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
                   </div>
+                } @else if (eff.type === 'START_DIALOGUE') {
+                  @if (dialogueNodes().length > 0) {
+                    <select class="studio-select" [(ngModel)]="eff.targetValue">
+                      <option value="" disabled>-- Seleziona nodo da cui iniziare --</option>
+                      @for (node of dialogueNodes(); track node.code) {
+                        <option [value]="node.code">{{ nodeLabel(node) }}</option>
+                      }
+                    </select>
+                  } @else {
+                    <div class="rule-hint">
+                      <i class="bi bi-chat-quote"></i>
+                      <span>Nessun dialogo salvato per questo oggetto. Crealo con "Gestisci dialoghi" e salvalo.</span>
+                    </div>
+                  }
                 } @else if (eff.type === 'SET_FLAG') {
                   <div class="set-flag-grid">
                     <input
