@@ -14,6 +14,7 @@ import { GameEndingModalComponent } from './components/game-ending-modal/game-en
 import { GameLaunchModalComponent } from '../../shared/ui/game-launch-modal/game-launch-modal.component';
 import { GameMessageBannerComponent } from './components/game-message-banner/game-message-banner.component';
 import { GameDragCursorComponent } from './components/game-drag-cursor/game-drag-cursor.component';
+import { GameDialogueOverlayComponent } from './components/game-dialogue-overlay/game-dialogue-overlay.component';
 
 @Component({
   selector: 'app-gameplay',
@@ -28,7 +29,8 @@ import { GameDragCursorComponent } from './components/game-drag-cursor/game-drag
     GameEndingModalComponent,
     GameLaunchModalComponent,
     GameMessageBannerComponent,
-    GameDragCursorComponent
+    GameDragCursorComponent,
+    GameDialogueOverlayComponent
   ],
   providers: [GameplayStore],
   templateUrl: './gameplay.component.html',
@@ -53,7 +55,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
 
   @HostListener('window:keydown.escape')
   handleEscape(): void {
-    if (this.isLaunchModalOpen() || this.store.isCompleted()) {
+    if (this.isLaunchModalOpen() || this.store.isCompleted() || this.store.activeDialogue()) {
       return;
     }
     if (this.store.inputOverlay()) {

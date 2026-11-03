@@ -1,6 +1,7 @@
 package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.action.ActionDto;
+import com.jadventure.backend.dto.dialogue.DialogueNodeDto;
 import com.jadventure.backend.dto.game.GameActionDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
 import com.jadventure.backend.dto.game.GameStateDto;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +25,7 @@ public class ActionService {
     private final ItemService itemService;
     private final GameEffectService gameEffectService;
     private final GameSaveService gameSaveService;
+    private final DialogueGameService dialogueGameService;
     private final AuthService authService;
 
     public ActionService(ActionRepository actionRepository,
@@ -33,6 +34,7 @@ public class ActionService {
                          ItemService itemService,
                          GameEffectService gameEffectService,
                          GameSaveService gameSaveService,
+                         DialogueGameService dialogueGameService,
                          AuthService authService) {
         this.actionRepository = actionRepository;
         this.actionMapper = actionMapper;
@@ -40,6 +42,7 @@ public class ActionService {
         this.itemService = itemService;
         this.gameEffectService = gameEffectService;
         this.gameSaveService = gameSaveService;
+        this.dialogueGameService = dialogueGameService;
         this.authService = authService;
     }
 
@@ -54,6 +57,10 @@ public class ActionService {
 
         if (stateDto.isCompleted()) {
             throw new IllegalArgumentException("L'avventura è già conclusa");
+        }
+
+        if (stateDto.getCurrentDialogueNodeCode() != null) {
+            throw new IllegalArgumentException("Non puoi compiere azioni durante un dialogo");
         }
 
         Action actionEntity = actionRepository.findByCode(gameActionDto.getActionCode())
@@ -81,6 +88,8 @@ public class ActionService {
 
         gameEffectService.applyAll(adventureCode, stateDto, action.getEffects());
 
+        DialogueNodeDto dialogue = dialogueGameService.openCurrentNode(adventureCode, stateDto);
+
         if (!stateDto.isCompleted()) {
             gameSaveService.updateAutoSave(adventureCode, stateDto);
         }
@@ -93,6 +102,7 @@ public class ActionService {
                 .success(true)
                 .feedbackMessage(successMessage)
                 .state(stateDto)
+                .dialogue(dialogue)
                 .build();
     }
 

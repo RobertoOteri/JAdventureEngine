@@ -8,4 +8,5 @@ export interface GameStateDto {
   visibleItemCodes: string[];
   playTime: number;
   completed?: boolean;
+  currentDialogueNodeCode?: string | null;
 }

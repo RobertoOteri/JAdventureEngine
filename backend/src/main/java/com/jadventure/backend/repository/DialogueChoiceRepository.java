@@ -1,8 +1,6 @@
 package com.jadventure.backend.repository;
 
 import com.jadventure.backend.model.DialogueChoice;
-import com.jadventure.backend.model.DialogueNode;
-import org.springframework.boot.autoconfigure.data.ConditionalOnRepositoryType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

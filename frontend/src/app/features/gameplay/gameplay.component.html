@@ -63,6 +63,14 @@
     (close)="store.setInventoryOpen(false)"
   />
 
+  @if (store.activeDialogue(); as dialogue) {
+    <app-game-dialogue-overlay
+      [node]="dialogue"
+      (choiceSelected)="store.chooseDialogueOption($event)"
+      (close)="store.closeDialogue()"
+    />
+  }
+
   @if (store.isPauseMenuOpen()) {
     <app-game-pause-modal
       [saves]="store.savesList()"

@@ -1,17 +1,19 @@
 import { inject, computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { exhaustMap, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { GamePlayService } from '../../../core/services/game-play.service';
 import { GameSaveService } from '../../../core/services/game-save.service';
 import { ActionService } from '../../../core/services/action.service';
+import { DialogueService } from '../../../core/services/dialogue.service';
 import {
   GameStateDto,
   GameActionDto,
   GameSaveDto,
   Item,
   ActionType,
-  GameActionResultDto
+  GameActionResultDto,
+  DialogueNode
 } from '../../../core/models';
 import { TextBoxDetail } from '../../../core/models/textbox-detail.model';
 
@@ -49,6 +51,7 @@ export interface GameplayState {
   isInventoryOpen: boolean;
   isPauseMenuOpen: boolean;
   inputOverlay: InputOverlayState | null;
+  activeDialogue: DialogueNode | null;
   radialMenu: RadialMenuState;
   draggedItem: DraggedItemState;
 }
@@ -89,6 +92,7 @@ const initialState: GameplayState = {
   isInventoryOpen: false,
   isPauseMenuOpen: false,
   inputOverlay: null,
+  activeDialogue: null,
   radialMenu: initialRadialState,
   draggedItem: initialDraggedState
 };
@@ -112,7 +116,8 @@ export const GameplayStore = signalStore(
     store,
     gameService = inject(GamePlayService),
     saveService = inject(GameSaveService),
-    actionService = inject(ActionService)
+    actionService = inject(ActionService),
+    dialogueService = inject(DialogueService)
   ) => {
     let feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -281,6 +286,7 @@ export const GameplayStore = signalStore(
             endingMessage: null,
             isPauseMenuOpen: false,
             inputOverlay: null,
+            activeDialogue: null,
             savesList: []
           })
         ),
@@ -331,7 +337,8 @@ export const GameplayStore = signalStore(
             feedbackMessage: null,
             endingMessage: null,
             isPauseMenuOpen: false,
-            inputOverlay: null
+            inputOverlay: null,
+            activeDialogue: null
           })
         ),
         switchMap((adventureCode) =>
@@ -380,7 +387,8 @@ export const GameplayStore = signalStore(
             feedbackMessage: null,
             endingMessage: null,
             isPauseMenuOpen: false,
-            inputOverlay: null
+            inputOverlay: null,
+            activeDialogue: null
           })
         ),
         switchMap((saveCode) =>
@@ -439,6 +447,7 @@ export const GameplayStore = signalStore(
                 if (result.state) {
                   patchState(store, {
                     gameState: result.state,
+                    activeDialogue: completed ? null : (result.dialogue ?? null),
                     endingMessage: completed ? result.feedbackMessage || null : null
                   });
                 }
@@ -477,6 +486,45 @@ export const GameplayStore = signalStore(
         })
       )
     );
+
+    const chooseDialogueOption = rxMethod<number>(
+      pipe(
+        exhaustMap((choiceId) => {
+          const adventureCode = store.adventureCode();
+          const gameState = store.gameState();
+
+          if (!adventureCode || !gameState) {
+            setFeedbackMessage('Errore: sessione di gioco non valida.');
+            return EMPTY;
+          }
+
+          return dialogueService.choose({adventureCode, gameState, choiceId}).pipe(
+            tap((result: GameActionResultDto) => {
+              if (result.state) {
+                const completed = !!result.state.completed;
+                patchState(store, {
+                  gameState: result.state,
+                  activeDialogue: completed ? null : (result.dialogue ?? null)
+                });
+              }
+            }),
+            catchError((err: any) => {
+              console.error('Errore durante la scelta del dialogo:', err);
+              setFeedbackMessage(err?.error?.message || 'Impossibile proseguire il dialogo.');
+              return EMPTY;
+            })
+          );
+        })
+      )
+    );
+
+    const closeDialogue = (): void => {
+      const state = store.gameState();
+      patchState(store, {
+        activeDialogue: null,
+        gameState: state ? {...state, currentDialogueNodeCode: null} : state
+      });
+    };
 
     const submitInput = (): void => {
       const overlay = store.inputOverlay();
@@ -610,6 +658,8 @@ export const GameplayStore = signalStore(
       loadGame,
       fetchSaves,
       executeAction,
+      chooseDialogueOption,
+      closeDialogue,
       saveCurrentGame,
       syncAutoSave,
       incrementPlayTime,

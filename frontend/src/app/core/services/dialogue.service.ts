@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DialogueNode } from '../models/dialogue-node.model';
+import {DialogueChoiceRequestDto, GameActionResultDto} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class DialogueService {
@@ -16,4 +17,9 @@ export class DialogueService {
   saveAll(itemId: number, nodes: DialogueNode[]): Observable<DialogueNode[]> {
     return this.http.put<DialogueNode[]>(`${this.baseUrl}/items/${itemId}`, nodes);
   }
+
+  choose(request: DialogueChoiceRequestDto): Observable<GameActionResultDto> {
+    return this.http.post<GameActionResultDto>(`${this.baseUrl}/choose`, request);
+  }
+
 }

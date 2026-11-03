@@ -1,39 +1,45 @@
-import { Component, input, signal, effect, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, effect, input, signal, untracked } from '@angular/core';
 
 export type BannerMessageType = 'info' | 'success' | 'error';
+
+const FADE_OUT_MS = 350;
 
 @Component({
   selector: 'app-game-message-banner',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './game-message-banner.component.html',
   styleUrl: './game-message-banner.component.css'
 })
 export class GameMessageBannerComponent implements OnDestroy {
-  message = input<string | null>(null);
-  type = input<BannerMessageType>('info');
-  duration = input<number>(4000);
+  readonly message = input<string | null>(null);
+  readonly type = input<BannerMessageType>('info');
+  readonly duration = input<number>(4000);
 
-  raised = input<boolean>(false);
+  readonly raised = input<boolean>(false);
 
-  visible = signal<boolean>(false);
-  currentText = signal<string>('');
-  isFadingOut = signal<boolean>(false);
+  readonly visible = signal<boolean>(false);
+  readonly currentText = signal<string>('');
+  readonly isFadingOut = signal<boolean>(false);
 
-  private hideTimeout: any = null;
-  private fadeTimeout: any = null;
+  private hideTimeout: ReturnType<typeof setTimeout> | null = null;
+  private fadeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    effect(() => {
-      const msg = this.message();
-      if (msg && msg.trim().length > 0) {
-        this.displayMessage(msg.trim());
-      } else {
-        this.clearTimers();
-        this.visible.set(false);
-      }
-    });
+    effect(
+      () => {
+        const msg = this.message();
+
+        untracked(() => {
+          if (msg && msg.trim().length > 0) {
+            this.displayMessage(msg.trim());
+          } else {
+            this.clearTimers();
+            this.visible.set(false);
+          }
+        });
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   private displayMessage(text: string): void {
@@ -47,7 +53,7 @@ export class GameMessageBannerComponent implements OnDestroy {
       this.fadeTimeout = setTimeout(() => {
         this.visible.set(false);
         this.isFadingOut.set(false);
-      }, 350);
+      }, FADE_OUT_MS);
     }, this.duration());
   }
 

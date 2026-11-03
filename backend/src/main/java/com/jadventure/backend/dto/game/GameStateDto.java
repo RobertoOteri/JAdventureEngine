@@ -27,4 +27,6 @@ public class GameStateDto {
     private long playTime = 0;
 
     private boolean completed;
+
+    private String currentDialogueNodeCode;
 }

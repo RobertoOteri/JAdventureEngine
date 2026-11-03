@@ -1,19 +1,23 @@
 @if (visible()) {
   <div
     class="banner-wrapper"
+    role="status"
+    aria-live="polite"
     [class.fade-out]="isFadingOut()"
     [class.is-raised]="raised()"
     [class.type-success]="type() === 'success'"
     [class.type-error]="type() === 'error'"
   >
-    <div class="banner-plaque">
-      <div class="plaque-gem left"></div>
+    <div class="banner-line">
+      <svg class="banner-gem" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 0 L12 6 L6 12 L0 6 Z" />
+      </svg>
 
-      <div class="message-content">
-        <p class="message-text">{{ currentText() }}</p>
-      </div>
+      <p class="message-text">{{ currentText() }}</p>
 
-      <div class="plaque-gem right"></div>
+      <svg class="banner-gem" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 0 L12 6 L6 12 L0 6 Z" />
+      </svg>
     </div>
   </div>
 }
