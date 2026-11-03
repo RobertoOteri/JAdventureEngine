@@ -1,0 +1,128 @@
+@if (store.selectedNode(); as node) {
+  <aside class="choices-column">
+    <div class="list-header">
+      <div class="header-title">
+        <i class="bi bi-chat-left-text icon-header"></i>
+        <h2>Scelte ({{ node.choices.length }})</h2>
+      </div>
+      <button type="button" class="btn-add-choice" (click)="addChoice(node.code, node.choices.length)">
+        <i class="bi bi-plus-lg"></i>
+        <span>Scelta</span>
+      </button>
+    </div>
+
+    <div class="choices-scroll">
+      @for (choice of node.choices; track $index) {
+        <div class="choice-item" [class.open]="expandedChoice() === $index">
+          <div class="choice-header">
+            <button
+              type="button"
+              class="choice-toggle"
+              [attr.aria-expanded]="expandedChoice() === $index"
+              (click)="toggleChoice($index)"
+            >
+              <i
+                class="bi chevron"
+                [class.bi-chevron-right]="expandedChoice() !== $index"
+                [class.bi-chevron-down]="expandedChoice() === $index"
+              ></i>
+              <span class="choice-summary">
+                <span class="choice-title" [class.is-empty]="!choice.text.trim()">
+                  {{ choice.text.trim() || 'Scelta senza testo' }}
+                </span>
+                <span class="choice-target">
+                  <i class="bi bi-arrow-return-right"></i>
+                  {{ targetLabel(choice.nextNodeCode) }}
+                </span>
+              </span>
+              <span class="choice-badges">
+                @if (choice.preconditions.length) {
+                  <span class="badge badge-pre">
+                    {{ choice.preconditions.length }}
+                    {{ choice.preconditions.length === 1 ? 'precondizione' : 'precondizioni' }}
+                  </span>
+                }
+                @if (choice.effects.length) {
+                  <span class="badge badge-eff">
+                    {{ choice.effects.length }} {{ choice.effects.length === 1 ? 'effetto' : 'effetti' }}
+                  </span>
+                }
+              </span>
+            </button>
+            <button
+              type="button"
+              class="btn-del-choice"
+              title="Elimina scelta"
+              aria-label="Elimina scelta"
+              (click)="removeChoice(node.code, $index)"
+            >
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+
+          @if (expandedChoice() === $index) {
+            <div class="choice-body">
+              <div class="field">
+                <label class="field-label">Testo della scelta</label>
+                <input
+                  type="text"
+                  class="studio-input"
+                  maxlength="1000"
+                  placeholder="Cosa risponde il giocatore"
+                  [ngModel]="choice.text"
+                  (ngModelChange)="onChoiceText(node.code, $index, $event)"
+                />
+              </div>
+
+              <div class="field">
+                <label class="field-label">
+                  <i class="bi bi-arrow-return-right"></i> Porta a
+                </label>
+                <select
+                  class="studio-select"
+                  [ngModel]="choice.nextNodeCode"
+                  (ngModelChange)="onChoiceTarget(node.code, $index, $event)"
+                >
+                  <option [ngValue]="null">Fine dialogo</option>
+                  @for (target of store.nodes(); track target.code) {
+                    <option [ngValue]="target.code">
+                      {{ nodeLabel(target) }}{{ target.code === node.code ? ' (questo nodo)' : '' }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="field-label">
+                  Precondizioni <span class="field-sub">la scelta compare solo se sono tutte vere</span>
+                </label>
+                <app-preconditions-editor
+                  [preconditions]="choice.preconditions"
+                  [dialogueNodes]="store.nodes()"
+                  (preconditionsChange)="onChoicePreconditions(node.code, $index, $event)"
+                />
+              </div>
+
+              <div class="field">
+                <label class="field-label">
+                  Effetti <span class="field-sub">si attivano quando il giocatore sceglie questa risposta</span>
+                </label>
+                <app-effects-editor
+                  [effects]="choice.effects"
+                  [dialogueNodes]="store.nodes()"
+                  [excludedTypes]="['START_DIALOGUE']"
+                  (effectsChange)="onChoiceEffects(node.code, $index, $event)"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="choices-empty">
+          <i class="bi bi-info-circle"></i>
+          <span>Nessuna scelta: il dialogo termina a questo nodo.</span>
+        </div>
+      }
+    </div>
+  </aside>
+}

@@ -4,6 +4,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, EMPTY, Observable, pipe, switchMap, tap } from 'rxjs';
 import { DialogueChoice, DialogueNode } from '../../../core/models';
 import { DialogueService } from '../../../core/services/dialogue.service';
+import { sanitizeNodes } from '../../../core/utils/sanitize-nodes';
 
 export interface DialogueEditorState {
   itemId: number | null;
@@ -36,7 +37,7 @@ export const DialogueEditorStore = signalStore(
 
   withMethods((store, dialogueService = inject(DialogueService)) => {
     const patchNodes = (update: (nodes: DialogueNode[]) => DialogueNode[]): void => {
-      patchState(store, { nodes: update(store.nodes()), isDirty: true });
+      patchState(store, { nodes: update(store.nodes()), isDirty: true, feedbackMessage: null });
     };
 
     const patchNode = (code: string, update: (node: DialogueNode) => DialogueNode): void => {
@@ -127,7 +128,7 @@ export const DialogueEditorStore = signalStore(
 
         patchState(store, { isSaving: true, feedbackMessage: null });
 
-        return dialogueService.saveAll(itemId, store.nodes()).pipe(
+        return dialogueService.saveAll(itemId, sanitizeNodes(store.nodes())).pipe(
           tap({
             next: (nodes) =>
               patchState(store, {

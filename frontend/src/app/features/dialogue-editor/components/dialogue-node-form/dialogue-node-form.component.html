@@ -1,6 +1,6 @@
 <section class="node-form">
   @if (store.selectedNode(); as node) {
-    <div class="form-scroll">
+    <div class="column-scroll">
       <div class="form-card">
         <div class="card-head">
           <h3>Testo del nodo</h3>
@@ -8,7 +8,7 @@
         </div>
         <textarea
           class="studio-input studio-textarea"
-          rows="5"
+          rows="8"
           maxlength="3000"
           placeholder="Cosa dice il personaggio quando si arriva a questo nodo..."
           [ngModel]="node.text"
@@ -18,62 +18,16 @@
 
       <div class="form-card">
         <div class="card-head">
-          <h3>Scelte <span class="count">{{ node.choices.length }}</span></h3>
-          <button type="button" class="btn-add" (click)="store.addChoice(node.code)">
-            <i class="bi bi-plus-lg"></i>
-            <span>Aggiungi scelta</span>
-          </button>
+          <h3>Effetti del nodo</h3>
         </div>
-
-        <div class="choices">
-          @for (choice of node.choices; track $index) {
-            <div class="choice-card">
-              <div class="choice-row">
-                <input
-                  type="text"
-                  class="studio-input"
-                  maxlength="1000"
-                  placeholder="Testo della scelta (cosa risponde il giocatore)"
-                  [ngModel]="choice.text"
-                  (ngModelChange)="onChoiceText(node.code, $index, $event)"
-                />
-                <button
-                  type="button"
-                  class="btn-del-choice"
-                  title="Elimina scelta"
-                  aria-label="Elimina scelta"
-                  (click)="store.removeChoice(node.code, $index)"
-                >
-                  <i class="bi bi-trash3"></i>
-                </button>
-              </div>
-
-              <div class="choice-row">
-                <label class="target-label">
-                  <i class="bi bi-arrow-return-right"></i>
-                  Porta a
-                </label>
-                <select
-                  class="studio-select"
-                  [ngModel]="choice.nextNodeCode"
-                  (ngModelChange)="onChoiceTarget(node.code, $index, $event)"
-                >
-                  <option [ngValue]="null">Fine dialogo</option>
-                  @for (target of store.nodes(); track target.code) {
-                    <option [ngValue]="target.code">
-                      {{ nodeLabel(target) }}{{ target.code === node.code ? ' (questo nodo)' : '' }}
-                    </option>
-                  }
-                </select>
-              </div>
-            </div>
-          } @empty {
-            <div class="choices-empty">
-              <i class="bi bi-info-circle"></i>
-              <span>Nessuna scelta: il dialogo termina a questo nodo.</span>
-            </div>
-          }
-        </div>
+        <p class="card-hint">Si attivano quando il giocatore arriva a questo nodo.</p>
+        <app-effects-editor
+          [effects]="node.effects"
+          [dialogueNodes]="store.nodes()"
+          [excludedTypes]="['START_DIALOGUE']"
+          emptyHint="Nessun effetto: il nodo mostra solo il testo."
+          (effectsChange)="onNodeEffects(node.code, $event)"
+        />
       </div>
     </div>
   } @else {

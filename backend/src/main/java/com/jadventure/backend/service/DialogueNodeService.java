@@ -60,13 +60,14 @@ public class DialogueNodeService {
             saved.put(dto.getCode(), node);
         });
 
+        nodeRepository.saveAllAndFlush(saved.values());
+
         dtos.forEach(dto -> linkTargets(dto, saved.get(dto.getCode()), saved));
 
         List<DialogueNode> removed = existing.values().stream()
                 .filter(node -> !saved.containsKey(node.getCode()))
                 .toList();
 
-        nodeRepository.saveAll(saved.values());
         if (!removed.isEmpty()) {
             dialogueChoiceService.detachTargets(removed.stream().map(DialogueNode::getId).toList());
             nodeRepository.deleteAll(removed);

@@ -1,0 +1,70 @@
+<div class="preconditions-editor">
+  @for (prec of preconditions(); track $index) {
+    <div class="rule-row">
+      <div class="rule-type-col">
+        <select
+          class="studio-select"
+          [ngModel]="prec.type"
+          (ngModelChange)="changeType($index, $event)"
+        >
+          @for (type of types; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="rule-val-col">
+        @if (prec.type === 'FLAG_EQUALS') {
+          <div class="flag-grid">
+            <input
+              type="text"
+              class="studio-input"
+              placeholder="Nome flag (es. porta_aperta)"
+              [attr.list]="flagListId"
+              [ngModel]="prec.requiredKey"
+              (ngModelChange)="patch($index, { requiredKey: $event })"
+            />
+            <span class="equals-sign">=</span>
+            <input
+              type="text"
+              class="studio-input"
+              placeholder="Valore atteso (es. true o 100)"
+              [ngModel]="prec.expectedValue"
+              (ngModelChange)="patch($index, { expectedValue: $event })"
+            />
+            <datalist [id]="flagListId">
+              @for (key of flagKeys(); track key) {
+                <option [value]="key"></option>
+              }
+            </datalist>
+          </div>
+        } @else {
+          <select
+            class="studio-select"
+            [ngModel]="prec.requiredKey"
+            (ngModelChange)="patch($index, { requiredKey: $event })"
+          >
+            <option value="" disabled>-- Seleziona oggetto --</option>
+            @for (item of itemOptions(); track item.code) {
+              <option [value]="item.code">{{ item.name }} (#{{ item.code }})</option>
+            }
+          </select>
+        }
+      </div>
+
+      <button type="button" class="btn-del-rule" title="Rimuovi precondizione" (click)="remove($index)">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>
+  } @empty {
+    <div class="empty-rules">
+      <i class="bi bi-info-circle"></i>
+      <span>{{ emptyHint() }}</span>
+    </div>
+  }
+
+  <button type="button" class="btn-add-rule" (click)="add()">
+    <i class="bi bi-plus-lg"></i>
+    <span>Aggiungi precondizione</span>
+  </button>
+</div>

@@ -1,0 +1,128 @@
+:host {
+  display: block;
+}
+
+.effects-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.rule-row {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 34px;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  background: #0c0e14;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+}
+
+.rule-type-col,
+.rule-val-col {
+  min-width: 0;
+}
+
+.studio-input,
+.studio-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+  color: #ffffff;
+  background: #141720;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.studio-input:focus,
+.studio-select:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.set-flag-grid {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.set-flag-grid input {
+  flex: 1;
+  min-width: 0;
+}
+
+.equals-sign {
+  padding: 0 0.2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #a1a1aa;
+}
+
+.rule-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #6a95a8;
+}
+
+.btn-del-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: #71717a;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: color 0.15s ease;
+}
+
+.btn-del-rule:hover {
+  color: #ef4444;
+}
+
+.empty-rules {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.25rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #6a95a8;
+}
+
+.btn-add-effect {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #38bdf8;
+  cursor: pointer;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.btn-add-effect:hover {
+  background: rgba(6, 182, 212, 0.22);
+}
+
+@media (max-width: 720px) {
+  .rule-row {
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+
+  .rule-type-col {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,0 +1,110 @@
+<div class="effects-editor">
+  @for (eff of effects(); track $index) {
+    <div class="rule-row">
+      <div class="rule-type-col">
+        <select
+          class="studio-select"
+          [ngModel]="eff.type"
+          (ngModelChange)="changeType($index, $event)"
+        >
+          @for (et of availableTypes(); track et) {
+            <option [value]="et">{{ et }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="rule-val-col">
+        @if (eff.type === 'CHANGE_SCENE') {
+          <select
+            class="studio-select"
+            [ngModel]="eff.targetValue"
+            (ngModelChange)="patch($index, { targetValue: $event })"
+          >
+            <option value="" disabled>-- Seleziona stanza di destinazione --</option>
+            @for (scene of sceneOptions(); track scene.code) {
+              <option [value]="scene.code">{{ scene.name }} (#{{ scene.code }})</option>
+            }
+          </select>
+        } @else if (eff.type === 'ADD_ITEM' || eff.type === 'REMOVE_ITEM') {
+          <select
+            class="studio-select"
+            [ngModel]="eff.targetValue"
+            (ngModelChange)="patch($index, { targetValue: $event })"
+          >
+            <option value="" disabled>-- Seleziona oggetto --</option>
+            @for (item of itemOptions(); track item.code) {
+              <option [value]="item.code">{{ item.name }} (#{{ item.code }})</option>
+            }
+          </select>
+        } @else if (eff.type === 'SHOW_SCENE_ITEM' || eff.type === 'HIDE_SCENE_ITEM') {
+          <select
+            class="studio-select"
+            [ngModel]="eff.targetValue"
+            (ngModelChange)="patch($index, { targetValue: $event })"
+          >
+            <option value="" disabled>-- Seleziona elemento con hotspot --</option>
+            @for (item of hotspotItemOptions(); track item.code) {
+              <option [value]="item.code">{{ item.name }} (#{{ item.code }})</option>
+            }
+          </select>
+        } @else if (eff.type === 'START_DIALOGUE') {
+          <select
+            class="studio-select"
+            [ngModel]="eff.targetValue"
+            (ngModelChange)="patch($index, { targetValue: $event })"
+          >
+            <option value="" disabled>-- Seleziona il nodo da cui parte il dialogo --</option>
+            @for (node of dialogueNodes(); track node.code) {
+              <option [value]="node.code">{{ nodeLabel(node) }}</option>
+            } @empty {
+              <option value="" disabled>Nessun nodo: crealo prima nell'editor dei dialoghi</option>
+            }
+          </select>
+        } @else if (eff.type === 'END_ADVENTURE') {
+          <div class="rule-hint">
+            <i class="bi bi-flag-fill"></i>
+            <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
+          </div>
+        } @else if (eff.type === 'SET_FLAG') {
+          <div class="set-flag-grid">
+            <input
+              type="text"
+              class="studio-input"
+              placeholder="Chiave (es. punteggio)"
+              [attr.list]="flagListId"
+              [ngModel]="eff.targetValue"
+              (ngModelChange)="patch($index, { targetValue: $event })"
+            />
+            <span class="equals-sign">=</span>
+            <input
+              type="text"
+              class="studio-input"
+              placeholder="Valore (es. 100 o true)"
+              [ngModel]="eff.flagValue"
+              (ngModelChange)="patch($index, { flagValue: $event })"
+            />
+            <datalist [id]="flagListId">
+              @for (key of flagKeys(); track key) {
+                <option [value]="key"></option>
+              }
+            </datalist>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="btn-del-rule" title="Rimuovi effetto" (click)="remove($index)">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>
+  } @empty {
+    <div class="empty-rules">
+      <i class="bi bi-info-circle"></i>
+      <span>{{ emptyHint() }}</span>
+    </div>
+  }
+
+  <button type="button" class="btn-add-effect" (click)="add()">
+    <i class="bi bi-plus-lg"></i>
+    <span>Aggiungi effetto</span>
+  </button>
+</div>

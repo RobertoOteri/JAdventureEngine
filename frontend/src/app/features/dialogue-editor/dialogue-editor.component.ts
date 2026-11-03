@@ -1,15 +1,16 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import {Component, OnInit, computed, inject, HostListener} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EditorStore } from '../scene-editor/store/editor.store';
 import { DialogueEditorStore } from './store/dialogue-editor.store';
 import { DialogueNodeListComponent } from './components/dialogue-node-list/dialogue-node-list.component';
 import { DialogueNodeFormComponent } from './components/dialogue-node-form/dialogue-node-form.component';
+import { DialogueChoicesPanelComponent } from './components/dialogue-choices-panel/dialogue-choices-panel.component';
 
 @Component({
   selector: 'app-dialogue-editor',
   standalone: true,
-  imports: [DialogueNodeListComponent, DialogueNodeFormComponent],
+  imports: [DialogueNodeListComponent, DialogueNodeFormComponent, DialogueChoicesPanelComponent],
   providers: [DialogueEditorStore],
   templateUrl: './dialogue-editor.component.html',
   styleUrl: './dialogue-editor.component.css'
@@ -55,5 +56,12 @@ export class DialogueEditorComponent implements OnInit {
       sessionStorage.setItem('pending_selected_item', code);
     }
     this.location.back();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.store.isDirty()) {
+      event.preventDefault();
+    }
   }
 }
