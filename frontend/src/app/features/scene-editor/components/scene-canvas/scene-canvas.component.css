@@ -260,7 +260,6 @@
   gap: 0.6rem;
 }
 
-/* === STATO VUOTO / NESSUNA SCENA SELEZIONATA === */
 .scene-empty-stage {
   display: flex;
   flex-direction: column;

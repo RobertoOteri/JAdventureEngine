@@ -5,7 +5,6 @@
 }
 
 .dialogue-stage {
-  /* contorno scuro attorno alle lettere: sostituisce qualsiasi box dietro il testo */
   --outline:
     -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000,
     -2px 0 0 #000, 2px 0 0 #000,
@@ -34,7 +33,6 @@
   animation: rise 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ---------- Testo ---------- */
 .speech-prose {
   width: 100%;
   margin: 0;
@@ -48,7 +46,6 @@
   white-space: pre-wrap;
 }
 
-/* parte non ancora scritta: invisibile ma già in layout */
 .speech-ghost {
   visibility: hidden;
 }
@@ -61,7 +58,6 @@
   animation: blink 0.7s infinite;
 }
 
-/* ---------- Scelte (sopra il testo, a sinistra) ---------- */
 .choices-list {
   list-style: none;
   margin: 0;
@@ -128,7 +124,6 @@
   text-shadow: var(--outline), 0 0 18px rgba(255, 200, 90, 0.6);
 }
 
-/* ---------- Freccia di selezione ---------- */
 .choice-arrow {
   flex: 0 0 auto;
   width: 0.8em;
@@ -147,7 +142,6 @@
   animation: nudge 0.7s ease-in-out infinite alternate;
 }
 
-/* ---------- Pulsante "Continua" ---------- */
 .continue-btn {
   align-self: flex-end;
   display: inline-flex;
@@ -176,7 +170,6 @@
   animation: nudge 0.7s ease-in-out infinite alternate;
 }
 
-/* ---------- Animazioni ---------- */
 @keyframes rise {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: none; }

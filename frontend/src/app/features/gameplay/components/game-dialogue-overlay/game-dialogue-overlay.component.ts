@@ -35,7 +35,6 @@ export class GameDialogueOverlayComponent {
 
   readonly hasChoices = computed(() => (this.node().choices?.length ?? 0) > 0);
 
-  // Parte di testo non ancora scritta: serve a riservare lo spazio nel layout
   readonly remainingText = computed(() =>
     (this.node().text ?? '').slice(this.displayedText().length)
   );

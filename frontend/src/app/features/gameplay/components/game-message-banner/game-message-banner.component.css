@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&display=swap');
 
 .banner-wrapper {
-  /* contorno scuro attorno alle lettere: sostituisce qualsiasi box dietro il testo */
   --outline:
     -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000,
     -2px 0 0 #000, 2px 0 0 #000,

@@ -98,7 +98,6 @@ export class GameRadialMenuComponent {
     }
   }
 
-  // Secondo click esplicito su un'icona specifica
   onActionClicked(event: MouseEvent, action: Action): void {
     event.stopPropagation();
     this.triggerSelectedAction(action.type);

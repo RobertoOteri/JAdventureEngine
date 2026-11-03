@@ -14,7 +14,6 @@
   border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Header originale con bordo tratteggiato, icona semplice e pulsante sobrio */
 .list-header {
   flex-shrink: 0;
   display: flex;
@@ -67,7 +66,6 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-/* Area di scroll verticale pulita per tutta la colonna delle scelte */
 .choices-scroll {
   flex: 1 1 0;
   min-height: 0;
@@ -90,7 +88,6 @@
   border-radius: 4px;
 }
 
-/* L'item della scelta non collassa né si sovrappone quando viene aperto */
 .choice-item {
   flex-shrink: 0;
   background: #0c0e14;
@@ -209,7 +206,6 @@
   color: #ef4444;
 }
 
-/* Corpo accordion: nessun overflow-x forzato su tutto il container */
 .choice-body {
   display: flex;
   flex-direction: column;
@@ -273,14 +269,6 @@
   color: #71717a;
 }
 
-/* ============================================================
-   Dimensioni Editor Figli e Scroll Selettivo
-============================================================ */
-
-/* ============================================================
-   Allineamento coerente Precondizioni ed Effetti
-============================================================ */
-
 :host ::ng-deep app-effects-editor,
 :host ::ng-deep app-preconditions-editor {
   display: block;
@@ -288,7 +276,6 @@
   min-width: 0 !important;
 }
 
-/* Applica la stessa larghezza e azzera i vincoli rigidi sui contenitori riga */
 :host ::ng-deep .rule-row,
 :host ::ng-deep .precondition-card,
 :host ::ng-deep .rule-main-row {
@@ -298,14 +285,12 @@
   min-width: 0 !important;
 }
 
-/* Forza la colonna del valore (dove risiedono i campi flag) a non restringersi */
 :host ::ng-deep .rule-val-col {
   min-width: 0 !important;
   width: 100% !important;
   overflow: hidden !important;
 }
 
-/* Attiva lo scroll orizzontale identico su entrambi i contenitori di coppia chiave/valore */
 :host ::ng-deep .set-flag-grid,
 :host ::ng-deep .flag-condition-grid {
   display: flex !important;
@@ -334,7 +319,6 @@
   border-radius: 4px;
 }
 
-/* Garantisce che gli input non collassino a pochi pixel */
 :host ::ng-deep .set-flag-grid input,
 :host ::ng-deep .flag-condition-grid input {
   min-width: 110px !important;
