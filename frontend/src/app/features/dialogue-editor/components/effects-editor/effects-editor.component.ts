@@ -13,8 +13,11 @@ const ALL_EFFECT_TYPES: readonly EffectType[] = [
   'SHOW_SCENE_ITEM',
   'HIDE_SCENE_ITEM',
   'START_DIALOGUE',
+  'END_DIALOGUE',
   'END_ADVENTURE'
 ];
+
+const DIALOGUE_ONLY_TYPES: readonly EffectType[] = ['END_DIALOGUE'];
 
 let nextListId = 0;
 
@@ -31,6 +34,8 @@ export class EffectsEditorComponent {
   readonly effects = input<GameEffect[]>([]);
   readonly dialogueNodes = input<DialogueNode[]>([]);
   readonly excludedTypes = input<readonly EffectType[]>([]);
+  readonly hiddenTypes = input<readonly EffectType[]>([]);
+  readonly dialogueMode = input<boolean>(false);
   readonly emptyHint = input<string>('Nessun effetto impostato.');
 
   readonly effectsChange = output<GameEffect[]>();
@@ -39,7 +44,17 @@ export class EffectsEditorComponent {
   readonly flagListId = `effect-flag-keys-${nextListId++}`;
 
   readonly availableTypes = computed(() =>
-    ALL_EFFECT_TYPES.filter((type) => !this.excludedTypes().includes(type))
+    ALL_EFFECT_TYPES.filter(
+      (type) =>
+        !this.excludedTypes().includes(type) &&
+        (this.dialogueMode() || !DIALOGUE_ONLY_TYPES.includes(type))
+    )
+  );
+
+  readonly visibleEffects = computed(() =>
+    this.effects()
+      .map((effect, index) => ({ effect, index }))
+      .filter(({ effect }) => !this.hiddenTypes().includes(effect.type))
   );
 
   readonly itemOptions = computed(() =>

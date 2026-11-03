@@ -1,11 +1,13 @@
 <div class="effects-editor">
-  @for (eff of effects(); track $index) {
+  @for (entry of visibleEffects(); track entry.index) {
+    @let eff = entry.effect;
+    @let i = entry.index;
     <div class="rule-row">
       <div class="rule-type-col">
         <select
           class="studio-select"
           [ngModel]="eff.type"
-          (ngModelChange)="changeType($index, $event)"
+          (ngModelChange)="changeType(i, $event)"
         >
           @for (et of availableTypes(); track et) {
             <option [value]="et">{{ et }}</option>
@@ -18,7 +20,7 @@
           <select
             class="studio-select"
             [ngModel]="eff.targetValue"
-            (ngModelChange)="patch($index, { targetValue: $event })"
+            (ngModelChange)="patch(i, { targetValue: $event })"
           >
             <option value="" disabled>-- Seleziona stanza di destinazione --</option>
             @for (scene of sceneOptions(); track scene.code) {
@@ -29,7 +31,7 @@
           <select
             class="studio-select"
             [ngModel]="eff.targetValue"
-            (ngModelChange)="patch($index, { targetValue: $event })"
+            (ngModelChange)="patch(i, { targetValue: $event })"
           >
             <option value="" disabled>-- Seleziona oggetto --</option>
             @for (item of itemOptions(); track item.code) {
@@ -40,7 +42,7 @@
           <select
             class="studio-select"
             [ngModel]="eff.targetValue"
-            (ngModelChange)="patch($index, { targetValue: $event })"
+            (ngModelChange)="patch(i, { targetValue: $event })"
           >
             <option value="" disabled>-- Seleziona elemento con hotspot --</option>
             @for (item of hotspotItemOptions(); track item.code) {
@@ -51,7 +53,7 @@
           <select
             class="studio-select"
             [ngModel]="eff.targetValue"
-            (ngModelChange)="patch($index, { targetValue: $event })"
+            (ngModelChange)="patch(i, { targetValue: $event })"
           >
             <option value="" disabled>-- Seleziona il nodo da cui parte il dialogo --</option>
             @for (node of dialogueNodes(); track node.code) {
@@ -60,6 +62,11 @@
               <option value="" disabled>Nessun nodo: crealo prima nell'editor dei dialoghi</option>
             }
           </select>
+        } @else if (eff.type === 'END_DIALOGUE') {
+          <div class="rule-hint">
+            <i class="bi bi-x-circle"></i>
+            <span>Chiude il dialogo dopo aver mostrato il testo del nodo.</span>
+          </div>
         } @else if (eff.type === 'END_ADVENTURE') {
           <div class="rule-hint">
             <i class="bi bi-flag-fill"></i>
@@ -73,7 +80,7 @@
               placeholder="Chiave (es. punteggio)"
               [attr.list]="flagListId"
               [ngModel]="eff.targetValue"
-              (ngModelChange)="patch($index, { targetValue: $event })"
+              (ngModelChange)="patch(i, { targetValue: $event })"
             />
             <span class="equals-sign">=</span>
             <input
@@ -81,7 +88,7 @@
               class="studio-input"
               placeholder="Valore (es. 100 o true)"
               [ngModel]="eff.flagValue"
-              (ngModelChange)="patch($index, { flagValue: $event })"
+              (ngModelChange)="patch(i, { flagValue: $event })"
             />
             <datalist [id]="flagListId">
               @for (key of flagKeys(); track key) {
@@ -92,7 +99,7 @@
         }
       </div>
 
-      <button type="button" class="btn-del-rule" title="Rimuovi effetto" (click)="remove($index)">
+      <button type="button" class="btn-del-rule" title="Rimuovi effetto" (click)="remove(i)">
         <i class="bi bi-trash3"></i>
       </button>
     </div>

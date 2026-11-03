@@ -2,7 +2,7 @@ import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogueEditorStore } from '../../store/dialogue-editor.store';
 import { nodeLabel } from '../../../../core/utils/node-label';
-import { GameEffect, Precondition } from '../../../../core/models';
+import { DialogueChoice, GameEffect, Precondition } from '../../../../core/models';
 import { EffectsEditorComponent } from '../effects-editor/effects-editor.component';
 import { PreconditionsEditorComponent } from '../preconditions-editor/preconditions-editor.component';
 
@@ -17,23 +17,34 @@ export class DialogueChoicesPanelComponent {
   readonly store = inject(DialogueEditorStore);
   readonly nodeLabel = nodeLabel;
 
-  /** indice della scelta aperta nell'accordion (una alla volta) */
+  readonly END_VALUE = '__END__';
+
   readonly expandedChoice = signal<number | null>(null);
 
   constructor() {
-    // cambiando nodo, l'accordion riparte chiuso
     effect(() => {
       this.store.selectedNodeCode();
       untracked(() => this.expandedChoice.set(null));
     });
   }
 
-  targetLabel(code: string | null | undefined): string {
-    if (!code) {
-      return 'Fine dialogo';
-    }
-    const target = this.store.nodes().find((n) => n.code === code);
+  endsDialogue(choice: DialogueChoice): boolean {
+    return choice.effects.some((e) => e.type === 'END_DIALOGUE');
+  }
+
+  targetValue(choice: DialogueChoice): string | null {
+    return this.endsDialogue(choice) ? this.END_VALUE : (choice.nextNodeCode ?? null);
+  }
+
+  targetLabel(choice: DialogueChoice): string {
+    if (this.endsDialogue(choice)) return 'Fine dialogo';
+    if (!choice.nextNodeCode) return 'Destinazione mancante';
+    const target = this.store.nodes().find((n) => n.code === choice.nextNodeCode);
     return target ? nodeLabel(target) : 'Nodo eliminato';
+  }
+
+  effectsCount(choice: DialogueChoice): number {
+    return choice.effects.filter((e) => e.type !== 'END_DIALOGUE').length;
   }
 
   toggleChoice(index: number): void {
@@ -57,8 +68,8 @@ export class DialogueChoicesPanelComponent {
     this.store.updateChoice(nodeCode, index, { text });
   }
 
-  onChoiceTarget(nodeCode: string, index: number, nextNodeCode: string | null): void {
-    this.store.updateChoice(nodeCode, index, { nextNodeCode });
+  onChoiceTarget(nodeCode: string, index: number, value: string | null): void {
+    this.store.setChoiceTarget(nodeCode, index, value === this.END_VALUE ? null : value);
   }
 
   onChoicePreconditions(nodeCode: string, index: number, preconditions: Precondition[]): void {

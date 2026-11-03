@@ -14,6 +14,7 @@
   border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Header originale con bordo tratteggiato, icona semplice e pulsante sobrio */
 .list-header {
   flex-shrink: 0;
   display: flex;
@@ -34,7 +35,7 @@
 
 .icon-header {
   font-size: 0.85rem;
-  color: #71717a;
+  color: #ffffff;
 }
 
 .list-header h2 {
@@ -66,16 +67,13 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-.btn-add:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
-}
-
+/* Area di scroll verticale pulita per tutta la colonna delle scelte */
 .choices-scroll {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 1rem 1rem;
+  overflow-x: hidden;
+  padding: 0 0.6rem 0.6rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -83,11 +81,21 @@
   scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 
+.choices-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.choices-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+
+/* L'item della scelta non collassa né si sovrappone quando viene aperto */
 .choice-item {
+  flex-shrink: 0;
   background: #0c0e14;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  overflow: hidden;
   transition: border-color 0.15s ease;
 }
 
@@ -201,18 +209,21 @@
   color: #ef4444;
 }
 
+/* Corpo accordion: nessun overflow-x forzato su tutto il container */
 .choice-body {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   padding: 0.85rem;
   border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  overflow: visible;
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  min-width: 0;
 }
 
 .field-label {
@@ -262,6 +273,83 @@
   color: #71717a;
 }
 
+/* ============================================================
+   Dimensioni Editor Figli e Scroll Selettivo
+============================================================ */
+
+/* ============================================================
+   Allineamento coerente Precondizioni ed Effetti
+============================================================ */
+
+:host ::ng-deep app-effects-editor,
+:host ::ng-deep app-preconditions-editor {
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Applica la stessa larghezza e azzera i vincoli rigidi sui contenitori riga */
+:host ::ng-deep .rule-row,
+:host ::ng-deep .precondition-card,
+:host ::ng-deep .rule-main-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+}
+
+/* Forza la colonna del valore (dove risiedono i campi flag) a non restringersi */
+:host ::ng-deep .rule-val-col {
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Attiva lo scroll orizzontale identico su entrambi i contenitori di coppia chiave/valore */
+:host ::ng-deep .set-flag-grid,
+:host ::ng-deep .flag-condition-grid {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding-bottom: 4px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+}
+
+:host ::ng-deep .set-flag-grid::-webkit-scrollbar,
+:host ::ng-deep .flag-condition-grid::-webkit-scrollbar {
+  height: 4px;
+}
+
+:host ::ng-deep .set-flag-grid::-webkit-scrollbar-thumb,
+:host ::ng-deep .flag-condition-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+/* Garantisce che gli input non collassino a pochi pixel */
+:host ::ng-deep .set-flag-grid input,
+:host ::ng-deep .flag-condition-grid input {
+  min-width: 110px !important;
+  width: 110px !important;
+  flex: 0 0 110px !important;
+  box-sizing: border-box !important;
+}
+
+:host ::ng-deep .set-flag-grid .equals-sign,
+:host ::ng-deep .flag-condition-grid .equals-sign {
+  flex-shrink: 0 !important;
+  padding: 0 0.2rem !important;
+  font-weight: 700 !important;
+  color: #71717a !important;
+}
 @media (max-width: 1200px) {
   :host {
     width: 380px;

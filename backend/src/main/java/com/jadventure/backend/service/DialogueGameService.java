@@ -10,6 +10,9 @@ import com.jadventure.backend.mapper.DialogueNodeMapper;
 import com.jadventure.backend.repository.DialogueNodeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
 public class DialogueGameService {
@@ -47,9 +50,20 @@ public class DialogueGameService {
             return null;
         }
 
-        node.setChoices(node.getChoices().stream()
+        if (state.getCurrentDialogueNodeCode() == null) {
+            node.setChoices(List.of());
+            return node;
+        }
+
+        List<DialogueChoiceDto> available = node.getChoices().stream()
                 .filter(choice -> isAvailable(state, choice))
-                .toList());
+                .toList();
+        node.setChoices(available);
+
+        if (available.isEmpty()) {
+            state.setCurrentDialogueNodeCode(null);
+        }
+
         return node;
     }
 
@@ -71,7 +85,9 @@ public class DialogueGameService {
             throw new IllegalArgumentException("Scelta non disponibile");
         }
 
-        state.setCurrentDialogueNodeCode(choice.getNextNodeCode());
+        if (StringUtils.hasText(choice.getNextNodeCode())) {
+            state.setCurrentDialogueNodeCode(choice.getNextNodeCode());
+        }
         gameEffectService.applyAll(adventureCode, state, choice.getEffects());
 
         DialogueNodeDto nextNode = openCurrentNode(adventureCode, state);

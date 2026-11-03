@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, EMPTY, Observable, pipe, switchMap, tap } from 'rxjs';
-import { DialogueChoice, DialogueNode } from '../../../core/models';
+import { DialogueChoice, DialogueNode, GameEffect } from '../../../core/models';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import { sanitizeNodes } from '../../../core/utils/sanitize-nodes';
 
@@ -44,6 +44,10 @@ export const DialogueEditorStore = signalStore(
       patchNodes((nodes) => nodes.map((n) => (n.code === code ? update(n) : n)));
     };
 
+    const endEffect = (): GameEffect => ({ type: 'END_DIALOGUE' });
+    const withoutEnd = (effects: GameEffect[]): GameEffect[] =>
+      effects.filter((e) => e.type !== 'END_DIALOGUE');
+
     return {
       load: rxMethod<number>(
         pipe(
@@ -84,28 +88,6 @@ export const DialogueEditorStore = signalStore(
         patchNode(code, (n) => ({ ...n, ...patch }));
       },
 
-      removeNode(code: string): void {
-        // le scelte che puntavano al nodo eliminato diventano "fine dialogo"
-        patchNodes((nodes) =>
-          nodes
-            .filter((n) => n.code !== code)
-            .map((n) => ({
-              ...n,
-              choices: n.choices.map((c) =>
-                c.nextNodeCode === code ? { ...c, nextNodeCode: null } : c
-              )
-            }))
-        );
-        if (store.selectedNodeCode() === code) {
-          patchState(store, { selectedNodeCode: store.nodes()[0]?.code ?? null });
-        }
-      },
-
-      addChoice(nodeCode: string): void {
-        const choice: DialogueChoice = { text: '', nextNodeCode: null, preconditions: [], effects: [] };
-        patchNode(nodeCode, (n) => ({ ...n, choices: [...n.choices, choice] }));
-      },
-
       updateChoice(nodeCode: string, index: number, patch: Partial<DialogueChoice>): void {
         patchNode(nodeCode, (n) => ({
           ...n,
@@ -117,6 +99,47 @@ export const DialogueEditorStore = signalStore(
         patchNode(nodeCode, (n) => ({
           ...n,
           choices: n.choices.filter((_, i) => i !== index)
+        }));
+      },
+
+      removeNode(code: string): void {
+        patchNodes((nodes) =>
+          nodes
+            .filter((n) => n.code !== code)
+            .map((n) => ({
+              ...n,
+              choices: n.choices.map((c) =>
+                c.nextNodeCode === code
+                  ? { ...c, nextNodeCode: null, effects: [...withoutEnd(c.effects), endEffect()] }
+                  : c
+              )
+            }))
+        );
+        if (store.selectedNodeCode() === code) {
+          patchState(store, { selectedNodeCode: store.nodes()[0]?.code ?? null });
+        }
+      },
+
+      addChoice(nodeCode: string): void {
+        const choice: DialogueChoice = {
+          text: '',
+          nextNodeCode: null,
+          preconditions: [],
+          effects: [endEffect()]
+        };
+        patchNode(nodeCode, (n) => ({ ...n, choices: [...n.choices, choice] }));
+      },
+
+      setChoiceTarget(nodeCode: string, index: number, nextNodeCode: string | null): void {
+        patchNode(nodeCode, (n) => ({
+          ...n,
+          choices: n.choices.map((c, i) => {
+            if (i !== index) return c;
+            const effects = withoutEnd(c.effects);
+            return nextNodeCode
+              ? { ...c, nextNodeCode, effects }
+              : { ...c, nextNodeCode: null, effects: [...effects, endEffect()] };
+          })
         }));
       },
 

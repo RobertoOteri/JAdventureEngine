@@ -36,14 +36,13 @@ export class DialogueEditorComponent implements OnInit {
 
     this.store.load(itemId);
 
-    // Se la pagina viene aperta direttamente (refresh) lo store dell'editor è vuoto
     if (adventureId && this.editorStore.adventure()?.id !== adventureId) {
       this.editorStore.loadAdventureAndScenes({ adventureId });
     }
   }
 
   save(): void {
-    this.store.save().subscribe({ error: () => undefined }); // il feedback è già nello store
+    this.store.save().subscribe({ error: () => undefined });
   }
 
   goBack(): void {

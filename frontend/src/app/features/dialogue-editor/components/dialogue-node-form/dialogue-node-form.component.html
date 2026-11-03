@@ -24,6 +24,7 @@
         <app-effects-editor
           [effects]="node.effects"
           [dialogueNodes]="store.nodes()"
+          [dialogueMode]="true"
           [excludedTypes]="['START_DIALOGUE']"
           emptyHint="Nessun effetto: il nodo mostra solo il testo."
           (effectsChange)="onNodeEffects(node.code, $event)"

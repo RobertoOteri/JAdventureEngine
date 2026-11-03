@@ -1,11 +1,13 @@
-import { DialogueNode, GameEffect, Precondition } from '../models';
+import { DialogueNode, EffectType, GameEffect, Precondition } from '../models';
+
+const NO_TARGET: readonly EffectType[] = ['END_ADVENTURE', 'END_DIALOGUE'];
 
 function sanitizeEffects(effects: GameEffect[] | null | undefined): GameEffect[] {
   return (effects ?? [])
-    .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue?.trim())
+    .filter((e) => NO_TARGET.includes(e.type) || !!e.targetValue?.trim())
     .map((e) => ({
       type: e.type,
-      targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue?.trim(),
+      targetValue: NO_TARGET.includes(e.type) ? undefined : e.targetValue?.trim(),
       flagValue: e.type === 'SET_FLAG' ? e.flagValue : undefined
     }));
 }
