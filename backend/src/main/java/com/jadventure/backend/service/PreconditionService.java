@@ -7,6 +7,7 @@ import com.jadventure.backend.model.Action;
 import com.jadventure.backend.model.Precondition;
 import com.jadventure.backend.model.enums.PreconditionType;
 import com.jadventure.backend.service.precondition.PreconditionChecker;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

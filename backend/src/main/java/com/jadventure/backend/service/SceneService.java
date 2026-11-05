@@ -10,6 +10,7 @@ import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.Scene;
 import com.jadventure.backend.repository.SceneRepository;
 import com.jadventure.backend.util.FileStorageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SceneService {
 
     private final SceneRepository sceneRepository;
@@ -25,21 +27,9 @@ public class SceneService {
     private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
-    public SceneService(SceneRepository sceneRepository,
-                        SceneMapper sceneMapper,
-                        ItemMapper itemMapper,
-                        FileStorageUtil fileStorageUtil,
-                        AuthService authService) {
-        this.sceneRepository = sceneRepository;
-        this.sceneMapper = sceneMapper;
-        this.itemMapper = itemMapper;
-        this.fileStorageUtil = fileStorageUtil;
-        this.authService = authService;
-    }
-
     @Transactional(readOnly = true)
-    public List<SceneDto> getScenesByAdventure(String adventureCode) {
-        return sceneMapper.toDtoList(sceneRepository.findAllByGraphicAdventureCode(adventureCode));
+    public List<SceneDto> getScenesByAdventure(Long adventureId) {
+        return sceneMapper.toDtoList(sceneRepository.findAllByGraphicAdventureId(adventureId));
     }
 
     @Transactional(readOnly = true)
@@ -50,8 +40,8 @@ public class SceneService {
     }
 
     @Transactional(readOnly = true)
-    public SceneDto getSceneByCode(String adventureCode, String sceneCode) {
-        Scene scene = sceneRepository.findByGraphicAdventureCodeAndCode(adventureCode, sceneCode)
+    public SceneDto getSceneByCode(Long adventureId, String sceneCode) {
+        Scene scene = sceneRepository.findByGraphicAdventureIdAndCode(adventureId, sceneCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata: " + sceneCode));
         return sceneMapper.toDto(scene);
     }
@@ -61,7 +51,9 @@ public class SceneService {
         Scene scene = sceneRepository.findById(sceneId)
                 .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
 
-        authService.validateOwnership(scene.getGraphicAdventure().getAuthor().getUsername());
+        authService.validateEditable(
+                scene.getGraphicAdventure().getAuthor().getUsername(),
+                scene.getGraphicAdventure().getStatus());
         sceneRepository.delete(scene);
     }
 
@@ -71,7 +63,7 @@ public class SceneService {
                 .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
 
         GraphicAdventure adventure = scene.getGraphicAdventure();
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
 
         if (itemDto.getHotspot() == null || itemDto.getHotspot().getPoints() == null || itemDto.getHotspot().getPoints().isBlank()) {
             throw new IllegalArgumentException("Un oggetto aggiunto alla scena deve avere un hotspot con dei punti validi");
@@ -81,7 +73,8 @@ public class SceneService {
         item.setGraphicAdventure(adventure);
 
         if (image != null && !image.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), itemDto.getCode());
+            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
+                    adventure.getCode(), adventure.getVersionNumber(), itemDto.getCode());
             item.setImageUrl(fileStorageUtil.storeFile(path, image));
         }
 

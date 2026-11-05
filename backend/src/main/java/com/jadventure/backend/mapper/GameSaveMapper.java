@@ -10,6 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {GameStateMapper.class})
 public interface GameSaveMapper {
 
+    @Mapping(target = "adventureId", source = "graphicAdventure.id")
     GameSaveDto toDto(GameSave entity);
 
     List<GameSaveDto> toDtoList(List<GameSave> entities);

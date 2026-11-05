@@ -26,8 +26,8 @@ public class ChangeSceneEffectHandler implements EffectHandler{
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
-        SceneDto scene = sceneService.getSceneByCode(adventureCode, effect.getTargetValue());
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
+        SceneDto scene = sceneService.getSceneByCode(adventureId, effect.getTargetValue());
         state.setCurrentScene(scene);
 
         if (scene == null || scene.getItems() == null) {

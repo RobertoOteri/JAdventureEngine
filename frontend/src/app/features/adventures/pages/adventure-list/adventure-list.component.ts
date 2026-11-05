@@ -53,4 +53,8 @@ export class AdventureListComponent implements OnInit {
   onPlayAdventure(adv: GraphicAdventureDto): void {
     this.router.navigate(['/adventures', adv.id, 'play']);
   }
+
+  onPlayVersion(adventureId: number): void {
+    this.router.navigate(['/adventures', adventureId, 'play']);
+  }
 }

@@ -1,5 +1,6 @@
 package com.jadventure.backend.model;
 
+import com.jadventure.backend.model.enums.AdventureStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "graphic_adventures")
+@Table(
+        name = "graphic_adventures",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_graphic_adventures_code_version",
+                columnNames = {"code", "version_number"}
+        )
+)
 @Builder
 public class GraphicAdventure {
 
@@ -25,10 +32,10 @@ public class GraphicAdventure {
     )
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, length = 100)
     private String code;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(nullable = false, length = 150)
     private String title;
 
     @Column(columnDefinition = "TEXT")
@@ -39,6 +46,18 @@ public class GraphicAdventure {
 
     @Column(columnDefinition = "TEXT")
     private String coverImageUrl;
+
+    @Column(name = "version_number", nullable = false)
+    @Builder.Default
+    private Integer versionNumber = 1;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private AdventureStatus status = AdventureStatus.DRAFT;
+
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

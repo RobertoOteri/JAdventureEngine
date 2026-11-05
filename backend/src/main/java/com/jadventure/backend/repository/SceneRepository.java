@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface SceneRepository extends JpaRepository<Scene, Long> {
 
-    List<Scene> findAllByGraphicAdventureCode(String adventureCode);
+    List<Scene> findAllByGraphicAdventureId(Long adventureId);
 
-    Optional<Scene> findByGraphicAdventureCodeAndCode(String adventureCode, String code);
+    Optional<Scene> findByGraphicAdventureIdAndCode(Long adventureId, String code);
 }

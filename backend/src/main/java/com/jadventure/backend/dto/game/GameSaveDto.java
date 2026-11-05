@@ -13,6 +13,7 @@ public class GameSaveDto {
     private Long id;
     private String code;
     private String name;
+    private Long adventureId;
     private LocalDateTime savedAt;
     private GameStateDto gameState;
 }

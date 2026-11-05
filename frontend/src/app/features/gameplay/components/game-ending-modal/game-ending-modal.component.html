@@ -52,7 +52,7 @@
 
 @if (isLeaderboardOpen()) {
   <app-leaderboard
-    [adventureCode]="adventureCode()"
+    [adventureId]="adventureId()"
     [adventureTitle]="adventureTitle()"
     (close)="isLeaderboardOpen.set(false)"
   />

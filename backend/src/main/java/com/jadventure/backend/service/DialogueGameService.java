@@ -8,6 +8,7 @@ import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.DialogueNodeMapper;
 import com.jadventure.backend.repository.DialogueNodeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DialogueGameService {
 
     private final DialogueNodeRepository nodeRepository;
@@ -23,27 +25,15 @@ public class DialogueGameService {
     private final GameEffectService gameEffectService;
     private final GameSaveService gameSaveService;
 
-    public DialogueGameService(DialogueNodeRepository nodeRepository,
-                               DialogueNodeMapper nodeMapper,
-                               PreconditionService preconditionService,
-                               GameEffectService gameEffectService,
-                               GameSaveService gameSaveService) {
-        this.nodeRepository = nodeRepository;
-        this.nodeMapper = nodeMapper;
-        this.preconditionService = preconditionService;
-        this.gameEffectService = gameEffectService;
-        this.gameSaveService = gameSaveService;
-    }
-
     @Transactional
-    public DialogueNodeDto openCurrentNode(String adventureCode, GameStateDto state) {
+    public DialogueNodeDto openCurrentNode(Long adventureId, GameStateDto state) {
         String nodeCode = state.getCurrentDialogueNodeCode();
         if (nodeCode == null) {
             return null;
         }
 
-        DialogueNodeDto node = loadNode(nodeCode);
-        gameEffectService.applyAll(adventureCode, state, node.getEffects());
+        DialogueNodeDto node = loadNode(adventureId, nodeCode);
+        gameEffectService.applyAll(adventureId, state, node.getEffects());
 
         if (state.isCompleted()) {
             state.setCurrentDialogueNodeCode(null);
@@ -69,14 +59,14 @@ public class DialogueGameService {
 
     @Transactional
     public GameActionResultDto chooseOption(DialogueChoiceRequestDto request) {
-        String adventureCode = request.getAdventureCode();
+        Long adventureId = request.getAdventureId();
         GameStateDto state = request.getGameState();
 
         if (state.getCurrentScene() == null || state.getCurrentDialogueNodeCode() == null) {
             throw new IllegalArgumentException("Nessun dialogo in corso");
         }
 
-        DialogueChoiceDto choice = loadNode(state.getCurrentDialogueNodeCode()).getChoices().stream()
+        DialogueChoiceDto choice = loadNode(adventureId, state.getCurrentDialogueNodeCode()).getChoices().stream()
                 .filter(c -> request.getChoiceId().equals(c.getId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Scelta non valida per il nodo corrente"));
@@ -88,12 +78,12 @@ public class DialogueGameService {
         if (StringUtils.hasText(choice.getNextNodeCode())) {
             state.setCurrentDialogueNodeCode(choice.getNextNodeCode());
         }
-        gameEffectService.applyAll(adventureCode, state, choice.getEffects());
+        gameEffectService.applyAll(adventureId, state, choice.getEffects());
 
-        DialogueNodeDto nextNode = openCurrentNode(adventureCode, state);
+        DialogueNodeDto nextNode = openCurrentNode(adventureId, state);
 
         if (!state.isCompleted()) {
-            gameSaveService.updateAutoSave(adventureCode, state);
+            gameSaveService.updateAutoSave(adventureId, state);
         }
 
         return GameActionResultDto.builder()
@@ -103,8 +93,8 @@ public class DialogueGameService {
                 .build();
     }
 
-    private DialogueNodeDto loadNode(String code) {
-        return nodeMapper.toDto(nodeRepository.findByCode(code)
+    private DialogueNodeDto loadNode(Long adventureId, String code) {
+        return nodeMapper.toDto(nodeRepository.findByCodeAndItemGraphicAdventureId(code, adventureId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nodo di dialogo non trovato: " + code)));
     }
 

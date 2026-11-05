@@ -23,8 +23,8 @@ public class SceneController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SceneDto>> getScenes(@RequestParam String adventureCode) {
-        return ResponseEntity.ok(sceneService.getScenesByAdventure(adventureCode));
+    public ResponseEntity<List<SceneDto>> getScenes(@RequestParam Long adventureId) {
+        return ResponseEntity.ok(sceneService.getScenesByAdventure(adventureId));
     }
 
     @GetMapping("/{sceneId}")

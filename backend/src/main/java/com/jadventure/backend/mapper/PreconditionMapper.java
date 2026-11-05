@@ -23,4 +23,13 @@ public interface PreconditionMapper {
     TextBoxDetailDto toDto(TextBoxDetail entity);
 
     TextBoxDetail toEntity(TextBoxDetailDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "action", ignore = true)
+    Precondition copy(Precondition source);
+
+    List<Precondition> copyList(List<Precondition> source);
+
+
+    TextBoxDetail copy(TextBoxDetail source);
 }

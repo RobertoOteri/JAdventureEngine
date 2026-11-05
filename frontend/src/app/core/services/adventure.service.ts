@@ -43,4 +43,12 @@ export class AdventureService {
     return this.http.post<Item>(`${this.apiUrl}/${adventureId}/addItem`, formData);
   }
 
+  getPublishedVersions(adventureId: number): Observable<GraphicAdventureDto[]> {
+    return this.http.get<GraphicAdventureDto[]>(`${this.apiUrl}/${adventureId}/versions`);
+  }
+
+  publish(adventureId: number): Observable<GraphicAdventureDto> {
+    return this.http.post<GraphicAdventureDto>(`${this.apiUrl}/${adventureId}/publish`, {});
+  }
+
 }

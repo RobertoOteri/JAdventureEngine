@@ -8,6 +8,7 @@ import com.jadventure.backend.model.LeaderboardEntry;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.repository.LeaderboardEntryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LeaderboardService {
 
     private final LeaderboardEntryRepository leaderboardEntryRepository;
@@ -22,41 +24,31 @@ public class LeaderboardService {
     private final LeaderboardEntryMapper leaderboardEntryMapper;
     private final AuthService authService;
 
-    public LeaderboardService(LeaderboardEntryRepository leaderboardEntryRepository,
-                              GraphicAdventureRepository graphicAdventureRepository,
-                              LeaderboardEntryMapper leaderboardEntryMapper,
-                              AuthService authService) {
-        this.leaderboardEntryRepository = leaderboardEntryRepository;
-        this.graphicAdventureRepository = graphicAdventureRepository;
-        this.leaderboardEntryMapper = leaderboardEntryMapper;
-        this.authService = authService;
-    }
-
     @Transactional(readOnly = true)
-    public List<LeaderboardEntryDto> getLeaderboardForAdventure(String adventureCode) {
-        if (!graphicAdventureRepository.existsByCode(adventureCode)) {
-            throw new ResourceNotFoundException("Avventura non trovata con codice: " + adventureCode);
+    public List<LeaderboardEntryDto> getLeaderboardForAdventure(Long adventureId) {
+        if (!graphicAdventureRepository.existsById(adventureId)) {
+            throw new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId);
         }
 
         List<LeaderboardEntry> entries = leaderboardEntryRepository
-                .findTop15ByGraphicAdventureCodeOrderByPlayTimeAscCompletedAtAsc(adventureCode);
+                .findTop15ByGraphicAdventureIdOrderByPlayTimeAscCompletedAtAsc(adventureId);
 
         return leaderboardEntryMapper.toDtoList(entries);
     }
 
     @Transactional
-    public void createLeaderboardEntry(String adventureCode, long playTime) {
+    public void createLeaderboardEntry(Long adventureId, long playTime) {
         User currentUser = authService.getCurrentUser();
 
         boolean alreadyCompleted = leaderboardEntryRepository
-                .existsByUserUsernameAndGraphicAdventureCode(currentUser.getUsername(), adventureCode);
+                .existsByUserUsernameAndGraphicAdventureId(currentUser.getUsername(), adventureId);
 
         if (alreadyCompleted) {
             return;
         }
 
-        GraphicAdventure adventure = graphicAdventureRepository.findByCode(adventureCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con codice: " + adventureCode));
+        GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
+                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId));
 
         LeaderboardEntry newEntry = LeaderboardEntry.builder()
                 .user(currentUser)

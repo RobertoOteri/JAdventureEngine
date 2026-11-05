@@ -9,6 +9,7 @@ import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.model.Action;
 import com.jadventure.backend.repository.ActionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ActionService {
 
     private final ActionRepository actionRepository;
@@ -28,31 +30,13 @@ public class ActionService {
     private final DialogueGameService dialogueGameService;
     private final AuthService authService;
 
-    public ActionService(ActionRepository actionRepository,
-                         ActionMapper actionMapper,
-                         PreconditionService preconditionService,
-                         ItemService itemService,
-                         GameEffectService gameEffectService,
-                         GameSaveService gameSaveService,
-                         DialogueGameService dialogueGameService,
-                         AuthService authService) {
-        this.actionRepository = actionRepository;
-        this.actionMapper = actionMapper;
-        this.preconditionService = preconditionService;
-        this.itemService = itemService;
-        this.gameEffectService = gameEffectService;
-        this.gameSaveService = gameSaveService;
-        this.dialogueGameService = dialogueGameService;
-        this.authService = authService;
-    }
-
     @Transactional
     public GameActionResultDto executeAction(GameActionDto gameActionDto) {
-        String adventureCode = gameActionDto.getAdventureCode();
+        Long adventureId = gameActionDto.getAdventureId();
         GameStateDto stateDto = gameActionDto.getGameState();
 
-        if (adventureCode == null || stateDto == null || stateDto.getCurrentScene() == null) {
-            throw new IllegalArgumentException("Stato di gioco o codice avventura mancante");
+        if (adventureId == null || stateDto == null || stateDto.getCurrentScene() == null) {
+            throw new IllegalArgumentException("Stato di gioco o avventura mancante");
         }
 
         if (stateDto.isCompleted()) {
@@ -63,7 +47,7 @@ public class ActionService {
             throw new IllegalArgumentException("Non puoi compiere azioni durante un dialogo");
         }
 
-        Action actionEntity = actionRepository.findByCode(gameActionDto.getActionCode())
+        Action actionEntity = actionRepository.findByCodeAndItemGraphicAdventureId(gameActionDto.getActionCode(), adventureId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Azione non trovata con codice: " + gameActionDto.getActionCode()
                 ));
@@ -86,12 +70,12 @@ public class ActionService {
                     .build();
         }
 
-        gameEffectService.applyAll(adventureCode, stateDto, action.getEffects());
+        gameEffectService.applyAll(adventureId, stateDto, action.getEffects());
 
-        DialogueNodeDto dialogue = dialogueGameService.openCurrentNode(adventureCode, stateDto);
+        DialogueNodeDto dialogue = dialogueGameService.openCurrentNode(adventureId, stateDto);
 
         if (!stateDto.isCompleted()) {
-            gameSaveService.updateAutoSave(adventureCode, stateDto);
+            gameSaveService.updateAutoSave(adventureId, stateDto);
         }
 
         String successMessage = StringUtils.hasText(action.getSuccessMessage())
@@ -123,7 +107,9 @@ public class ActionService {
         Action action = actionRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + dto.getId()));
 
-        authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
+        authService.validateEditable(
+                action.getItem().getGraphicAdventure().getAuthor().getUsername(),
+                action.getItem().getGraphicAdventure().getStatus());
 
         itemService.validateActionUniqueness(action.getItem().getActions(), dto);
 
@@ -137,7 +123,9 @@ public class ActionService {
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
 
-        authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
+        authService.validateEditable(
+                action.getItem().getGraphicAdventure().getAuthor().getUsername(),
+                action.getItem().getGraphicAdventure().getStatus());
         action.getItem().getActions().remove(action);
 
         actionRepository.delete(action);

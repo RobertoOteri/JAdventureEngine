@@ -23,7 +23,7 @@ public class AddItemEffectHandler implements EffectHandler {
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         String itemCode = effect.getTargetValue();
         boolean alreadyOwned = state.getInventory().stream()
                 .anyMatch(item -> item.getCode().equals(itemCode));
@@ -31,7 +31,7 @@ public class AddItemEffectHandler implements EffectHandler {
             return;
         }
 
-        itemService.loadPlayerInventory(adventureCode, Set.of(itemCode))
+        itemService.loadPlayerInventory(adventureId, Set.of(itemCode))
                 .stream()
                 .findFirst()
                 .ifPresent(state.getInventory()::add);

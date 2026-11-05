@@ -76,43 +76,21 @@ export class GameplayComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const rawParam =
-      this.route.snapshot.paramMap.get('adventureCode') ||
-      this.route.snapshot.paramMap.get('adventureId') ||
-      this.route.snapshot.paramMap.get('id');
+    const advId = Number(this.route.snapshot.paramMap.get('adventureId'));
 
-    if (!rawParam) {
+    if (!advId) {
       void this.router.navigate(['/adventures']);
       return;
     }
 
-    const isNumericId = /^\d+$/.test(rawParam);
-
-    if (isNumericId) {
-      const advId = Number(rawParam);
-      this.adventureService.getAdventureById(advId).subscribe({
-        next: (adv) => {
-          this.adventureDetails.set(adv);
-          this.store.setAdventureCode(adv.code);
-          this.store.fetchSaves(adv.code);
-        },
-        error: () => void this.router.navigate(['/adventures'])
-      });
-    } else {
-      this.store.setAdventureCode(rawParam);
-      this.store.fetchSaves(rawParam);
-      this.adventureService.getAllAdventures().subscribe({
-        next: (adventures) => {
-          const adv = adventures.find((a) => a.code.toLowerCase() === rawParam.toLowerCase());
-          if (adv) {
-            this.adventureDetails.set(adv);
-          } else {
-            void this.router.navigate(['/adventures']);
-          }
-        },
-        error: () => void this.router.navigate(['/adventures'])
-      });
-    }
+    this.adventureService.getAdventureById(advId).subscribe({
+      next: (adv) => {
+        this.adventureDetails.set(adv);
+        this.store.setAdventureId(advId);
+        this.store.fetchSaves(advId);
+      },
+      error: () => void this.router.navigate(['/adventures'])
+    });
 
     this.timerInterval = setInterval(() => {
       const state = this.store.gameState();
@@ -129,17 +107,17 @@ export class GameplayComponent implements OnInit, OnDestroy {
   }
 
   onStartNew(): void {
-    const code = this.store.adventureCode();
-    if (code) {
-      this.store.startNewGame(code);
+    const id = this.store.adventureId();
+    if (id) {
+      this.store.startNewGame(id);
       this.isLaunchModalOpen.set(false);
     }
   }
 
   onContinue(): void {
-    const code = this.store.adventureCode();
-    if (code) {
-      this.store.continueGame(code);
+    const id = this.store.adventureId();
+    if (id) {
+      this.store.continueGame(id);
       this.isLaunchModalOpen.set(false);
     }
   }

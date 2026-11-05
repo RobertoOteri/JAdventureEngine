@@ -36,11 +36,29 @@
         </p>
       </div>
 
+      @if (versions().length > 0) {
+        <div class="version-box">
+          <app-version-select
+            label="Versione"
+            [versions]="versions()"
+            [selectedId]="selectedVersionId()"
+            (selectedChange)="selectedVersionId.set($event)"
+          />
+        </div>
+      } @else {
+        <p class="version-empty">Non ancora pubblicata: puoi giocarla come anteprima.</p>
+      }
+
       <div class="modal-actions">
         <button type="button" class="btn-cancel" (click)="close.emit()">
           Chiudi
         </button>
-        <button type="button" class="btn-leaderboard" (click)="isLeaderboardOpen.set(true)">
+        <button
+          type="button"
+          class="btn-leaderboard"
+          [disabled]="!hasLeaderboard()"
+          (click)="isLeaderboardOpen.set(true)"
+        >
           <i class="bi bi-trophy-fill"></i>
           <span>Classifica</span>
         </button>
@@ -53,9 +71,11 @@
   </div>
 </div>
 
-@if (isLeaderboardOpen()) {
+@if (isLeaderboardOpen() && selectedVersionId(); as versionId) {
   <app-leaderboard
-    [adventureCode]="adventure().code"
+    [adventureId]="versionId"
+    [adventureTitle]="adventure().title"
     (close)="isLeaderboardOpen.set(false)"
   />
 }
+

@@ -11,7 +11,7 @@ export class LeaderboardService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl + '/leaderboard';
 
-  getLeaderboard(adventureCode: string): Observable<LeaderboardEntryDto[]> {
-    return this.http.get<LeaderboardEntryDto[]>(this.apiUrl + '/' + adventureCode);
+  getLeaderboard(adventureId: number): Observable<LeaderboardEntryDto[]> {
+    return this.http.get<LeaderboardEntryDto[]>(`${this.apiUrl}/${adventureId}`);
   }
 }

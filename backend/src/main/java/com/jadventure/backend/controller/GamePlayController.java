@@ -16,14 +16,14 @@ public class GamePlayController {
         this.gamePlayService = gamePlayService;
     }
 
-    @PostMapping("/adventure/{adventureCode}")
-    public ResponseEntity<GameSaveDto> startNewGame(@PathVariable("adventureCode") String adventureCode) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(gamePlayService.startNewGame(adventureCode));
+    @PostMapping("/adventure/{adventureId}")
+    public ResponseEntity<GameSaveDto> startNewGame(@PathVariable("adventureId") Long adventureId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(gamePlayService.startNewGame(adventureId));
     }
 
-    @GetMapping("/adventure/{adventureCode}/continue")
-    public ResponseEntity<GameSaveDto> continueGame(@PathVariable("adventureCode") String adventureCode) {
-        return ResponseEntity.ok(gamePlayService.continueGame(adventureCode));
+    @GetMapping("/adventure/{adventureId}/continue")
+    public ResponseEntity<GameSaveDto> continueGame(@PathVariable("adventureId") Long adventureId) {
+        return ResponseEntity.ok(gamePlayService.continueGame(adventureId));
     }
 
     @GetMapping("/load/{saveCode}")

@@ -23,8 +23,8 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAdventureItems(@RequestParam String adventureCode) {
-        return ResponseEntity.ok(itemService.getAdventureItems(adventureCode));
+    public ResponseEntity<List<ItemDto>> getAdventureItems(@RequestParam Long adventureId) {
+        return ResponseEntity.ok(itemService.getAdventureItems(adventureId));
     }
 
     @GetMapping("/{itemId}")

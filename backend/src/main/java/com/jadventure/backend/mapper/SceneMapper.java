@@ -2,6 +2,9 @@ package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.model.Scene;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Builder;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -18,4 +21,11 @@ public interface SceneMapper {
     @Mapping(target = "graphicAdventure", ignore = true)
     @Mapping(target = "items", ignore = true)
     Scene toEntity(SceneDto dto);
+
+    @BeanMapping(builder = @Builder(disableBuilder = true))
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "graphicAdventure", ignore = true)
+    Scene copy(Scene source, @Context AdventureCopyContext context);
+
+    List<Scene> copyList(List<Scene> source, @Context AdventureCopyContext context);
 }

@@ -3,7 +3,7 @@ import { GameStateDto } from './game-state.model';
 import { DialogueNode } from './dialogue-node.model';
 
 export interface GameActionDto {
-  adventureCode: string;
+  adventureId: number;
   gameState: GameStateDto;
   actionCode: string;
   actionType: ActionType;
@@ -18,7 +18,7 @@ export interface GameActionResultDto {
 }
 
 export interface DialogueChoiceRequestDto {
-  adventureCode: string;
+  adventureId: number;
   gameState: GameStateDto;
   choiceId: number;
 }

@@ -15,7 +15,7 @@ public class StartDialogueEffectHandler implements EffectHandler {
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         if (StringUtils.hasText(effect.getTargetValue())) {
             state.setCurrentDialogueNodeCode(effect.getTargetValue());
         }

@@ -14,7 +14,7 @@ public class ShowSceneItemEffectHandler implements EffectHandler {
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         state.getVisibleItemCodes().add(effect.getTargetValue());
     }
 }

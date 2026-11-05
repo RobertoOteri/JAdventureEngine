@@ -13,8 +13,8 @@ import java.util.Optional;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    List<Item> findAllByGraphicAdventureCode(String adventureCode);
+    List<Item> findAllByGraphicAdventureId(Long adventureId);
 
-    List<Item> findAllByGraphicAdventureCodeAndCodeIn(String adventureCode, Collection<String> codes);
+    List<Item> findAllByGraphicAdventureIdAndCodeIn(Long adventureId, Collection<String> codes);
 
 }

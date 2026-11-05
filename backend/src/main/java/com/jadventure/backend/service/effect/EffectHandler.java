@@ -9,5 +9,5 @@ public interface EffectHandler {
 
     EffectType type();
 
-    void apply(String adventureCode, GameStateDto state, GameEffectDto effect);
+    void apply(Long adventureId, GameStateDto state, GameEffectDto effect);
 }

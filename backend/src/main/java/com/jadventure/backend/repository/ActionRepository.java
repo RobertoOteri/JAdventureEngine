@@ -12,5 +12,5 @@ public interface ActionRepository extends JpaRepository<Action, Long> {
 
     List<Action> findAllByItemId(Long itemId);
 
-    Optional<Action> findByCode(String code);
+    Optional<Action> findByCodeAndItemGraphicAdventureId(String code, Long adventureId);
 }

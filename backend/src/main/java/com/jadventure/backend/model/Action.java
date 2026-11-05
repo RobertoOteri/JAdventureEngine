@@ -13,7 +13,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "actions")
+@Table(
+        name = "actions",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_actions_item_code",
+                columnNames = {"item_id", "code"}
+        )
+)
 public class Action {
 
     @Id
@@ -25,7 +31,7 @@ public class Action {
     )
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String code;
 
     @Enumerated(EnumType.STRING)

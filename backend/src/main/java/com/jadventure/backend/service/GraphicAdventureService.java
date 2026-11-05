@@ -4,103 +4,105 @@ import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
-import com.jadventure.backend.mapper.GraphicAdventureMapper;
-import com.jadventure.backend.mapper.ItemMapper;
-import com.jadventure.backend.mapper.SceneMapper;
+import com.jadventure.backend.mapper.*;
 import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.Scene;
 import com.jadventure.backend.model.User;
+import com.jadventure.backend.model.enums.AdventureStatus;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.util.FileStorageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
     private final GraphicAdventureMapper graphicAdventureMapper;
     private final SceneMapper sceneMapper;
     private final ItemMapper itemMapper;
-    private final ItemService itemService;
     private final AuthService authService;
     private final FileStorageUtil fileStorageUtil;
 
-    public GraphicAdventureService(GraphicAdventureRepository graphicAdventureRepository,
-                                   GraphicAdventureMapper graphicAdventureMapper,
-                                   SceneMapper sceneMapper,
-                                   ItemMapper itemMapper,
-                                   ItemService itemService,
-                                   AuthService authService,
-                                   FileStorageUtil fileStorageUtil) {
-        this.graphicAdventureRepository = graphicAdventureRepository;
-        this.graphicAdventureMapper = graphicAdventureMapper;
-        this.sceneMapper = sceneMapper;
-        this.itemMapper = itemMapper;
-        this.itemService = itemService;
-        this.authService = authService;
-        this.fileStorageUtil = fileStorageUtil;
-    }
-
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getAllAdventures() {
-        return graphicAdventureMapper.toDtoList(graphicAdventureRepository.findAll());
+        Map<String, GraphicAdventure> latestByCode = new LinkedHashMap<>();
+        graphicAdventureRepository.findAllByStatusOrderByCodeAscVersionNumberDesc(AdventureStatus.PUBLISHED)
+                .forEach(adventure -> latestByCode.putIfAbsent(adventure.getCode(), adventure));
+
+        return graphicAdventureMapper.toDtoList(new ArrayList<>(latestByCode.values()));
     }
 
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getMyAdventures() {
         String username = authService.getCurrentUsername();
         return graphicAdventureMapper.toDtoList(
-                graphicAdventureRepository.findAllByAuthorUsernameOrderByCreatedAtDesc(username)
+                graphicAdventureRepository.findAllByAuthorUsernameAndStatusOrderByCreatedAtDesc(
+                        username, AdventureStatus.DRAFT)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<GraphicAdventureDto> getPublishedVersions(Long adventureId) {
+        GraphicAdventure adventure = findReadableAdventure(adventureId);
+        return graphicAdventureMapper.toDtoList(
+                graphicAdventureRepository.findAllByCodeAndStatusOrderByVersionNumberDesc(
+                        adventure.getCode(), AdventureStatus.PUBLISHED)
         );
     }
 
     @Transactional(readOnly = true)
     public GraphicAdventureDto getAdventureById(Long adventureId) {
-        GraphicAdventure adventure = findAdventureById(adventureId);
-        return graphicAdventureMapper.toDto(adventure);
-    }
-
-    @Transactional(readOnly = true)
-    public GraphicAdventureDto getAdventureByCode(String code) {
-        return graphicAdventureMapper.toDto(findAdventureByCode(code));
+        return graphicAdventureMapper.toDto(findReadableAdventure(adventureId));
     }
 
     @Transactional
     public GraphicAdventureDto createAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
         String title = dto.getTitle();
-        String code = generateUniqueCode(title);
-
-        User author = authService.getCurrentUser();
-
-        String coverUrl = null;
-        if (coverImage != null && !coverImage.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, code);
-            coverUrl = fileStorageUtil.storeFile(path, coverImage);
+        if (graphicAdventureRepository.existsByTitle(title)) {
+            throw new IllegalArgumentException("Esiste già un'avventura con questo titolo");
         }
+
+        String code = generateUniqueCode(title);
+        User author = authService.getCurrentUser();
 
         GraphicAdventure adventure = GraphicAdventure.builder()
                 .title(title)
                 .code(code)
                 .description(dto.getDescription())
-                .coverImageUrl(coverUrl)
                 .initialSceneCode(null)
+                .versionNumber(1)
+                .status(AdventureStatus.DRAFT)
                 .author(author)
                 .build();
+
+        if (coverImage != null && !coverImage.isEmpty()) {
+            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, code, adventure.getVersionNumber());
+            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
+        }
 
         return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
     }
 
     @Transactional
     public GraphicAdventureDto updateAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
-        GraphicAdventure adventure = findAdventureById(dto.getId());
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        GraphicAdventure adventure = findOwnedDraft(dto.getId());
+
+        if (graphicAdventureRepository.existsByTitleAndCodeNot(dto.getTitle(), adventure.getCode())) {
+            throw new IllegalArgumentException("Esiste già un'avventura con questo titolo");
+        }
 
         adventure.setTitle(dto.getTitle());
         adventure.setDescription(dto.getDescription());
@@ -110,7 +112,8 @@ public class GraphicAdventureService {
         }
 
         if (coverImage != null && !coverImage.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, adventure.getCode());
+            String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER,
+                    adventure.getCode(), adventure.getVersionNumber());
             adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
         }
 
@@ -119,20 +122,43 @@ public class GraphicAdventureService {
 
     @Transactional
     public void deleteAdventureById(Long adventureId) {
-        GraphicAdventure adventure = findAdventureById(adventureId);
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        GraphicAdventure adventure = findOwnedDraft(adventureId);
+        graphicAdventureRepository.deleteAll(graphicAdventureRepository.findAllByCode(adventure.getCode()));
+    }
 
-        graphicAdventureRepository.delete(adventure);
+    @Transactional
+    public GraphicAdventureDto publish(Long adventureId) {
+        GraphicAdventure published = findOwnedDraft(adventureId);
+
+        if (published.getScenes().isEmpty()) {
+            throw new IllegalStateException("Impossibile pubblicare: l'avventura non contiene scene");
+        }
+
+        boolean initialSceneValid = published.getInitialSceneCode() != null
+                && published.getScenes().stream()
+                .anyMatch(s -> s.getCode().equals(published.getInitialSceneCode()));
+        if (!initialSceneValid) {
+            throw new IllegalStateException("Impossibile pubblicare: scena iniziale non impostata o non valida");
+        }
+
+        published.setStatus(AdventureStatus.PUBLISHED);
+        published.setPublishedAt(LocalDateTime.now());
+
+        graphicAdventureRepository.saveAndFlush(published);
+
+        GraphicAdventure newDraft = createNextDraft(published);
+
+        return graphicAdventureMapper.toDto(newDraft);
     }
 
     @Transactional
     public SceneDto addScene(Long adventureId, SceneDto sceneDto, MultipartFile backgroundImage) {
-        GraphicAdventure adventure = findAdventureById(adventureId);
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        GraphicAdventure adventure = findOwnedDraft(adventureId);
 
         Scene scene = sceneMapper.toEntity(sceneDto);
 
-        String path = String.format(FileStorageUtil.PATH_SCENE_BACKGROUND, adventure.getCode(), sceneDto.getCode());
+        String path = String.format(FileStorageUtil.PATH_SCENE_BACKGROUND,
+                adventure.getCode(), adventure.getVersionNumber(), sceneDto.getCode());
         String backgroundImageUrl = fileStorageUtil.storeFile(path, backgroundImage);
 
         scene.setBackgroundImageUrl(backgroundImageUrl);
@@ -150,15 +176,15 @@ public class GraphicAdventureService {
 
     @Transactional
     public ItemDto addItem(Long adventureId, ItemDto itemDto, MultipartFile image) {
-        GraphicAdventure adventure = findAdventureById(adventureId);
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        GraphicAdventure adventure = findOwnedDraft(adventureId);
 
         Item item = itemMapper.toEntity(itemDto);
         item.setHotspot(null);
         item.setGraphicAdventure(adventure);
 
         if (image != null && !image.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), itemDto.getCode());
+            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
+                    adventure.getCode(), adventure.getVersionNumber(), itemDto.getCode());
             item.setImageUrl(fileStorageUtil.storeFile(path, image));
         }
 
@@ -173,9 +199,27 @@ public class GraphicAdventureService {
                 .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + id));
     }
 
-    private GraphicAdventure findAdventureByCode(String code) {
-        return graphicAdventureRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata: " + code));
+    private GraphicAdventure findReadableAdventure(Long id) {
+        GraphicAdventure adventure = findAdventureById(id);
+        boolean isAuthor = adventure.getAuthor().getUsername().equals(authService.getCurrentUsername());
+        if (!isAuthor && adventure.getStatus() != AdventureStatus.PUBLISHED) {
+            throw new ResourceNotFoundException("Avventura non trovata con ID: " + id);
+        }
+        return adventure;
+    }
+
+    private GraphicAdventure findOwnedDraft(Long id) {
+        GraphicAdventure adventure = findAdventureById(id);
+        authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
+        return adventure;
+    }
+
+    private GraphicAdventure createNextDraft(GraphicAdventure adventure) {
+        GraphicAdventure draft = graphicAdventureMapper.copy(adventure, new AdventureCopyContext());
+        draft.setVersionNumber(adventure.getVersionNumber() + 1);
+        draft.setStatus(AdventureStatus.DRAFT);
+
+        return graphicAdventureRepository.save(draft);
     }
 
     private String generateUniqueCode(String input) {
@@ -186,7 +230,7 @@ public class GraphicAdventureService {
 
         String code = baseCode;
         int counter = 1;
-        while (graphicAdventureRepository.findByCode(code).isPresent()) {
+        while (graphicAdventureRepository.existsByCode(code)) {
             code = baseCode + "_" + counter;
             counter++;
         }

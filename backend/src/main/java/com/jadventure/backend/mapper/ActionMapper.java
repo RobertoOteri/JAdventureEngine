@@ -27,6 +27,12 @@ public interface ActionMapper {
     @Mapping(target = "item", ignore = true)
     Action toEntity(ActionDto dto);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    Action copy(Action source, @Context AdventureCopyContext context);
+
+    List<Action> copyList(List<Action> source, @Context AdventureCopyContext context);
+
     @AfterMapping
     default void afterMapping(@MappingTarget Action action) {
         if (action.getCode() == null || action.getCode().isBlank()) {

@@ -22,7 +22,7 @@ const CONFETTI_COLORS = ['#ffffff', '#fbbf24', '#e2c05c', '#38bdf8', '#a1a1aa'];
 })
 export class GameEndingModalComponent {
   adventureTitle = input<string>('Avventura');
-  adventureCode = input.required<string>();
+  adventureId = input.required<number>();
   message = input<string | null>(null);
   playTimeSeconds = input<number>(0);
 

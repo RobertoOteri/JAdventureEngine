@@ -19,9 +19,9 @@ public class GameSaveController {
         this.gameSaveService = gameSaveService;
     }
 
-    @GetMapping("/saveGame/{adventureCode}")
-    public ResponseEntity<List<GameSaveDto>> getSavesForAdventure(@PathVariable("adventureCode") String adventureCode) {
-        return ResponseEntity.ok(gameSaveService.getSavesForAdventure(adventureCode));
+    @GetMapping("/saveGame/{adventureId}")
+    public ResponseEntity<List<GameSaveDto>> getSavesForAdventure(@PathVariable("adventureId") Long adventureId) {
+        return ResponseEntity.ok(gameSaveService.getSavesForAdventure(adventureId));
     }
 
     @GetMapping("/{saveCode}")
@@ -30,18 +30,18 @@ public class GameSaveController {
     }
 
 
-    @PostMapping("/{adventureCode}")
-    public ResponseEntity<GameSaveDto> createSave(@PathVariable("adventureCode") String adventureCode,
+    @PostMapping("/{adventureId}")
+    public ResponseEntity<GameSaveDto> createSave(@PathVariable("adventureId") Long adventureId,
                                                   @RequestParam(required = false) String saveName,
                                                   @RequestBody GameStateDto gameStateDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(gameSaveService.createSave(adventureCode, saveName, gameStateDto));
+                .body(gameSaveService.createSave(adventureId, saveName, gameStateDto));
     }
 
-    @PutMapping("/{adventureCode}/autosave")
-    public ResponseEntity<Void> updateAutoSave(@PathVariable("adventureCode") String adventureCode,
+    @PutMapping("/{adventureId}/autosave")
+    public ResponseEntity<Void> updateAutoSave(@PathVariable("adventureId") Long adventureId,
                                                @RequestBody GameStateDto gameStateDto) {
-        gameSaveService.updateAutoSave(adventureCode, gameStateDto);
+        gameSaveService.updateAutoSave(adventureId, gameStateDto);
         return ResponseEntity.ok().build();
     }
 

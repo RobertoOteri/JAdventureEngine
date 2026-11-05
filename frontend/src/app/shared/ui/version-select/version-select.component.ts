@@ -1,0 +1,25 @@
+import { Component, input, output } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { GraphicAdventureDto } from '../../../core/models';
+
+@Component({
+  selector: 'app-version-select',
+  standalone: true,
+  imports: [DatePipe],
+  templateUrl: './version-select.component.html',
+  styleUrl: './version-select.component.css'
+})
+export class VersionSelectComponent {
+  readonly versions = input<GraphicAdventureDto[]>([]);
+  readonly selectedId = input<number | null>(null);
+  readonly label = input<string>('Versione');
+
+  readonly selectedChange = output<number>();
+
+  onChange(event: Event): void {
+    const value = Number((event.target as HTMLSelectElement).value);
+    if (!isNaN(value)) {
+      this.selectedChange.emit(value);
+    }
+  }
+}

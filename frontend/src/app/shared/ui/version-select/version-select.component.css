@@ -1,0 +1,35 @@
+.version-select {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #a1a1aa;
+}
+
+.version-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+}
+
+select {
+  flex: 1;
+  background: #131622;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+select:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+select:focus {
+  outline: none;
+  border-color: rgba(251, 191, 36, 0.6);
+}

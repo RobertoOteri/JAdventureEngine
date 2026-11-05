@@ -50,7 +50,7 @@
     <app-adventure-detail-modal
       [adventure]="selectedAdventure()!"
       (close)="selectedAdventure.set(null)"
-      (play)="onPlayAdventure(selectedAdventure()!)"
+      (play)="onPlayVersion($event)"
     />
   }
 </div>

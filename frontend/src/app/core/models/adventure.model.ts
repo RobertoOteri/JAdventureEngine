@@ -1,3 +1,5 @@
+export type AdventureStatus = 'DRAFT' | 'PUBLISHED';
+
 export interface GraphicAdventureDto {
   id?: number;
   code: string;
@@ -7,4 +9,7 @@ export interface GraphicAdventureDto {
   initialSceneCode?: string;
   authorUsername?: string;
   createdAt?: string;
+  versionNumber?: number;
+  status?: AdventureStatus;
+  publishedAt?: string | null;
 }

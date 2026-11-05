@@ -13,7 +13,13 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "dialogue_nodes")
+@Table(
+        name = "dialogue_nodes",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_dialogue_nodes_item_code",
+                columnNames = {"item_id", "code"}
+        )
+)
 public class DialogueNode {
 
     @Id
@@ -25,7 +31,7 @@ public class DialogueNode {
     )
     private Long id;
 
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String code;
 
     @Column(length = 3000)

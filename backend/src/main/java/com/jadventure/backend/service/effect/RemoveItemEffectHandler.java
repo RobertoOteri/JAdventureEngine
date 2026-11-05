@@ -14,7 +14,7 @@ public class RemoveItemEffectHandler implements EffectHandler {
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         state.getInventory().removeIf(item -> item.getCode().equals(effect.getTargetValue()));
     }
 }

@@ -259,3 +259,18 @@
   background: rgba(251, 191, 36, 0.2);
   color: #ffffff;
 }
+
+.version-box {
+  margin-bottom: 1rem;
+}
+
+.version-empty {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #a1a1aa;
+}
+
+.btn-leaderboard:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

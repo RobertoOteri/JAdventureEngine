@@ -12,11 +12,11 @@ public interface GameSaveRepository extends JpaRepository<GameSave, Long> {
 
     Optional<GameSave> findByCodeAndUserUsername(String code, String username);
 
-    Optional<GameSave> findFirstByUserUsernameAndGraphicAdventureCodeAndAutoSaveTrue(String username, String adventureCode);
+    Optional<GameSave> findFirstByUserUsernameAndGraphicAdventureIdAndAutoSaveTrue(String username, Long adventureId);
 
-    Optional<GameSave> findFirstByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(String username, String adventureCode);
+    Optional<GameSave> findFirstByUserUsernameAndGraphicAdventureIdOrderBySavedAtDesc(String username, Long adventureId);
 
-    List<GameSave> findAllByUserUsernameAndGraphicAdventureCodeOrderBySavedAtDesc(String username, String adventureCode);
+    List<GameSave> findAllByUserUsernameAndGraphicAdventureIdOrderBySavedAtDesc(String username, Long adventureId);
 
-    void deleteAllByUserUsernameAndGraphicAdventureCode(String username, String adventureCode);
+    void deleteAllByUserUsernameAndGraphicAdventureId(String username, Long adventureId);
 }

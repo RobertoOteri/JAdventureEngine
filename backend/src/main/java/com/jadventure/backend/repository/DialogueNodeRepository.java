@@ -12,5 +12,5 @@ public interface DialogueNodeRepository extends JpaRepository<DialogueNode, Long
 
     List<DialogueNode> findByItemIdOrderById(Long itemId);
 
-    Optional<DialogueNode> findByCode(String code);
+    Optional<DialogueNode> findByCodeAndItemGraphicAdventureId(String code, Long adventureId);
 }

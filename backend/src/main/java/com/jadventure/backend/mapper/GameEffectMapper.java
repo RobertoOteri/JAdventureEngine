@@ -17,4 +17,10 @@ public interface GameEffectMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "action", ignore = true)
     GameEffect toEntity(GameEffectDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "action", ignore = true)
+    GameEffect copy(GameEffect source);
+
+    List<GameEffect> copyList(List<GameEffect> source);
 }

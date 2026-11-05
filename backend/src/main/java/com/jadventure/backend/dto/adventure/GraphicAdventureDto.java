@@ -1,5 +1,6 @@
 package com.jadventure.backend.dto.adventure;
 
+import com.jadventure.backend.model.enums.AdventureStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class GraphicAdventureDto {
     private String description;
     private String coverImageUrl;
     private String initialSceneCode;
+    private Integer versionNumber;
+    private AdventureStatus status;
+    private LocalDateTime publishedAt;
     private String authorUsername;
     private LocalDateTime createdAt;
 }

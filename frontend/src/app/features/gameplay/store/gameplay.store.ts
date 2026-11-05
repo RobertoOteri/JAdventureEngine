@@ -41,7 +41,8 @@ export interface InputOverlayState {
 }
 
 export interface GameplayState {
-  adventureCode: string | null;
+  /** Id della versione dell'avventura che si sta giocando. */
+  adventureId: number | null;
   currentSaveCode: string | null;
   gameState: GameStateDto | null;
   savesList: GameSaveDto[];
@@ -82,7 +83,7 @@ const FALLBACK_TEXTBOX: TextBoxDetail = {
 };
 
 const initialState: GameplayState = {
-  adventureCode: null,
+  adventureId: null,
   currentSaveCode: null,
   gameState: null,
   savesList: [],
@@ -188,8 +189,8 @@ export const GameplayStore = signalStore(
       patchState(store, {isInventoryOpen: isOpen});
     };
 
-    const setAdventureCode = (code: string): void => {
-      patchState(store, {adventureCode: code});
+    const setAdventureId = (id: number): void => {
+      patchState(store, {adventureId: id});
     };
 
     const startDragItem = (item: Item, x: number, y: number): void => {
@@ -231,10 +232,10 @@ export const GameplayStore = signalStore(
       patchState(store, {draggedItem: initialDraggedState});
     };
 
-    const fetchSaves = rxMethod<string>(
+    const fetchSaves = rxMethod<number>(
       pipe(
-        switchMap((adventureCode) =>
-          saveService.getSavesForAdventure(adventureCode).pipe(
+        switchMap((adventureId) =>
+          saveService.getSavesForAdventure(adventureId).pipe(
             tap({
               next: (savesList) => patchState(store, {savesList}),
               error: (err) => console.error('Errore recupero lista salvataggi:', err)
@@ -247,12 +248,12 @@ export const GameplayStore = signalStore(
     const syncAutoSave = rxMethod<void>(
       pipe(
         switchMap(() => {
-          const advCode = store.adventureCode();
+          const advId = store.adventureId();
           const currentState = store.gameState();
-          if (!advCode || !currentState) {
+          if (!advId || !currentState) {
             return [];
           }
-          return saveService.updateAutoSave(advCode, currentState).pipe(
+          return saveService.updateAutoSave(advId, currentState).pipe(
             tap({
               error: (err) => console.error('Errore sincronizzazione autosave:', err)
             })
@@ -266,9 +267,9 @@ export const GameplayStore = signalStore(
         syncAutoSave();
       }
       patchState(store, {isPauseMenuOpen: isOpen});
-      const advCode = store.adventureCode();
-      if (isOpen && advCode) {
-        fetchSaves(advCode);
+      const advId = store.adventureId();
+      if (isOpen && advId) {
+        fetchSaves(advId);
       }
     };
 
@@ -276,11 +277,11 @@ export const GameplayStore = signalStore(
       setPauseMenuOpen(!store.isPauseMenuOpen());
     };
 
-    const startNewGame = rxMethod<string>(
+    const startNewGame = rxMethod<number>(
       pipe(
-        tap((adventureCode) =>
+        tap((adventureId) =>
           patchState(store, {
-            adventureCode,
+            adventureId,
             isLoading: true,
             feedbackMessage: null,
             endingMessage: null,
@@ -290,10 +291,10 @@ export const GameplayStore = signalStore(
             savesList: []
           })
         ),
-        switchMap((adventureCode) =>
-          gameService.startNewGame(adventureCode).pipe(
+        switchMap((adventureId) =>
+          gameService.startNewGame(adventureId).pipe(
             switchMap((save) =>
-              saveService.getSavesForAdventure(adventureCode).pipe(
+              saveService.getSavesForAdventure(adventureId).pipe(
                 tap({
                   next: (savesList) => {
                     patchState(store, {
@@ -328,11 +329,11 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const continueGame = rxMethod<string>(
+    const continueGame = rxMethod<number>(
       pipe(
-        tap((adventureCode) =>
+        tap((adventureId) =>
           patchState(store, {
-            adventureCode,
+            adventureId,
             isLoading: true,
             feedbackMessage: null,
             endingMessage: null,
@@ -341,10 +342,10 @@ export const GameplayStore = signalStore(
             activeDialogue: null
           })
         ),
-        switchMap((adventureCode) =>
-          gameService.continueGame(adventureCode).pipe(
+        switchMap((adventureId) =>
+          gameService.continueGame(adventureId).pipe(
             switchMap((save) =>
-              saveService.getSavesForAdventure(adventureCode).pipe(
+              saveService.getSavesForAdventure(adventureId).pipe(
                 tap({
                   next: (savesList) => {
                     patchState(store, {
@@ -401,9 +402,9 @@ export const GameplayStore = signalStore(
                   isLoading: false
                 });
                 closeRadialMenu();
-                const advCode = store.adventureCode();
-                if (advCode) {
-                  fetchSaves(advCode);
+                const advId = store.adventureId();
+                if (advId) {
+                  fetchSaves(advId);
                 }
               },
               error: (err) => {
@@ -420,10 +421,10 @@ export const GameplayStore = signalStore(
     const executeAction = rxMethod<{ actionCode: string; actionType: ActionType; input?: string }>(
       pipe(
         exhaustMap(({actionCode, actionType, input}) => {
-          const adventureCode = store.adventureCode();
+          const adventureId = store.adventureId();
           const gameState = store.gameState();
 
-          if (!adventureCode || !gameState) {
+          if (!adventureId || !gameState) {
             console.error('Nessuna partita attiva nello store');
             setFeedbackMessage('Errore: sessione di gioco non valida.');
             closeRadialMenu();
@@ -432,7 +433,7 @@ export const GameplayStore = signalStore(
           }
 
           const payload: GameActionDto = {
-            adventureCode,
+            adventureId,
             gameState,
             actionCode,
             actionType,
@@ -490,15 +491,15 @@ export const GameplayStore = signalStore(
     const chooseDialogueOption = rxMethod<number>(
       pipe(
         exhaustMap((choiceId) => {
-          const adventureCode = store.adventureCode();
+          const adventureId = store.adventureId();
           const gameState = store.gameState();
 
-          if (!adventureCode || !gameState) {
+          if (!adventureId || !gameState) {
             setFeedbackMessage('Errore: sessione di gioco non valida.');
             return EMPTY;
           }
 
-          return dialogueService.choose({adventureCode, gameState, choiceId}).pipe(
+          return dialogueService.choose({adventureId, gameState, choiceId}).pipe(
             tap((result: GameActionResultDto) => {
               if (result.state) {
                 const completed = !!result.state.completed;
@@ -593,19 +594,19 @@ export const GameplayStore = signalStore(
     const saveCurrentGame = rxMethod<string | undefined>(
       pipe(
         switchMap((saveName) => {
-          const advCode = store.adventureCode();
+          const advId = store.adventureId();
           const currentState = store.gameState();
 
-          if (!advCode) {
+          if (!advId) {
             console.error('Nessuna avventura attiva da salvare');
             return [];
           }
 
-          return saveService.createSave(advCode, currentState, saveName).pipe(
+          return saveService.createSave(advId, currentState, saveName).pipe(
             tap({
               next: () => {
                 setFeedbackMessage('Partita salvata con successo!');
-                fetchSaves(advCode);
+                fetchSaves(advId);
               },
               error: (err) => {
                 console.error('Errore durante il salvataggio:', err);
@@ -652,7 +653,7 @@ export const GameplayStore = signalStore(
       dropOnInventoryTarget,
       togglePauseMenu,
       setPauseMenuOpen,
-      setAdventureCode,
+      setAdventureId,
       startNewGame,
       continueGame,
       loadGame,

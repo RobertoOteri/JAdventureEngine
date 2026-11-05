@@ -19,6 +19,15 @@
       >
         <i class="bi bi-pencil-square"></i>
       </button>
+
+      @if (store.adventure()?.versionNumber; as version) {
+        <span
+          class="version-badge"
+          title="Stai modificando questa bozza: i giocatori vedono solo le versioni pubblicate"
+        >
+          Bozza v{{ version }}
+        </span>
+      }
     </div>
   </div>
 
@@ -33,6 +42,24 @@
       </div>
     }
 
+    @if (publishError()) {
+      <div class="publish-error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ publishError() }}</span>
+      </div>
+    }
+
+    <button
+      type="button"
+      class="btn-publish"
+      [disabled]="store.isSaving() || !store.adventure()"
+      (click)="isPublishConfirmOpen.set(true)"
+      title="Rendi giocabile la bozza attuale come nuova versione"
+    >
+      <i class="bi bi-rocket-takeoff"></i>
+      <span>Pubblica</span>
+    </button>
+
     <div class="status-indicator">
       <span class="status-dot"></span>
       <span class="scene-active-tag">
@@ -41,3 +68,15 @@
     </div>
   </div>
 </header>
+
+@if (isPublishConfirmOpen()) {
+  <app-confirmation-modal
+    title="Pubblicare la bozza?"
+    [message]="'La bozza diventerà la versione ' + store.adventure()?.versionNumber + ', giocabile da tutti. Le versioni già pubblicate restano disponibili e continuerai a lavorare su una nuova bozza.'"
+    confirmText="Pubblica"
+    cancelText="Annulla"
+    [isDestructive]="false"
+    (confirm)="confirmPublish()"
+    (cancel)="isPublishConfirmOpen.set(false)"
+  />
+}

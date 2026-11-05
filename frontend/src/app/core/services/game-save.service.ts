@@ -11,16 +11,16 @@ export class GameSaveService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/saves`;
 
-  getSavesForAdventure(adventureCode: string): Observable<GameSaveDto[]> {
-    return this.http.get<GameSaveDto[]>(`${this.apiUrl}/saveGame/${adventureCode}`);
+  getSavesForAdventure(adventureId: number): Observable<GameSaveDto[]> {
+    return this.http.get<GameSaveDto[]>(`${this.apiUrl}/saveGame/${adventureId}`);
   }
 
-  createSave(adventureCode: string, gameState: GameStateDto | null, saveName?: string): Observable<GameSaveDto> {
+  createSave(adventureId: number, gameState: GameStateDto | null, saveName?: string): Observable<GameSaveDto> {
     const params = saveName ? new HttpParams().set('saveName', saveName) : undefined;
-    return this.http.post<GameSaveDto>(`${this.apiUrl}/${adventureCode}`, gameState, { params });
+    return this.http.post<GameSaveDto>(`${this.apiUrl}/${adventureId}`, gameState, { params });
   }
 
-  updateAutoSave(adventureCode: string, gameState: GameStateDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${adventureCode}/autosave`, gameState);
+  updateAutoSave(adventureId: number, gameState: GameStateDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${adventureId}/autosave`, gameState);
   }
 }

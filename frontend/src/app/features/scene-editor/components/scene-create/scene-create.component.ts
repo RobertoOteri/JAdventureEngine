@@ -49,7 +49,7 @@ export class SceneCreateComponent implements OnInit {
           if (isInitialParam !== null) {
             this.applyInitialState(isInitialParam === 'true');
           } else {
-            this.sceneService.getAllScenes(adv.code).subscribe({
+            this.sceneService.getAllScenes(advId).subscribe({
               next: (scenes) => {
                 const isFirstScene = scenes.length === 0;
                 this.applyInitialState(isFirstScene);

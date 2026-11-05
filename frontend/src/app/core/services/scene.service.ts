@@ -11,13 +11,13 @@ export class SceneService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/scenes`;
 
-  getScenes(adventureCode: string): Observable<Scene[]> {
-    const params = new HttpParams().set('adventureCode', adventureCode);
+  getScenes(adventureId: number): Observable<Scene[]> {
+    const params = new HttpParams().set('adventureId', adventureId);
     return this.http.get<Scene[]>(this.apiUrl, { params });
   }
 
-  getAllScenes(adventureCode: string): Observable<Scene[]> {
-    return this.getScenes(adventureCode);
+  getAllScenes(adventureId: number): Observable<Scene[]> {
+    return this.getScenes(adventureId);
   }
 
   getSceneById(sceneId: number): Observable<Scene> {

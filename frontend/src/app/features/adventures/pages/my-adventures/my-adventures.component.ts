@@ -89,4 +89,8 @@ export class MyAdventuresComponent implements OnInit {
       }
     });
   }
+
+  onPlayVersion(adventureId: number): void {
+    void this.router.navigate(['/adventures', adventureId, 'play']);
+  }
 }

@@ -10,6 +10,7 @@ import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.model.GameState;
 import com.jadventure.backend.model.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GamePlayService {
 
     private final GraphicAdventureService graphicAdventureService;
@@ -26,31 +28,19 @@ public class GamePlayService {
     private final SceneService sceneService;
     private final GameSaveMapper gameSaveMapper;
 
-    public GamePlayService(GraphicAdventureService graphicAdventureService,
-                           GameSaveService gameSaveService,
-                           AuthService authService,
-                           SceneService sceneService,
-                           GameSaveMapper gameSaveMapper) {
-        this.graphicAdventureService = graphicAdventureService;
-        this.gameSaveService = gameSaveService;
-        this.authService = authService;
-        this.sceneService = sceneService;
-        this.gameSaveMapper = gameSaveMapper;
-    }
-
     @Transactional
-    public GameSaveDto startNewGame(String adventureCode) {
+    public GameSaveDto startNewGame(Long adventureId) {
         User user = authService.getCurrentUser();
-        GraphicAdventureDto adventure = graphicAdventureService.getAdventureByCode(adventureCode);
+        GraphicAdventureDto adventure = graphicAdventureService.getAdventureById(adventureId);
 
-        gameSaveService.deleteSavesForAdventure(user.getUsername(), adventureCode);
+        gameSaveService.deleteSavesForAdventure(user.getUsername(), adventureId);
 
         String initialSceneCode = adventure.getInitialSceneCode();
         if (initialSceneCode == null || initialSceneCode.isBlank()) {
             throw new ResourceNotFoundException("L'avventura non ha una scena iniziale configurata");
         }
 
-        SceneDto initialScene = sceneService.getSceneByCode(adventureCode, initialSceneCode);
+        SceneDto initialScene = sceneService.getSceneByCode(adventureId, initialSceneCode);
 
         Set<String> visibleItems = (initialScene.getItems() == null)
                 ? Collections.emptySet()
@@ -64,7 +54,7 @@ public class GamePlayService {
                 .visibleItemCodes(visibleItems)
                 .build();
 
-        GameSaveDto saveDto = gameSaveService.createSave(adventureCode, "Salvataggio automatico", initialState);
+        GameSaveDto saveDto = gameSaveService.createSave(adventureId, "Salvataggio automatico", initialState);
 
         GameSave saveEntity = gameSaveService.findSaveByUser(saveDto.getCode());
         saveEntity.setAutoSave(true);
@@ -73,9 +63,9 @@ public class GamePlayService {
     }
 
     @Transactional(readOnly = true)
-    public GameSaveDto continueGame(String adventureCode) {
+    public GameSaveDto continueGame(Long adventureId) {
         User user = authService.getCurrentUser();
-        GameSave lastSave = gameSaveService.findLatestSave(user.getUsername(), adventureCode);
+        GameSave lastSave = gameSaveService.findLatestSave(user.getUsername(), adventureId);
         return buildGameSaveDto(lastSave);
     }
 
@@ -87,13 +77,13 @@ public class GamePlayService {
 
     @Transactional(readOnly = true)
     public GameSaveDto buildGameSaveDto(GameSave save) {
-        String adventureCode = save.getGraphicAdventure().getCode();
+        Long adventureId = save.getGraphicAdventure().getId();
         GameState state = save.getGameState();
 
         GameSaveDto dto = gameSaveMapper.toDto(save);
 
         if (dto.getGameState() != null && state != null) {
-            SceneDto sceneDto = sceneService.getSceneByCode(adventureCode, state.getCurrentSceneCode());
+            SceneDto sceneDto = sceneService.getSceneByCode(adventureId, state.getCurrentSceneCode());
             dto.getGameState().setCurrentScene(sceneDto);
         }
 

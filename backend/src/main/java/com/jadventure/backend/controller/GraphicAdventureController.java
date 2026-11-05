@@ -39,6 +39,11 @@ public class GraphicAdventureController {
         return ResponseEntity.ok(graphicAdventureService.getAdventureById(adventureId));
     }
 
+    @GetMapping("/{adventureId}/versions")
+    public ResponseEntity<List<GraphicAdventureDto>> getPublishedVersions(@PathVariable Long adventureId) {
+        return ResponseEntity.ok(graphicAdventureService.getPublishedVersions(adventureId));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GraphicAdventureDto> createAdventure(
             @Valid @RequestPart("data") GraphicAdventureDto data,
@@ -46,6 +51,11 @@ public class GraphicAdventureController {
     ) {
         GraphicAdventureDto created = graphicAdventureService.createAdventure(data, coverImage);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PostMapping("/{adventureId}/publish")
+    public ResponseEntity<GraphicAdventureDto> publish(@PathVariable Long adventureId) {
+        return ResponseEntity.ok(graphicAdventureService.publish(adventureId));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

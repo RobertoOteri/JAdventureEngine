@@ -11,12 +11,12 @@ export class GamePlayService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/game`;
 
-  startNewGame(adventureCode: string): Observable<GameSaveDto> {
-    return this.http.post<GameSaveDto>(`${this.apiUrl}/adventure/${adventureCode}`, {});
+  startNewGame(adventureId: number): Observable<GameSaveDto> {
+    return this.http.post<GameSaveDto>(`${this.apiUrl}/adventure/${adventureId}`, {});
   }
 
-  continueGame(adventureCode: string): Observable<GameSaveDto> {
-    return this.http.get<GameSaveDto>(`${this.apiUrl}/adventure/${adventureCode}/continue`);
+  continueGame(adventureId: number): Observable<GameSaveDto> {
+    return this.http.get<GameSaveDto>(`${this.apiUrl}/adventure/${adventureId}/continue`);
   }
 
   loadGame(saveCode: string): Observable<GameSaveDto> {

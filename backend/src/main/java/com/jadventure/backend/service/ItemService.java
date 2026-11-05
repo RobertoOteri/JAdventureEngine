@@ -13,6 +13,7 @@ import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.enums.ActionType;
 import com.jadventure.backend.repository.ItemRepository;
 import com.jadventure.backend.util.FileStorageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ItemService {
 
     private final ItemRepository itemRepository;
@@ -30,21 +32,9 @@ public class ItemService {
     private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
-    public ItemService(ItemRepository itemRepository,
-                       ItemMapper itemMapper,
-                       ActionMapper actionMapper,
-                       FileStorageUtil fileStorageUtil,
-                       AuthService authService) {
-        this.itemRepository = itemRepository;
-        this.itemMapper = itemMapper;
-        this.actionMapper = actionMapper;
-        this.fileStorageUtil = fileStorageUtil;
-        this.authService = authService;
-    }
-
     @Transactional(readOnly = true)
-    public List<ItemDto> getAdventureItems(String adventureCode) {
-        return itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureCode(adventureCode));
+    public List<ItemDto> getAdventureItems(Long adventureId) {
+        return itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureId(adventureId));
     }
 
     @Transactional(readOnly = true)
@@ -60,12 +50,13 @@ public class ItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + dto.getId()));
 
         GraphicAdventure adventure = item.getGraphicAdventure();
-        authService.validateOwnership(adventure.getAuthor().getUsername());
+        authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
 
         copyItemProperties(item, dto);
 
         if (image != null && !image.isEmpty()) {
-            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE, adventure.getCode(), item.getCode());
+            String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
+                    adventure.getCode(), adventure.getVersionNumber(), item.getCode());
             item.setImageUrl(fileStorageUtil.storeFile(path, image));
         } else if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
             item.setImageUrl(dto.getImageUrl());
@@ -79,7 +70,9 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
 
-        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
+        authService.validateEditable(
+                item.getGraphicAdventure().getAuthor().getUsername(),
+                item.getGraphicAdventure().getStatus());
         itemRepository.delete(item);
     }
 
@@ -88,7 +81,9 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
 
-        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
+        authService.validateEditable(
+                item.getGraphicAdventure().getAuthor().getUsername(),
+                item.getGraphicAdventure().getStatus());
 
         validateActionUniqueness(item.getActions(), actionDto);
 
@@ -102,12 +97,12 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemDto> loadPlayerInventory(String adventureCode, Collection<String> itemCodes) {
+    public List<ItemDto> loadPlayerInventory(Long adventureId, Collection<String> itemCodes) {
         if (itemCodes == null || itemCodes.isEmpty()) {
             return Collections.emptyList();
         }
         return itemMapper.toDtoList(
-                itemRepository.findAllByGraphicAdventureCodeAndCodeIn(adventureCode, itemCodes)
+                itemRepository.findAllByGraphicAdventureIdAndCodeIn(adventureId, itemCodes)
         );
     }
 

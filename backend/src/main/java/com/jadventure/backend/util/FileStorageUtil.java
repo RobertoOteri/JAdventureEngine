@@ -17,9 +17,9 @@ public class FileStorageUtil {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".webp");
 
-    public static final String PATH_ADVENTURE_COVER = "%s/cover";
-    public static final String PATH_SCENE_BACKGROUND = "%s/scenes/%s";
-    public static final String PATH_ITEM_IMAGE = "%s/items/%s";
+    public static final String PATH_ADVENTURE_COVER = "%s/v%d/cover";
+    public static final String PATH_SCENE_BACKGROUND = "%s/v%d/scenes/%s";
+    public static final String PATH_ITEM_IMAGE = "%s/v%d/items/%s";
 
     private final Path rootUploadPath;
     private final String publicUrlBase;

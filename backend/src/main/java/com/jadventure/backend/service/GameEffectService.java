@@ -5,6 +5,7 @@ import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.model.GameEffect;
 import com.jadventure.backend.model.enums.EffectType;
 import com.jadventure.backend.service.effect.EffectHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,16 +23,16 @@ public class GameEffectService {
                 .collect(Collectors.toMap(EffectHandler::type, Function.identity()));
     }
 
-    public void applyAll(String adventureCode, GameStateDto state, List<GameEffectDto> effects) {
+    public void applyAll(Long adventureId, GameStateDto state, List<GameEffectDto> effects) {
         if (effects != null) {
-            effects.forEach(effect -> apply(adventureCode, state, effect));
+            effects.forEach(effect -> apply(adventureId, state, effect));
         }
     }
 
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         if (effect == null || effect.getType() == null) {
             return;
         }
-        handlers.get(effect.getType()).apply(adventureCode, state, effect);
+        handlers.get(effect.getType()).apply(adventureId, state, effect);
     }
 }

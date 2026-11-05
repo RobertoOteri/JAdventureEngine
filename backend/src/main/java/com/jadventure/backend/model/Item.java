@@ -52,5 +52,9 @@ public class Item {
     @Builder.Default
     private List<Action> actions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id")
+    @Builder.Default
+    private List<DialogueNode> dialogueNodes = new ArrayList<>();
 
 }

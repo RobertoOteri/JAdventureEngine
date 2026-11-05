@@ -184,7 +184,7 @@ export const EditorStore = signalStore(
               if (!adventure) return of(null);
 
               return forkJoin({
-                rawScenes: sceneService.getScenes(adventure.code)
+                rawScenes: sceneService.getScenes(adventure.id!)
               }).pipe(
                 tap({
                   next: ({ rawScenes }) => {
@@ -225,9 +225,9 @@ export const EditorStore = signalStore(
                       isLoading: false
                     });
 
-                    const currentAdvCode = adventure.code;
-                    if (currentAdvCode) {
-                      itemService.getItemsByAdventure(currentAdvCode).subscribe({
+                    const currentAdvId = adventure.id;
+                    if (currentAdvId) {
+                      itemService.getItemsByAdventure(currentAdvId).subscribe({
                         next: (allItems) => {
                           patchState(store, { adventureItems: allItems });
 
@@ -275,10 +275,10 @@ export const EditorStore = signalStore(
       updateItemInState,
 
       loadInventoryCatalog(): void {
-        const advCode = store.adventure()?.code;
-        if (!advCode) return;
+        const advId = store.adventure()?.id;
+        if (!advId) return;
 
-        itemService.getItemsByAdventure(advCode).subscribe({
+        itemService.getItemsByAdventure(advId).subscribe({
           next: (allItems) => {
             patchState(store, { adventureItems: allItems });
           },
@@ -364,9 +364,9 @@ export const EditorStore = signalStore(
         return sceneService.addItemToScene(sceneId, formData).pipe(
           switchMap((savedItem) => {
             if (!savedItem.id) {
-              const currentAdvCode = store.adventure()?.code;
-              if (currentAdvCode) {
-                return itemService.getItemsByAdventure(currentAdvCode).pipe(
+              const currentAdvId = store.adventure()?.id;
+              if (currentAdvId) {
+                return itemService.getItemsByAdventure(currentAdvId).pipe(
                   tap((allItems) => {
                     const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
                     updateItemInState(freshItem);
@@ -410,9 +410,9 @@ export const EditorStore = signalStore(
         return adventureService.addItem(adventureId, formData).pipe(
           switchMap((savedItem) => {
             if (!savedItem.id) {
-              const currentAdvCode = store.adventure()?.code;
-              if (currentAdvCode) {
-                return itemService.getItemsByAdventure(currentAdvCode).pipe(
+              const currentAdvId = store.adventure()?.id;
+              if (currentAdvId) {
+                return itemService.getItemsByAdventure(currentAdvId).pipe(
                   tap((allItems) => {
                     const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
                     const currentList = store.adventureItems() ?? [];
@@ -501,6 +501,28 @@ export const EditorStore = signalStore(
             error: (err: any) => {
               console.error('Errore eliminazione item:', err);
               patchState(store, { isSaving: false });
+            }
+          })
+        );
+      },
+
+      publishDraft(): Observable<GraphicAdventureDto> {
+        const adventureId = store.adventure()?.id;
+        if (!adventureId) {
+          throw new Error('Nessuna avventura caricata.');
+        }
+
+        patchState(store, { isSaving: true, feedbackMessage: null });
+
+        return adventureService.publish(adventureId).pipe(
+          tap({
+            next: () => patchState(store, { isSaving: false }),
+            error: (err: any) => {
+              console.error('Errore pubblicazione:', err);
+              patchState(store, {
+                isSaving: false,
+                feedbackMessage: err?.error?.message || 'Errore durante la pubblicazione.'
+              });
             }
           })
         );

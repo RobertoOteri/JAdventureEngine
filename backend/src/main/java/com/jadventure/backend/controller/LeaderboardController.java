@@ -20,10 +20,10 @@ public class LeaderboardController {
         this.leaderboardService = leaderboardService;
     }
 
-    @GetMapping("/{adventureCode}")
+    @GetMapping("/{adventureId}")
     public ResponseEntity<List<LeaderboardEntryDto>> getLeaderboard(
-            @PathVariable("adventureCode") String adventureCode) {
-        List<LeaderboardEntryDto> leaderboard = leaderboardService.getLeaderboardForAdventure(adventureCode);
+            @PathVariable("adventureId") Long adventureId) {
+        List<LeaderboardEntryDto> leaderboard = leaderboardService.getLeaderboardForAdventure(adventureId);
         return ResponseEntity.ok(leaderboard);
     }
 

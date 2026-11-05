@@ -17,7 +17,7 @@ interface RankedEntry {
   styleUrl: './leaderboard.component.css'
 })
 export class LeaderboardComponent implements OnInit {
-  readonly adventureCode = input.required<string>();
+  readonly adventureId = input.required<number>();
   readonly adventureTitle = input<string>('');
   readonly close = output<void>();
 
@@ -45,17 +45,17 @@ export class LeaderboardComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    const code = this.adventureCode();
-    if (code) {
-      this.loadLeaderboard(code);
+    const id = this.adventureId();
+    if (id) {
+      this.loadLeaderboard(id);
     }
   }
 
-  loadLeaderboard(code: string): void {
+  loadLeaderboard(adventureId: number): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.leaderboardService.getLeaderboard(code).subscribe({
+    this.leaderboardService.getLeaderboard(adventureId).subscribe({
       next: (data) => {
         this.entries.set(data);
         this.loading.set(false);

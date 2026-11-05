@@ -16,7 +16,7 @@ public class SetFlagEffectHandler implements EffectHandler {
     }
 
     @Override
-    public void apply(String adventureCode, GameStateDto state, GameEffectDto effect) {
+    public void apply(Long adventureId, GameStateDto state, GameEffectDto effect) {
         if (state.getAdventureFlags() == null) {
             state.setAdventureFlags(new HashMap<>());
         }
