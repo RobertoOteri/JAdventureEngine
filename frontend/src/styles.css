@@ -44,3 +44,132 @@ body {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* ==========================================================================
+   Menu a tendina (select) – stile globale
+   Nei browser che supportano appearance: base-select (Chrome, Edge, Safari 27+)
+   anche la lista delle opzioni è personalizzata; negli altri (Firefox)
+   resta il menu nativo, con gli stessi colori.
+   ========================================================================== */
+
+select {
+  font: inherit;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+select:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+select option {
+  background-color: #12151f;
+  color: #ffffff;
+}
+
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* freccia a "V": ruota quando il menu è aperto */
+  select::picker-icon {
+    content: '';
+    width: 0.42rem;
+    height: 0.42rem;
+    margin-left: auto;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    translate: 0 -25%;
+    rotate: 45deg;
+    color: #8b92a0;
+    transition: rotate 0.2s ease, translate 0.2s ease, color 0.2s ease;
+  }
+
+  select:hover::picker-icon {
+    color: #ffffff;
+  }
+
+  select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 25%;
+    color: #fbbf24;
+  }
+
+  /* pannello delle opzioni */
+  ::picker(select) {
+    margin-block: 6px;
+    padding: 6px;
+    background: #12151f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.4);
+    max-height: 320px;
+    overflow-y: auto;
+    opacity: 0;
+    translate: 0 -4px;
+    transition:
+      opacity 0.15s ease,
+      translate 0.15s ease,
+      display 0.15s allow-discrete,
+      overlay 0.15s allow-discrete;
+  }
+
+  ::picker(select):popover-open {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    ::picker(select):popover-open {
+      opacity: 0;
+      translate: 0 -4px;
+    }
+  }
+
+  /* singola opzione */
+  select option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    background: transparent;
+    color: #c9ced8;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  select option:hover,
+  select option:focus-visible {
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+    outline: none;
+  }
+
+  select option:checked {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  /* spunta sull'opzione selezionata, a destra */
+  select option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: #fbbf24;
+  }
+
+  select option:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}

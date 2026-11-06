@@ -40,45 +40,31 @@
   font-weight: 500;
 }
 
-.fab-add {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: none;
-  color: #0b0c10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
-}
-
-.fab-cross {
-  font-size: 1.35rem;
-  line-height: 1;
-  display: inline-block;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.fab-add:hover {
-  transform: scale(1.1);
-  background: #f1f3f7;
-}
-
-.fab-add:hover .fab-cross {
-  transform: rotate(90deg);
-}
-
-.fab-add:active {
-  transform: scale(0.96);
-}
-
 .divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.07);
   margin-bottom: 2.25rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.25rem;
+}
+
+.toolbar app-search-bar {
+  flex: 1 1 320px;
+  max-width: 480px;
+}
+
+.toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
 }
 
 .catalog-grid {

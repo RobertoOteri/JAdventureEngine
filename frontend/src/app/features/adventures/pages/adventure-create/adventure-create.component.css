@@ -319,11 +319,6 @@ label {
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-.studio-select option {
-  background-color: #0f1117;
-  color: #ffffff;
-}
-
 .field-hint {
   font-size: 0.75rem;
   color: #71717a;

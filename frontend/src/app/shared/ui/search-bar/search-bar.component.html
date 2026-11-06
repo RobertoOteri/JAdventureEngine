@@ -1,0 +1,15 @@
+<label class="search-bar">
+  <i class="bi bi-search search-icon"></i>
+  <input
+    type="text"
+    [value]="value()"
+    (input)="onInput($event)"
+    [placeholder]="placeholder()"
+    [attr.aria-label]="placeholder()"
+  />
+  @if (value()) {
+    <button type="button" class="clear-btn" (click)="clear()" aria-label="Cancella ricerca">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  }
+</label>

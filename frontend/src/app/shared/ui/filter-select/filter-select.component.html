@@ -1,0 +1,15 @@
+<label class="filter-select">
+  @if (icon()) {
+    <i class="bi {{ icon() }} filter-icon"></i>
+  }
+  @if (label()) {
+    <span class="filter-label">{{ label() }}</span>
+  }
+  <select (change)="onChange($event)">
+    @for (option of options(); track option.value) {
+      <option [value]="option.value" [selected]="option.value === value()">
+        {{ option.label }}
+      </option>
+    }
+  </select>
+</label>

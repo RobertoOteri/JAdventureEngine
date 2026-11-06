@@ -5,7 +5,13 @@
     <header class="masthead">
       <div class="masthead-text">
         <h1>Le Mie Avventure</h1>
-        <span class="counter">{{ adventures().length }} progetti personali</span>
+        <span class="counter">
+          @if (hasActiveFilters()) {
+            {{ filteredAdventures().length }} di {{ adventures().length }} progetti
+          } @else {
+            {{ adventures().length }} progetti personali
+          }
+        </span>
       </div>
 
       <button
@@ -21,6 +27,28 @@
 
     <div class="divider"></div>
 
+    <div class="toolbar">
+      <app-search-bar
+        [value]="query()"
+        (valueChange)="query.set($event)"
+        placeholder="Cerca tra le tue avventure"
+      />
+      <div class="toolbar-filters">
+        <app-segmented-control
+          ariaLabel="Stato di pubblicazione"
+          [options]="publicationOptions"
+          [value]="publication()"
+          (valueChange)="publication.set($event)"
+        />
+        <app-filter-select
+          icon="bi-sort-down"
+          [options]="sortOptions"
+          [value]="sort()"
+          (valueChange)="sort.set($event)"
+        />
+      </div>
+    </div>
+
     @if (errorMessage()) {
       <div class="empty-wrap">
         <i class="bi bi-exclamation-triangle-fill empty-icon error"></i>
@@ -32,7 +60,7 @@
       </div>
     } @else {
       <div class="catalog-grid">
-        @for (adv of adventures(); track adv.id ?? adv.code) {
+        @for (adv of filteredAdventures(); track adv.id ?? adv.code) {
           <app-adventure-card
             [adventure]="adv"
             [isAuthor]="true"
@@ -42,13 +70,23 @@
             (info)="selectedAdventure.set($event)"
           />
         } @empty {
-          <div class="empty-wrap">
-            <i class="bi bi-folder-plus empty-icon"></i>
-            <p>Non hai ancora creato nessuna avventura.</p>
-            <button type="button" class="btn-create-first" (click)="goToCreate()">
-              <i class="bi bi-plus-lg"></i> Comincia ora
-            </button>
-          </div>
+          @if (adventures().length > 0) {
+            <div class="empty-wrap">
+              <i class="bi bi-search empty-icon"></i>
+              <p>Nessun'avventura corrisponde ai filtri.</p>
+              <button type="button" class="btn-create-first" (click)="resetFilters()">
+                <i class="bi bi-x-lg"></i> Azzera filtri
+              </button>
+            </div>
+          } @else {
+            <div class="empty-wrap">
+              <i class="bi bi-folder-plus empty-icon"></i>
+              <p>Non hai ancora creato nessuna avventura.</p>
+              <button type="button" class="btn-create-first" (click)="goToCreate()">
+                <i class="bi bi-plus-lg"></i> Comincia ora
+              </button>
+            </div>
+          }
         }
       </div>
     }

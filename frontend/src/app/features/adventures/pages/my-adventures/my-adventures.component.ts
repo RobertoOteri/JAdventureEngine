@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
@@ -6,6 +6,16 @@ import { GraphicAdventureDto } from '../../../../core/models';
 import { SidebarComponent } from '../../../../shared/ui/sidebar/sidebar.component';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
 import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
+import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
+import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
+import { SegmentedControlComponent } from '../../../../shared/ui/segmented-control/segmented-control.component';
+import {
+  ADVENTURE_SORT_OPTIONS,
+  AdventureSort,
+  filterAdventures,
+  PUBLICATION_OPTIONS,
+  PublicationFilter
+} from '../../../../core/utils/adventure-filter';
 
 @Component({
   selector: 'app-my-adventures',
@@ -14,7 +24,10 @@ import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-d
     CommonModule,
     SidebarComponent,
     AdventureCardComponent,
-    AdventureDetailModalComponent
+    AdventureDetailModalComponent,
+    SearchBarComponent,
+    FilterSelectComponent,
+    SegmentedControlComponent
   ],
   templateUrl: './my-adventures.component.html',
   styleUrl: './my-adventures.component.css'
@@ -27,6 +40,23 @@ export class MyAdventuresComponent implements OnInit {
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
+
+  readonly query = signal('');
+  readonly publication = signal<PublicationFilter>('all');
+  readonly sort = signal<AdventureSort>('recent');
+
+  readonly sortOptions = ADVENTURE_SORT_OPTIONS;
+  readonly publicationOptions = PUBLICATION_OPTIONS;
+
+  readonly filteredAdventures = computed(() =>
+    filterAdventures(this.adventures(), {
+      query: this.query(),
+      publication: this.publication(),
+      sort: this.sort()
+    })
+  );
+
+  readonly hasActiveFilters = computed(() => !!this.query() || this.publication() !== 'all');
 
   ngOnInit(): void {
     this.loadAdventures();
@@ -47,6 +77,11 @@ export class MyAdventuresComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  resetFilters(): void {
+    this.query.set('');
+    this.publication.set('all');
   }
 
   goToCreate(): void {
