@@ -1,143 +1,158 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { AuthRequest } from '../../../core/models/auth.model';
+import { AuthResponse, RegisterRequest } from '../../../core/models/auth.model';
 import { ErrorResponse } from '../../../core/models/error-response.model';
+import { SegmentedControlComponent } from '../../../shared/ui/segmented-control/segmented-control.component';
+import { FilterOption } from '../../../shared/ui/filter-select/filter-select.component';
+import { AuthShowcaseComponent } from '../components/auth-showcase/auth-showcase.component';
+
+type AuthMode = 'login' | 'register';
+
+const USERNAME_PATTERN = /^[a-zA-Z0-9_.-]+$/;
+
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value;
+  const confirm = group.get('confirmPassword')?.value;
+  return password && confirm && password !== confirm ? { passwordMismatch: true } : null;
+}
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule, SegmentedControlComponent, AuthShowcaseComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })
 export class AuthComponent {
   protected readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder).nonNullable;
 
-  readonly isLoginMode = signal<boolean>(true);
-  readonly showPassword = signal<boolean>(false);
-  readonly errorMessage = signal<string>('');
-  readonly successMessage = signal<string>('');
+  readonly mode: AuthMode = inject(ActivatedRoute).snapshot.data['mode'] ?? 'login';
+  readonly isLogin = this.mode === 'login';
 
-  username = signal<string>('');
-  password = signal<string>('');
+  readonly modeOptions: FilterOption<AuthMode>[] = [
+    { value: 'login', label: 'Accedi' },
+    { value: 'register', label: 'Registrati' }
+  ];
 
-  private readonly allowedCharRegex = /^[a-zA-Z0-9_.\-]$/;
+  readonly showPassword = signal(false);
+  readonly submitted = signal(false);
+  readonly errorMessage = signal<string | null>(null);
 
-  readonly usernameLen = computed(() => this.username().length);
-
-  readonly invalidChars = computed(() => {
-    const val = this.username();
-    const badChars = new Set<string>();
-    for (const char of val) {
-      if (!this.allowedCharRegex.test(char)) {
-        badChars.add(char === ' ' ? 'Spazio' : char);
-      }
-    }
-    return Array.from(badChars);
+  readonly loginForm = this.fb.group({
+    identifier: ['', Validators.required],
+    password: ['', Validators.required]
   });
 
-  readonly usernameError = computed(() => {
-    const len = this.usernameLen();
-    if (len === 0) {
-      return null;
+  readonly registerForm = this.fb.group(
+    {
+      firstName: ['', [Validators.required, Validators.maxLength(50)]],
+      lastName: ['', [Validators.required, Validators.maxLength(50)]],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+          Validators.pattern(USERNAME_PATTERN)
+        ]
+      ],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
+    },
+    { validators: passwordsMatch }
+  );
+
+  switchMode(mode: AuthMode): void {
+    if (mode !== this.mode) {
+      void this.router.navigate(['/', mode]);
     }
-
-    if (this.invalidChars().length > 0) {
-      return `Caratteri non validi: ${this.invalidChars().join(', ')}`;
-    }
-
-    if (len < 3) {
-      return `Minimo 3 caratteri (mancano ${3 - len})`;
-    }
-
-    if (len > 50) {
-      return `Massimo 50 caratteri (in eccesso: ${len - 50})`;
-    }
-
-    return null;
-  });
-
-  readonly passwordLen = computed(() => this.password().length);
-
-  readonly passwordError = computed(() => {
-    const len = this.passwordLen();
-    if (len === 0) {
-      return null;
-    }
-    if (len < 4) {
-      return `Minimo 4 caratteri (mancano ${4 - len})`;
-    }
-
-    return null;
-  });
-
-  readonly isFormInvalid = computed(() => {
-    return (
-      this.usernameLen() < 3 ||
-      this.usernameLen() > 50 ||
-      this.invalidChars().length > 0 ||
-      this.passwordLen() < 4
-    );
-  });
-
-  toggleMode(): void {
-    this.isLoginMode.update(mode => !mode);
-    this.errorMessage.set('');
-    this.successMessage.set('');
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword.update(show => !show);
+  togglePassword(): void {
+    this.showPassword.update((visible) => !visible);
+  }
+
+  showError(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && (control.touched || this.submitted());
+  }
+
+  errorFor(control: AbstractControl | null): string {
+    const errors = control?.errors;
+    if (!errors) {
+      return '';
+    }
+    if (errors['required']) {
+      return 'Campo obbligatorio';
+    }
+    if (errors['email']) {
+      return 'Inserisci un indirizzo email valido';
+    }
+    if (errors['minlength']) {
+      return `Almeno ${errors['minlength'].requiredLength} caratteri`;
+    }
+    if (errors['maxlength']) {
+      return `Al massimo ${errors['maxlength'].requiredLength} caratteri`;
+    }
+    if (errors['pattern']) {
+      return 'Solo lettere, numeri e i caratteri _ . -';
+    }
+    return 'Valore non valido';
+  }
+
+  showMismatch(): boolean {
+    const confirm = this.registerForm.controls.confirmPassword;
+    return this.registerForm.hasError('passwordMismatch') && (confirm.touched || this.submitted());
   }
 
   onSubmit(): void {
-    this.errorMessage.set('');
-    this.successMessage.set('');
+    this.submitted.set(true);
+    this.errorMessage.set(null);
 
-    const user = this.username();
-    const pass = this.password();
-
-    if (this.isFormInvalid()) {
-      this.errorMessage.set(this.usernameError() || this.passwordError() || 'Compila correttamente tutti i campi.');
+    const form = this.isLogin ? this.loginForm : this.registerForm;
+    if (form.invalid) {
+      form.markAllAsTouched();
       return;
     }
 
-    const payload: AuthRequest = { username: user, password: pass };
+    const request$: Observable<AuthResponse> = this.isLogin
+      ? this.authService.login(this.loginForm.getRawValue())
+      : this.authService.register(this.registerPayload());
 
-    if (this.isLoginMode()) {
-      this.authService.login(payload).subscribe({
-        next: (res) => {
-          this.successMessage.set(`Bentornato, ${res.username}! Accesso eseguito.`);
-          setTimeout(() => {
-            this.router.navigate(['/adventures']);
-          }, 1000);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.errorMessage.set(this.extractErrorMessage(err) || 'Credenziali non valide.');
-        }
-      });
-    } else {
-      this.authService.register(payload).subscribe({
-        next: () => {
-          this.successMessage.set('Account creato con successo! Ora puoi accedere.');
-          this.isLoginMode.set(true);
-          this.password.set('');
-        },
-        error: (err: HttpErrorResponse) => {
-          this.errorMessage.set(this.extractErrorMessage(err) || 'Impossibile completare la registrazione.');
-        }
-      });
-    }
+    request$.subscribe({
+      next: () => void this.router.navigate(['/adventures']),
+      error: (err: HttpErrorResponse) => this.errorMessage.set(this.extractErrorMessage(err))
+    });
+  }
+
+  private registerPayload(): RegisterRequest {
+    const value = this.registerForm.getRawValue();
+    return {
+      firstName: value.firstName.trim(),
+      lastName: value.lastName.trim(),
+      username: value.username.trim(),
+      email: value.email.trim(),
+      password: value.password
+    };
   }
 
   private extractErrorMessage(err: HttpErrorResponse): string {
-    if (!err?.error) return err.statusText || 'Errore di connessione col server.';
-
-    const apiError = err.error as ErrorResponse;
-    return apiError.message || apiError.error || 'Si è verificato un errore.';
+    if (err.status === 0) {
+      return 'Impossibile contattare il server. Riprova tra poco.';
+    }
+    const apiError = err.error as ErrorResponse | null;
+    return apiError?.message || 'Si è verificato un errore. Riprova.';
   }
 }

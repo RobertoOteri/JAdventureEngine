@@ -1,0 +1,68 @@
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+
+const COVERS: readonly string[] = [
+  '/showcase/fantasy_slide.jpg',
+  '/showcase/space_slide.jpg',
+  '/showcase/pirate_slide.jpg',
+  '/showcase/cyberpunk_slide.jpg',
+  '/showcase/train_slide.jpg',
+  '/showcase/messy_room_slide.jpg'
+];
+
+const FEATURES: readonly string[] = [
+  'Gioca le avventure create dagli altri giocatori.',
+  'Crea la tua avventura: scene, oggetti e dialoghi.',
+  'Scrivi dialoghi con scelte che cambiano la storia.',
+  'Pubblica e aggiorna le tue avventure con nuove versioni.',
+  'Sfida gli altri giocatori in classifica.',
+  'Batti il tuo record di tempo.',
+  'Salva la partita e riprendi quando vuoi.'
+];
+
+const INTERVAL_MS = 5500;
+
+/**
+ * Vetrina della pagina di accesso: immagini di avventure che si alternano
+ * in dissolvenza, ognuna con una frase sulle funzioni dell'app.
+ */
+@Component({
+  selector: 'app-auth-showcase',
+  standalone: true,
+  templateUrl: './auth-showcase.component.html',
+  styleUrl: './auth-showcase.component.css'
+})
+export class AuthShowcaseComponent {
+  private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private timer?: ReturnType<typeof setInterval>;
+
+  readonly covers = COVERS;
+  readonly features = FEATURES;
+
+  /** Passo corrente: cresce sempre, frasi e immagini lo usano ciascuna a giro */
+  private readonly step = signal(0);
+
+  readonly featureIndex = computed(() => this.step() % FEATURES.length);
+  readonly feature = computed(() => FEATURES[this.featureIndex()]);
+  readonly coverIndex = computed(() => this.step() % COVERS.length);
+
+  constructor() {
+    this.start();
+    inject(DestroyRef).onDestroy(() => this.stop());
+  }
+
+  goTo(featureIndex: number): void {
+    this.step.set(featureIndex);
+    this.stop();
+    this.start();
+  }
+
+  private start(): void {
+    if (!this.reducedMotion) {
+      this.timer = setInterval(() => this.step.update((s) => s + 1), INTERVAL_MS);
+    }
+  }
+
+  private stop(): void {
+    clearInterval(this.timer);
+  }
+}

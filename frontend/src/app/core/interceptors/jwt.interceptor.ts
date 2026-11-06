@@ -19,7 +19,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (!isAuthUrl && (error.status === 401 || error.status === 403)) {
         authService.logout();
-        router.navigate(['/auth']);
+        router.navigate(['/login']);
       }
 
       return throwError(() => error);

@@ -11,95 +11,63 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
-                .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return build(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
+        return build(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        return build(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.FORBIDDEN.value())
-                .error("Forbidden")
-                .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        return build(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage());
     }
 
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.CONFLICT.value())
-                .error("Conflict")
-                .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
+    @ExceptionHandler({UsernameAlreadyExistsException.class, EmailAlreadyExistsException.class})
+    public ResponseEntity<ErrorResponse> handleAlreadyExists(RuntimeException ex) {
+        return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
+    }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+        return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
-
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .message("Validation Failed")
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse("Dati non validi");
+        return build(HttpStatus.BAD_REQUEST, "Bad Request", message);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         ex.printStackTrace();
-        ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Internal Server Error")
-                .message("Si è verificato un errore interno del server")
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+                "Si è verificato un errore interno del server");
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String error, String message) {
         ErrorResponse response = ErrorResponse.builder()
-                .status(HttpStatus.CONFLICT.value())
-                .error("Conflict")
-                .message(ex.getMessage())
+                .status(status.value())
+                .error(error)
+                .message(message)
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(status).body(response);
     }
 }

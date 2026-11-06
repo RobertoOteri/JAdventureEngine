@@ -1,125 +1,203 @@
-<div class="auth-viewport">
-  <div class="auth-box">
+<div class="auth-page">
+  <app-auth-showcase class="auth-showcase" />
 
-    <header class="auth-header">
-      <span class="brand-tag">JADVENTURE</span>
-      <h1>{{ isLoginMode() ? 'Accedi' : 'Registrati' }}</h1>
-      <p>{{ isLoginMode() ? 'Inserisci le credenziali del tuo account.' : 'Crea un account per iniziare a creare.' }}</p>
-    </header>
+  <main class="auth-main">
+    <app-segmented-control
+      class="mode-switch"
+      ariaLabel="Accedi o registrati"
+      [compact]="true"
+      [options]="modeOptions"
+      [value]="mode"
+      (valueChange)="switchMode($event)"
+    />
 
-    <form (ngSubmit)="onSubmit()" class="auth-form" novalidate>
-
-      <div class="field-group">
-        <div class="field-label-row">
-          <label for="username">Username</label>
-          @if (usernameLen() > 0) {
-            <span class="field-counter" [class.counter-limit]="usernameLen() > 50">
-              {{ usernameLen() }}/50
-            </span>
-          }
-        </div>
-
-        <input
-          id="username"
-          type="text"
-          name="username"
-          [ngModel]="username()"
-          (ngModelChange)="username.set($event)"
-          placeholder="es. guybrush"
-          autocomplete="username"
-          [class.input-error]="usernameError()"
-          required
-        />
-
-        @if (usernameError()) {
-          <div class="field-feedback error">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            @if (invalidChars().length > 0) {
-              <div class="bad-chars-list">
-                <span>Non ammessi:</span>
-                @for (char of invalidChars(); track char) {
-                  <span class="bad-char-tag">{{ char }}</span>
-                }
-              </div>
-            } @else {
-              <span>{{ usernameError() }}</span>
-            }
-          </div>
-        }
+    <div class="auth-form">
+      <div class="mobile-brand">
+        <i class="bi bi-controller"></i>
+        <span>JAdventure</span>
       </div>
 
-      <div class="field-group">
-        <div class="field-label-row">
-          <label for="password">Password</label>
-          @if (passwordLen() > 0) {
-            <span class="field-counter">{{ passwordLen() }} car.</span>
-          }
-        </div>
-
-        <div class="password-input-wrapper">
-          <input
-            id="password"
-            [type]="showPassword() ? 'text' : 'password'"
-            name="password"
-            [ngModel]="password()"
-            (ngModelChange)="password.set($event)"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            [class.input-error]="passwordError()"
-            required
-          />
-          <button
-            type="button"
-            class="btn-toggle-pwd"
-            (click)="togglePasswordVisibility()"
-            title="Mostra / Nascondi Password"
-            tabindex="-1"
-          >
-            <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
-          </button>
-        </div>
-
-        @if (passwordError()) {
-          <div class="field-feedback error">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span>{{ passwordError() }}</span>
-          </div>
-        }
-      </div>
+      <h1>{{ isLogin ? 'Bentornato' : 'Crea un account' }}</h1>
+      <p class="subtitle">
+        {{ isLogin ? 'Accedi per giocare e continuare le tue avventure.' : 'Ti servirà per creare avventure e comparire in classifica.' }}
+      </p>
 
       @if (errorMessage()) {
-        <div class="status-msg error">
-          <i class="bi bi-exclamation-octagon-fill"></i>
+        <div class="error-banner">
+          <i class="bi bi-exclamation-triangle-fill"></i>
           <span>{{ errorMessage() }}</span>
         </div>
       }
 
-      @if (successMessage()) {
-        <div class="status-msg success">
-          <i class="bi bi-check-circle-fill"></i>
-          <span>{{ successMessage() }}</span>
-        </div>
+      @if (isLogin) {
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+          <div class="field-group">
+            <label for="identifier">Username o email</label>
+            <input
+              id="identifier"
+              type="text"
+              class="studio-input"
+              formControlName="identifier"
+              autocomplete="username"
+              [class.input-error]="showError(loginForm.controls.identifier)"
+            />
+            @if (showError(loginForm.controls.identifier)) {
+              <span class="error-hint">{{ errorFor(loginForm.controls.identifier) }}</span>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="login-password">Password</label>
+            <div class="password-wrap">
+              <input
+                id="login-password"
+                class="studio-input"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+                [class.input-error]="showError(loginForm.controls.password)"
+              />
+              <button
+                type="button"
+                class="btn-eye"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+              >
+                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+              </button>
+            </div>
+            @if (showError(loginForm.controls.password)) {
+              <span class="error-hint">{{ errorFor(loginForm.controls.password) }}</span>
+            }
+          </div>
+
+          <button type="submit" class="btn-primary" [disabled]="authService.isLoading()">
+            @if (authService.isLoading()) {
+              <span class="spinner"></span>
+            } @else {
+              Accedi
+            }
+          </button>
+        </form>
+      } @else {
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+          <div class="field-row">
+            <div class="field-group">
+              <label for="firstName">Nome</label>
+              <input
+                id="firstName"
+                type="text"
+                class="studio-input"
+                formControlName="firstName"
+                autocomplete="given-name"
+                [class.input-error]="showError(registerForm.controls.firstName)"
+              />
+              @if (showError(registerForm.controls.firstName)) {
+                <span class="error-hint">{{ errorFor(registerForm.controls.firstName) }}</span>
+              }
+            </div>
+
+            <div class="field-group">
+              <label for="lastName">Cognome</label>
+              <input
+                id="lastName"
+                type="text"
+                class="studio-input"
+                formControlName="lastName"
+                autocomplete="family-name"
+                [class.input-error]="showError(registerForm.controls.lastName)"
+              />
+              @if (showError(registerForm.controls.lastName)) {
+                <span class="error-hint">{{ errorFor(registerForm.controls.lastName) }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              class="studio-input"
+              formControlName="username"
+              autocomplete="username"
+              [class.input-error]="showError(registerForm.controls.username)"
+            />
+            @if (showError(registerForm.controls.username)) {
+              <span class="error-hint">{{ errorFor(registerForm.controls.username) }}</span>
+            } @else {
+              <span class="field-hint">È il nome che vedono gli altri giocatori.</span>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              class="studio-input"
+              formControlName="email"
+              autocomplete="email"
+              [class.input-error]="showError(registerForm.controls.email)"
+            />
+            @if (showError(registerForm.controls.email)) {
+              <span class="error-hint">{{ errorFor(registerForm.controls.email) }}</span>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="register-password">Password</label>
+            <div class="password-wrap">
+              <input
+                id="register-password"
+                class="studio-input"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="new-password"
+                [class.input-error]="showError(registerForm.controls.password)"
+              />
+              <button
+                type="button"
+                class="btn-eye"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+              >
+                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+              </button>
+            </div>
+            @if (showError(registerForm.controls.password)) {
+              <span class="error-hint">{{ errorFor(registerForm.controls.password) }}</span>
+            } @else {
+              <span class="field-hint">Almeno 8 caratteri.</span>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="confirmPassword">Conferma password</label>
+            <input
+              id="confirmPassword"
+              class="studio-input"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+              [class.input-error]="showError(registerForm.controls.confirmPassword) || showMismatch()"
+            />
+            @if (showError(registerForm.controls.confirmPassword)) {
+              <span class="error-hint">{{ errorFor(registerForm.controls.confirmPassword) }}</span>
+            } @else if (showMismatch()) {
+              <span class="error-hint">Le password non coincidono.</span>
+            }
+          </div>
+
+          <button type="submit" class="btn-primary" [disabled]="authService.isLoading()">
+            @if (authService.isLoading()) {
+              <span class="spinner"></span>
+            } @else {
+              Crea account
+            }
+          </button>
+        </form>
       }
-
-      <button
-        type="submit"
-        class="btn-primary"
-        [disabled]="authService.isLoading() || isFormInvalid()"
-      >
-        @if (authService.isLoading()) {
-          <span class="spinner"></span>
-        } @else {
-          {{ isLoginMode() ? 'Continua' : 'Crea account' }}
-        }
-      </button>
-    </form>
-
-    <footer class="auth-footer">
-      <span>{{ isLoginMode() ? 'Non hai ancora un profilo?' : 'Hai già un account?' }}</span>
-      <button type="button" class="btn-link" (click)="toggleMode()">
-        {{ isLoginMode() ? 'Registrati' : 'Accedi' }}
-      </button>
-    </footer>
-
-  </div>
+    </div>
+  </main>
 </div>

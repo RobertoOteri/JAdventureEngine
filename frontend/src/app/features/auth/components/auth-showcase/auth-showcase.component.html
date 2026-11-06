@@ -1,0 +1,29 @@
+<div class="showcase">
+  @for (src of covers; track src; let i = $index) {
+    <img class="slide" [class.active]="i === coverIndex()" [src]="src" alt="" />
+  }
+  <div class="shade"></div>
+
+  <div class="brand">
+    <i class="bi bi-controller brand-icon"></i>
+    <span class="brand-name">JAdventureEngine</span>
+  </div>
+
+  <div class="caption">
+    @for (text of [feature()]; track text) {
+      <p class="feature" aria-live="polite">{{ text }}</p>
+    }
+
+    <div class="dots">
+      @for (text of features; track text; let i = $index) {
+        <button
+          type="button"
+          class="dot"
+          [class.active]="i === featureIndex()"
+          (click)="goTo(i)"
+          [attr.aria-label]="text"
+        ></button>
+      }
+    </div>
+  </div>
+</div>

@@ -27,4 +27,19 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
+    @Column(length = 1000)
+    private String bio;
 }

@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthRequest, AuthResponse } from '../models/auth.model';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,20 +22,12 @@ export class AuthService {
   readonly currentUsername: Signal<string | null> = this.usernameSignal.asReadonly();
   readonly isLoading: Signal<boolean> = this.loadingSignal.asReadonly();
 
-  login(credentials: AuthRequest): Observable<AuthResponse> {
-    this.loadingSignal.set(true);
-    return this.http.post<AuthResponse>(`${this.authEndpoint}/login`, credentials).pipe(
-      tap((response) => this.persistSession(response)),
-      finalize(() => this.loadingSignal.set(false))
-    );
+  login(request: LoginRequest): Observable<AuthResponse> {
+    return this.authenticate(`${this.authEndpoint}/login`, request);
   }
 
-  register(credentials: AuthRequest): Observable<AuthResponse> {
-    this.loadingSignal.set(true);
-    return this.http.post<AuthResponse>(`${this.authEndpoint}/register`, credentials).pipe(
-      tap((response) => this.persistSession(response)),
-      finalize(() => this.loadingSignal.set(false))
-    );
+  register(request: RegisterRequest): Observable<AuthResponse> {
+    return this.authenticate(`${this.authEndpoint}/register`, request);
   }
 
   logout(): void {
@@ -47,6 +39,14 @@ export class AuthService {
 
   getToken(): string | null {
     return this.tokenSignal();
+  }
+
+  private authenticate(url: string, body: LoginRequest | RegisterRequest): Observable<AuthResponse> {
+    this.loadingSignal.set(true);
+    return this.http.post<AuthResponse>(url, body).pipe(
+      tap((response) => this.persistSession(response)),
+      finalize(() => this.loadingSignal.set(false))
+    );
   }
 
   private persistSession(response: AuthResponse): void {

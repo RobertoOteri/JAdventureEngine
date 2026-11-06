@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <div class="brand">
     <i class="bi bi-controller brand-icon"></i>
-    <span class="brand-name">JAdventure</span>
+    <span class="brand-name">JAdventureEngine</span>
   </div>
 
   <nav class="nav-menu">
@@ -25,8 +25,11 @@
     </a>
   </nav>
 
-  <div class="sidebar-footer">
-    <i class="bi bi-circle-fill status-indicator"></i>
-    <span class="status-text">Studio Online</span>
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ initial() }}</div>
+    <span class="user-name">{{ username() }}</span>
+    <button type="button" class="btn-logout" (click)="logout()" title="Esci" aria-label="Esci">
+      <i class="bi bi-box-arrow-right"></i>
+    </button>
   </div>
 </aside>
