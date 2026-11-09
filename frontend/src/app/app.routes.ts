@@ -20,15 +20,42 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full'
   },
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
 
   {
-    path: 'adventures',
+    path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/adventures/pages/adventure-list/adventure-list.component').then(
-        (m) => m.AdventureListComponent
-      )
+      import('./layout/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
+    children: [
+      {
+        path: 'adventures',
+        loadComponent: () =>
+          import('./features/adventures/pages/adventure-list/adventure-list.component').then(
+            (m) => m.AdventureListComponent
+          )
+      },
+      {
+        path: 'adventures/my',
+        loadComponent: () =>
+          import('./features/adventures/pages/my-adventures/my-adventures.component').then(
+            (m) => m.MyAdventuresComponent
+          )
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/pages/profile/profile.component').then(
+            (m) => m.ProfileComponent
+          )
+      }
+    ]
   },
+
   {
     path: 'adventures/new',
     canActivate: [authGuard],
@@ -38,71 +65,37 @@ export const routes: Routes = [
       )
   },
   {
-    path: 'adventures/my',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/adventures/pages/my-adventures/my-adventures.component').then(
-        (m) => m.MyAdventuresComponent
-      )
-  },
-
-  {
-    path: 'profile',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/profile/pages/profile/profile.component').then(
-        (m) => m.ProfileComponent
-      )
-  },
-
-  {
     path: 'adventures/:adventureId/scenes/new',
     canActivate: [authGuard],
     loadComponent: () =>
-      import(
-        './features/scene-editor/components/scene-create/scene-create.component'
-        ).then((m) => m.SceneCreateComponent)
+      import('./features/scene-editor/components/scene-create/scene-create.component').then(
+        (m) => m.SceneCreateComponent
+      )
   },
-
   {
     path: 'adventures/:adventureId/play',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/gameplay/gameplay.component').then(
-        (m) => m.GameplayComponent
-      )
+      import('./features/gameplay/gameplay.component').then((m) => m.GameplayComponent)
   },
-
   {
     path: 'editor/:adventureId',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/scene-editor/scene-editor.component').then(
-        (m) => m.SceneEditorComponent
-      )
+      import('./features/scene-editor/scene-editor.component').then((m) => m.SceneEditorComponent)
   },
-
   {
     path: 'editor/:adventureId/:sceneCode',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/scene-editor/scene-editor.component').then(
-        (m) => m.SceneEditorComponent
-      )
+      import('./features/scene-editor/scene-editor.component').then((m) => m.SceneEditorComponent)
   },
-
   {
     path: 'adventures/:adventureId/items/:itemId/dialogues',
     loadComponent: () =>
       import('./features/dialogue-editor/dialogue-editor.component').then(
         (m) => m.DialogueEditorComponent
       )
-  },
-
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
   },
 
   {

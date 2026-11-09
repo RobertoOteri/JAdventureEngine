@@ -4,7 +4,6 @@ import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { GraphicAdventureDto } from '../../../../core/models';
-import { SidebarComponent } from '../../../../shared/ui/sidebar/sidebar.component';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
 import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
@@ -20,7 +19,6 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    SidebarComponent,
     AdventureCardComponent,
     AdventureDetailModalComponent,
     SearchBarComponent,

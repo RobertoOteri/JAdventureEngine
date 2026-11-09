@@ -18,6 +18,7 @@ import { SegmentedControlComponent } from '../../../shared/ui/segmented-control/
 import { FilterOption } from '../../../shared/ui/filter-select/filter-select.component';
 import { LanguageSwitchComponent } from '../../../shared/ui/language-switch/language-switch.component';
 import { AuthShowcaseComponent } from '../components/auth-showcase/auth-showcase.component';
+import { BrandLogoComponent } from '../../../shared/ui/brand-logo/brand-logo.component';
 
 type AuthMode = 'login' | 'register';
 
@@ -37,7 +38,8 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
     SegmentedControlComponent,
     AuthShowcaseComponent,
     LanguageSwitchComponent,
-    TranslatePipe
+    TranslatePipe,
+    BrandLogoComponent
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'

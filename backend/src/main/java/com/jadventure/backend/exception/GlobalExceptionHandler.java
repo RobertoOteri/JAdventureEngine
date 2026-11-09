@@ -58,7 +58,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
-        // Il "message" delle annotazioni nei DTO è già il codice (es. "validation.firstName.required")
         String code = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .findFirst()

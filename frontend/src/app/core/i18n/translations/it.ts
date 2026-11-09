@@ -16,10 +16,12 @@ export const it = {
     generic: 'Si è verificato un errore. Riprova.'
   },
   sidebar: {
+    navAria: 'Menu principale',
+    newAdventure: 'Nuova avventura',
     library: 'Libreria',
     myStories: 'Le mie storie',
-    myProfile: 'Il mio profilo',
-    logout: 'Esci'
+    profile: 'Profilo',
+    tagline: 'Crea, gioca, condividi'
   },
   auth: {
     modeLogin: 'Accedi',
@@ -734,5 +736,11 @@ export const it = {
         }
       }
     }
-  }
+  },
+
+  topbar: {
+    home: 'Vai alla libreria',
+    myProfile: 'Il mio profilo',
+    logout: 'Esci'
+  },
 };

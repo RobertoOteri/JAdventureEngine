@@ -18,10 +18,12 @@ export const en: Translations = {
     generic: 'Something went wrong. Please try again.'
   },
   sidebar: {
+    navAria: 'Main menu',
+    newAdventure: 'New adventure',
     library: 'Library',
     myStories: 'My stories',
-    myProfile: 'My profile',
-    logout: 'Log out'
+    profile: 'Profile',
+    tagline: 'Create, play, share'
   },
   auth: {
     modeLogin: 'Log in',
@@ -735,5 +737,11 @@ export const en: Translations = {
         }
       }
     }
-  }
+  },
+
+  topbar: {
+    home: 'Go to library',
+    myProfile: 'My profile',
+    logout: 'Log out'
+  },
 };

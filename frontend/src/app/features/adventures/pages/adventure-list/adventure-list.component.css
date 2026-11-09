@@ -1,21 +1,17 @@
 :host {
   display: block;
-  background-color: #080a0f;
-  min-height: 100vh;
+  min-height: 100%;
   color: #e6e8ec;
 }
 
 .shell-layout {
-  display: flex;
-  min-height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
+  width: 100%;
 }
 
 .content-body {
-  flex: 1;
+  max-width: 1600px;
+  margin: 0 auto;
   padding: 2.5rem 3.5rem;
-  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -31,7 +27,7 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0 0 0.35rem 0;
-  color: #ffffff;
+  color: #f1ece2;
 }
 
 .counter {

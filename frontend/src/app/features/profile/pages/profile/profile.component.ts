@@ -4,7 +4,6 @@ import { TranslationService } from '../../../../core/i18n/translation.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from '../../../../core/services/user.service';
 import { httpErrorMessage } from '../../../../core/utils/http-error.util';
-import { SidebarComponent } from '../../../../shared/ui/sidebar/sidebar.component';
 import { UserAvatarComponent } from '../../../../shared/ui/user-avatar/user-avatar.component';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
@@ -14,7 +13,7 @@ const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, SidebarComponent, UserAvatarComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, UserAvatarComponent, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

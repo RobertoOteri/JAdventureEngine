@@ -1,0 +1,27 @@
+<aside class="sidebar">
+  <a routerLink="/adventures/new" class="btn-create" [title]="'sidebar.newAdventure' | t">
+    <i class="bi bi-plus-lg"></i>
+    <span>{{ 'sidebar.newAdventure' | t }}</span>
+  </a>
+
+  <nav class="nav" [attr.aria-label]="'sidebar.navAria' | t">
+    @for (item of items; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: !!item.exact }"
+        class="nav-item"
+        [title]="item.labelKey | t"
+      >
+        <i class="bi {{ item.icon }} nav-icon"></i>
+        <span class="nav-label">{{ item.labelKey | t }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <i class="bi bi-map"></i>
+    <span>{{ 'sidebar.tagline' | t }}</span>
+  </div>
+</aside>

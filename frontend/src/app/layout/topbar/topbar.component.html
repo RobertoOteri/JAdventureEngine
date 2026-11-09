@@ -1,0 +1,28 @@
+<header class="topbar" [class.is-scrolled]="scrolled()">
+  <a routerLink="/adventures" class="brand" [attr.aria-label]="'topbar.home' | t">
+    <app-brand-logo />
+  </a>
+
+  <div class="topbar-actions">
+    <app-language-switch variant="full" align="end" />
+
+    <span class="actions-divider" aria-hidden="true"></span>
+
+    <a routerLink="/profile" routerLinkActive="active" class="user-chip" [title]="'topbar.myProfile' | t">
+      <span class="avatar-ring">
+        <app-user-avatar [src]="user()?.avatarUrl" [name]="username()" [size]="30" />
+      </span>
+      <span class="user-name">{{ username() }}</span>
+    </a>
+
+    <button
+      type="button"
+      class="btn-logout"
+      (click)="logout()"
+      [title]="'topbar.logout' | t"
+      [attr.aria-label]="'topbar.logout' | t"
+    >
+      <i class="bi bi-box-arrow-right"></i>
+    </button>
+  </div>
+</header>

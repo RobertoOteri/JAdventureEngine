@@ -1,13 +1,12 @@
 :host {
   display: block;
-  background-color: #080a0f;
-  height: 100vh;
+  height: 100%;
   color: #e6e8ec;
 }
 
 .shell-layout {
   display: flex;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   overflow: hidden;
 }
@@ -31,7 +30,7 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0 0 0.35rem;
-  color: #ffffff;
+  color: #f1ece2;
 }
 
 .counter {

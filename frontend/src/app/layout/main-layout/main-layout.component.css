@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.app-shell {
+  --sidebar-width: 248px;
+
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0b0d12;
+  color: #e6e8ec;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    --sidebar-width: 68px;
+  }
+}

@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { TranslationKey } from '../../../../core/i18n/i18n.types';
+import { BrandLogoComponent } from '../../../../shared/ui/brand-logo/brand-logo.component';
 
 const COVERS: readonly string[] = [
   '/showcase/fantasy_slide.jpg',
@@ -26,7 +27,7 @@ const INTERVAL_MS = 5500;
 @Component({
   selector: 'app-auth-showcase',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, BrandLogoComponent],
   templateUrl: './auth-showcase.component.html',
   styleUrl: './auth-showcase.component.css'
 })

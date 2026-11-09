@@ -9,7 +9,6 @@ interface LanguageOption {
   name: string;
 }
 
-/** Nomi scritti nella lingua stessa (endonimi): non si traducono, così ognuno riconosce la propria. */
 const LANGUAGE_OPTIONS: Record<Language, LanguageOption> = {
   it: { code: 'it', short: 'IT', name: 'Italiano' },
   en: { code: 'en', short: 'EN', name: 'English' }
@@ -26,11 +25,8 @@ export class LanguageSwitchComponent {
   private readonly i18n = inject(TranslationService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  /** compact: globo + codice (sidebar). full: globo + nome completo (pagina di login). */
   readonly variant = input<'compact' | 'full'>('compact');
-  /** Da che parte si apre il menu rispetto al pulsante. */
   readonly placement = input<'top' | 'bottom'>('bottom');
-  /** A quale bordo del pulsante si allinea il menu. */
   readonly align = input<'start' | 'end'>('start');
 
   readonly isOpen = signal(false);

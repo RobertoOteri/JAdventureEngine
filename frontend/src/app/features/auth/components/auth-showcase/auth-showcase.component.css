@@ -53,22 +53,6 @@
   position: absolute;
   top: 2.5rem;
   left: 3rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.brand-icon {
-  font-size: 1.9rem;
-  line-height: 1;
-  color: #60a5fa;
-}
-
-.brand-name {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #ffffff;
 }
 
 .caption {
@@ -127,7 +111,7 @@
 }
 
 .dot:focus-visible {
-  outline: 2px solid #60a5fa;
+  outline: 2px solid #d9b26a;
   outline-offset: 3px;
 }
 
