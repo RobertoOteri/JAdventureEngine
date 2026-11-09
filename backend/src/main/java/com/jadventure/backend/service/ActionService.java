@@ -49,16 +49,12 @@ public class ActionService {
         }
 
         Action actionEntity = actionRepository.findByCodeAndItemGraphicAdventureId(gameActionDto.getActionCode(), adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Azione non trovata con codice: " + gameActionDto.getActionCode()
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("error.action.notFoundByCode", gameActionDto.getActionCode()));
 
         ActionDto action = actionMapper.toDto(actionEntity);
 
         if (action.getType() != gameActionDto.getActionType()) {
-            throw new IllegalArgumentException(
-                    "Tipo di azione non corrispondente: atteso " + action.getType() + " ma ricevuto " + gameActionDto.getActionType()
-            );
+            throw new InvalidOperationException("error.action.typeMismatch", action.getType(), gameActionDto.getActionType());
         }
 
         Optional<String> failureMessage = preconditionService.validatePreconditions(stateDto, action, gameActionDto.getInput());
@@ -81,7 +77,7 @@ public class ActionService {
 
         String successMessage = StringUtils.hasText(action.getSuccessMessage())
                 ? action.getSuccessMessage()
-                : "Azione eseguita con successo.";
+                : null;
 
         return GameActionResultDto.builder()
                 .success(true)

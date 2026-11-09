@@ -1,4 +1,4 @@
-import { EffectType, PreconditionType } from '../models';
+import { EffectType, PreconditionType, ActionType } from '../models';
 import { TranslationKey } from './i18n.types';
 
 export const EFFECT_TYPE_KEYS: Record<EffectType, TranslationKey> = {
@@ -18,4 +18,14 @@ export const PRECONDITION_TYPE_KEYS: Record<PreconditionType, TranslationKey> = 
   DOES_NOT_HAVE_ITEM: 'enums.preconditionType.DOES_NOT_HAVE_ITEM',
   FLAG_EQUALS: 'enums.preconditionType.FLAG_EQUALS',
   INPUT_EQUALS: 'enums.preconditionType.INPUT_EQUALS'
+};
+
+export const ACTION_TYPE_KEYS: Record<ActionType, TranslationKey> = {
+  LOOK_AT: 'enums.actionType.LOOK_AT',
+  OPEN: 'enums.actionType.OPEN',
+  PICK_UP: 'enums.actionType.PICK_UP',
+  MOVE: 'enums.actionType.MOVE',
+  USE: 'enums.actionType.USE',
+  TALK_TO: 'enums.actionType.TALK_TO',
+  USE_WITH: 'enums.actionType.USE_WITH'
 };

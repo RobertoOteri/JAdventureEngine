@@ -1,31 +1,28 @@
 <header class="editor-navbar">
   <div class="navbar-left">
-    <button type="button" class="btn-nav-back" (click)="goBackToAdventures()" title="Torna all'elenco avventure">
+    <button type="button" class="btn-nav-back" (click)="goBackToAdventures()" [title]="'sceneEditor.header.back' | t">
       <i class="bi bi-chevron-left"></i>
-      <span>Avventure</span>
+      <span>{{ 'sceneEditor.header.adventures' | t }}</span>
     </button>
 
     <div class="nav-divider"></div>
 
     <div class="adventure-title-group">
       <h1 class="adventure-main-title">
-        {{ store.adventureTitle() || 'Avventura Grafica' }}
+        {{ store.adventureTitle() || ('common.graphicAdventure' | t) }}
       </h1>
       <button
         type="button"
         class="btn-edit-title"
         (click)="editAdventureRequested.emit()"
-        title="Modifica informazioni avventura"
+        [title]="'sceneEditor.header.editInfo' | t"
       >
         <i class="bi bi-pencil-square"></i>
       </button>
 
       @if (store.adventure()?.versionNumber; as version) {
-        <span
-          class="version-badge"
-          title="Stai modificando questa bozza: i giocatori vedono solo le versioni pubblicate"
-        >
-          Bozza v{{ version }}
+        <span class="version-badge" [title]="'sceneEditor.header.draftTitle' | t">
+          {{ 'sceneEditor.header.draft' | t: { version: version } }}
         </span>
       }
     </div>
@@ -35,8 +32,8 @@
     @if (draftPointsCount() > 0) {
       <div class="draft-pill">
         <i class="bi bi-vector-pen"></i>
-        <span>{{ draftPointsCount() }} vertici</span>
-        <button type="button" class="btn-undo-point" (click)="undoPoint.emit()" title="Annulla ultimo vertice">
+        <span>{{ 'sceneEditor.header.vertices' | t: { count: draftPointsCount() } }}</span>
+        <button type="button" class="btn-undo-point" (click)="undoPoint.emit()" [title]="'sceneEditor.header.undoVertex' | t">
           <i class="bi bi-arrow-counterclockwise"></i>
         </button>
       </div>
@@ -54,16 +51,16 @@
       class="btn-publish"
       [disabled]="store.isSaving() || !store.adventure()"
       (click)="isPublishConfirmOpen.set(true)"
-      title="Rendi giocabile la bozza attuale come nuova versione"
+      [title]="'sceneEditor.header.publishTitle' | t"
     >
       <i class="bi bi-rocket-takeoff"></i>
-      <span>Pubblica</span>
+      <span>{{ 'sceneEditor.header.publish' | t }}</span>
     </button>
 
     <div class="status-indicator">
       <span class="status-dot"></span>
       <span class="scene-active-tag">
-        {{ store.currentScene()?.name || 'Stanza non selezionata' }}
+        {{ store.currentScene()?.name || ('sceneEditor.header.noScene' | t) }}
       </span>
     </div>
   </div>
@@ -71,10 +68,10 @@
 
 @if (isPublishConfirmOpen()) {
   <app-confirmation-modal
-    title="Pubblicare la bozza?"
-    [message]="'La bozza diventerà la versione ' + store.adventure()?.versionNumber + ', giocabile da tutti. Le versioni già pubblicate restano disponibili e continuerai a lavorare su una nuova bozza.'"
-    confirmText="Pubblica"
-    cancelText="Annulla"
+    [title]="'sceneEditor.header.confirmPublishTitle' | t"
+    [message]="'sceneEditor.header.confirmPublishMessage' | t: { version: store.adventure()?.versionNumber ?? '' }"
+    [confirmText]="'sceneEditor.header.publish' | t"
+    [cancelText]="'common.cancel' | t"
     [isDestructive]="false"
     (confirm)="confirmPublish()"
     (cancel)="isPublishConfirmOpen.set(false)"

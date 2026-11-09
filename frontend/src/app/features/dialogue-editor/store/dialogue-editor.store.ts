@@ -6,6 +6,7 @@ import { DialogueChoice, DialogueNode, GameEffect } from '../../../core/models';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import { sanitizeNodes } from '../../../core/utils/sanitize-nodes';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import {apiErrorMessage} from '../../../core/utils/http-error.util';
 
 export interface DialogueEditorState {
   itemId: number | null;
@@ -165,7 +166,7 @@ export const DialogueEditorStore = signalStore(
               console.error('Errore salvataggio dialoghi:', err);
               patchState(store, {
                 isSaving: false,
-                feedbackMessage: err?.error?.message || i18n.t('dialogueEditor.feedback.saveError')
+                feedbackMessage: apiErrorMessage(err, i18n)|| i18n.t('dialogueEditor.feedback.saveError')
               });
             }
           })

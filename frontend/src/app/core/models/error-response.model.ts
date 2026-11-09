@@ -1,6 +1,7 @@
 export interface ErrorResponse {
   status: number;
   error: string;
-  message: string;
+  code?: string;
+  params?: string[];
   timestamp: string;
 }

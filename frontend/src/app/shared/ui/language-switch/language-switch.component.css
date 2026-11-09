@@ -1,24 +1,208 @@
-.lang-switch {
+:host {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lang-picker {
+  position: relative;
+}
+
+.lang-trigger {
   display: inline-flex;
-  gap: 0.25rem;
-  padding: 0.2rem;
+  align-items: center;
+  gap: 0.35rem;
+  height: 32px;
+  padding: 0 0.55rem;
+  border: 1px solid transparent;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.lang-btn {
-  border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  color: #8b92a0;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.lang-btn.active {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+.lang-trigger:hover,
+.is-open .lang-trigger {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.lang-trigger:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.trigger-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.trigger-chevron {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.is-open .trigger-chevron {
+  transform: rotate(180deg);
+}
+
+.is-full .lang-trigger {
+  height: 36px;
+  gap: 0.5rem;
+  padding: 0 0.8rem;
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d4d8e0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.is-full .lang-trigger:hover,
+.is-full.is-open .lang-trigger {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 190px;
+  padding: 0.4rem;
+  background: #151821;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transform-origin: top left;
+  animation: menu-in-down 0.16s ease-out;
+}
+
+.lang-menu.align-end {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+
+.lang-menu.place-top {
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform-origin: bottom left;
+  animation-name: menu-in-up;
+}
+
+.lang-menu.place-top.align-end {
+  transform-origin: bottom right;
+}
+
+.menu-title {
+  padding: 0.45rem 0.6rem 0.35rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #5f6675;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #c3c8d2;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.lang-option:hover,
+.lang-option:focus-visible {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  outline: none;
+}
+
+.lang-option.selected {
+  color: #ffffff;
+}
+
+.option-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 0.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8b92a0;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  transition: all 0.15s ease;
+}
+
+.lang-option.selected .option-code {
+  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+
+.option-name {
+  flex: 1;
+}
+
+.option-check {
+  color: #60a5fa;
+  font-size: 1rem;
+}
+
+@keyframes menu-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-menu,
+  .trigger-chevron {
+    animation: none;
+    transition: none;
+  }
 }

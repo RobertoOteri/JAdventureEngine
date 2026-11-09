@@ -6,15 +6,19 @@ import { SceneService } from '../../../../core/services/scene.service';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import {apiErrorMessage} from '../../../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-scene-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent],
+  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent, TranslatePipe],
   templateUrl: './scene-create.component.html',
   styleUrl: './scene-create.component.css'
 })
 export class SceneCreateComponent implements OnInit {
+  private readonly i18n = inject(TranslationService);
   private readonly fb = inject(FormBuilder);
   private readonly sceneService = inject(SceneService);
   private readonly adventureService = inject(AdventureService);
@@ -60,7 +64,7 @@ export class SceneCreateComponent implements OnInit {
         },
         error: (err) => {
           console.error('Errore nel caricamento dei dati avventura:', err);
-          this.errorMessage.set("Impossibile caricare i dati dell'avventura.");
+          this.errorMessage.set(this.i18n.t('sceneEditor.sceneForm.loadError'));
         }
       });
     }
@@ -101,13 +105,13 @@ export class SceneCreateComponent implements OnInit {
     if (this.form.invalid || !file) {
       this.form.markAllAsTouched();
       if (!file) {
-        this.errorMessage.set('Lo sfondo della stanza è obbligatorio.');
+        this.errorMessage.set(this.i18n.t('sceneEditor.sceneForm.backgroundRequired'));
       }
       return;
     }
 
     if (!advId) {
-      this.errorMessage.set("Identificativo dell'avventura non disponibile. Riprova.");
+      this.errorMessage.set(this.i18n.t('sceneEditor.sceneForm.missingAdventure'));
       return;
     }
 
@@ -136,8 +140,7 @@ export class SceneCreateComponent implements OnInit {
       error: (err: any) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(
-          err?.error?.message || err?.error?.detail || 'Errore nel salvataggio della stanza.'
-        );
+          apiErrorMessage(err, this.i18n) || this.i18n.t('sceneEditor.sceneForm.saveError')        );
       }
     });
   }

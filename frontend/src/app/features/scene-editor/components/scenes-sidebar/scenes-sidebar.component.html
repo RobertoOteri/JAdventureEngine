@@ -3,9 +3,9 @@
     <div class="sidebar-header">
       <div class="header-title">
         <i class="bi bi-grid-1x2 icon-header"></i>
-        <h2>Scene ({{ store.scenes().length }})</h2>
+        <h2>{{ 'sceneEditor.sidebar.scenes' | t: { count: store.scenes().length } }}</h2>
       </div>
-      <button type="button" class="btn-add-square" (click)="goToAddScene()" title="Aggiungi Nuova Stanza">
+      <button type="button" class="btn-add-square" (click)="goToAddScene()" [title]="'sceneEditor.sidebar.addScene' | t">
         <i class="bi bi-plus-lg"></i>
       </button>
     </div>
@@ -26,7 +26,7 @@
             type="button"
             class="btn-delete-scene"
             (click)="deleteScene($event, scene)"
-            title="Elimina stanza"
+            [title]="'sceneEditor.sidebar.deleteScene' | t"
           >
             <i class="bi bi-trash3"></i>
           </button>
@@ -34,7 +34,7 @@
       } @empty {
         <div class="sidebar-empty">
           <i class="bi bi-inbox icon-empty"></i>
-          <span>Nessuna stanza presente</span>
+          <span>{{ 'sceneEditor.sidebar.noScenes' | t }}</span>
         </div>
       }
     </nav>
@@ -46,13 +46,13 @@
     <div class="sidebar-header">
       <div class="header-title">
         <i class="bi bi-box-seam icon-header"></i>
-        <h2>Oggetti ({{ totalItemsCount() }})</h2>
+        <h2>{{ 'sceneEditor.sidebar.objects' | t: { count: totalItemsCount() } }}</h2>
       </div>
       <button
         type="button"
         class="btn-add-square"
         (click)="onAddObjectClick()"
-        title="Aggiungi Nuovo Oggetto (di scena o globale)"
+        [title]="'sceneEditor.sidebar.addObject' | t"
       >
         <i class="bi bi-plus-lg"></i>
       </button>
@@ -86,13 +86,13 @@
                   <span class="bullet-name">{{ entry.item.name }}</span>
 
                   @if (entry.isGlobal) {
-                    <span class="mini-tag tag-global">GLOBAL</span>
+                    <span class="mini-tag tag-global">{{ 'sceneEditor.sidebar.tagGlobal' | t }}</span>
                   } @else if (entry.isInventory) {
-                    <span class="mini-tag tag-inventory">INV</span>
+                    <span class="mini-tag tag-inventory">{{ 'sceneEditor.sidebar.tagInventory' | t }}</span>
                   }
                 </li>
               } @empty {
-                <li class="group-empty">Nessun oggetto</li>
+                <li class="group-empty">{{ 'sceneEditor.sidebar.noObjects' | t }}</li>
               }
             </ul>
           }

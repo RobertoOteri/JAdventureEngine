@@ -45,6 +45,6 @@ public class PreconditionService {
         if (StringUtils.hasText(action.getDefaultFailureMessage())) {
             return action.getDefaultFailureMessage();
         }
-        return "Non puoi compiere questa azione in questo momento.";
+        return "";
     }
 }

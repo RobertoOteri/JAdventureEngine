@@ -66,4 +66,14 @@ export class TranslationService {
     }
     return navigator.language?.toLowerCase().startsWith('it') ? 'it' : 'en';
   }
+
+  tryT(key: string, params?: TranslationParams): string | null {
+    const text =
+      this.lookup(this.dictionary(), key) ??
+      this.lookup(DICTIONARIES[DEFAULT_LANGUAGE], key);
+    if (text === undefined) {
+      return null;
+    }
+    return params ? this.interpolate(text, params) : text;
+  }
 }

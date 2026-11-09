@@ -293,7 +293,8 @@ export const en: Translations = {
       noEffect: "It doesn't seem to have any effect.",
       cannotCombine: "You can't combine these two items.",
       saved: 'Game saved successfully!',
-      saveError: 'Error while saving the game.'
+      saveError: 'Error while saving the game.',
+      preconditionFailed: "You can't do that right now."
     }
   },
 
@@ -320,8 +321,7 @@ export const en: Translations = {
     nodeEffects: 'Node effects',
     nodeEffectsHint: 'Triggered when the player reaches this node.',
     nodeEffectsEmpty: 'No effects: the node only shows its text.',
-    noSelection: 'Select a node from the list or create a new one with the <strong>Node</strong> button.',
-    choices: 'Choices ({count})',
+    noSelection: 'Pick a node from the list or create a new one with the <strong>Node</strong> button.',    choices: 'Choices ({count})',
     addChoice: 'Choice',
     untitledChoice: 'Untitled choice',
     preconditionCount: '{count} preconditions',
@@ -369,6 +369,107 @@ export const en: Translations = {
     empty: 'No preconditions set.',
     add: 'Add precondition'
   },
+
+  sceneEditor: {
+    confirmDeleteItem: 'Are you sure you want to delete item #{code}?',
+    actionSaveError: 'Unable to save the action.',
+    confirmDeleteAction: 'Do you want to remove this action?',
+    textboxPlaceholder: 'Enter text...',
+    header: {
+      back: 'Back to the adventure list',
+      adventures: 'Adventures',
+      editInfo: 'Edit adventure details',
+      draftTitle: 'You are editing this draft: players only see published versions',
+      draft: 'Draft v{version}',
+      vertices: '{count} vertices',
+      undoVertex: 'Undo last vertex',
+      publishTitle: 'Make the current draft playable as a new version',
+      publish: 'Publish',
+      noScene: 'No room selected',
+      confirmPublishTitle: 'Publish the draft?',
+      confirmPublishMessage: 'The draft will become version {version}, playable by everyone. Published versions remain available and you will keep working on a new draft.',
+      publishError: 'Publishing failed'
+    },
+    sidebar: {
+      scenes: 'Scenes ({count})',
+      addScene: 'Add new room',
+      deleteScene: 'Delete room',
+      noScenes: 'No rooms yet',
+      objects: 'Items ({count})',
+      addObject: 'Add new item (scene or global)',
+      globalInventory: 'Global Inventory',
+      tagGlobal: 'GLOBAL',
+      tagInventory: 'INV',
+      noObjects: 'No items',
+      confirmDeleteScene: 'Are you sure you want to delete the room "{name}"?'
+    },
+    sceneForm: {
+      cancelTitle: 'Cancel creation',
+      initialBadge: 'Starting Scene',
+      newBadge: 'New Scene',
+      saving: 'Saving...',
+      submit: 'Confirm and save',
+      initialTitle: 'Set Up Starting Scene',
+      newTitle: 'Create New Scene',
+      initialSubtitle: "This room will be the player's starting point in your adventure.",
+      newSubtitle: 'Add a new room to the adventure and define its unique identifier.',
+      nameLabel: 'Scene name *',
+      namePlaceholder: 'e.g. Lighthouse Hall, Dark Forest, Study...',
+      nameRequired: 'Room name is required.',
+      codeLabel: 'Unique scene code (ID) *',
+      codePlaceholder: 'e.g. lighthouse_hall, night_forest',
+      initialCodeHint: "The game engine's default starting ID.",
+      codeHint: 'Used by hotspots to point transitions to this room.',
+      codeInvalid: 'Only lowercase letters, digits and underscores (_) are allowed.',
+      backgroundLabel: 'Room background *',
+      backgroundDropTitle: 'Drag the room background here',
+      backgroundDropSubtitle: 'or click to browse files',
+      backgroundHint: 'High-resolution PNG, JPG or WEBP recommended (16:9)',
+      loadError: 'Unable to load adventure data.',
+      backgroundRequired: 'The room background is required.',
+      missingAdventure: 'Adventure identifier not available. Please try again.',
+      saveError: 'Error while saving the room.'
+    },
+    canvas: {
+      loading: 'Loading scene...',
+      spriteDraftAlt: 'Sprite draft',
+      moveBoth: 'Move on both axes',
+      moveX: 'Move X axis',
+      moveY: 'Move Y axis',
+      scaleBoth: 'Free diagonal stretch',
+      scaleX: 'Stretch width (X)',
+      scaleY: 'Stretch height (Y)',
+      dropSprite: 'Drop the sprite here',
+      noSceneTitle: 'No Scene Selected',
+      noSceneText: 'Create or select a room to start setting it up.',
+      addScene: 'Add Scene'
+    },
+    gizmo: {
+      select: 'Select (Cursor)',
+      move: 'Move sprite (X/Y axes)',
+      scale: 'Resize sprite',
+      hotspot: 'Draw hotspot polygon'
+    },
+    feedback: {
+      invalidAdventureId: 'Invalid adventure identifier.',
+      scenesLoadError: 'Unable to load scene data.',
+      adventureLoadError: 'Unable to load the requested adventure.',
+      detailsSaved: 'Adventure details updated successfully!',
+      detailsSaveError: 'Error while saving details.',
+      itemSaved: 'Item "{name}" saved!',
+      saveError: 'Save error.',
+      globalItemSaved: 'Global item "{name}" saved successfully!',
+      itemSaveError: 'Error while saving the item.',
+      itemUpdated: 'Item "{name}" updated!',
+      updateError: 'Update error.',
+      publishError: 'Error while publishing.',
+      actionAdded: 'Action "{type}" added!',
+      actionSaveError: 'Error while saving the action.',
+      actionUpdated: 'Action "{type}" updated successfully!',
+      actionUpdateError: 'Error while updating the action.'
+    }
+  },
+
   enums: {
     effectType: {
       CHANGE_SCENE: 'Change scene',
@@ -386,6 +487,253 @@ export const en: Translations = {
       DOES_NOT_HAVE_ITEM: "Doesn't have item",
       FLAG_EQUALS: 'Flag equals',
       INPUT_EQUALS: 'Input equals'
+    },
+    actionType: {
+      LOOK_AT: 'Look at',
+      OPEN: 'Open',
+      PICK_UP: 'Pick up',
+      MOVE: 'Move',
+      USE: 'Use',
+      TALK_TO: 'Talk to',
+      USE_WITH: 'Use with'
     }
   },
+
+  inspector: {
+    hotspots: 'Hotspots ({count})',
+    tagInventory: 'INVENTORY',
+    tagHidden: 'HIDDEN',
+    noHotspots: 'No hotspots in this room',
+    editItem: 'Edit Item',
+    newItem: 'New Item',
+    noVertices: 'No vertices = Global',
+    nameLabel: 'Item name *',
+    namePlaceholder: 'e.g. Reinforced Chest or Golden Key',
+    codeLabel: 'Unique code (ID) *',
+    codePlaceholder: 'e.g. golden_key',
+    description: 'Description',
+    descriptionPlaceholder: 'Item description...',
+    spriteLabel: 'Sprite / Icon (optional)',
+    changeImage: 'Change image...',
+    chooseImage: 'Choose an image from your computer...',
+    visibleAtStart: 'Visible at start',
+    hiddenAtStart: 'Hidden at start',
+    saveChanges: 'Save changes',
+    confirmSave: 'Confirm and save',
+    title: 'Inspector',
+    editItemTitle: 'Edit item',
+    deleteItemTitle: 'Delete item',
+    noDescription: 'No description.',
+    actions: 'Actions',
+    add: 'Add',
+    withTarget: 'with #{code}',
+    noMessage: 'No message',
+    editAction: 'Edit action',
+    deleteAction: 'Delete action',
+    noActions: 'No actions set.',
+    dialogues: 'Dialogues',
+    dialoguesHint: 'Multiple-choice conversations with this character.',
+    manageDialogues: 'Manage dialogues',
+    empty: 'Pick an item from the left column or create a new one with the <strong>+</strong> button.'
+  },
+
+  actionModal: {
+    editTitle: 'Edit Game Action',
+    newTitle: 'New Game Action',
+    subtitle: 'Assign a behavior to element',
+    typeLabel: 'Action type *',
+    useWithTarget: 'Target / Item to interact or combine with *',
+    selectTarget: '-- Select target element --',
+    successMessage: 'Success message (optional)',
+    successPlaceholder: 'e.g. You unlocked the door with the brass key.',
+    preconditions: 'Preconditions',
+    addCondition: 'Add condition',
+    inputSolutionPlaceholder: 'Exact solution (e.g. 1234)',
+    textBoxTitle: 'Where the text field appears',
+    textBoxHint: 'Drag the box to move it, the corner to resize it, or draw a new rectangle on the background.',
+    noBackground: 'Select a scene with a background to place the box.',
+    decreaseSize: 'Decrease size',
+    increaseSize: 'Increase size',
+    textColor: 'Text color',
+    preciseValues: 'Precise values',
+    width: 'Width',
+    height: 'Height',
+    failurePlaceholder: 'Specific message if not met (optional)...',
+    noPreconditions: 'No preconditions set: the action can always be performed.',
+    effects: 'Game Effects',
+    noDialogue: 'No saved dialogue for this item. Create one with "Manage dialogues" and save it.',
+    noEffects: 'No effects set: the action will only show the message.',
+    saveChanges: 'Save changes',
+    saveAction: 'Save action',
+    colors: {
+      white: 'White',
+      black: 'Black',
+      yellow: 'Yellow',
+      red: 'Red',
+      green: 'Green',
+      blue: 'Light blue',
+      orange: 'Orange',
+      custom: 'Custom'
+    }
+  },
+  api: {
+    error: {
+      generic: {
+        internal: 'An internal server error occurred',
+        badRequest: 'Invalid request',
+        conflict: 'Unable to complete the operation'
+      },
+      validation: {
+        generic: 'Invalid data'
+      },
+      auth: {
+        invalidCredentials: 'Invalid credentials',
+        usernameTaken: "The username '{0}' is already taken",
+        emailTaken: "The email '{0}' is already linked to an account",
+        notAuthenticated: 'Operation not allowed: user not authenticated',
+        notOwner: 'Access denied: you are not the owner of this resource',
+        forbidden: 'Access denied'
+      },
+      user: {
+        authenticatedNotFound: 'Authenticated user not found: {0}'
+      },
+      adventure: {
+        notFoundById: 'Adventure not found with ID: {0}',
+        titleTaken: 'An adventure with this title already exists',
+        noStartScene: 'The adventure has no starting scene configured',
+        versionPublished: 'This version is published and cannot be modified',
+        publishNoScenes: 'Cannot publish: the adventure has no scenes',
+        publishInvalidStartScene: 'Cannot publish: starting scene missing or invalid'
+      },
+      scene: {
+        notFoundById: 'Scene not found with ID: {0}',
+        notFoundByCode: 'Scene not found: {0}'
+      },
+      item: {
+        notFoundById: 'Item not found with ID: {0}',
+        hotspotRequired: 'An item added to the scene must have a hotspot with valid points'
+      },
+      action: {
+        notFoundById: 'Action not found with ID: {0}',
+        notFoundByCode: 'Action not found with code: {0}',
+        typeMismatch: 'Action type mismatch: expected {0} but received {1}',
+        duplicateType: 'The item already has an action of type {0}',
+        duplicateUseWith: 'A USE_WITH action targeting this item already exists: {0}',
+        useWithTargetRequired: 'A USE_WITH action requires targetItemCode',
+        duringDialogue: "You can't perform actions during a dialogue"
+      },
+      game: {
+        stateMissing: 'Game state missing',
+        stateOrAdventureMissing: 'Game state or adventure missing',
+        alreadyEnded: 'The adventure has already ended'
+      },
+      save: {
+        notFound: 'Save not found: {0}',
+        noneForAdventure: 'No save found for adventure: {0}',
+        autosaveNotFound: 'No autosave found for this adventure'
+      },
+      dialogue: {
+        nodeNotFound: 'Dialogue node not found: {0}',
+        targetNodeNotFound: 'Target node does not exist: {0}',
+        noneActive: 'No dialogue in progress',
+        invalidChoice: 'Invalid choice for the current node',
+        choiceUnavailable: 'Choice not available'
+      },
+      upload: {
+        imageRequired: 'Please select an image',
+        missingExtension: 'The uploaded file has no valid extension',
+        unsupportedFormat: 'Unsupported file format. Allowed extensions: {0}'
+      }
+    },
+    validation: {
+      firstName: {
+        required: 'First name is required',
+        size: 'First name can be at most 50 characters'
+      },
+      lastName: {
+        required: 'Last name is required',
+        size: 'Last name can be at most 50 characters'
+      },
+      email: {
+        required: 'Email is required',
+        invalid: 'Please enter a valid email address',
+        size: 'Email can be at most 255 characters'
+      },
+      username: {
+        required: 'Username is required',
+        size: 'Username must be between 3 and 50 characters',
+        pattern: 'Username can only contain letters, numbers and the characters _ . -'
+      },
+      login: {
+        identifier: {
+          required: 'Enter your username or email'
+        }
+      },
+      password: {
+        required: 'Password is required',
+        size: 'Password must be at least 8 characters'
+      },
+      bio: {
+        size: 'Bio can be at most 500 characters'
+      },
+      description: {
+        size: 'Description cannot exceed 1000 characters'
+      },
+      adventure: {
+        id: {
+          required: 'Adventure id is required'
+        }
+      },
+      gameState: {
+        required: 'Game state is required'
+      },
+      action: {
+        code: {
+          required: 'Action code is required',
+          size: 'Code cannot exceed 255 characters'
+        },
+        type: {
+          required: 'Action type is required'
+        }
+      },
+      effect: {
+        type: {
+          required: 'Effect type is required'
+        }
+      },
+      precondition: {
+        type: {
+          required: 'Precondition type is required'
+        },
+        key: {
+          required: 'Required key is mandatory'
+        }
+      },
+      item: {
+        code: {
+          required: 'Item code is required',
+          size: 'Item code cannot exceed 50 characters'
+        },
+        name: {
+          required: 'Item name is required',
+          size: 'Item name cannot exceed 100 characters'
+        }
+      },
+      scene: {
+        code: {
+          required: 'Scene code is required',
+          size: 'Scene code cannot exceed 50 characters'
+        },
+        name: {
+          required: 'Scene name is required',
+          size: 'Scene name cannot exceed 100 characters'
+        }
+      },
+      hotspot: {
+        points: {
+          size: 'Points cannot exceed 1000 characters'
+        }
+      }
+    }
+  }
 };

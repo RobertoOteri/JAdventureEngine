@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { EditorStore } from '../../store/editor.store';
 import { ConfirmationModalComponent } from '../../../../shared/ui/confirmation-modal/confirmation-modal.component';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import {apiErrorMessage} from '../../../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-editor-header',
   standalone: true,
-  imports: [CommonModule, ConfirmationModalComponent],
+  imports: [CommonModule, ConfirmationModalComponent, TranslatePipe],
   templateUrl: './editor-header.component.html',
   styleUrl: './editor-header.component.css'
 })
 export class EditorHeaderComponent {
+  private readonly i18n = inject(TranslationService);
   private readonly router = inject(Router);
   readonly store = inject(EditorStore);
 
@@ -41,7 +45,6 @@ export class EditorHeaderComponent {
         void this.router.navigate(target);
       },
       error: (err: any) =>
-        this.publishError.set(err?.error?.message || 'Pubblicazione non riuscita')
-    });
+        this.publishError.set(apiErrorMessage(err, this.i18n) || this.i18n.t('sceneEditor.header.publishError'))    });
   }
 }

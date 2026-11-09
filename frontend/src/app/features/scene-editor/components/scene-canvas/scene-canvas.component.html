@@ -2,7 +2,7 @@
   @if (store.isLoading()) {
     <div class="editor-loading-overlay">
       <div class="spinner"></div>
-      <p>Caricamento scena...</p>
+      <p>{{ 'sceneEditor.canvas.loading' | t }}</p>
     </div>
   } @else if (store.currentScene() && store.backgroundUrl()) {
     <div
@@ -56,19 +56,19 @@
           [style.width.%]="spriteWidth() / 10"
           [style.height.%]="spriteHeight() / 10"
         >
-          <img [src]="previewSpriteUrl()" class="gizmo-image" alt="Bozza Sprite" draggable="false" />
+          <img [src]="previewSpriteUrl()" class="gizmo-image" [alt]="'sceneEditor.canvas.spriteDraftAlt' | t" draggable="false" />
 
           @if (activeTool() === 'MOVE') {
             <div class="unity-translate-gizmo">
               <div
                 class="gizmo-center-handle"
                 (mousedown)="startAxisDrag($event, 'BOTH')"
-                title="Sposta su entrambi gli assi"
+                [title]="'sceneEditor.canvas.moveBoth' | t"
               ></div>
               <div
                 class="gizmo-axis axis-x"
                 (mousedown)="startAxisDrag($event, 'X')"
-                title="Sposta asse X"
+                [title]="'sceneEditor.canvas.moveX' | t"
               >
                 <div class="axis-line"></div>
                 <div class="axis-arrow"></div>
@@ -76,7 +76,7 @@
               <div
                 class="gizmo-axis axis-y"
                 (mousedown)="startAxisDrag($event, 'Y')"
-                title="Sposta asse Y"
+                [title]="'sceneEditor.canvas.moveY' | t"
               >
                 <div class="axis-arrow"></div>
                 <div class="axis-line"></div>
@@ -89,12 +89,12 @@
               <div
                 class="scale-center-cube"
                 (mousedown)="startScaleDrag($event, 'BOTH')"
-                title="Stretch libero diagonale"
+                [title]="'sceneEditor.canvas.scaleBoth' | t"
               ></div>
               <div
                 class="scale-axis axis-x"
                 (mousedown)="startScaleDrag($event, 'X')"
-                title="Stretch larghezza (X)"
+                [title]="'sceneEditor.canvas.scaleX' | t"
               >
                 <div class="scale-line"></div>
                 <div class="scale-cube"></div>
@@ -102,7 +102,7 @@
               <div
                 class="scale-axis axis-y"
                 (mousedown)="startScaleDrag($event, 'Y')"
-                title="Stretch altezza (Y)"
+                [title]="'sceneEditor.canvas.scaleY' | t"
               >
                 <div class="scale-cube"></div>
                 <div class="scale-line"></div>
@@ -150,7 +150,7 @@
         <div class="drop-zone-overlay">
           <div class="drop-zone-badge">
             <i class="bi bi-file-earmark-arrow-down icon-drop"></i>
-            <span>Rilascia lo sprite qui</span>
+            <span>{{ 'sceneEditor.canvas.dropSprite' | t }}</span>
           </div>
         </div>
       }
@@ -158,12 +158,11 @@
   } @else {
     <div class="scene-empty-stage">
       <i class="bi bi-film empty-stage-icon"></i>
-      <h2>Nessuna Scena Selezionata</h2>
-      <p>Crea o seleziona una stanza per iniziare a configurarla.</p>
+      <h2>{{ 'sceneEditor.canvas.noSceneTitle' | t }}</h2>
+      <p>{{ 'sceneEditor.canvas.noSceneText' | t }}</p>
       <button type="button" class="btn-create-first-scene" (click)="createSceneRequested.emit()">
         <i class="bi bi-plus-lg"></i>
-        <span>Aggiungi Scena</span>
-      </button>
+        <span>{{ 'sceneEditor.canvas.addScene' | t }}</span>      </button>
     </div>
   }
 </section>

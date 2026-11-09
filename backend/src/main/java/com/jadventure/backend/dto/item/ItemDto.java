@@ -19,15 +19,15 @@ public class ItemDto {
 
     private Long id;
 
-    @NotBlank(message = "{validation.item.code.required}")
-    @Size(max = 50, message = "{validation.item.code.size}")
+    @NotBlank(message = "validation.item.code.required")
+    @Size(max = 50, message = "validation.item.code.size")
     private String code;
 
-    @NotBlank(message = "{validation.item.name.required}")
-    @Size(max = 100, message = "{validation.item.name.size}")
+    @NotBlank(message = "validation.item.name.required")
+    @Size(max = 100, message = "validation.item.name.size")
     private String name;
 
-    @Size(max = 1000, message = "{validation.description.size}")
+    @Size(max = 1000, message = "validation.description.size")
     private String description;
 
     private String imageUrl;

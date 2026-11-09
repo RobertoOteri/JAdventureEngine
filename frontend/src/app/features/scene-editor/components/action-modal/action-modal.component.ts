@@ -1,6 +1,9 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EditorStore } from '../../store/editor.store';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { TranslationKey } from '../../../../core/i18n/i18n.types';
+import { ACTION_TYPE_KEYS, EFFECT_TYPE_KEYS, PRECONDITION_TYPE_KEYS } from '../../../../core/i18n/enum-labels';
 import {
   Action,
   ActionType,
@@ -21,7 +24,7 @@ import { nodeLabel } from '../../../../core/utils/node-label';
 @Component({
   selector: 'app-action-modal',
   standalone: true,
-  imports: [FormsModule, TextBoxPlacerComponent],
+  imports: [FormsModule, TextBoxPlacerComponent, TranslatePipe],
   templateUrl: './action-modal.component.html',
   styleUrl: './action-modal.component.css'
 })
@@ -46,6 +49,10 @@ export class ActionModalComponent {
   readonly dialogueNodes = signal<DialogueNode[]>([]);
   readonly nodeLabel = (node: DialogueNode) => nodeLabel(node, this.i18n);
 
+  readonly actionTypeKeys = ACTION_TYPE_KEYS;
+  readonly preconditionTypeKeys = PRECONDITION_TYPE_KEYS;
+  readonly effectTypeKeys = EFFECT_TYPE_KEYS;
+
   readonly currentItemId = computed(
     () => this.store.combinedSceneList().find((i) => i.code === this.itemCode())?.id ?? null
   );
@@ -61,14 +68,14 @@ export class ActionModalComponent {
     'Trebuchet MS'
   ];
 
-  readonly textColors: readonly { label: string; value: string }[] = [
-    { label: 'Bianco', value: '#ffffff' },
-    { label: 'Nero', value: '#000000' },
-    { label: 'Giallo', value: '#facc15' },
-    { label: 'Rosso', value: '#ef4444' },
-    { label: 'Verde', value: '#22c55e' },
-    { label: 'Azzurro', value: '#38bdf8' },
-    { label: 'Arancione', value: '#f97316' }
+  readonly textColors: readonly { labelKey: TranslationKey; value: string }[] = [
+    { labelKey: 'actionModal.colors.white', value: '#ffffff' },
+    { labelKey: 'actionModal.colors.black', value: '#000000' },
+    { labelKey: 'actionModal.colors.yellow', value: '#facc15' },
+    { labelKey: 'actionModal.colors.red', value: '#ef4444' },
+    { labelKey: 'actionModal.colors.green', value: '#22c55e' },
+    { labelKey: 'actionModal.colors.blue', value: '#38bdf8' },
+    { labelKey: 'actionModal.colors.orange', value: '#f97316' }
   ];
 
   readonly availableActionTypes = computed(() => {
@@ -329,9 +336,9 @@ export class ActionModalComponent {
     this.closeColorMenu();
   }
 
-  colorLabel(value?: string): string {
+  colorLabel(value?: string): TranslationKey {
     const current = value ?? '#ffffff';
-    return this.textColors.find((c) => c.value === current)?.label ?? 'Personalizzato';
+    return this.textColors.find((c) => c.value === current)?.labelKey ?? 'actionModal.colors.custom';
   }
 
   onSubmit(): void {

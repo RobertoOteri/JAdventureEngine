@@ -9,6 +9,8 @@ import { Point2D, SceneCanvasComponent } from './components/scene-canvas/scene-c
 import { InspectorSidebarComponent } from './components/inspector-sidebar/inspector-sidebar.component';
 import { ActionModalComponent } from './components/action-modal/action-modal.component';
 import { AdventureCreateComponent } from '../adventures/pages/adventure-create/adventure-create.component';
+import { TranslationService } from '../../core/i18n/translation.service';
+import {apiErrorMessage} from '../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-scene-editor',
@@ -25,6 +27,7 @@ import { AdventureCreateComponent } from '../adventures/pages/adventure-create/a
   styleUrl: './scene-editor.component.css'
 })
 export class SceneEditorComponent implements OnInit, OnDestroy {
+  private readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly store = inject(EditorStore);
@@ -236,7 +239,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
 
     save$.subscribe({
       next: () => this.cancelDraft(),
-      error: (err: any) => console.error(err?.error?.message || 'Errore salvataggio.')
+      error: (err: any) => console.error(err)
     });
   }
 
@@ -244,14 +247,13 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     const item = this.store.findItemEverywhere(itemCode);
     if (!item?.id) return;
 
-    if (confirm(`Sei sicuro di voler eliminare l'oggetto #${itemCode}?`)) {
-      this.store.deleteItem(item.id).subscribe({
+    if (confirm(this.i18n.t('sceneEditor.confirmDeleteItem', { code: itemCode }))) {      this.store.deleteItem(item.id).subscribe({
         next: () => {
           if (this.editingItemCode() === itemCode) {
             this.cancelDraft();
           }
         },
-        error: (err: any) => console.error(err?.error?.message || 'Errore eliminazione.')
+        error: (err: any) => console.error(err)
       });
     }
   }
@@ -338,7 +340,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       next: () => this.closeActionModal(),
       error: (err: any) => {
         console.error('Errore salvataggio azione:', err);
-        alert(err?.error?.message || "Impossibile salvare l'azione.");
+        alert(apiErrorMessage(err, this.i18n) || this.i18n.t('sceneEditor.actionSaveError'));
       }
     });
   }
@@ -346,7 +348,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
   onDeleteAction(actionId: number): void {
     if (!actionId) return;
 
-    if (confirm('Vuoi rimuovere questa azione?')) {
+    if (confirm(this.i18n.t('sceneEditor.confirmDeleteAction'))) {
       this.store.deleteAction(actionId).subscribe({
         error: (err: any) => console.error('Errore eliminazione azione:', err)
       });
@@ -372,7 +374,7 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
       next: () => {
         this.isAdventureModalOpen.set(false);
       },
-      error: (err: any) => console.error(err?.error?.message || 'Errore modifica avventura.')
+      error: (err: any) => console.error(err)
     });
   }
 

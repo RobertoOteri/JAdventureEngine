@@ -7,6 +7,7 @@ import { GraphicAdventureDto, Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import {apiErrorMessage} from '../../../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-adventure-create',
@@ -109,7 +110,7 @@ export class AdventureCreateComponent {
       error: (err: any) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(
-          err?.error?.message || err?.error?.detail || this.i18n.t('adventureForm.saveError')
+          apiErrorMessage(err, this.i18n) || this.i18n.t('adventureForm.saveError')
         );
       }
     });

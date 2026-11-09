@@ -12,16 +12,16 @@ import lombok.*;
 @AllArgsConstructor
 public class GameActionDto {
 
-    @NotNull(message = "{validation.adventure.id.required}")
+    @NotNull(message = "validation.adventure.id.required")
     private Long adventureId;
 
-    @NotNull(message = "{validation.gameState.required}")
+    @NotNull(message = "validation.gameState.required")
     private GameStateDto gameState;
 
-    @NotBlank(message = "{validation.action.code.required}")
+    @NotBlank(message = "validation.action.code.required")
     private String actionCode;
 
-    @NotNull(message = "{validation.action.type.required}")
+    @NotNull(message = "validation.action.type.required")
     private ActionType actionType;
 
     private String input;

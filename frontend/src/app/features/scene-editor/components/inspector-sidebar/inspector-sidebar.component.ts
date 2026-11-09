@@ -2,18 +2,21 @@ import { Component, effect, inject, input, output, signal } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { EditorStore } from '../../store/editor.store';
 import { Action, Item } from '../../../../core/models';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { ACTION_TYPE_KEYS } from '../../../../core/i18n/enum-labels';
 
 export type ActionKind = 'scene' | 'inventory';
 
 @Component({
   selector: 'app-inspector-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './inspector-sidebar.component.html',
   styleUrl: './inspector-sidebar.component.css'
 })
 export class InspectorSidebarComponent {
   readonly store = inject(EditorStore);
+  readonly actionTypeKeys = ACTION_TYPE_KEYS;
 
   readonly dialogueNodeCount = signal<number | null>(null);
 

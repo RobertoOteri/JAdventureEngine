@@ -19,12 +19,12 @@ public class SceneDto {
 
     private Long id;
 
-    @NotBlank(message = "{validation.scene.code.required}")
-    @Size(max = 50, message = "{validation.scene.code.size}")
+    @NotBlank(message = "validation.scene.code.required")
+    @Size(max = 50, message = "validation.scene.code.size")
     private String code;
 
-    @NotBlank(message = "{validation.scene.name.required}")
-    @Size(max = 100, message = "{validation.scene.name.size}")
+    @NotBlank(message = "validation.scene.name.required")
+    @Size(max = 100, message = "validation.scene.name.size")
     private String name;
 
     private String backgroundImageUrl;

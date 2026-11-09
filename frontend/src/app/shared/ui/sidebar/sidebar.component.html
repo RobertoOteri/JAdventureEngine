@@ -25,15 +25,12 @@
     </a>
   </nav>
 
-  <div class="sidebar-lang">
-    <app-language-switch />
-  </div>
-
   <div class="sidebar-user">
     <a routerLink="/profile" routerLinkActive="active" class="user-link" [title]="'sidebar.myProfile' | t">
       <app-user-avatar [src]="user()?.avatarUrl" [name]="username()" [size]="32" />
       <span class="user-name">{{ username() }}</span>
     </a>
+    <app-language-switch placement="top" align="end" />
     <button
       type="button"
       class="btn-logout"

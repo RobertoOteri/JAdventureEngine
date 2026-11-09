@@ -1,5 +1,6 @@
-import { Component, ElementRef, computed, input, model, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, inject, input, model, viewChild } from '@angular/core';
 import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 
 export type { TextBoxDetail };
 
@@ -29,12 +30,15 @@ const clamp = (v: number, min: number, max: number): number => Math.max(min, Mat
   styleUrl: './textbox-placer.component.css'
 })
 export class TextBoxPlacerComponent {
+  private readonly i18n = inject(TranslationService);
   readonly backgroundUrl = input.required<string>();
   readonly box = model.required<TextBoxDetail>();
   readonly sampleText = input<string>('');
 
   readonly isPlaceholder = computed(() => this.sampleText().trim().length === 0);
-  readonly displayText = computed(() => this.sampleText().trim() || 'Inserisci testo...');
+  readonly displayText = computed(
+    () => this.sampleText().trim() || this.i18n.t('sceneEditor.textboxPlaceholder')
+  );
 
   readonly textColor = computed(() => this.box().color || DEFAULT_COLOR);
 

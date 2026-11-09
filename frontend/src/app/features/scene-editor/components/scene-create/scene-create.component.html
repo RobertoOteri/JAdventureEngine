@@ -1,14 +1,14 @@
 <div class="workspace-screen">
   <header class="workspace-topbar">
     <div class="topbar-left">
-      <button type="button" class="btn-back" (click)="onCancel()" title="Annulla creazione">
+      <button type="button" class="btn-back" (click)="onCancel()" [title]="'sceneEditor.sceneForm.cancelTitle' | t">
         <i class="bi bi-chevron-left icon"></i>
-        <span>Annulla</span>
+        <span>{{ 'common.cancel' | t }}</span>
       </button>
       <div class="crumb-separator">/</div>
       <span class="badge-title">#{{ adventureCode() }}</span>
       <div class="crumb-separator">/</div>
-      <span class="badge-subtitle">{{ isInitialScene() ? 'Scena Iniziale' : 'Nuova Scena' }}</span>
+      <span class="badge-subtitle">{{ (isInitialScene() ? 'sceneEditor.sceneForm.initialBadge' : 'sceneEditor.sceneForm.newBadge') | t }}</span>
     </div>
 
     <div class="topbar-actions">
@@ -20,9 +20,9 @@
       >
         @if (isSubmitting()) {
           <span class="spinner-btn"></span>
-          <span>Salvataggio...</span>
+          <span>{{ 'sceneEditor.sceneForm.saving' | t }}</span>
         } @else {
-          <span>Conferma e Salva</span>
+          <span>{{ 'sceneEditor.sceneForm.submit' | t }}</span>
           <i class="bi bi-arrow-right icon-btn"></i>
         }
       </button>
@@ -40,56 +40,52 @@
     <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">
       <section class="meta-column">
         <div class="column-header">
-          <h1>{{ isInitialScene() ? 'Configura Scena Iniziale' : 'Crea Nuova Scena' }}</h1>
+          <h1>{{ (isInitialScene() ? 'sceneEditor.sceneForm.initialTitle' : 'sceneEditor.sceneForm.newTitle') | t }}</h1>
           <p class="subtitle">
-            {{ isInitialScene()
-            ? 'Questa stanza sarà il punto di partenza del giocatore per la tua avventura.'
-            : 'Aggiungi una nuova stanza all’avventura e definisci il suo identificativo univoco.' }}
+            {{ (isInitialScene() ? 'sceneEditor.sceneForm.initialSubtitle' : 'sceneEditor.sceneForm.newSubtitle') | t }}
           </p>
         </div>
 
         <div class="field-group">
-          <label for="name">Nome della Scena *</label>
+          <label for="name">{{ 'sceneEditor.sceneForm.nameLabel' | t }}</label>
           <input
             id="name"
             type="text"
             formControlName="name"
             class="studio-input"
-            placeholder="es. Atrio del Faro, Bosco Oscuro, Studio..."
+            [placeholder]="'sceneEditor.sceneForm.namePlaceholder' | t"
             [class.input-error]="form.get('name')?.touched && form.get('name')?.invalid"
           />
           @if (form.get('name')?.touched && form.get('name')?.errors?.['required']) {
-            <span class="error-hint">Il nome della stanza è obbligatorio.</span>
+            <span class="error-hint">{{ 'sceneEditor.sceneForm.nameRequired' | t }}</span>
           }
         </div>
 
         <div class="field-group">
-          <label for="code">Codice Univoco Scena (ID) *</label>
+          <label for="code">{{ 'sceneEditor.sceneForm.codeLabel' | t }}</label>
           <input
             id="code"
             type="text"
             formControlName="code"
             class="studio-input"
-            [placeholder]="isInitialScene() ? 'start' : 'es. atrio_faro, bosco_notte'"
+            [placeholder]="isInitialScene() ? 'start' : ('sceneEditor.sceneForm.codePlaceholder' | t)"
             [class.input-error]="form.get('code')?.touched && form.get('code')?.invalid"
           />
           <span class="field-hint">
-            {{ isInitialScene()
-            ? 'ID di avvio predefinito del motore di gioco.'
-            : 'Utilizzato negli hotspot per indirizzare transizioni verso questa stanza.' }}
+            {{ (isInitialScene() ? 'sceneEditor.sceneForm.initialCodeHint' : 'sceneEditor.sceneForm.codeHint') | t }}
           </span>
           @if (form.get('code')?.touched && form.get('code')?.invalid) {
-            <span class="error-hint">Consentiti solo caratteri minuscoli, cifre e underscore (_).</span>
+            <span class="error-hint">{{ 'sceneEditor.sceneForm.codeInvalid' | t }}</span>
           }
         </div>
       </section>
 
       <section class="preview-column">
         <app-file-dropzone
-          label="Sfondo della Stanza *"
-          dropTitle="Trascina lo sfondo della stanza qui"
-          dropSubtitle="oppure clicca per sfogliare i file"
-          hint="PNG, JPG o WEBP consigliati in alta definizione (16:9)"
+          [label]="'sceneEditor.sceneForm.backgroundLabel' | t"
+          [dropTitle]="'sceneEditor.sceneForm.backgroundDropTitle' | t"
+          [dropSubtitle]="'sceneEditor.sceneForm.backgroundDropSubtitle' | t"
+          [hint]="'sceneEditor.sceneForm.backgroundHint' | t"
           (fileChange)="onFileChange($event)"
         />
       </section>

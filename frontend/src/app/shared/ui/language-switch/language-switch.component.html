@@ -1,13 +1,47 @@
-<div class="lang-switch" role="group" [attr.aria-label]="'language.label' | t">
-  @for (lang of languages; track lang) {
-    <button
-      type="button"
-      class="lang-btn"
-      [class.active]="current() === lang"
-      [attr.aria-pressed]="current() === lang"
-      (click)="select(lang)"
+<div class="lang-picker" [class.is-full]="variant() === 'full'" [class.is-open]="isOpen()">
+  <button
+    type="button"
+    class="lang-trigger"
+    (click)="toggle()"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-label]="'language.label' | t"
+    [title]="'language.label' | t"
+  >
+    <i class="bi bi-globe2 trigger-icon"></i>
+    @if (variant() === 'full') {
+      <span class="trigger-name">{{ current().name }}</span>
+    } @else {
+      <span class="trigger-code">{{ current().short }}</span>
+    }
+    <i class="bi bi-chevron-down trigger-chevron"></i>
+  </button>
+
+  @if (isOpen()) {
+    <div
+      class="lang-menu"
+      [class.place-top]="placement() === 'top'"
+      [class.align-end]="align() === 'end'"
+      role="listbox"
+      [attr.aria-label]="'language.label' | t"
     >
-      {{ lang.toUpperCase() }}
-    </button>
+      <span class="menu-title">{{ 'language.label' | t }}</span>
+      @for (option of options; track option.code) {
+        <button
+          type="button"
+          role="option"
+          class="lang-option"
+          [class.selected]="option.code === current().code"
+          [attr.aria-selected]="option.code === current().code"
+          (click)="select(option.code)"
+        >
+          <span class="option-code">{{ option.short }}</span>
+          <span class="option-name">{{ option.name }}</span>
+          @if (option.code === current().code) {
+            <i class="bi bi-check2 option-check"></i>
+          }
+        </button>
+      }
+    </div>
   }
 </div>

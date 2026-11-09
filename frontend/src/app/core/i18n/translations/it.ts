@@ -291,7 +291,8 @@ export const it = {
       noEffect: 'Non sembra avere alcun effetto.',
       cannotCombine: 'Non puoi combinare questi due oggetti.',
       saved: 'Partita salvata con successo!',
-      saveError: 'Errore durante il salvataggio della partita.'
+      saveError: 'Errore durante il salvataggio della partita.',
+      preconditionFailed: 'Non puoi compiere questa azione in questo momento.'
     }
   },
 
@@ -367,6 +368,107 @@ export const it = {
     empty: 'Nessuna precondizione impostata.',
     add: 'Aggiungi precondizione'
   },
+
+  sceneEditor: {
+    confirmDeleteItem: "Sei sicuro di voler eliminare l'oggetto #{code}?",
+    actionSaveError: "Impossibile salvare l'azione.",
+    confirmDeleteAction: 'Vuoi rimuovere questa azione?',
+    textboxPlaceholder: 'Inserisci testo...',
+    header: {
+      back: "Torna all'elenco avventure",
+      adventures: 'Avventure',
+      editInfo: 'Modifica informazioni avventura',
+      draftTitle: 'Stai modificando questa bozza: i giocatori vedono solo le versioni pubblicate',
+      draft: 'Bozza v{version}',
+      vertices: '{count} vertici',
+      undoVertex: 'Annulla ultimo vertice',
+      publishTitle: 'Rendi giocabile la bozza attuale come nuova versione',
+      publish: 'Pubblica',
+      noScene: 'Stanza non selezionata',
+      confirmPublishTitle: 'Pubblicare la bozza?',
+      confirmPublishMessage: 'La bozza diventerà la versione {version}, giocabile da tutti. Le versioni già pubblicate restano disponibili e continuerai a lavorare su una nuova bozza.',
+      publishError: 'Pubblicazione non riuscita'
+    },
+    sidebar: {
+      scenes: 'Scene ({count})',
+      addScene: 'Aggiungi Nuova Stanza',
+      deleteScene: 'Elimina stanza',
+      noScenes: 'Nessuna stanza presente',
+      objects: 'Oggetti ({count})',
+      addObject: 'Aggiungi Nuovo Oggetto (di scena o globale)',
+      globalInventory: 'Inventario Globale',
+      tagGlobal: 'GLOBAL',
+      tagInventory: 'INV',
+      noObjects: 'Nessun oggetto',
+      confirmDeleteScene: 'Sei sicuro di voler eliminare la stanza "{name}"?'
+    },
+    sceneForm: {
+      cancelTitle: 'Annulla creazione',
+      initialBadge: 'Scena Iniziale',
+      newBadge: 'Nuova Scena',
+      saving: 'Salvataggio...',
+      submit: 'Conferma e Salva',
+      initialTitle: 'Configura Scena Iniziale',
+      newTitle: 'Crea Nuova Scena',
+      initialSubtitle: 'Questa stanza sarà il punto di partenza del giocatore per la tua avventura.',
+      newSubtitle: "Aggiungi una nuova stanza all'avventura e definisci il suo identificativo univoco.",
+      nameLabel: 'Nome della Scena *',
+      namePlaceholder: 'es. Atrio del Faro, Bosco Oscuro, Studio...',
+      nameRequired: 'Il nome della stanza è obbligatorio.',
+      codeLabel: 'Codice Univoco Scena (ID) *',
+      codePlaceholder: 'es. atrio_faro, bosco_notte',
+      initialCodeHint: 'ID di avvio predefinito del motore di gioco.',
+      codeHint: 'Utilizzato negli hotspot per indirizzare transizioni verso questa stanza.',
+      codeInvalid: 'Consentiti solo caratteri minuscoli, cifre e underscore (_).',
+      backgroundLabel: 'Sfondo della Stanza *',
+      backgroundDropTitle: 'Trascina lo sfondo della stanza qui',
+      backgroundDropSubtitle: 'oppure clicca per sfogliare i file',
+      backgroundHint: 'PNG, JPG o WEBP consigliati in alta definizione (16:9)',
+      loadError: "Impossibile caricare i dati dell'avventura.",
+      backgroundRequired: 'Lo sfondo della stanza è obbligatorio.',
+      missingAdventure: "Identificativo dell'avventura non disponibile. Riprova.",
+      saveError: 'Errore nel salvataggio della stanza.'
+    },
+    canvas: {
+      loading: 'Caricamento scena...',
+      spriteDraftAlt: 'Bozza Sprite',
+      moveBoth: 'Sposta su entrambi gli assi',
+      moveX: 'Sposta asse X',
+      moveY: 'Sposta asse Y',
+      scaleBoth: 'Stretch libero diagonale',
+      scaleX: 'Stretch larghezza (X)',
+      scaleY: 'Stretch altezza (Y)',
+      dropSprite: 'Rilascia lo sprite qui',
+      noSceneTitle: 'Nessuna Scena Selezionata',
+      noSceneText: 'Crea o seleziona una stanza per iniziare a configurarla.',
+      addScene: 'Aggiungi Scena'
+    },
+    gizmo: {
+      select: 'Selezione (Cursore)',
+      move: 'Sposta Sprite (Assi X/Y)',
+      scale: 'Ridimensiona Sprite',
+      hotspot: 'Disegna Poligono Hotspot'
+    },
+    feedback: {
+      invalidAdventureId: 'Identificativo avventura non valido.',
+      scenesLoadError: 'Impossibile caricare i dati delle scene.',
+      adventureLoadError: "Impossibile caricare l'avventura richiesta.",
+      detailsSaved: 'Dettagli avventura aggiornati con successo!',
+      detailsSaveError: 'Errore durante il salvataggio dei dettagli.',
+      itemSaved: 'Oggetto "{name}" salvato!',
+      saveError: 'Errore salvataggio.',
+      globalItemSaved: 'Oggetto globale "{name}" salvato con successo!',
+      itemSaveError: "Errore durante il salvataggio dell'oggetto.",
+      itemUpdated: 'Oggetto "{name}" aggiornato!',
+      updateError: 'Errore aggiornamento.',
+      publishError: 'Errore durante la pubblicazione.',
+      actionAdded: 'Azione "{type}" aggiunta!',
+      actionSaveError: 'Errore salvataggio azione.',
+      actionUpdated: 'Azione "{type}" modificata con successo!',
+      actionUpdateError: 'Errore aggiornamento azione.'
+    }
+  },
+
   enums: {
     effectType: {
       CHANGE_SCENE: 'Cambia scena',
@@ -384,6 +486,253 @@ export const it = {
       DOES_NOT_HAVE_ITEM: "Non ha l'oggetto",
       FLAG_EQUALS: 'Flag uguale a',
       INPUT_EQUALS: 'Testo inserito uguale a'
+    },
+    actionType: {
+      LOOK_AT: 'Guarda',
+      OPEN: 'Apri',
+      PICK_UP: 'Raccogli',
+      MOVE: 'Muovi',
+      USE: 'Usa',
+      TALK_TO: 'Parla con',
+      USE_WITH: 'Usa con'
     }
   },
+
+  inspector: {
+    hotspots: 'Hotspot ({count})',
+    tagInventory: 'INVENTARIO',
+    tagHidden: 'NASCOSTO',
+    noHotspots: 'Nessun hotspot in questa stanza',
+    editItem: 'Modifica Oggetto',
+    newItem: 'Nuovo Oggetto',
+    noVertices: 'Senza vertici = Globale',
+    nameLabel: 'Nome Oggetto *',
+    namePlaceholder: 'Es. Baule Rinforzato o Chiave Dorata',
+    codeLabel: 'Codice Univoco (ID) *',
+    codePlaceholder: 'Es. chiave_dorata',
+    description: 'Descrizione',
+    descriptionPlaceholder: "Descrizione dell'oggetto...",
+    spriteLabel: 'Sprite / Icona (opzionale)',
+    changeImage: 'Cambia immagine...',
+    chooseImage: 'Scegli immagine dal computer...',
+    visibleAtStart: "Visibile all'inizio",
+    hiddenAtStart: "Nascosto all'inizio",
+    saveChanges: 'Salva Modifiche',
+    confirmSave: 'Conferma e Salva',
+    title: 'Inspector',
+    editItemTitle: 'Modifica oggetto',
+    deleteItemTitle: 'Elimina oggetto',
+    noDescription: 'Nessuna descrizione.',
+    actions: 'Azioni',
+    add: 'Aggiungi',
+    withTarget: 'con #{code}',
+    noMessage: 'Nessun messaggio',
+    editAction: 'Modifica azione',
+    deleteAction: 'Elimina azione',
+    noActions: 'Nessuna azione impostata.',
+    dialogues: 'Dialoghi',
+    dialoguesHint: 'Conversazioni a scelta multipla con questo personaggio.',
+    manageDialogues: 'Gestisci dialoghi',
+    empty: 'Seleziona un oggetto dalla colonna di sinistra o creane uno nuovo con il tasto <strong>+</strong>.'
+  },
+  actionModal: {
+    editTitle: 'Modifica Azione di Gioco',
+    newTitle: 'Nuova Azione di Gioco',
+    subtitle: "Assegna un comportamento all'elemento",
+    typeLabel: 'Tipo di Azione *',
+    useWithTarget: 'Bersaglio / Oggetto con cui interagire o combinare *',
+    selectTarget: '-- Seleziona elemento bersaglio --',
+    successMessage: 'Messaggio di Successo (opzionale)',
+    successPlaceholder: "Es. Hai sbloccato la porta con la chiave d'ottone.",
+    preconditions: 'Precondizioni',
+    addCondition: 'Aggiungi Condizione',
+    inputSolutionPlaceholder: 'Soluzione esatta (es. 1234)',
+    textBoxTitle: 'Dove appare il campo di testo',
+    textBoxHint: "Trascina il box per spostarlo, l'angolo per ridimensionarlo, o disegna un nuovo rettangolo sullo sfondo.",
+    noBackground: 'Seleziona una scena con uno sfondo per posizionare il box.',
+    decreaseSize: 'Riduci dimensione',
+    increaseSize: 'Aumenta dimensione',
+    textColor: 'Colore del testo',
+    preciseValues: 'Valori precisi',
+    width: 'Larghezza',
+    height: 'Altezza',
+    failurePlaceholder: 'Messaggio specifico se non soddisfatta (opzionale)...',
+    noPreconditions: "Nessuna precondizione impostata: l'azione sarà sempre eseguibile.",
+    effects: 'Effetti di Gioco',
+    noDialogue: 'Nessun dialogo salvato per questo oggetto. Crealo con "Gestisci dialoghi" e salvalo.',
+    noEffects: "Nessun effetto impostato: l'azione mostrerà solo il messaggio.",
+    saveChanges: 'Salva Modifiche',
+    saveAction: 'Salva Azione',
+    colors: {
+      white: 'Bianco',
+      black: 'Nero',
+      yellow: 'Giallo',
+      red: 'Rosso',
+      green: 'Verde',
+      blue: 'Azzurro',
+      orange: 'Arancione',
+      custom: 'Personalizzato'
+    }
+  },
+
+  api: {
+    error: {
+      generic: {
+        internal: 'Si è verificato un errore interno del server',
+        badRequest: 'Richiesta non valida',
+        conflict: "Impossibile completare l'operazione"
+      },
+      validation: {
+        generic: 'Dati non validi'
+      },
+      auth: {
+        invalidCredentials: 'Credenziali non valide',
+        usernameTaken: "L'username '{0}' è già in uso",
+        emailTaken: "L'email '{0}' è già associata a un account",
+        notAuthenticated: 'Operazione non consentita: utente non autenticato',
+        notOwner: 'Accesso negato: non sei il proprietario di questa risorsa',
+        forbidden: 'Accesso negato'
+      },
+      user: {
+        authenticatedNotFound: 'Utente autenticato non trovato: {0}'
+      },
+      adventure: {
+        notFoundById: 'Avventura non trovata con ID: {0}',
+        titleTaken: "Esiste già un'avventura con questo titolo",
+        noStartScene: "L'avventura non ha una scena iniziale configurata",
+        versionPublished: 'Questa versione è pubblicata e non può essere modificata',
+        publishNoScenes: "Impossibile pubblicare: l'avventura non contiene scene",
+        publishInvalidStartScene: 'Impossibile pubblicare: scena iniziale non impostata o non valida'
+      },
+      scene: {
+        notFoundById: 'Scena non trovata con ID: {0}',
+        notFoundByCode: 'Scena non trovata: {0}'
+      },
+      item: {
+        notFoundById: 'Oggetto non trovato con ID: {0}',
+        hotspotRequired: 'Un oggetto aggiunto alla scena deve avere un hotspot con dei punti validi'
+      },
+      action: {
+        notFoundById: 'Azione non trovata con ID: {0}',
+        notFoundByCode: 'Azione non trovata con codice: {0}',
+        typeMismatch: 'Tipo di azione non corrispondente: atteso {0} ma ricevuto {1}',
+        duplicateType: "L'oggetto ha già un'azione di tipo {0}",
+        duplicateUseWith: "Esiste già un'azione USE_WITH verso l'oggetto: {0}",
+        useWithTargetRequired: "Per l'azione USE_WITH è obbligatorio specificare targetItemCode",
+        duringDialogue: 'Non puoi compiere azioni durante un dialogo'
+      },
+      game: {
+        stateMissing: 'Stato di gioco mancante',
+        stateOrAdventureMissing: 'Stato di gioco o avventura mancante',
+        alreadyEnded: "L'avventura è già conclusa"
+      },
+      save: {
+        notFound: 'Salvataggio non trovato: {0}',
+        noneForAdventure: "Nessun salvataggio trovato per l'avventura: {0}",
+        autosaveNotFound: 'Autosave non trovato per questa avventura'
+      },
+      dialogue: {
+        nodeNotFound: 'Nodo di dialogo non trovato: {0}',
+        targetNodeNotFound: 'Nodo di destinazione inesistente: {0}',
+        noneActive: 'Nessun dialogo in corso',
+        invalidChoice: 'Scelta non valida per il nodo corrente',
+        choiceUnavailable: 'Scelta non disponibile'
+      },
+      upload: {
+        imageRequired: "Seleziona un'immagine",
+        missingExtension: "Il file caricato non ha un'estensione valida",
+        unsupportedFormat: 'Formato file non supportato. Estensioni consentite: {0}'
+      }
+    },
+    validation: {
+      firstName: {
+        required: 'Il nome è obbligatorio',
+        size: 'Il nome può contenere al massimo 50 caratteri'
+      },
+      lastName: {
+        required: 'Il cognome è obbligatorio',
+        size: 'Il cognome può contenere al massimo 50 caratteri'
+      },
+      email: {
+        required: "L'email è obbligatoria",
+        invalid: 'Inserisci un indirizzo email valido',
+        size: "L'email può contenere al massimo 255 caratteri"
+      },
+      username: {
+        required: 'Lo username è obbligatorio',
+        size: 'Lo username deve contenere dai 3 ai 50 caratteri',
+        pattern: 'Lo username può contenere solo lettere, numeri e i caratteri _ . -'
+      },
+      login: {
+        identifier: {
+          required: 'Inserisci username o email'
+        }
+      },
+      password: {
+        required: 'La password è obbligatoria',
+        size: 'La password deve contenere almeno 8 caratteri'
+      },
+      bio: {
+        size: 'La biografia può contenere al massimo 500 caratteri'
+      },
+      description: {
+        size: 'La descrizione non può superare i 1000 caratteri'
+      },
+      adventure: {
+        id: {
+          required: "L'id dell'avventura è obbligatorio"
+        }
+      },
+      gameState: {
+        required: 'Lo stato di gioco è obbligatorio'
+      },
+      action: {
+        code: {
+          required: "Il codice dell'azione è obbligatorio",
+          size: 'Il codice non può superare i 255 caratteri'
+        },
+        type: {
+          required: 'Il tipo di azione è obbligatorio'
+        }
+      },
+      effect: {
+        type: {
+          required: 'Il tipo di effetto è obbligatorio'
+        }
+      },
+      precondition: {
+        type: {
+          required: 'Il tipo di precondizione è obbligatorio'
+        },
+        key: {
+          required: 'La chiave richiesta è obbligatoria'
+        }
+      },
+      item: {
+        code: {
+          required: "Il codice dell'item è obbligatorio",
+          size: "Il codice dell'item non può superare i 50 caratteri"
+        },
+        name: {
+          required: "Il nome dell'item è obbligatorio",
+          size: "Il nome dell'item non può superare i 100 caratteri"
+        }
+      },
+      scene: {
+        code: {
+          required: 'Il codice della scena è obbligatorio',
+          size: 'Il codice della scena non può superare i 50 caratteri'
+        },
+        name: {
+          required: 'Il nome della scena è obbligatorio',
+          size: 'Il nome della scena non può superare i 100 caratteri'
+        }
+      },
+      hotspot: {
+        points: {
+          size: 'I punti non possono superare i 1000 caratteri'
+        }
+      }
+    }
+  }
 };

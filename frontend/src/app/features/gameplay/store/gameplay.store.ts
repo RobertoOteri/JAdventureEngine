@@ -17,6 +17,7 @@ import {
   DialogueNode
 } from '../../../core/models';
 import { TextBoxDetail } from '../../../core/models/textbox-detail.model';
+import {apiErrorMessage} from '../../../core/utils/http-error.util';
 
 export interface RadialMenuState {
   isOpen: boolean;
@@ -457,8 +458,7 @@ export const GameplayStore = signalStore(
 
                 if (!completed) {
                   setFeedbackMessage(
-                    result.feedbackMessage || i18n.t(result.success ? 'gameplay.feedback.actionDone' : 'gameplay.feedback.nothingHappens')
-                  );
+                    result.feedbackMessage || i18n.t(result.success ? 'gameplay.feedback.actionDone' : 'gameplay.feedback.preconditionFailed')                  );
                 }
                 closeRadialMenu();
 
@@ -474,8 +474,7 @@ export const GameplayStore = signalStore(
                 console.error('Errore durante l\'esecuzione dell\'azione:', err);
                 const msg =
                   err?.error?.feedbackMessage ||
-                  err?.error?.message ||
-                  err?.message ||
+                  apiErrorMessage(err, i18n) ||
                   i18n.t('gameplay.feedback.actionNotAllowed');
                 setFeedbackMessage(msg);
                 closeRadialMenu();
@@ -513,7 +512,7 @@ export const GameplayStore = signalStore(
             }),
             catchError((err: any) => {
               console.error('Errore durante la scelta del dialogo:', err);
-              setFeedbackMessage(err?.error?.message || i18n.t('gameplay.feedback.dialogueError'));
+              setFeedbackMessage(apiErrorMessage(err, i18n) || i18n.t('gameplay.feedback.dialogueError'));
               return EMPTY;
             })
           );

@@ -26,7 +26,8 @@
             <div class="save-info">
               <strong class="save-title">{{ 'gameSaves.autosaveName' | t }}</strong>
               <span class="save-meta">
-              <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ auto.gameState?.currentScene?.code }}</strong>              </span>
+                <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ auto.gameState?.currentScene?.code }}</strong>
+              </span>
             </div>
             <button type="button" class="btn-select-save" [title]="'gameSaves.loadAutosave' | t">
               <i class="bi bi-box-arrow-in-right"></i>
@@ -49,7 +50,7 @@
                   <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ save.gameState?.currentScene?.code }}</strong>
                 </span>
               </div>
-              <button type="button" class="btn-select-save" title="Carica questo salvataggio">
+              <button type="button" class="btn-select-save" [title]="'gameSaves.loadThis' | t">
                 <i class="bi bi-box-arrow-in-right"></i>
                 <span>{{ 'common.load' | t }}</span>
               </button>
@@ -71,6 +72,7 @@
     </div>
 
     <footer class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="close.emit()">{{ 'common.close' | t }}</button>    </footer>
+      <button type="button" class="btn-cancel" (click)="close.emit()">{{ 'common.close' | t }}</button>
+    </footer>
   </div>
 </div>

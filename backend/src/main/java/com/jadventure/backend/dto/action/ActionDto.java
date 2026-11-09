@@ -19,10 +19,10 @@ public class ActionDto {
 
     private Long id;
 
-    @Size(max = 255, message = "{validation.action.code.size}")
+    @Size(max = 255, message = "validation.action.code.size")
     private String code;
 
-    @NotNull(message = "{validation.action.type.required}")
+    @NotNull(message = "validation.action.type.required")
     private ActionType type;
 
     private String successMessage;

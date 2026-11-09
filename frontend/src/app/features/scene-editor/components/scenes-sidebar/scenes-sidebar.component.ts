@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorStore } from '../../store/editor.store';
 import { Item, Scene } from '../../../../core/models';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 export interface SidebarItemEntry {
   item: Item;
@@ -22,11 +24,12 @@ export interface SidebarItemGroup {
 @Component({
   selector: 'app-scenes-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './scenes-sidebar.component.html',
   styleUrl: './scenes-sidebar.component.css'
 })
 export class ScenesSidebarComponent {
+  private readonly i18n = inject(TranslationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly store = inject(EditorStore);
@@ -82,7 +85,7 @@ export class ScenesSidebarComponent {
       ...sceneGroups,
       {
         code: '__global__',
-        name: 'Inventario Globale',
+        name: this.i18n.t('sceneEditor.sidebar.globalInventory'),
         isGlobal: true,
         items: globalItems
       }
@@ -146,7 +149,7 @@ export class ScenesSidebarComponent {
     const advId = this.getAdventureId();
     if (!advId) return;
 
-    if (confirm(`Sei sicuro di voler eliminare la stanza "${scene.name}"?`)) {
+    if (confirm(this.i18n.t('sceneEditor.sidebar.confirmDeleteScene', { name: scene.name }))) {
       this.store.deleteScene(scene.id).subscribe({
         next: () => {
           const remaining = this.store.scenes();
@@ -156,7 +159,7 @@ export class ScenesSidebarComponent {
             void this.router.navigate(['/editor', advId]);
           }
         },
-        error: (err: any) => console.error(err?.error?.message || 'Errore eliminazione scena')
+        error: (err: any) => console.error(err)
       });
     }
   }

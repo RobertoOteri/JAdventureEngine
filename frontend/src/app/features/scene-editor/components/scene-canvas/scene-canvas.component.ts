@@ -13,6 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { EditorStore } from '../../store/editor.store';
 import { Item } from '../../../../core/models';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { SceneGizmoToolbarComponent, UnityGizmoTool } from '../scene-gizmo-toolbar/scene-gizmo-toolbar.component';
 
 export interface Point2D {
@@ -23,7 +24,7 @@ export interface Point2D {
 @Component({
   selector: 'app-scene-canvas',
   standalone: true,
-  imports: [CommonModule, SceneGizmoToolbarComponent],
+  imports: [CommonModule, SceneGizmoToolbarComponent, TranslatePipe],
   templateUrl: './scene-canvas.component.html',
   styleUrl: './scene-canvas.component.css'
 })

@@ -3,7 +3,7 @@
     <div class="properties-header">
       <div class="header-title">
         <i class="bi bi-bounding-box-circles icon-header"></i>
-        <h2>Hotspot ({{ store.currentScene()?.items?.length || 0 }})</h2>
+        <h2>{{ 'inspector.hotspots' | t: { count: store.currentScene()?.items?.length || 0 } }}</h2>
       </div>
     </div>
 
@@ -22,10 +22,10 @@
 
                 <div class="row-tags">
                   @if (hasPickUp(item)) {
-                    <span class="tag tag-inventory">INVENTORY</span>
+                    <span class="tag tag-inventory">{{ 'inspector.tagInventory' | t }}</span>
                   }
                   @if (item.hotspot && item.hotspot.initiallyVisible === false) {
-                    <span class="tag tag-hidden">NASCOSTO</span>
+                    <span class="tag tag-hidden">{{ 'inspector.tagHidden' | t }}</span>
                   }
                 </div>
               </div>
@@ -35,7 +35,7 @@
       } @empty {
         <div class="hotspots-empty">
           <i class="bi bi-inbox icon-empty"></i>
-          <span>Nessun hotspot in questa stanza</span>
+          <span>{{ 'inspector.noHotspots' | t }}</span>
         </div>
       }
     </div>
@@ -48,29 +48,29 @@
       <div class="creation-box custom-scroll">
         <div class="creation-box-header">
           <span class="section-tag">
-            {{ editingItemCode() ? 'Modifica Oggetto' : 'Nuovo Oggetto' }}
+            {{ (editingItemCode() ? 'inspector.editItem' : 'inspector.newItem') | t }}
           </span>
           @if (draftPointsCount() > 0) {
-            <span class="tag-points-count">{{ draftPointsCount() }} vertici</span>
+            <span class="tag-points-count">{{ 'sceneEditor.header.vertices' | t: { count: draftPointsCount() } }}</span>
           } @else {
-            <span class="tag-points-count">Senza vertici = Globale</span>
+            <span class="tag-points-count">{{ 'inspector.noVertices' | t }}</span>
           }
         </div>
 
         <div class="field-group">
-          <label for="hotspotNameInput">Nome Oggetto *</label>
+          <label for="hotspotNameInput">{{ 'inspector.nameLabel' | t }}</label>
           <input
             id="hotspotNameInput"
             type="text"
             class="studio-input"
             [value]="itemName()"
             (input)="onNameInput($event)"
-            placeholder="Es. Baule Rinforzato o Chiave Dorata"
+            [placeholder]="'inspector.namePlaceholder' | t"
           />
         </div>
 
         <div class="field-group">
-          <label for="hotspotCodeInput">Codice Univoco (ID) *</label>
+          <label for="hotspotCodeInput">{{ 'inspector.codeLabel' | t }}</label>
           <input
             id="hotspotCodeInput"
             type="text"
@@ -78,24 +78,24 @@
             [value]="itemCode()"
             (input)="onCodeInput($event)"
             [disabled]="!!editingItemCode()"
-            placeholder="Es. chiave_dorata"
+            [placeholder]="'inspector.codePlaceholder' | t"
           />
         </div>
 
         <div class="field-group">
-          <label for="hotspotDescriptionInput">Descrizione</label>
+          <label for="hotspotDescriptionInput">{{ 'inspector.description' | t }}</label>
           <textarea
             id="hotspotDescriptionInput"
             class="studio-input studio-textarea"
             [value]="itemDescription()"
             (input)="onDescriptionInput($event)"
-            placeholder="Descrizione dell'oggetto..."
+            [placeholder]="'inspector.descriptionPlaceholder' | t"
             rows="2"
           ></textarea>
         </div>
 
         <div class="field-group file-field-group">
-          <label>Sprite / Icona (opzionale)</label>
+          <label>{{ 'inspector.spriteLabel' | t }}</label>
           <div class="file-picker-wrap">
             <input
               type="file"
@@ -107,7 +107,7 @@
             <label for="sceneSpriteInput" class="file-custom-btn highlight-picker">
               <i class="bi bi-image icon-file"></i>
               <span class="file-btn-text">
-                {{ sceneImageFile() ? sceneImageFile()?.name : (previewSpriteUrl() ? 'Cambia immagine...' : 'Scegli immagine dal computer...') }}
+                {{ sceneImageFile() ? sceneImageFile()?.name : ((previewSpriteUrl() ? 'inspector.changeImage' : 'inspector.chooseImage') | t) }}
               </span>
             </label>
           </div>
@@ -124,7 +124,7 @@
               />
               <span class="toggle-text">
                 <i class="bi" [class.bi-eye]="isInitiallyVisible()" [class.bi-eye-slash]="!isInitiallyVisible()"></i>
-                <span>{{ isInitiallyVisible() ? 'Visibile all\'inizio' : 'Nascosto all\'inizio' }}</span>
+                <span>{{ (isInitiallyVisible() ? 'inspector.visibleAtStart' : 'inspector.hiddenAtStart') | t }}</span>
               </span>
             </label>
           </div>
@@ -133,10 +133,10 @@
         <div class="actions-row">
           <button type="button" class="btn-save-draft" (click)="saveDraftRequested.emit()">
             <i class="bi bi-check-lg"></i>
-            <span>{{ editingItemCode() ? 'Salva Modifiche' : 'Conferma e Salva' }}</span>
+            <span>{{ (editingItemCode() ? 'inspector.saveChanges' : 'inspector.confirmSave') | t }}</span>
           </button>
           <button type="button" class="btn-cancel-draft" (click)="cancelDraftRequested.emit()">
-            Annulla
+            {{ 'common.cancel' | t }}
           </button>
         </div>
       </div>
@@ -146,7 +146,7 @@
         <div class="inspector-fixed-header">
           <div class="header-title">
             <i class="bi bi-sliders icon-header"></i>
-            <h2>Inspector</h2>
+            <h2>{{ 'inspector.title' | t }}</h2>
           </div>
         </div>
 
@@ -169,8 +169,8 @@
                     type="button"
                     class="tool-btn"
                     (click)="editItemRequested.emit(selected)"
-                    title="Modifica oggetto"
-                    aria-label="Modifica oggetto"
+                    [title]="'inspector.editItemTitle' | t"
+                    [attr.aria-label]="'inspector.editItemTitle' | t"
                   >
                     <i class="bi bi-pencil"></i>
                   </button>
@@ -178,8 +178,8 @@
                     type="button"
                     class="tool-btn danger"
                     (click)="deleteItemRequested.emit(selected.code)"
-                    title="Elimina oggetto"
-                    aria-label="Elimina oggetto"
+                    [title]="'inspector.deleteItemTitle' | t"
+                    [attr.aria-label]="'inspector.deleteItemTitle' | t"
                   >
                     <i class="bi bi-trash3"></i>
                   </button>
@@ -189,20 +189,20 @@
             </header>
 
             <section class="detail-block">
-              <h4>Descrizione</h4>
+              <h4>{{ 'inspector.description' | t }}</h4>
               @if (selected.description) {
                 <p class="description">{{ selected.description }}</p>
               } @else {
-                <p class="description is-empty">Nessuna descrizione.</p>
+                <p class="description is-empty">{{ 'inspector.noDescription' | t }}</p>
               }
             </section>
 
             <section class="detail-block actions-block">
               <div class="block-head">
-                <h4>Azioni <span class="count">{{ selected.actions?.length || 0 }}</span></h4>
+                <h4>{{ 'inspector.actions' | t }} <span class="count">{{ selected.actions?.length || 0 }}</span></h4>
                 <button type="button" class="btn-add-action" (click)="onAddActionClick()">
                   <i class="bi bi-plus-lg"></i>
-                  <span>Aggiungi</span>
+                  <span>{{ 'inspector.add' | t }}</span>
                 </button>
               </div>
 
@@ -217,9 +217,9 @@
 
                     <div class="action-body">
                       <div class="action-line">
-                        <span class="action-type">{{ action.type }}</span>
+                        <span class="action-type">{{ actionTypeKeys[action.type] | t }}</span>
                         @if (action.type === 'USE_WITH' && action.targetItemCode) {
-                          <span class="action-target">con #{{ action.targetItemCode }}</span>
+                          <span class="action-target">{{ 'inspector.withTarget' | t: { code: action.targetItemCode } }}</span>
                         }
                       </div>
 
@@ -228,7 +228,7 @@
                         [class.is-empty]="!action.successMessage"
                         [title]="action.successMessage || ''"
                       >
-                        {{ action.successMessage || 'Nessun messaggio' }}
+                        {{ action.successMessage || ('inspector.noMessage' | t) }}
                       </span>
                     </div>
 
@@ -237,8 +237,8 @@
                         type="button"
                         class="action-btn"
                         (click)="onEditAction(action)"
-                        title="Modifica azione"
-                        aria-label="Modifica azione"
+                        [title]="'inspector.editAction' | t"
+                        [attr.aria-label]="'inspector.editAction' | t"
                       >
                         <i class="bi bi-pencil"></i>
                       </button>
@@ -246,38 +246,38 @@
                         type="button"
                         class="action-btn delete"
                         (click)="onDeleteAction($event, action.id)"
-                        title="Elimina azione"
-                        aria-label="Elimina azione"
+                        [title]="'inspector.deleteAction' | t"
+                        [attr.aria-label]="'inspector.deleteAction' | t"
                       >
                         <i class="bi bi-trash3"></i>
                       </button>
                     </div>
                   </li>
                 } @empty {
-                  <li class="action-empty">Nessuna azione impostata.</li>
+                  <li class="action-empty">{{ 'inspector.noActions' | t }}</li>
                 }
               </ul>
             </section>
 
             <section class="detail-block dialogues-block">
               <h4>
-                Dialoghi
+                {{ 'inspector.dialogues' | t }}
                 @if (dialogueNodeCount() !== null) {
                   <span class="count">{{ dialogueNodeCount() }}</span>
                 }
               </h4>
 
-              <p class="dialogues-hint">Conversazioni a scelta multipla con questo personaggio.</p>
+              <p class="dialogues-hint">{{ 'inspector.dialoguesHint' | t }}</p>
 
               <button
                 type="button"
                 class="btn-manage-dialogues"
                 (click)="openDialoguesRequested.emit(selected)"
               >
-    <span class="btn-manage-left">
-      <i class="bi bi-chat-quote"></i>
-      <span>Gestisci dialoghi</span>
-    </span>
+                <span class="btn-manage-left">
+                  <i class="bi bi-chat-quote"></i>
+                  <span>{{ 'inspector.manageDialogues' | t }}</span>
+                </span>
                 <i class="bi bi-arrow-right btn-manage-arrow"></i>
               </button>
             </section>
@@ -287,7 +287,7 @@
       } @else {
         <div class="properties-empty">
           <i class="bi bi-bounding-box empty-icon"></i>
-          <p>Seleziona un oggetto dalla colonna di sinistra o creane uno nuovo con il tasto <strong>+</strong>.</p>
+          <p [innerHTML]="'inspector.empty' | t"></p>
         </div>
       }
     }

@@ -7,13 +7,13 @@
           <i class="bi bi-lightning-charge-fill"></i>
         </div>
         <div>
-          <h3>{{ actionToEdit() ? 'Modifica Azione di Gioco' : 'Nuova Azione di Gioco' }}</h3>
+          <h3>{{ (actionToEdit() ? 'actionModal.editTitle' : 'actionModal.newTitle') | t }}</h3>
           <span class="modal-subtitle">
-            Assegna un comportamento all'elemento <strong>#{{ itemCode() }}</strong>
+            {{ 'actionModal.subtitle' | t }} <strong>#{{ itemCode() }}</strong>
           </span>
         </div>
       </div>
-      <button type="button" class="btn-close" (click)="closeRequested.emit()" title="Chiudi finestra">
+      <button type="button" class="btn-close" (click)="closeRequested.emit()" [title]="'common.closeWindow' | t">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
@@ -21,10 +21,10 @@
     <div class="modal-body custom-scroll">
       <div class="main-fields">
         <div class="field-group">
-          <label for="actionTypeSelect">Tipo di Azione *</label>
+          <label for="actionTypeSelect">{{ 'actionModal.typeLabel' | t }}</label>
           <select id="actionTypeSelect" class="studio-select" [(ngModel)]="actionType">
             @for (type of availableActionTypes(); track type) {
-              <option [value]="type">{{ type }}</option>
+              <option [value]="type">{{ actionTypeKeys[type] | t }}</option>
             }
           </select>
         </div>
@@ -33,10 +33,10 @@
           <div class="field-group">
             <label for="withInvItemSelect">
               <i class="bi bi-arrow-left-right"></i>
-              Bersaglio / Oggetto con cui interagire o combinare *
+              {{ 'actionModal.useWithTarget' | t }}
             </label>
             <select id="withInvItemSelect" class="studio-select" [(ngModel)]="targetItemCode">
-              <option value="" disabled>-- Seleziona elemento bersaglio --</option>
+              <option value="" disabled>{{ 'actionModal.selectTarget' | t }}</option>
               @for (sceneItem of availableUseWithOptions().sceneItems; track sceneItem.code) {
                 <option [value]="sceneItem.code">
                   {{ sceneItem.name }} (#{{ sceneItem.code }})
@@ -47,13 +47,13 @@
         }
 
         <div class="field-group">
-          <label for="successMsgInput">Messaggio di Successo (opzionale)</label>
+          <label for="successMsgInput">{{ 'actionModal.successMessage' | t }}</label>
           <input
             id="successMsgInput"
             type="text"
             class="studio-input"
             [(ngModel)]="actionSuccessMsg"
-            placeholder="Es. Hai sbloccato la porta con la chiave d'ottone."
+            [placeholder]="'actionModal.successPlaceholder' | t"
           />
         </div>
       </div>
@@ -63,13 +63,13 @@
           <div class="section-title">
             <span class="color-badge badge-amber"></span>
             <i class="bi bi-shield-check icon-theme-amber"></i>
-            <h4>Precondizioni</h4>
+            <h4>{{ 'actionModal.preconditions' | t }}</h4>
             <span class="count-pill amber">{{ actionPreconditions().length }}</span>
           </div>
 
           <button type="button" class="btn-sub-add amber" (click)="addPrecondition()">
             <i class="bi bi-plus-lg"></i>
-            <span>Aggiungi Condizione</span>
+            <span>{{ 'actionModal.addCondition' | t }}</span>
           </button>
         </div>
 
@@ -80,7 +80,7 @@
                 <div class="rule-type-col">
                   <select class="studio-select" [(ngModel)]="prec.type">
                     @for (pt of preconditionTypes; track pt) {
-                      <option [value]="pt">{{ pt }}</option>
+                      <option [value]="pt">{{ preconditionTypeKeys[pt] | t }}</option>
                     }
                   </select>
                 </div>
@@ -88,7 +88,7 @@
                 <div class="rule-val-col">
                   @if (prec.type === 'HAS_ITEM' || prec.type === 'DOES_NOT_HAVE_ITEM') {
                     <select class="studio-select" [(ngModel)]="prec.requiredKey">
-                      <option value="" disabled>-- Seleziona oggetto --</option>
+                      <option value="" disabled>{{ 'effectsEditor.selectItem' | t }}</option>
                       @for (inv of availableInventoryItems(); track inv.code) {
                         <option [value]="inv.code">{{ inv.name }} (#{{ inv.code }})</option>
                       }
@@ -98,7 +98,7 @@
                       type="text"
                       class="studio-input code-input"
                       [(ngModel)]="prec.expectedValue"
-                      placeholder="Soluzione esatta (es. 1234)"
+                      [placeholder]="'actionModal.inputSolutionPlaceholder' | t"
                       autocomplete="off"
                       spellcheck="false"
                     />
@@ -108,7 +108,7 @@
                         type="text"
                         class="studio-input"
                         [(ngModel)]="prec.requiredKey"
-                        placeholder="Nome Flag (es. porta_aperta)"
+                        [placeholder]="'preconditionsEditor.flagNamePlaceholder' | t"
                         list="flagKeysList"
                       />
                       <datalist id="flagKeysList">
@@ -121,7 +121,7 @@
                         type="text"
                         class="studio-input"
                         [(ngModel)]="prec.expectedValue"
-                        placeholder="Valore atteso (es. true o 100)"
+                        [placeholder]="'preconditionsEditor.expectedValuePlaceholder' | t"
                       />
                     </div>
                   }
@@ -131,7 +131,7 @@
                   type="button"
                   class="btn-del-rule"
                   (click)="removePrecondition($index)"
-                  title="Rimuovi precondizione"
+                  [title]="'preconditionsEditor.remove' | t"
                 >
                   <i class="bi bi-trash3"></i>
                 </button>
@@ -143,11 +143,9 @@
                     <div class="panel-head">
                       <div class="panel-title">
                         <i class="bi bi-input-cursor-text"></i>
-                        <span>Dove appare il campo di testo</span>
+                        <span>{{ 'actionModal.textBoxTitle' | t }}</span>
                       </div>
-                      <span class="panel-hint">
-                        Trascina il box per spostarlo, l'angolo per ridimensionarlo, o disegna un nuovo rettangolo sullo sfondo.
-                      </span>
+                      <span class="panel-hint">{{ 'actionModal.textBoxHint' | t }}</span>
                     </div>
 
                     @if (backgroundUrl()) {
@@ -160,7 +158,7 @@
                     } @else {
                       <div class="empty-rules amber">
                         <i class="bi bi-info-circle"></i>
-                        <span>Seleziona una scena con uno sfondo per posizionare il box.</span>
+                        <span>{{ 'actionModal.noBackground' | t }}</span>
                       </div>
                     }
 
@@ -176,11 +174,11 @@
                       </select>
 
                       <div class="font-stepper">
-                        <button type="button" (click)="stepFont(prec, -2)" title="Riduci dimensione">
+                        <button type="button" (click)="stepFont(prec, -2)" [title]="'actionModal.decreaseSize' | t">
                           <i class="bi bi-dash"></i>
                         </button>
                         <span>{{ tb.fontSize }}</span>
-                        <button type="button" (click)="stepFont(prec, 2)" title="Aumenta dimensione">
+                        <button type="button" (click)="stepFont(prec, 2)" [title]="'actionModal.increaseSize' | t">
                           <i class="bi bi-plus"></i>
                         </button>
                       </div>
@@ -189,11 +187,11 @@
                         <button
                           type="button"
                           class="color-trigger"
-                          title="Colore del testo"
+                          [title]="'actionModal.textColor' | t"
                           (click)="toggleColorMenu($index)"
                         >
                           <span class="color-dot" [style.background]="tb.color ?? '#ffffff'"></span>
-                          <span>{{ colorLabel(tb.color) }}</span>
+                          <span>{{ colorLabel(tb.color) | t }}</span>
                           <i class="bi bi-chevron-down"></i>
                         </button>
 
@@ -209,7 +207,7 @@
                                   (click)="pickColor(prec, c.value)"
                                 >
                                   <span class="color-dot" [style.background]="c.value"></span>
-                                  <span>{{ c.label }}</span>
+                                  <span>{{ c.labelKey | t }}</span>
                                   @if ((tb.color ?? '#ffffff') === c.value) {
                                     <i class="bi bi-check2 color-check"></i>
                                   }
@@ -222,7 +220,7 @@
                     </div>
 
                     <details class="precise-values">
-                      <summary>Valori precisi</summary>
+                      <summary>{{ 'actionModal.preciseValues' | t }}</summary>
                       <div class="textbox-config-grid">
                         <div class="config-field">
                           <label>X</label>
@@ -233,11 +231,11 @@
                           <input type="number" class="studio-input" [ngModel]="tb.posY" (ngModelChange)="patchBox(prec, { posY: $event })" />
                         </div>
                         <div class="config-field">
-                          <label>Larghezza</label>
+                          <label>{{ 'actionModal.width' | t }}</label>
                           <input type="number" class="studio-input" [ngModel]="tb.width" (ngModelChange)="patchBox(prec, { width: $event })" />
                         </div>
                         <div class="config-field">
-                          <label>Altezza</label>
+                          <label>{{ 'actionModal.height' | t }}</label>
                           <input type="number" class="studio-input" [ngModel]="tb.height" (ngModelChange)="patchBox(prec, { height: $event })" />
                         </div>
                       </div>
@@ -253,7 +251,7 @@
                     type="text"
                     class="studio-input sub-input"
                     [(ngModel)]="prec.failureMessage"
-                    placeholder="Messaggio specifico se non soddisfatta (opzionale)..."
+                    [placeholder]="'actionModal.failurePlaceholder' | t"
                   />
                 </div>
               </div>
@@ -261,7 +259,7 @@
           } @empty {
             <div class="empty-rules amber">
               <i class="bi bi-info-circle"></i>
-              <span>Nessuna precondizione impostata: l'azione sarà sempre eseguibile.</span>
+              <span>{{ 'actionModal.noPreconditions' | t }}</span>
             </div>
           }
         </div>
@@ -272,13 +270,13 @@
           <div class="section-title">
             <span class="color-badge badge-cyan"></span>
             <i class="bi bi-magic icon-theme-cyan"></i>
-            <h4>Effetti di Gioco</h4>
+            <h4>{{ 'actionModal.effects' | t }}</h4>
             <span class="count-pill cyan">{{ actionEffects().length }}</span>
           </div>
 
           <button type="button" class="btn-sub-add cyan" (click)="addEffect()">
             <i class="bi bi-plus-lg"></i>
-            <span>Aggiungi Effetto</span>
+            <span>{{ 'effectsEditor.add' | t }}</span>
           </button>
         </div>
 
@@ -292,7 +290,7 @@
                   (ngModelChange)="onEffectTypeChange(eff, $event)"
                 >
                   @for (et of effectTypes; track et) {
-                    <option [value]="et">{{ et }}</option>
+                    <option [value]="et">{{ effectTypeKeys[et] | t }}</option>
                   }
                 </select>
               </div>
@@ -300,21 +298,21 @@
               <div class="rule-val-col">
                 @if (eff.type === 'CHANGE_SCENE') {
                   <select class="studio-select" [(ngModel)]="eff.targetValue">
-                    <option value="" disabled>-- Seleziona stanza di destinazione --</option>
+                    <option value="" disabled>{{ 'effectsEditor.selectScene' | t }}</option>
                     @for (scene of availableSceneOptions(); track scene.code) {
                       <option [value]="scene.code">{{ scene.name }} (#{{ scene.code }})</option>
                     }
                   </select>
                 } @else if (eff.type === 'ADD_ITEM' || eff.type === 'REMOVE_ITEM') {
                   <select class="studio-select" [(ngModel)]="eff.targetValue">
-                    <option value="" disabled>-- Seleziona oggetto --</option>
+                    <option value="" disabled>{{ 'effectsEditor.selectItem' | t }}</option>
                     @for (inv of availableInventoryItems(); track inv.code) {
                       <option [value]="inv.code">{{ inv.name }} (#{{ inv.code }})</option>
                     }
                   </select>
                 } @else if (eff.type === 'SHOW_SCENE_ITEM' || eff.type === 'HIDE_SCENE_ITEM') {
                   <select class="studio-select" [(ngModel)]="eff.targetValue">
-                    <option value="" disabled>-- Seleziona elemento con hotspot --</option>
+                    <option value="" disabled>{{ 'effectsEditor.selectHotspotItem' | t }}</option>
                     @for (it of sceneItemsWithHotspot(); track it.code) {
                       <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
                     }
@@ -322,12 +320,12 @@
                 } @else if (eff.type === 'END_ADVENTURE') {
                   <div class="rule-hint">
                     <i class="bi bi-flag-fill"></i>
-                    <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
+                    <span>{{ 'effectsEditor.endAdventureHint' | t }}</span>
                   </div>
                 } @else if (eff.type === 'START_DIALOGUE') {
                   @if (dialogueNodes().length > 0) {
                     <select class="studio-select" [(ngModel)]="eff.targetValue">
-                      <option value="" disabled>-- Seleziona nodo da cui iniziare --</option>
+                      <option value="" disabled>{{ 'effectsEditor.selectStartNode' | t }}</option>
                       @for (node of dialogueNodes(); track node.code) {
                         <option [value]="node.code">{{ nodeLabel(node) }}</option>
                       }
@@ -335,7 +333,7 @@
                   } @else {
                     <div class="rule-hint">
                       <i class="bi bi-chat-quote"></i>
-                      <span>Nessun dialogo salvato per questo oggetto. Crealo con "Gestisci dialoghi" e salvalo.</span>
+                      <span>{{ 'actionModal.noDialogue' | t }}</span>
                     </div>
                   }
                 } @else if (eff.type === 'SET_FLAG') {
@@ -344,7 +342,7 @@
                       type="text"
                       class="studio-input"
                       [(ngModel)]="eff.targetValue"
-                      placeholder="Chiave (es. punteggio)"
+                      [placeholder]="'effectsEditor.flagKeyPlaceholder' | t"
                       list="flagKeysList"
                     />
                     <span class="equals-sign">=</span>
@@ -352,7 +350,7 @@
                       type="text"
                       class="studio-input"
                       [(ngModel)]="eff.flagValue"
-                      placeholder="Valore (es. 100 o true)"
+                      [placeholder]="'effectsEditor.flagValuePlaceholder' | t"
                     />
                   </div>
                 }
@@ -362,7 +360,7 @@
                 type="button"
                 class="btn-del-rule"
                 (click)="removeEffect($index)"
-                title="Rimuovi effetto"
+                [title]="'effectsEditor.remove' | t"
               >
                 <i class="bi bi-trash3"></i>
               </button>
@@ -370,7 +368,7 @@
           } @empty {
             <div class="empty-rules cyan">
               <i class="bi bi-info-circle"></i>
-              <span>Nessun effetto impostato: l'azione mostrerà solo il messaggio.</span>
+              <span>{{ 'actionModal.noEffects' | t }}</span>
             </div>
           }
         </div>
@@ -379,11 +377,11 @@
 
     <footer class="modal-footer">
       <button type="button" class="btn-cancel" (click)="closeRequested.emit()">
-        Annulla
+        {{ 'common.cancel' | t }}
       </button>
       <button type="button" class="btn-save" (click)="onSubmit()">
         <i class="bi bi-check2"></i>
-        <span>{{ actionToEdit() ? 'Salva Modifiche' : 'Salva Azione' }}</span>
+        <span>{{ (actionToEdit() ? 'actionModal.saveChanges' : 'actionModal.saveAction') | t }}</span>
       </button>
     </footer>
   </div>
