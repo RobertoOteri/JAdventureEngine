@@ -1,6 +1,6 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
-  <div class="leaderboard-card" role="dialog" aria-label="Classifica">
-    <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi" aria-label="Chiudi">
+  <div class="leaderboard-card" role="dialog" [attr.aria-label]="'leaderboard.title' | t">
+    <button type="button" class="btn-close" (click)="close.emit()" [title]="'common.close' | t" [attr.aria-label]="'common.close' | t">
       <i class="bi bi-x-lg"></i>
     </button>
 
@@ -9,9 +9,9 @@
         <i class="bi bi-trophy-fill"></i>
       </div>
       <div class="header-texts">
-        <span class="header-kicker">Classifica</span>
-        <h2 class="leaderboard-title">{{ adventureTitle() || 'Migliori tempi' }}</h2>
-        <p class="header-sub">Il miglior tempo di completamento di ogni giocatore</p>
+        <span class="header-kicker">{{ 'leaderboard.title' | t }}</span>
+        <h2 class="leaderboard-title">{{ adventureTitle() || ('leaderboard.fallbackTitle' | t) }}</h2>
+        <p class="header-sub">{{ 'leaderboard.subtitle' | t }}</p>
       </div>
     </header>
 
@@ -22,10 +22,10 @@
             <div class="skeleton-row"></div>
           }
         </div>
-      } @else if (errorMessage()) {
+      } @else if (errorMessage(); as errorKey) {
         <div class="state-box error">
           <i class="bi bi-exclamation-circle"></i>
-          <span>{{ errorMessage() }}</span>
+          <span>{{ errorKey | t }}</span>
         </div>
       } @else if (entries().length > 0) {
         <div class="podium">
@@ -83,12 +83,16 @@
         }
 
         <p class="list-footer">
-          {{ entries().length === 1 ? '1 giocatore in classifica' : entries().length + ' giocatori in classifica' }}
+          @if (entries().length === 1) {
+            {{ 'leaderboard.playersOne' | t }}
+          } @else {
+            {{ 'leaderboard.players' | t: { count: entries().length } }}
+          }
         </p>
       } @else {
         <div class="state-box">
           <i class="bi bi-compass"></i>
-          <span>Ancora nessuno ha completato questa storia. Sii il primo!</span>
+          <span>{{ 'leaderboard.empty' | t }}</span>
         </div>
       }
     </div>

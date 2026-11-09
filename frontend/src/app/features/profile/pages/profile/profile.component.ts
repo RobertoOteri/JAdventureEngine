@@ -6,6 +6,7 @@ import { UserService } from '../../../../core/services/user.service';
 import { httpErrorMessage } from '../../../../core/utils/http-error.util';
 import { SidebarComponent } from '../../../../shared/ui/sidebar/sidebar.component';
 import { UserAvatarComponent } from '../../../../shared/ui/user-avatar/user-avatar.component';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -13,7 +14,7 @@ const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, SidebarComponent, UserAvatarComponent],
+  imports: [ReactiveFormsModule, SidebarComponent, UserAvatarComponent, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -63,11 +64,11 @@ export class ProfileComponent {
     }
 
     if (!AVATAR_TYPES.includes(file.type)) {
-      this.avatarError.set('Usa un\'immagine JPG, PNG o WebP.');
+      this.avatarError.set(this.i18n.t('profile.avatarInvalidType'));
       return;
     }
     if (file.size > MAX_AVATAR_BYTES) {
-      this.avatarError.set('L\'immagine deve pesare al massimo 2 MB.');
+      this.avatarError.set(this.i18n.t('profile.avatarTooLarge'));
       return;
     }
 
@@ -146,14 +147,14 @@ export class ProfileComponent {
       return '';
     }
     if (errors['required']) {
-      return 'Campo obbligatorio';
+      return this.i18n.t('formErrors.required');
     }
     if (errors['email']) {
-      return 'Inserisci un indirizzo email valido';
+      return this.i18n.t('formErrors.email');
     }
     if (errors['maxlength']) {
-      return `Al massimo ${errors['maxlength'].requiredLength} caratteri`;
+      return this.i18n.t('formErrors.maxLength', { n: errors['maxlength'].requiredLength });
     }
-    return 'Valore non valido';
+    return this.i18n.t('common.invalidValue');
   }
 }

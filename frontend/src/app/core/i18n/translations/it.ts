@@ -185,5 +185,35 @@ export const it = {
   },
   versionSelect: {
     latest: 'più recente'
-  }
+  },
+
+  profile: {
+    title: 'Il mio profilo',
+    subtitle: 'La tua foto e i tuoi dati personali',
+    changePhoto: 'Cambia foto',
+    uploadPhoto: 'Carica foto',
+    removePhoto: 'Rimuovi',
+    personalData: 'Dati personali',
+    firstName: 'Nome',
+    lastName: 'Cognome',
+    username: 'Username',
+    email: 'Email',
+    usernameLocked: 'Lo username non si può cambiare',
+    note: "Lo username è visibile agli altri giocatori e non può essere modificato. L'email serve solo per accedere e non viene mostrata.",
+    bio: 'Biografia',
+    bioPlaceholder: 'Racconta qualcosa di te e delle avventure che crei…',
+    saving: 'Salvataggio…',
+    save: 'Salva modifiche',
+    avatarInvalidType: "Usa un'immagine JPG, PNG o WebP.",
+    avatarTooLarge: "L'immagine deve pesare al massimo 2 MB."
+  },
+  leaderboard: {
+    title: 'Classifica',
+    fallbackTitle: 'Migliori tempi',
+    subtitle: 'Il miglior tempo di completamento di ogni giocatore',
+    loadError: 'Impossibile caricare la classifica.',
+    players: '{count} giocatori in classifica',
+    playersOne: '1 giocatore in classifica',
+    empty: 'Ancora nessuno ha completato questa storia. Sii il primo!'
+  },
 };

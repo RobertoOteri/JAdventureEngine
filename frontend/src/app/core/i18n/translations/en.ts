@@ -187,5 +187,35 @@ export const en: Translations = {
   },
   versionSelect: {
     latest: 'latest'
-  }
+  },
+
+  profile: {
+    title: 'My profile',
+    subtitle: 'Your photo and personal details',
+    changePhoto: 'Change photo',
+    uploadPhoto: 'Upload photo',
+    removePhoto: 'Remove',
+    personalData: 'Personal details',
+    firstName: 'First name',
+    lastName: 'Last name',
+    username: 'Username',
+    email: 'Email',
+    usernameLocked: "The username can't be changed",
+    note: 'Your username is visible to other players and cannot be changed. Your email is only used to log in and is never shown.',
+    bio: 'Bio',
+    bioPlaceholder: 'Tell us something about yourself and the adventures you create…',
+    saving: 'Saving…',
+    save: 'Save changes',
+    avatarInvalidType: 'Please use a JPG, PNG or WebP image.',
+    avatarTooLarge: 'The image must be 2 MB or smaller.'
+  },
+  leaderboard: {
+    title: 'Leaderboard',
+    fallbackTitle: 'Best times',
+    subtitle: "Each player's best completion time",
+    loadError: 'Unable to load the leaderboard.',
+    players: '{count} players on the leaderboard',
+    playersOne: '1 player on the leaderboard',
+    empty: 'Nobody has completed this story yet. Be the first!'
+  },
 };

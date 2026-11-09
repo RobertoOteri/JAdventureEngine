@@ -3,6 +3,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { LeaderboardEntryDto } from '../../core/models/leaderboard-entry.model';
 import { LeaderboardService } from '../../core/services/leaderboard.service';
 import { formatPlayTime } from '../../core/utils/time.util';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+import { TranslationKey } from '../../core/i18n/i18n.types';
 
 interface RankedEntry {
   entry: LeaderboardEntryDto;
@@ -12,7 +14,7 @@ interface RankedEntry {
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, TranslatePipe],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.css'
 })
@@ -25,7 +27,7 @@ export class LeaderboardComponent implements OnInit {
 
   readonly entries = signal<LeaderboardEntryDto[]>([]);
   readonly loading = signal<boolean>(true);
-  readonly errorMessage = signal<string>('');
+  readonly errorMessage = signal<TranslationKey | null>(null);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
@@ -53,7 +55,7 @@ export class LeaderboardComponent implements OnInit {
 
   loadLeaderboard(adventureId: number): void {
     this.loading.set(true);
-    this.errorMessage.set('');
+    this.errorMessage.set(null);
 
     this.leaderboardService.getLeaderboard(adventureId).subscribe({
       next: (data) => {
@@ -61,7 +63,7 @@ export class LeaderboardComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage.set('Impossibile caricare la classifica.');
+        this.errorMessage.set('leaderboard.loadError');
         this.loading.set(false);
         console.error('Errore caricamento leaderboard:', err);
       }
