@@ -6,16 +6,21 @@ import { DialogueEditorStore } from './store/dialogue-editor.store';
 import { DialogueNodeListComponent } from './components/dialogue-node-list/dialogue-node-list.component';
 import { DialogueNodeFormComponent } from './components/dialogue-node-form/dialogue-node-form.component';
 import { DialogueChoicesPanelComponent } from './components/dialogue-choices-panel/dialogue-choices-panel.component';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-dialogue-editor',
   standalone: true,
-  imports: [DialogueNodeListComponent, DialogueNodeFormComponent, DialogueChoicesPanelComponent],
+  imports: [DialogueNodeListComponent, DialogueNodeFormComponent, DialogueChoicesPanelComponent, TranslatePipe],
   providers: [DialogueEditorStore],
   templateUrl: './dialogue-editor.component.html',
   styleUrl: './dialogue-editor.component.css'
 })
 export class DialogueEditorComponent implements OnInit {
+
+  private readonly i18n = inject(TranslationService);
+
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly editorStore = inject(EditorStore);
@@ -46,7 +51,7 @@ export class DialogueEditorComponent implements OnInit {
   }
 
   goBack(): void {
-    if (this.store.isDirty() && !confirm('Hai modifiche non salvate. Uscire comunque?')) {
+    if (this.store.isDirty() && !confirm(this.i18n.t('dialogueEditor.confirmLeave'))) {
       return;
     }
 

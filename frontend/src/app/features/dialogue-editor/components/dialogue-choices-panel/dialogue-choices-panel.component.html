@@ -3,11 +3,11 @@
     <div class="list-header">
       <div class="header-title">
         <i class="bi bi-chat-left-text icon-header"></i>
-        <h2>Scelte ({{ node.choices.length }})</h2>
+        <h2>{{ 'dialogueEditor.choices' | t: { count: node.choices.length } }}</h2>
       </div>
       <button type="button" class="btn-add-choice" (click)="addChoice(node.code, node.choices.length)">
         <i class="bi bi-plus-lg"></i>
-        <span>Scelta</span>
+        <span>{{ 'dialogueEditor.addChoice' | t }}</span>
       </button>
     </div>
 
@@ -28,7 +28,7 @@
               ></i>
               <span class="choice-summary">
                 <span class="choice-title" [class.is-empty]="!choice.text.trim()">
-                  {{ choice.text.trim() || 'Scelta senza testo' }}
+                  {{ choice.text.trim() || ('dialogueEditor.untitledChoice' | t) }}
                 </span>
                 <span class="choice-target">
                   <i class="bi bi-arrow-return-right"></i>
@@ -38,13 +38,20 @@
               <span class="choice-badges">
                 @if (choice.preconditions.length) {
                   <span class="badge badge-pre">
-                    {{ choice.preconditions.length }}
-                    {{ choice.preconditions.length === 1 ? 'precondizione' : 'precondizioni' }}
+                    @if (choice.preconditions.length === 1) {
+                      {{ 'dialogueEditor.preconditionCountOne' | t }}
+                    } @else {
+                      {{ 'dialogueEditor.preconditionCount' | t: { count: choice.preconditions.length } }}
+                    }
                   </span>
                 }
                 @if (effectsCount(choice) > 0) {
                   <span class="badge badge-eff">
-                    {{ effectsCount(choice) }} {{ effectsCount(choice) === 1 ? 'effetto' : 'effetti' }}
+                    @if (effectsCount(choice) === 1) {
+                      {{ 'dialogueEditor.effectCountOne' | t }}
+                    } @else {
+                      {{ 'dialogueEditor.effectCount' | t: { count: effectsCount(choice) } }}
+                    }
                   </span>
                 }
               </span>
@@ -52,8 +59,8 @@
             <button
               type="button"
               class="btn-del-choice"
-              title="Elimina scelta"
-              aria-label="Elimina scelta"
+              [title]="'dialogueEditor.deleteChoice' | t"
+              [attr.aria-label]="'dialogueEditor.deleteChoice' | t"
               (click)="removeChoice(node.code, $index)"
             >
               <i class="bi bi-trash3"></i>
@@ -63,12 +70,12 @@
           @if (expandedChoice() === $index) {
             <div class="choice-body">
               <div class="field">
-                <label class="field-label">Testo della scelta</label>
+                <label class="field-label">{{ 'dialogueEditor.choiceText' | t }}</label>
                 <input
                   type="text"
                   class="studio-input"
                   maxlength="1000"
-                  placeholder="Cosa risponde il giocatore"
+                  [placeholder]="'dialogueEditor.choiceTextPlaceholder' | t"
                   [ngModel]="choice.text"
                   (ngModelChange)="onChoiceText(node.code, $index, $event)"
                 />
@@ -76,18 +83,18 @@
 
               <div class="field">
                 <label class="field-label">
-                  <i class="bi bi-arrow-return-right"></i> Porta a
+                  <i class="bi bi-arrow-return-right"></i> {{ 'dialogueEditor.leadsTo' | t }}
                 </label>
                 <select
                   class="studio-select"
                   [ngModel]="targetValue(choice)"
                   (ngModelChange)="onChoiceTarget(node.code, $index, $event)"
                 >
-                  <option [ngValue]="null" disabled>-- Seleziona destinazione --</option>
-                  <option [value]="END_VALUE">Fine dialogo</option>
+                  <option [ngValue]="null" disabled>{{ 'dialogueEditor.selectTarget' | t }}</option>
+                  <option [value]="END_VALUE">{{ 'dialogueEditor.endDialogue' | t }}</option>
                   @for (target of store.nodes(); track target.code) {
                     <option [ngValue]="target.code">
-                      {{ nodeLabel(target) }}{{ target.code === node.code ? ' (questo nodo)' : '' }}
+                      {{ nodeLabel(target) }}{{ target.code === node.code ? ' ' + ('dialogueEditor.thisNode' | t) : '' }}
                     </option>
                   }
                 </select>
@@ -95,7 +102,8 @@
 
               <div class="field">
                 <label class="field-label">
-                  Precondizioni <span class="field-sub">la scelta compare solo se sono tutte vere</span>
+                  {{ 'dialogueEditor.preconditions' | t }}
+                  <span class="field-sub">{{ 'dialogueEditor.preconditionsHint' | t }}</span>
                 </label>
                 <app-preconditions-editor
                   [preconditions]="choice.preconditions"
@@ -106,7 +114,8 @@
 
               <div class="field">
                 <label class="field-label">
-                  Effetti <span class="field-sub">si attivano quando il giocatore sceglie questa risposta</span>
+                  {{ 'dialogueEditor.effects' | t }}
+                  <span class="field-sub">{{ 'dialogueEditor.effectsHint' | t }}</span>
                 </label>
                 <app-effects-editor
                   [effects]="choice.effects"
@@ -122,7 +131,7 @@
       } @empty {
         <div class="choices-empty">
           <i class="bi bi-info-circle"></i>
-          <span>Nessuna scelta: il dialogo termina a questo nodo.</span>
+          <span>{{ 'dialogueEditor.noChoices' | t }}</span>
         </div>
       }
     </div>

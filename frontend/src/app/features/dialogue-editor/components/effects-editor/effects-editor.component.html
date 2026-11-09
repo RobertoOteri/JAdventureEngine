@@ -10,7 +10,7 @@
           (ngModelChange)="changeType(i, $event)"
         >
           @for (et of availableTypes(); track et) {
-            <option [value]="et">{{ et }}</option>
+            <option [value]="et">{{ effectTypeKeys[et] | t }}</option>
           }
         </select>
       </div>
@@ -22,7 +22,7 @@
             [ngModel]="eff.targetValue"
             (ngModelChange)="patch(i, { targetValue: $event })"
           >
-            <option value="" disabled>-- Seleziona stanza di destinazione --</option>
+            <option value="" disabled>{{ 'effectsEditor.selectScene' | t }}</option>
             @for (scene of sceneOptions(); track scene.code) {
               <option [value]="scene.code">{{ scene.name }} (#{{ scene.code }})</option>
             }
@@ -33,7 +33,7 @@
             [ngModel]="eff.targetValue"
             (ngModelChange)="patch(i, { targetValue: $event })"
           >
-            <option value="" disabled>-- Seleziona oggetto --</option>
+            <option value="" disabled>{{ 'effectsEditor.selectItem' | t }}</option>
             @for (item of itemOptions(); track item.code) {
               <option [value]="item.code">{{ item.name }} (#{{ item.code }})</option>
             }
@@ -44,7 +44,7 @@
             [ngModel]="eff.targetValue"
             (ngModelChange)="patch(i, { targetValue: $event })"
           >
-            <option value="" disabled>-- Seleziona elemento con hotspot --</option>
+            <option value="" disabled>{{ 'effectsEditor.selectHotspotItem' | t }}</option>
             @for (item of hotspotItemOptions(); track item.code) {
               <option [value]="item.code">{{ item.name }} (#{{ item.code }})</option>
             }
@@ -55,29 +55,29 @@
             [ngModel]="eff.targetValue"
             (ngModelChange)="patch(i, { targetValue: $event })"
           >
-            <option value="" disabled>-- Seleziona il nodo da cui parte il dialogo --</option>
+            <option value="" disabled>{{ 'effectsEditor.selectStartNode' | t }}</option>
             @for (node of dialogueNodes(); track node.code) {
               <option [value]="node.code">{{ nodeLabel(node) }}</option>
             } @empty {
-              <option value="" disabled>Nessun nodo: crealo prima nell'editor dei dialoghi</option>
+              <option value="" disabled>{{ 'effectsEditor.noNodes' | t }}</option>
             }
           </select>
         } @else if (eff.type === 'END_DIALOGUE') {
           <div class="rule-hint">
             <i class="bi bi-x-circle"></i>
-            <span>Chiude il dialogo dopo aver mostrato il testo del nodo.</span>
+            <span>{{ 'effectsEditor.endDialogueHint' | t }}</span>
           </div>
         } @else if (eff.type === 'END_ADVENTURE') {
           <div class="rule-hint">
             <i class="bi bi-flag-fill"></i>
-            <span>Termina l'avventura: il giocatore vedrà la schermata di fine.</span>
+            <span>{{ 'effectsEditor.endAdventureHint' | t }}</span>
           </div>
         } @else if (eff.type === 'SET_FLAG') {
           <div class="set-flag-grid">
             <input
               type="text"
               class="studio-input"
-              placeholder="Chiave (es. punteggio)"
+              [placeholder]="'effectsEditor.flagKeyPlaceholder' | t"
               [attr.list]="flagListId"
               [ngModel]="eff.targetValue"
               (ngModelChange)="patch(i, { targetValue: $event })"
@@ -86,7 +86,7 @@
             <input
               type="text"
               class="studio-input"
-              placeholder="Valore (es. 100 o true)"
+              [placeholder]="'effectsEditor.flagValuePlaceholder' | t"
               [ngModel]="eff.flagValue"
               (ngModelChange)="patch(i, { flagValue: $event })"
             />
@@ -99,19 +99,19 @@
         }
       </div>
 
-      <button type="button" class="btn-del-rule" title="Rimuovi effetto" (click)="remove(i)">
+      <button type="button" class="btn-del-rule" [title]="'effectsEditor.remove' | t" (click)="remove(i)">
         <i class="bi bi-trash3"></i>
       </button>
     </div>
   } @empty {
     <div class="empty-rules">
       <i class="bi bi-info-circle"></i>
-      <span>{{ emptyHint() }}</span>
+      <span>{{ emptyHint() || ('effectsEditor.empty' | t) }}</span>
     </div>
   }
 
   <button type="button" class="btn-add-effect" (click)="add()">
     <i class="bi bi-plus-lg"></i>
-    <span>Aggiungi effetto</span>
+    <span>{{ 'effectsEditor.add' | t }}</span>
   </button>
 </div>

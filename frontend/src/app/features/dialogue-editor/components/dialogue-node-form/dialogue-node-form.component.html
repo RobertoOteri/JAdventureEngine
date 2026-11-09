@@ -3,14 +3,14 @@
     <div class="column-scroll">
       <div class="form-card">
         <div class="card-head">
-          <h3>Testo del nodo</h3>
+          <h3>{{ 'dialogueEditor.nodeText' | t }}</h3>
           <span class="node-code">#{{ node.code.slice(0, 8) }}</span>
         </div>
         <textarea
           class="studio-input studio-textarea"
           rows="8"
           maxlength="3000"
-          placeholder="Cosa dice il personaggio quando si arriva a questo nodo..."
+          [placeholder]="'dialogueEditor.nodeTextPlaceholder' | t"
           [ngModel]="node.text"
           (ngModelChange)="onNodeText(node.code, $event)"
         ></textarea>
@@ -18,15 +18,15 @@
 
       <div class="form-card">
         <div class="card-head">
-          <h3>Effetti del nodo</h3>
+          <h3>{{ 'dialogueEditor.nodeEffects' | t }}</h3>
         </div>
-        <p class="card-hint">Si attivano quando il giocatore arriva a questo nodo.</p>
+        <p class="card-hint">{{ 'dialogueEditor.nodeEffectsHint' | t }}</p>
         <app-effects-editor
           [effects]="node.effects"
           [dialogueNodes]="store.nodes()"
           [dialogueMode]="true"
           [excludedTypes]="['START_DIALOGUE']"
-          emptyHint="Nessun effetto: il nodo mostra solo il testo."
+          [emptyHint]="'dialogueEditor.nodeEffectsEmpty' | t"
           (effectsChange)="onNodeEffects(node.code, $event)"
         />
       </div>
@@ -34,7 +34,7 @@
   } @else {
     <div class="form-empty">
       <i class="bi bi-chat-square-text empty-icon"></i>
-      <p>Seleziona un nodo dalla lista oppure creane uno nuovo con il tasto <strong>Nodo</strong>.</p>
+      <p [innerHTML]="'dialogueEditor.noSelection' | t"></p>
     </div>
   }
 </section>

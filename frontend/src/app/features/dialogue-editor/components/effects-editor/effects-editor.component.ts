@@ -4,6 +4,9 @@ import { DialogueNode, EffectType, GameEffect } from '../../../../core/models';
 import { EditorStore } from '../../../scene-editor/store/editor.store';
 import { collectFlagKeys } from '../../../../core/utils/flag-keys';
 import { nodeLabel } from '../../../../core/utils/node-label';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { EFFECT_TYPE_KEYS } from '../../../../core/i18n/enum-labels';
 
 const ALL_EFFECT_TYPES: readonly EffectType[] = [
   'CHANGE_SCENE',
@@ -24,23 +27,27 @@ let nextListId = 0;
 @Component({
   selector: 'app-effects-editor',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './effects-editor.component.html',
   styleUrl: './effects-editor.component.css'
 })
 export class EffectsEditorComponent {
+
   private readonly store = inject(EditorStore);
+  private readonly i18n = inject(TranslationService);
 
   readonly effects = input<GameEffect[]>([]);
   readonly dialogueNodes = input<DialogueNode[]>([]);
   readonly excludedTypes = input<readonly EffectType[]>([]);
   readonly hiddenTypes = input<readonly EffectType[]>([]);
   readonly dialogueMode = input<boolean>(false);
-  readonly emptyHint = input<string>('Nessun effetto impostato.');
+  readonly emptyHint = input<string>('');
 
   readonly effectsChange = output<GameEffect[]>();
 
-  readonly nodeLabel = nodeLabel;
+  readonly nodeLabel = (node: DialogueNode) => nodeLabel(node, this.i18n);
+  readonly effectTypeKeys = EFFECT_TYPE_KEYS;
+
   readonly flagListId = `effect-flag-keys-${nextListId++}`;
 
   readonly availableTypes = computed(() =>

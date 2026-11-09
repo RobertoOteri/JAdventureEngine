@@ -15,6 +15,7 @@ import {
   TextBoxPlacerComponent
 } from '../textbox-placer/textbox-placer.component';
 import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 import { nodeLabel } from '../../../../core/utils/node-label';
 
 @Component({
@@ -25,6 +26,9 @@ import { nodeLabel } from '../../../../core/utils/node-label';
   styleUrl: './action-modal.component.css'
 })
 export class ActionModalComponent {
+
+  private readonly i18n = inject(TranslationService);
+
   readonly store = inject(EditorStore);
 
   readonly itemCode = input.required<string>();
@@ -40,7 +44,7 @@ export class ActionModalComponent {
   readonly actionEffects = signal<GameEffect[]>([]);
 
   readonly dialogueNodes = signal<DialogueNode[]>([]);
-  readonly nodeLabel = nodeLabel;
+  readonly nodeLabel = (node: DialogueNode) => nodeLabel(node, this.i18n);
 
   readonly currentItemId = computed(
     () => this.store.combinedSceneList().find((i) => i.code === this.itemCode())?.id ?? null

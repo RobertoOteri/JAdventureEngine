@@ -2,20 +2,24 @@ import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogueEditorStore } from '../../store/dialogue-editor.store';
 import { nodeLabel } from '../../../../core/utils/node-label';
-import { DialogueChoice, GameEffect, Precondition } from '../../../../core/models';
+import { DialogueChoice, GameEffect, Precondition, DialogueNode } from '../../../../core/models';
 import { EffectsEditorComponent } from '../effects-editor/effects-editor.component';
 import { PreconditionsEditorComponent } from '../preconditions-editor/preconditions-editor.component';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-dialogue-choices-panel',
   standalone: true,
-  imports: [FormsModule, EffectsEditorComponent, PreconditionsEditorComponent],
+  imports: [FormsModule, EffectsEditorComponent, PreconditionsEditorComponent, TranslatePipe],
   templateUrl: './dialogue-choices-panel.component.html',
   styleUrl: './dialogue-choices-panel.component.css'
 })
 export class DialogueChoicesPanelComponent {
+
   readonly store = inject(DialogueEditorStore);
-  readonly nodeLabel = nodeLabel;
+  private readonly i18n = inject(TranslationService);
+  readonly nodeLabel = (node: DialogueNode) => nodeLabel(node, this.i18n);
 
   readonly END_VALUE = '__END__';
 
@@ -37,10 +41,10 @@ export class DialogueChoicesPanelComponent {
   }
 
   targetLabel(choice: DialogueChoice): string {
-    if (this.endsDialogue(choice)) return 'Fine dialogo';
-    if (!choice.nextNodeCode) return 'Destinazione mancante';
+    if (this.endsDialogue(choice)) return this.i18n.t('dialogueEditor.endDialogue');
+    if (!choice.nextNodeCode) return this.i18n.t('dialogueEditor.missingTarget');
     const target = this.store.nodes().find((n) => n.code === choice.nextNodeCode);
-    return target ? nodeLabel(target) : 'Nodo eliminato';
+    return target ? this.nodeLabel(target) : this.i18n.t('dialogueEditor.deletedNode');
   }
 
   effectsCount(choice: DialogueChoice): number {

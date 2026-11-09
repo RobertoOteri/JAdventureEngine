@@ -2,11 +2,11 @@
   <div class="list-header">
     <div class="header-title">
       <i class="bi bi-diagram-3 icon-header"></i>
-      <h2>Nodi ({{ store.nodes().length }})</h2>
+      <h2>{{ 'dialogueEditor.nodes' | t: { count: store.nodes().length } }}</h2>
     </div>
     <button type="button" class="btn-add-node" (click)="store.addNode()">
       <i class="bi bi-plus-lg"></i>
-      <span>Nodo</span>
+      <span>{{ 'dialogueEditor.addNode' | t }}</span>
     </button>
   </div>
 
@@ -23,17 +23,19 @@
           </span>
           <span class="node-card-meta">
             @if (node.choices.length === 0) {
-              fine dialogo
+              {{ 'dialogueEditor.endsHere' | t }}
+            } @else if (node.choices.length === 1) {
+              {{ 'dialogueEditor.choiceCountOne' | t }}
             } @else {
-              {{ node.choices.length }} {{ node.choices.length === 1 ? 'scelta' : 'scelte' }}
+              {{ 'dialogueEditor.choiceCount' | t: { count: node.choices.length } }}
             }
           </span>
         </div>
         <button
           type="button"
           class="btn-del-node"
-          title="Elimina nodo"
-          aria-label="Elimina nodo"
+          [title]="'dialogueEditor.deleteNode' | t"
+          [attr.aria-label]="'dialogueEditor.deleteNode' | t"
           (click)="onRemove($event, node.code)"
         >
           <i class="bi bi-trash3"></i>
@@ -42,7 +44,7 @@
     } @empty {
       <div class="nodes-empty">
         <i class="bi bi-inbox icon-empty"></i>
-        <span>Nessun nodo. Crea il primo con il tasto "Nodo".</span>
+        <span>{{ 'dialogueEditor.noNodes' | t }}</span>
       </div>
     }
   </div>

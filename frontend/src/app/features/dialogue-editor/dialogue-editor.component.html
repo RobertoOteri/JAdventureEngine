@@ -3,11 +3,11 @@
     <div class="header-left">
       <button type="button" class="btn-back" (click)="goBack()">
         <i class="bi bi-arrow-left"></i>
-        <span>Torna all'editor</span>
+        <span>{{ 'dialogueEditor.back' | t }}</span>
       </button>
       <div class="header-title">
         <i class="bi bi-chat-quote icon-header"></i>
-        <h1>Dialoghi di {{ item()?.name ?? 'oggetto' }}</h1>
+        <h1>{{ 'dialogueEditor.title' | t: { name: item()?.name ?? ('dialogueEditor.fallbackItem' | t) } }}</h1>
         @if (item(); as it) {
           <span class="header-code">#{{ it.code }}</span>
         }
@@ -19,7 +19,7 @@
         <span class="feedback">{{ message }}</span>
       }
       @if (store.isDirty()) {
-        <span class="dirty-badge">Modifiche non salvate</span>
+        <span class="dirty-badge">{{ 'dialogueEditor.unsaved' | t }}</span>
       }
       <button
         type="button"
@@ -28,7 +28,7 @@
         (click)="save()"
       >
         <i class="bi bi-check2"></i>
-        <span>{{ store.isSaving() ? 'Salvataggio...' : 'Salva' }}</span>
+        <span>{{ (store.isSaving() ? 'dialogueEditor.saving' : 'dialogueEditor.save') | t }}</span>
       </button>
     </div>
   </header>
@@ -36,7 +36,7 @@
   @if (store.isLoading()) {
     <div class="dialogue-loading">
       <div class="spinner"></div>
-      <p>Caricamento dialoghi...</p>
+      <p>{{ 'dialogueEditor.loading' | t }}</p>
     </div>
   } @else {
     <div class="dialogue-workspace">

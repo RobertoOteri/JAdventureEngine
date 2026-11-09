@@ -296,4 +296,96 @@ export const en: Translations = {
       saveError: 'Error while saving the game.'
     }
   },
+
+  dialogueEditor: {
+    back: 'Back to editor',
+    title: 'Dialogues of {name}',
+    fallbackItem: 'item',
+    unsaved: 'Unsaved changes',
+    saving: 'Saving...',
+    save: 'Save',
+    loading: 'Loading dialogues...',
+    confirmLeave: 'You have unsaved changes. Leave anyway?',
+    nodes: 'Nodes ({count})',
+    addNode: 'Node',
+    endsHere: 'end of dialogue',
+    choiceCount: '{count} choices',
+    choiceCountOne: '1 choice',
+    deleteNode: 'Delete node',
+    confirmDeleteNode: 'Delete this node? Choices leading here will end the dialogue.',
+    noNodes: 'No nodes yet. Create the first one with the "Node" button.',
+    untitledNode: 'Untitled node',
+    nodeText: 'Node text',
+    nodeTextPlaceholder: 'What the character says when this node is reached...',
+    nodeEffects: 'Node effects',
+    nodeEffectsHint: 'Triggered when the player reaches this node.',
+    nodeEffectsEmpty: 'No effects: the node only shows its text.',
+    noSelection: 'Select a node from the list or create a new one with the <strong>Node</strong> button.',
+    choices: 'Choices ({count})',
+    addChoice: 'Choice',
+    untitledChoice: 'Untitled choice',
+    preconditionCount: '{count} preconditions',
+    preconditionCountOne: '1 precondition',
+    effectCount: '{count} effects',
+    effectCountOne: '1 effect',
+    deleteChoice: 'Delete choice',
+    choiceText: 'Choice text',
+    choiceTextPlaceholder: 'What the player answers',
+    leadsTo: 'Leads to',
+    selectTarget: '-- Select destination --',
+    endDialogue: 'End of dialogue',
+    missingTarget: 'Missing destination',
+    deletedNode: 'Deleted node',
+    thisNode: '(this node)',
+    preconditions: 'Preconditions',
+    preconditionsHint: 'the choice appears only if all are true',
+    effects: 'Effects',
+    effectsHint: 'triggered when the player picks this answer',
+    noChoices: 'No choices: the dialogue ends at this node.',
+    feedback: {
+      loadError: 'Unable to load dialogues.',
+      saved: 'Dialogues saved!',
+      saveError: 'Error while saving dialogues.'
+    }
+  },
+  effectsEditor: {
+    selectScene: '-- Select destination room --',
+    selectItem: '-- Select item --',
+    selectHotspotItem: '-- Select item with hotspot --',
+    selectStartNode: '-- Select the node the dialogue starts from --',
+    noNodes: 'No nodes: create one first in the dialogue editor',
+    endDialogueHint: "Closes the dialogue after showing the node's text.",
+    endAdventureHint: 'Ends the adventure: the player will see the ending screen.',
+    flagKeyPlaceholder: 'Key (e.g. score)',
+    flagValuePlaceholder: 'Value (e.g. 100 or true)',
+    remove: 'Remove effect',
+    empty: 'No effects set.',
+    add: 'Add effect'
+  },
+  preconditionsEditor: {
+    flagNamePlaceholder: 'Flag name (e.g. door_open)',
+    expectedValuePlaceholder: 'Expected value (e.g. true or 100)',
+    remove: 'Remove precondition',
+    empty: 'No preconditions set.',
+    add: 'Add precondition'
+  },
+  enums: {
+    effectType: {
+      CHANGE_SCENE: 'Change scene',
+      ADD_ITEM: 'Add to inventory',
+      REMOVE_ITEM: 'Remove from inventory',
+      SET_FLAG: 'Set flag',
+      SHOW_SCENE_ITEM: 'Show scene item',
+      HIDE_SCENE_ITEM: 'Hide scene item',
+      END_ADVENTURE: 'End adventure',
+      START_DIALOGUE: 'Start dialogue',
+      END_DIALOGUE: 'End dialogue'
+    },
+    preconditionType: {
+      HAS_ITEM: 'Has item',
+      DOES_NOT_HAVE_ITEM: "Doesn't have item",
+      FLAG_EQUALS: 'Flag equals',
+      INPUT_EQUALS: 'Input equals'
+    }
+  },
 };

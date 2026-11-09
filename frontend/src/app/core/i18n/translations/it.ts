@@ -294,4 +294,96 @@ export const it = {
       saveError: 'Errore durante il salvataggio della partita.'
     }
   },
+
+  dialogueEditor: {
+    back: "Torna all'editor",
+    title: 'Dialoghi di {name}',
+    fallbackItem: 'oggetto',
+    unsaved: 'Modifiche non salvate',
+    saving: 'Salvataggio...',
+    save: 'Salva',
+    loading: 'Caricamento dialoghi...',
+    confirmLeave: 'Hai modifiche non salvate. Uscire comunque?',
+    nodes: 'Nodi ({count})',
+    addNode: 'Nodo',
+    endsHere: 'fine dialogo',
+    choiceCount: '{count} scelte',
+    choiceCountOne: '1 scelta',
+    deleteNode: 'Elimina nodo',
+    confirmDeleteNode: 'Eliminare questo nodo? Le scelte che portavano qui chiuderanno il dialogo.',
+    noNodes: 'Nessun nodo. Crea il primo con il tasto "Nodo".',
+    untitledNode: 'Nodo senza testo',
+    nodeText: 'Testo del nodo',
+    nodeTextPlaceholder: 'Cosa dice il personaggio quando si arriva a questo nodo...',
+    nodeEffects: 'Effetti del nodo',
+    nodeEffectsHint: 'Si attivano quando il giocatore arriva a questo nodo.',
+    nodeEffectsEmpty: 'Nessun effetto: il nodo mostra solo il testo.',
+    noSelection: 'Seleziona un nodo dalla lista oppure creane uno nuovo con il tasto <strong>Nodo</strong>.',
+    choices: 'Scelte ({count})',
+    addChoice: 'Scelta',
+    untitledChoice: 'Scelta senza testo',
+    preconditionCount: '{count} precondizioni',
+    preconditionCountOne: '1 precondizione',
+    effectCount: '{count} effetti',
+    effectCountOne: '1 effetto',
+    deleteChoice: 'Elimina scelta',
+    choiceText: 'Testo della scelta',
+    choiceTextPlaceholder: 'Cosa risponde il giocatore',
+    leadsTo: 'Porta a',
+    selectTarget: '-- Seleziona destinazione --',
+    endDialogue: 'Fine dialogo',
+    missingTarget: 'Destinazione mancante',
+    deletedNode: 'Nodo eliminato',
+    thisNode: '(questo nodo)',
+    preconditions: 'Precondizioni',
+    preconditionsHint: 'la scelta compare solo se sono tutte vere',
+    effects: 'Effetti',
+    effectsHint: 'si attivano quando il giocatore sceglie questa risposta',
+    noChoices: 'Nessuna scelta: il dialogo termina a questo nodo.',
+    feedback: {
+      loadError: 'Impossibile caricare i dialoghi.',
+      saved: 'Dialoghi salvati!',
+      saveError: 'Errore salvataggio dialoghi.'
+    }
+  },
+  effectsEditor: {
+    selectScene: '-- Seleziona stanza di destinazione --',
+    selectItem: '-- Seleziona oggetto --',
+    selectHotspotItem: '-- Seleziona elemento con hotspot --',
+    selectStartNode: '-- Seleziona il nodo da cui parte il dialogo --',
+    noNodes: "Nessun nodo: crealo prima nell'editor dei dialoghi",
+    endDialogueHint: 'Chiude il dialogo dopo aver mostrato il testo del nodo.',
+    endAdventureHint: "Termina l'avventura: il giocatore vedrà la schermata di fine.",
+    flagKeyPlaceholder: 'Chiave (es. punteggio)',
+    flagValuePlaceholder: 'Valore (es. 100 o true)',
+    remove: 'Rimuovi effetto',
+    empty: 'Nessun effetto impostato.',
+    add: 'Aggiungi effetto'
+  },
+  preconditionsEditor: {
+    flagNamePlaceholder: 'Nome flag (es. porta_aperta)',
+    expectedValuePlaceholder: 'Valore atteso (es. true o 100)',
+    remove: 'Rimuovi precondizione',
+    empty: 'Nessuna precondizione impostata.',
+    add: 'Aggiungi precondizione'
+  },
+  enums: {
+    effectType: {
+      CHANGE_SCENE: 'Cambia scena',
+      ADD_ITEM: "Aggiungi all'inventario",
+      REMOVE_ITEM: "Rimuovi dall'inventario",
+      SET_FLAG: 'Imposta flag',
+      SHOW_SCENE_ITEM: 'Mostra elemento',
+      HIDE_SCENE_ITEM: 'Nascondi elemento',
+      END_ADVENTURE: "Termina l'avventura",
+      START_DIALOGUE: 'Avvia dialogo',
+      END_DIALOGUE: 'Chiudi dialogo'
+    },
+    preconditionType: {
+      HAS_ITEM: "Ha l'oggetto",
+      DOES_NOT_HAVE_ITEM: "Non ha l'oggetto",
+      FLAG_EQUALS: 'Flag uguale a',
+      INPUT_EQUALS: 'Testo inserito uguale a'
+    }
+  },
 };

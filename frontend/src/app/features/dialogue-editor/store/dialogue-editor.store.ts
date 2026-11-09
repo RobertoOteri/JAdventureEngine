@@ -5,6 +5,7 @@ import { catchError, EMPTY, Observable, pipe, switchMap, tap } from 'rxjs';
 import { DialogueChoice, DialogueNode, GameEffect } from '../../../core/models';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import { sanitizeNodes } from '../../../core/utils/sanitize-nodes';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 export interface DialogueEditorState {
   itemId: number | null;
@@ -35,7 +36,7 @@ export const DialogueEditorStore = signalStore(
     )
   })),
 
-  withMethods((store, dialogueService = inject(DialogueService)) => {
+  withMethods((store, dialogueService = inject(DialogueService), i18n = inject(TranslationService)) => {
     const patchNodes = (update: (nodes: DialogueNode[]) => DialogueNode[]): void => {
       patchState(store, { nodes: update(store.nodes()), isDirty: true, feedbackMessage: null });
     };
@@ -65,7 +66,7 @@ export const DialogueEditorStore = signalStore(
                 console.error('Errore caricamento dialoghi:', err);
                 patchState(store, {
                   isLoading: false,
-                  feedbackMessage: 'Impossibile caricare i dialoghi.'
+                  feedbackMessage: i18n.t('dialogueEditor.feedback.loadError')
                 });
                 return EMPTY;
               })
@@ -158,13 +159,13 @@ export const DialogueEditorStore = signalStore(
                 nodes,
                 isDirty: false,
                 isSaving: false,
-                feedbackMessage: 'Dialoghi salvati!'
+                feedbackMessage: i18n.t('dialogueEditor.feedback.saved')
               }),
             error: (err: any) => {
               console.error('Errore salvataggio dialoghi:', err);
               patchState(store, {
                 isSaving: false,
-                feedbackMessage: err?.error?.message || 'Errore salvataggio dialoghi.'
+                feedbackMessage: err?.error?.message || i18n.t('dialogueEditor.feedback.saveError')
               });
             }
           })
