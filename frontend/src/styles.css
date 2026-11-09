@@ -45,13 +45,6 @@ body {
   background: transparent;
 }
 
-/* ==========================================================================
-   Menu a tendina (select) – stile globale
-   Nei browser che supportano appearance: base-select (Chrome, Edge, Safari 27+)
-   anche la lista delle opzioni è personalizzata; negli altri (Firefox)
-   resta il menu nativo, con gli stessi colori.
-   ========================================================================== */
-
 select {
   font: inherit;
   color: #ffffff;
@@ -79,7 +72,6 @@ select option {
     gap: 0.6rem;
   }
 
-  /* freccia a "V": ruota quando il menu è aperto */
   select::picker-icon {
     content: '';
     width: 0.42rem;
@@ -103,7 +95,6 @@ select option {
     color: #fbbf24;
   }
 
-  /* pannello delle opzioni */
   ::picker(select) {
     margin-block: 6px;
     padding: 6px;
@@ -134,7 +125,6 @@ select option {
     }
   }
 
-  /* singola opzione */
   select option {
     display: flex;
     align-items: center;
@@ -161,7 +151,6 @@ select option {
     font-weight: 600;
   }
 
-  /* spunta sull'opzione selezionata, a destra */
   select option::checkmark {
     order: 1;
     margin-left: auto;

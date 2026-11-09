@@ -1,6 +1,7 @@
 package com.jadventure.backend.repository;
 
 import com.jadventure.backend.model.LeaderboardEntry;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +12,6 @@ public interface LeaderboardEntryRepository extends JpaRepository<LeaderboardEnt
 
     boolean existsByUserUsernameAndGraphicAdventureId(String username, Long adventureId);
 
+    @EntityGraph(attributePaths = "user")
     List<LeaderboardEntry> findTop15ByGraphicAdventureIdOrderByPlayTimeAscCompletedAtAsc(Long adventureId);
 }

@@ -12,8 +12,6 @@
   border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* ---------- immagini ---------- */
-
 .slide {
   position: absolute;
   inset: 0;
@@ -39,7 +37,6 @@
   }
 }
 
-/* scurisce sopra (logo) e sotto (testi) per la leggibilità */
 .shade {
   position: absolute;
   inset: 0;
@@ -51,8 +48,6 @@
     rgba(8, 10, 15, 0.92) 100%
   );
 }
-
-/* ---------- logo ---------- */
 
 .brand {
   position: absolute;
@@ -75,8 +70,6 @@
   letter-spacing: -0.02em;
   color: #ffffff;
 }
-
-/* ---------- testi ---------- */
 
 .caption {
   position: absolute;

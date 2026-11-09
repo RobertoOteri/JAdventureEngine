@@ -41,7 +41,6 @@ export interface InputOverlayState {
 }
 
 export interface GameplayState {
-  /** Id della versione dell'avventura che si sta giocando. */
   adventureId: number | null;
   currentSaveCode: string | null;
   gameState: GameStateDto | null;

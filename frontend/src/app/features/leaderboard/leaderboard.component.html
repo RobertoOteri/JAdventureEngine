@@ -41,7 +41,11 @@
                   <i class="bi bi-trophy-fill crown"></i>
                 }
                 <div class="avatar" [style.--hue]="hue(item.entry.username)">
-                  {{ initial(item.entry.username) }}
+                  @if (item.entry.avatarUrl) {
+                    <img [src]="item.entry.avatarUrl" [alt]="item.entry.username" />
+                  } @else {
+                    {{ initial(item.entry.username) }}
+                  }
                 </div>
                 <span class="podium-name">{{ item.entry.username }}</span>
                 <span class="podium-time">{{ formatTime(item.entry.playTime) }}</span>
@@ -60,7 +64,11 @@
               <li class="rank-row" [style.--i]="$index">
                 <span class="row-rank">{{ item.rank }}</span>
                 <span class="avatar small" [style.--hue]="hue(item.entry.username)">
-                  {{ initial(item.entry.username) }}
+                  @if (item.entry.avatarUrl) {
+                    <img [src]="item.entry.avatarUrl" [alt]="item.entry.username" />
+                  } @else {
+                    {{ initial(item.entry.username) }}
+                  }
                 </span>
                 <span class="row-name">{{ item.entry.username }}</span>
                 <span class="row-delta">{{ formatDelta(item.entry.playTime) }}</span>

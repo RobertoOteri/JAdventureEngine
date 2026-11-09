@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class LeaderboardEntryDto {
 
     private String username;
+    private String avatarUrl;
     private long playTime;
     private LocalDateTime completedAt;
 }

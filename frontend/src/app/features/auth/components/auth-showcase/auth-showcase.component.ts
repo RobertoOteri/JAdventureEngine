@@ -21,10 +21,6 @@ const FEATURES: readonly string[] = [
 
 const INTERVAL_MS = 5500;
 
-/**
- * Vetrina della pagina di accesso: immagini di avventure che si alternano
- * in dissolvenza, ognuna con una frase sulle funzioni dell'app.
- */
 @Component({
   selector: 'app-auth-showcase',
   standalone: true,
@@ -38,7 +34,6 @@ export class AuthShowcaseComponent {
   readonly covers = COVERS;
   readonly features = FEATURES;
 
-  /** Passo corrente: cresce sempre, frasi e immagini lo usano ciascuna a giro */
   private readonly step = signal(0);
 
   readonly featureIndex = computed(() => this.step() % FEATURES.length);

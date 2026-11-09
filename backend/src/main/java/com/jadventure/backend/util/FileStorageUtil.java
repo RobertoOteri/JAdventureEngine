@@ -20,6 +20,7 @@ public class FileStorageUtil {
     public static final String PATH_ADVENTURE_COVER = "%s/v%d/cover";
     public static final String PATH_SCENE_BACKGROUND = "%s/v%d/scenes/%s";
     public static final String PATH_ITEM_IMAGE = "%s/v%d/items/%s";
+    public static final String PATH_USER_AVATAR = "users/%s/avatar-%d";
 
     private final Path rootUploadPath;
     private final String publicUrlBase;

@@ -22,6 +22,13 @@
         {{ isLogin ? 'Accedi per giocare e continuare le tue avventure.' : 'Ti servirà per creare avventure e comparire in classifica.' }}
       </p>
 
+      @if (successMessage()) {
+        <div class="success-banner">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
       @if (errorMessage()) {
         <div class="error-banner">
           <i class="bi bi-exclamation-triangle-fill"></i>

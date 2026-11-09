@@ -8,9 +8,8 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { AuthResponse, RegisterRequest } from '../../../core/models/auth.model';
+import { RegisterRequest } from '../../../core/models/auth.model';
 import { ErrorResponse } from '../../../core/models/error-response.model';
 import { SegmentedControlComponent } from '../../../shared/ui/segmented-control/segmented-control.component';
 import { FilterOption } from '../../../shared/ui/filter-select/filter-select.component';
@@ -49,6 +48,7 @@ export class AuthComponent {
   readonly showPassword = signal(false);
   readonly submitted = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
 
   readonly loginForm = this.fb.group({
     identifier: ['', Validators.required],
@@ -74,6 +74,14 @@ export class AuthComponent {
     },
     { validators: passwordsMatch }
   );
+
+  constructor() {
+    const registeredUsername = history.state?.registeredUsername as string | undefined;
+    if (this.isLogin && registeredUsername) {
+      this.loginForm.controls.identifier.setValue(registeredUsername);
+      this.successMessage.set('Account creato. Accedi con la tua password.');
+    }
+  }
 
   switchMode(mode: AuthMode): void {
     if (mode !== this.mode) {
@@ -116,10 +124,10 @@ export class AuthComponent {
     const confirm = this.registerForm.controls.confirmPassword;
     return this.registerForm.hasError('passwordMismatch') && (confirm.touched || this.submitted());
   }
-
   onSubmit(): void {
     this.submitted.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
 
     const form = this.isLogin ? this.loginForm : this.registerForm;
     if (form.invalid) {
@@ -127,12 +135,18 @@ export class AuthComponent {
       return;
     }
 
-    const request$: Observable<AuthResponse> = this.isLogin
-      ? this.authService.login(this.loginForm.getRawValue())
-      : this.authService.register(this.registerPayload());
+    if (this.isLogin) {
+      this.authService.login(this.loginForm.getRawValue()).subscribe({
+        next: () => void this.router.navigate(['/adventures']),
+        error: (err: HttpErrorResponse) => this.errorMessage.set(this.extractErrorMessage(err))
+      });
+      return;
+    }
 
-    request$.subscribe({
-      next: () => void this.router.navigate(['/adventures']),
+    const payload = this.registerPayload();
+    this.authService.register(payload).subscribe({
+      next: () =>
+        void this.router.navigate(['/login'], { state: { registeredUsername: payload.username } }),
       error: (err: HttpErrorResponse) => this.errorMessage.set(this.extractErrorMessage(err))
     });
   }

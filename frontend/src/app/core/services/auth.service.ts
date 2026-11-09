@@ -27,7 +27,10 @@ export class AuthService {
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.authenticate(`${this.authEndpoint}/register`, request);
+    this.loadingSignal.set(true);
+    return this.http.post<AuthResponse>(`${this.authEndpoint}/register`, request).pipe(
+      finalize(() => this.loadingSignal.set(false))
+    );
   }
 
   logout(): void {
@@ -41,7 +44,7 @@ export class AuthService {
     return this.tokenSignal();
   }
 
-  private authenticate(url: string, body: LoginRequest | RegisterRequest): Observable<AuthResponse> {
+  private authenticate(url: string, body: LoginRequest): Observable<AuthResponse> {
     this.loadingSignal.set(true);
     return this.http.post<AuthResponse>(url, body).pipe(
       tap((response) => this.persistSession(response)),

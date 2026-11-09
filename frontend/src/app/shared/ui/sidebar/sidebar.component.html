@@ -26,8 +26,10 @@
   </nav>
 
   <div class="sidebar-user">
-    <div class="user-avatar">{{ initial() }}</div>
-    <span class="user-name">{{ username() }}</span>
+    <a routerLink="/profile" routerLinkActive="active" class="user-link" title="Il mio profilo">
+      <app-user-avatar [src]="user()?.avatarUrl" [name]="username()" [size]="32" />
+      <span class="user-name">{{ username() }}</span>
+    </a>
     <button type="button" class="btn-logout" (click)="logout()" title="Esci" aria-label="Esci">
       <i class="bi bi-box-arrow-right"></i>
     </button>

@@ -11,6 +11,7 @@ import java.util.List;
 public interface LeaderboardEntryMapper {
 
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "avatarUrl", source = "user.avatarUrl")
     LeaderboardEntryDto toDto(LeaderboardEntry entity);
 
     List<LeaderboardEntryDto> toDtoList(List<LeaderboardEntry> entities);

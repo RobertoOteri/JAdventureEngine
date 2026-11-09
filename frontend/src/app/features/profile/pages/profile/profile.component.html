@@ -1,0 +1,151 @@
+<div class="shell-layout">
+  <app-sidebar />
+
+  <main class="content-body">
+    <header class="masthead">
+      <h1>Il mio profilo</h1>
+      <span class="counter">La tua foto e i tuoi dati personali</span>
+    </header>
+
+    <div class="divider"></div>
+
+    @if (user(); as u) {
+      <div class="profile">
+        <section class="card identity">
+          <label class="avatar-upload" [class.busy]="avatarSaving()" title="Cambia foto">
+            <app-user-avatar [src]="u.avatarUrl" [name]="u.username" [size]="86" />
+            <span class="avatar-overlay">
+              @if (avatarSaving()) {
+                <span class="loader loader-sm"></span>
+              } @else {
+                <i class="bi bi-camera"></i>
+              }
+            </span>
+            <input type="file" accept="image/jpeg,image/png,image/webp" hidden
+                   [disabled]="avatarSaving()" (change)="onAvatarSelected($event)" />
+          </label>
+
+          <div class="identity-text">
+            <h2 class="identity-name">{{ u.firstName }} {{ u.lastName }}</h2>
+            <span class="identity-username">&#64;{{ u.username }}</span>
+            @if (avatarError()) {
+              <p class="form-error"><i class="bi bi-exclamation-circle"></i> {{ avatarError() }}</p>
+            }
+          </div>
+
+          <div class="identity-actions">
+            <label class="btn-secondary" [class.disabled]="avatarSaving()">
+              <i class="bi bi-upload"></i>
+              {{ u.avatarUrl ? 'Cambia foto' : 'Carica foto' }}
+              <input type="file" accept="image/jpeg,image/png,image/webp" hidden
+                     [disabled]="avatarSaving()" (change)="onAvatarSelected($event)" />
+            </label>
+            @if (u.avatarUrl) {
+              <button type="button" class="btn-ghost-danger" [disabled]="avatarSaving()" (click)="removeAvatar()">
+                <i class="bi bi-trash3"></i>
+                Rimuovi
+              </button>
+            }
+          </div>
+        </section>
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+          <div class="grid">
+            <section class="card">
+              <div class="card-head">
+                <i class="bi bi-person"></i>
+                <h3>Dati personali</h3>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="firstName">Nome</label>
+                  <input id="firstName" type="text" class="studio-input" formControlName="firstName"
+                         [class.input-error]="showError(profileForm.controls.firstName)" />
+                  @if (showError(profileForm.controls.firstName)) {
+                    <span class="error-hint">{{ errorFor(profileForm.controls.firstName) }}</span>
+                  }
+                </div>
+
+                <div class="field-group">
+                  <label for="lastName">Cognome</label>
+                  <input id="lastName" type="text" class="studio-input" formControlName="lastName"
+                         [class.input-error]="showError(profileForm.controls.lastName)" />
+                  @if (showError(profileForm.controls.lastName)) {
+                    <span class="error-hint">{{ errorFor(profileForm.controls.lastName) }}</span>
+                  }
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="username">Username</label>
+                  <div class="input-icon">
+                    <i class="bi bi-lock"></i>
+                    <input id="username" type="text" class="studio-input" [value]="u.username" disabled
+                           title="Lo username non si può cambiare" />
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <label for="email">Email</label>
+                  <input id="email" type="email" class="studio-input" formControlName="email"
+                         [class.input-error]="showError(profileForm.controls.email)" />
+                  @if (showError(profileForm.controls.email)) {
+                    <span class="error-hint">{{ errorFor(profileForm.controls.email) }}</span>
+                  }
+                </div>
+              </div>
+
+              <p class="card-note">
+                <i class="bi bi-info-circle"></i>
+                Lo username è visibile agli altri giocatori e non può essere modificato.
+                L'email serve solo per accedere e non viene mostrata.
+              </p>
+            </section>
+
+            <section class="card bio-card">
+              <div class="card-head">
+                <i class="bi bi-feather"></i>
+                <h3>Biografia</h3>
+              </div>
+
+              <div class="bio-box" [class.input-error]="showError(profileForm.controls.bio)">
+                <textarea id="bio" class="bio-textarea" formControlName="bio"
+                          aria-label="Biografia"
+                          placeholder="Racconta qualcosa di te e delle avventure che crei…"></textarea>
+                <div class="bio-footer">
+                  @if (showError(profileForm.controls.bio)) {
+                    <span class="error-hint">{{ errorFor(profileForm.controls.bio) }}</span>
+                  }
+                  <span class="bio-counter"
+                        [class.warn]="profileForm.controls.bio.value.length > 450"
+                        [class.over]="profileForm.controls.bio.value.length > 500">
+                    {{ profileForm.controls.bio.value.length }}/500
+                  </span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="actions">
+            @if (profileError()) {
+              <p class="form-error"><i class="bi bi-exclamation-circle"></i> {{ profileError() }}</p>
+            }
+            <button type="button" class="btn-ghost" [disabled]="profileSaving() || profileForm.pristine"
+                    (click)="resetForm()">
+              Annulla
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="profileSaving() || profileForm.pristine">
+              {{ profileSaving() ? 'Salvataggio…' : 'Salva modifiche' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    } @else {
+      <div class="empty-wrap">
+        <div class="loader"></div>
+      </div>
+    }
+  </main>
+</div>

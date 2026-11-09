@@ -1,0 +1,22 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #1c2030;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
