@@ -1,6 +1,18 @@
-import { Component, computed, HostListener, input, output, signal } from '@angular/core';
+import { Component, computed, HostListener, inject,  input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Action, ActionType, Item } from '../../../../core/models';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslationKey } from '../../../../core/i18n/i18n.types';
+
+
+const ACTION_SENTENCE_KEYS: Partial<Record<ActionType, TranslationKey>> = {
+  LOOK_AT: 'gameplay.radial.lookAt',
+  PICK_UP: 'gameplay.radial.pickUp',
+  USE: 'gameplay.radial.use',
+  OPEN: 'gameplay.radial.open',
+  TALK_TO: 'gameplay.radial.talkTo',
+  MOVE: 'gameplay.radial.move'
+};
 
 const ACTION_POSITIONS: Record<string, number> = {
   LOOK_AT: 0,
@@ -19,6 +31,9 @@ const ACTION_POSITIONS: Record<string, number> = {
   styleUrl: './game-radial-menu.component.css'
 })
 export class GameRadialMenuComponent {
+
+  private readonly i18n = inject(TranslationService);
+
   x = input<number>(0);
   y = input<number>(0);
   item = input<Item | null>(null);
@@ -48,18 +63,9 @@ export class GameRadialMenuComponent {
 
   actionSentence = computed(() => {
     const act = this.hoveredAction();
-    const itemName = this.item()?.name || '';
     if (!act) return '';
-
-    switch (act) {
-      case 'LOOK_AT': return `Guarda ${itemName}`;
-      case 'PICK_UP': return `Raccogli ${itemName}`;
-      case 'USE': return `Usa ${itemName}`;
-      case 'OPEN': return `Apri ${itemName}`;
-      case 'TALK_TO': return `Parla con ${itemName}`;
-      case 'MOVE': return `Muovi ${itemName}`;
-      default: return `Interagisci con ${itemName}`;
-    }
+    const key = ACTION_SENTENCE_KEYS[act] ?? 'gameplay.radial.interact';
+    return this.i18n.t(key, { item: this.item()?.name || '' });
   });
 
   @HostListener('window:mousemove', ['$event'])

@@ -13,18 +13,18 @@
     }
   </div>
 
-  <div class="ending-box" role="dialog" aria-label="Fine dell'avventura">
+  <div class="ending-box" role="dialog" [attr.aria-label]="'gameplay.ending.aria' | t">
     <div class="ending-badge">
       <i class="bi bi-trophy-fill"></i>
     </div>
 
-    <span class="ending-kicker">Avventura completata</span>
-    <h2 class="ending-title">{{ adventureTitle() }}</h2>
+    <span class="ending-kicker">{{ 'gameplay.ending.kicker' | t }}</span>
+    <h2 class="ending-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h2>
 
     <div class="time-card">
       <span class="time-label">
         <i class="bi bi-stopwatch"></i>
-        Tempo impiegato
+        {{ 'gameplay.ending.time' | t }}
       </span>
       <span class="time-value">{{ formattedFinalTime() }}</span>
     </div>
@@ -36,15 +36,15 @@
     <div class="ending-actions">
       <button type="button" class="btn primary" (click)="isLeaderboardOpen.set(true)">
         <i class="bi bi-trophy-fill"></i>
-        <span>Visualizza la classifica</span>
+        <span>{{ 'gameplay.ending.leaderboard' | t }}</span>
       </button>
       <button type="button" class="btn secondary" (click)="continueGame.emit()">
         <i class="bi bi-arrow-counterclockwise"></i>
-        <span>Riprendi dall'ultimo salvataggio</span>
+        <span>{{ 'gameplay.ending.continue' | t }}</span>
       </button>
       <button type="button" class="btn ghost" (click)="exit.emit()">
         <i class="bi bi-box-arrow-left"></i>
-        <span>Torna alle avventure</span>
+        <span>{{ 'gameplay.ending.exit' | t }}</span>
       </button>
     </div>
   </div>

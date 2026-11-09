@@ -216,4 +216,82 @@ export const it = {
     playersOne: '1 giocatore in classifica',
     empty: 'Ancora nessuno ha completato questa storia. Sii il primo!'
   },
+
+  gameplay: {
+    waiting: 'In attesa...',
+    timer: 'Tempo di gioco',
+    topbar: {
+      back: "Torna all'elenco avventure",
+      lobby: 'Lobby',
+      openInventory: 'Apri Inventario',
+      bag: 'Borsa',
+      pauseMenu: 'Menu di Pausa (ESC)',
+      menu: 'Menu'
+    },
+    viewport: {
+      backgroundAlt: 'Sfondo Scena',
+      loading: 'Caricamento della scena in corso...'
+    },
+    dialogue: {
+      choicesAria: 'Risposte possibili',
+      continue: 'Continua'
+    },
+    inventory: {
+      aria: 'Inventario',
+      backpack: 'Zaino',
+      noDetails: "Nessun dettaglio particolare su quest'oggetto.",
+      empty: 'Il borsello è completamente vuoto...',
+      medallion: 'Zaino del protagonista',
+      close: 'Chiudi lo zaino'
+    },
+    radial: {
+      lookAt: 'Guarda {item}',
+      pickUp: 'Raccogli {item}',
+      use: 'Usa {item}',
+      open: 'Apri {item}',
+      talkTo: 'Parla con {item}',
+      move: 'Muovi {item}',
+      interact: 'Interagisci con {item}'
+    },
+    drag: {
+      useOn: 'Usa {item} su {target}',
+      useWith: 'Usa {item} con…'
+    },
+    pause: {
+      title: 'Menu di Pausa',
+      subtitle: 'Gestione della sessione di gioco',
+      resumeTitle: 'Riprendi gioco',
+      resume: 'Riprendi Partita',
+      save: 'Salva Partita',
+      load: 'Carica Partita',
+      exit: "Esci all'Elenco Avventure",
+      saveName: 'Nome del Salvataggio',
+      saveNamePlaceholder: 'Es. Prima della porta chiusa...',
+      back: 'Indietro',
+      confirmSave: 'Conferma Salvataggio',
+      quickSaveName: 'Salvataggio rapido'
+    },
+    ending: {
+      aria: "Fine dell'avventura",
+      kicker: 'Avventura completata',
+      time: 'Tempo impiegato',
+      leaderboard: 'Visualizza la classifica',
+      continue: "Riprendi dall'ultimo salvataggio",
+      exit: 'Torna alle avventure'
+    },
+    feedback: {
+      startError: 'Impossibile avviare la partita.',
+      noSaveToContinue: 'Nessun salvataggio trovato per continuare.',
+      loadError: 'Errore nel caricamento del salvataggio.',
+      invalidSession: 'Errore: sessione di gioco non valida.',
+      actionDone: 'Azione eseguita.',
+      nothingHappens: 'Non succede nulla.',
+      actionNotAllowed: 'Non puoi fare questa azione qui.',
+      dialogueError: 'Impossibile proseguire il dialogo.',
+      noEffect: 'Non sembra avere alcun effetto.',
+      cannotCombine: 'Non puoi combinare questi due oggetti.',
+      saved: 'Partita salvata con successo!',
+      saveError: 'Errore durante il salvataggio della partita.'
+    }
+  },
 };

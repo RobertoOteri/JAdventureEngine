@@ -6,11 +6,11 @@
           <i class="bi bi-pause-fill"></i>
         </div>
         <div>
-          <h3>Menu di Pausa</h3>
-          <span class="modal-subtitle">Gestione della sessione di gioco</span>
+          <h3>{{ 'gameplay.pause.title' | t }}</h3>
+          <span class="modal-subtitle">{{ 'gameplay.pause.subtitle' | t }}</span>
         </div>
       </div>
-      <button type="button" class="btn-close" (click)="resume.emit()" title="Riprendi gioco">
+      <button type="button" class="btn-close" (click)="resume.emit()" [title]="'gameplay.pause.resumeTitle' | t">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
@@ -20,24 +20,24 @@
         <div class="pause-actions-list">
           <button type="button" class="btn-pause-option primary" (click)="resume.emit()">
             <i class="bi bi-play-fill"></i>
-            <span>Riprendi Partita</span>
+            <span>{{ 'gameplay.pause.resume' | t }}</span>
           </button>
 
           <button type="button" class="btn-pause-option" (click)="setMode('SAVE_FORM')">
             <i class="bi bi-floppy-fill"></i>
-            <span>Salva Partita</span>
+            <span>{{ 'gameplay.pause.save' | t }}</span>
           </button>
 
           <button type="button" class="btn-pause-option" (click)="setMode('LOAD_LIST')">
             <i class="bi bi-folder2-open"></i>
-            <span>Carica Partita</span>
+            <span>{{ 'gameplay.pause.load' | t }}</span>
           </button>
 
           <div class="pause-divider"></div>
 
           <button type="button" class="btn-pause-option danger" (click)="exit.emit()">
             <i class="bi bi-box-arrow-left"></i>
-            <span>Esci all'Elenco Avventure</span>
+            <span>{{ 'gameplay.pause.exit' | t }}</span>
           </button>
         </div>
       }
@@ -45,21 +45,21 @@
       @if (mode() === 'SAVE_FORM') {
         <div class="save-form-container">
           <div class="field-group">
-            <label for="saveName">Nome del Salvataggio</label>
+            <label for="saveName">{{ 'gameplay.pause.saveName' | t }}</label>
             <input
               id="saveName"
               type="text"
               class="studio-input"
               [(ngModel)]="saveSlotName"
-              placeholder="Es. Prima della porta chiusa..."
+              [placeholder]="'gameplay.pause.saveNamePlaceholder' | t"
             />
           </div>
 
           <div class="action-buttons-row">
-            <button type="button" class="btn-cancel" (click)="setMode('MENU')">Indietro</button>
+            <button type="button" class="btn-cancel" (click)="setMode('MENU')">{{ 'gameplay.pause.back' | t }}</button>
             <button type="button" class="btn-save" (click)="onConfirmSave()">
               <i class="bi bi-check2"></i>
-              <span>Conferma Salvataggio</span>
+              <span>{{ 'gameplay.pause.confirmSave' | t }}</span>
             </button>
           </div>
         </div>
@@ -72,18 +72,18 @@
             @if (autoSave(); as auto) {
               <div class="save-section-group">
                 <span class="section-label">
-                  <i class="bi bi-lightning-charge-fill"></i> Autosalvataggio
+                  <i class="bi bi-lightning-charge-fill"></i> {{ 'gameSaves.autosave' | t }}
                 </span>
                 <div class="save-row autosave-row" (click)="onSelectSaveToLoad(auto.code)">
                   <div class="save-info">
-                    <strong class="save-title">{{ auto.name }}</strong>
+                    <strong class="save-title">{{ 'gameSaves.autosaveName' | t }}</strong>
                     <span class="save-meta">
-                      <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.gameState?.currentScene?.code }}</strong>
+                      <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ auto.gameState?.currentScene?.code }}</strong>
                     </span>
                   </div>
                   <button type="button" class="btn-load-slot">
                     <i class="bi bi-box-arrow-in-right"></i>
-                    <span>Carica</span>
+                    <span>{{ 'common.load' | t }}</span>
                   </button>
                 </div>
               </div>
@@ -91,7 +91,7 @@
 
             <div class="save-section-group">
               <span class="section-label">
-                <i class="bi bi-journal-bookmark-fill"></i> Salvataggi Manuali
+                <i class="bi bi-journal-bookmark-fill"></i> {{ 'gameSaves.manual' | t }}
               </span>
               <div class="manual-saves-stack">
                 @for (save of manualSaves(); track save.code) {
@@ -99,17 +99,17 @@
                     <div class="save-info">
                       <strong class="save-title">{{ save.name }}</strong>
                       <span class="save-meta">
-                        <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.gameState?.currentScene?.code }}</strong>
+                        <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ save.gameState?.currentScene?.code }}</strong>
                       </span>
                     </div>
                     <button type="button" class="btn-load-slot">
                       <i class="bi bi-box-arrow-in-right"></i>
-                      <span>Carica</span>
+                      <span>{{ 'common.load' | t }}</span>
                     </button>
                   </div>
                 } @empty {
                   <div class="empty-saves-inline">
-                    <p>Nessun salvataggio manuale presente.</p>
+                    <p>{{ 'gameSaves.noManual' | t }}</p>
                   </div>
                 }
               </div>
@@ -118,7 +118,7 @@
           </div>
 
           <div class="action-buttons-row">
-            <button type="button" class="btn-cancel" (click)="setMode('MENU')">Indietro</button>
+            <button type="button" class="btn-cancel" (click)="setMode('MENU')">{{ 'gameplay.pause.back' | t }}</button>
           </div>
         </div>
       }

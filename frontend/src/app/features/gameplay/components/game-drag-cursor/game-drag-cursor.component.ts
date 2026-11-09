@@ -1,6 +1,7 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Item } from '../../../../core/models';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 
 const ORB_OFFSET_X = 32;
 
@@ -12,15 +13,20 @@ const ORB_OFFSET_X = 32;
   styleUrl: './game-drag-cursor.component.css'
 })
 export class GameDragCursorComponent {
+
+  private readonly i18n = inject(TranslationService);
+
   x = input.required<number>();
   y = input.required<number>();
   item = input<Item | null>(null);
   targetName = input<string | null>(null);
 
   readonly sentence = computed(() => {
-    const name = this.item()?.name ?? '';
+    const item = this.item()?.name ?? '';
     const target = this.targetName();
-    return target ? `Usa ${name} su ${target}` : `Usa ${name} con…`;
+    return target
+      ? this.i18n.t('gameplay.drag.useOn', { item, target })
+      : this.i18n.t('gameplay.drag.useWith', { item });
   });
 
   readonly plaqueShift = computed(() => {

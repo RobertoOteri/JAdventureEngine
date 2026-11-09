@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
 import { Action, ActionType, GraphicAdventureDto } from '../../core/models';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 import { GameTopbarComponent } from './components/game-topbar/game-topbar.component';
 import { GameViewportComponent } from './components/game-viewport/game-viewport.component';
@@ -30,7 +31,8 @@ import { GameDialogueOverlayComponent } from './components/game-dialogue-overlay
     GameLaunchModalComponent,
     GameMessageBannerComponent,
     GameDragCursorComponent,
-    GameDialogueOverlayComponent
+    GameDialogueOverlayComponent,
+    TranslatePipe
   ],
   providers: [GameplayStore],
   templateUrl: './gameplay.component.html',

@@ -10,6 +10,7 @@ import {
   output,
   signal
 } from '@angular/core';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { DialogueChoice, DialogueNode } from '../../../../core/models';
 
 const TYPING_SPEED_MS = 18;
@@ -17,6 +18,7 @@ const TYPING_SPEED_MS = 18;
 @Component({
   selector: 'app-game-dialogue-overlay',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './game-dialogue-overlay.component.html',
   styleUrl: './game-dialogue-overlay.component.css'
 })

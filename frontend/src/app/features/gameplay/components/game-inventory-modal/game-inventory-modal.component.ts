@@ -1,6 +1,7 @@
 import { Component, HostListener, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Item } from '../../../../core/models';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 const MIN_SLOTS = 8;
 const DRAG_THRESHOLD_PX = 6;
@@ -8,7 +9,7 @@ const DRAG_THRESHOLD_PX = 6;
 @Component({
   selector: 'app-game-inventory-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './game-inventory-modal.component.html',
   styleUrl: './game-inventory-modal.component.css'
 })

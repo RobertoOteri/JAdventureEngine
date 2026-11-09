@@ -5,6 +5,7 @@ import { catchError, EMPTY, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { GamePlayService } from '../../../core/services/game-play.service';
 import { GameSaveService } from '../../../core/services/game-save.service';
 import { ActionService } from '../../../core/services/action.service';
+import { TranslationService } from '../../../core/i18n/translation.service';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import {
   GameStateDto,
@@ -117,7 +118,8 @@ export const GameplayStore = signalStore(
     gameService = inject(GamePlayService),
     saveService = inject(GameSaveService),
     actionService = inject(ActionService),
-    dialogueService = inject(DialogueService)
+    dialogueService = inject(DialogueService),
+    i18n = inject(TranslationService)
   ) => {
     let feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -320,7 +322,7 @@ export const GameplayStore = signalStore(
               error: (err) => {
                 console.error('Errore avvio nuova partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage('Impossibile avviare la partita.');
+                setFeedbackMessage(i18n.t('gameplay.feedback.startError'));
               }
             })
           )
@@ -371,7 +373,7 @@ export const GameplayStore = signalStore(
               error: (err) => {
                 console.error('Errore ripresa partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage('Nessun salvataggio trovato per continuare.');
+                setFeedbackMessage(i18n.t('gameplay.feedback.noSaveToContinue'));
               }
             })
           )
@@ -409,7 +411,8 @@ export const GameplayStore = signalStore(
               error: (err) => {
                 console.error('Errore caricamento partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage('Errore nel caricamento del salvataggio.');
+                setFeedbackMessage(i18n.t('gameplay.feedback.loadError'));
+
               }
             })
           )
@@ -425,7 +428,7 @@ export const GameplayStore = signalStore(
 
           if (!adventureId || !gameState) {
             console.error('Nessuna partita attiva nello store');
-            setFeedbackMessage('Errore: sessione di gioco non valida.');
+            setFeedbackMessage(i18n.t('gameplay.feedback.invalidSession'));
             closeRadialMenu();
             closeInputOverlay();
             return [];
@@ -454,7 +457,7 @@ export const GameplayStore = signalStore(
 
                 if (!completed) {
                   setFeedbackMessage(
-                    result.feedbackMessage || (result.success ? 'Azione eseguita.' : 'Non succede nulla.')
+                    result.feedbackMessage || i18n.t(result.success ? 'gameplay.feedback.actionDone' : 'gameplay.feedback.nothingHappens')
                   );
                 }
                 closeRadialMenu();
@@ -473,7 +476,7 @@ export const GameplayStore = signalStore(
                   err?.error?.feedbackMessage ||
                   err?.error?.message ||
                   err?.message ||
-                  'Non puoi fare questa azione qui.';
+                  i18n.t('gameplay.feedback.actionNotAllowed');
                 setFeedbackMessage(msg);
                 closeRadialMenu();
 
@@ -494,7 +497,7 @@ export const GameplayStore = signalStore(
           const gameState = store.gameState();
 
           if (!adventureId || !gameState) {
-            setFeedbackMessage('Errore: sessione di gioco non valida.');
+            setFeedbackMessage(i18n.t('gameplay.feedback.invalidSession'));
             return EMPTY;
           }
 
@@ -510,7 +513,7 @@ export const GameplayStore = signalStore(
             }),
             catchError((err: any) => {
               console.error('Errore durante la scelta del dialogo:', err);
-              setFeedbackMessage(err?.error?.message || 'Impossibile proseguire il dialogo.');
+              setFeedbackMessage(err?.error?.message || i18n.t('gameplay.feedback.dialogueError'));
               return EMPTY;
             })
           );
@@ -564,7 +567,7 @@ export const GameplayStore = signalStore(
       if (action && actionIdentifier) {
         executeAction({actionCode: actionIdentifier, actionType: 'USE_WITH'});
       } else {
-        setFeedbackMessage('Non sembra avere alcun effetto.');
+        setFeedbackMessage(i18n.t('gameplay.feedback.noEffect'));
       }
     };
 
@@ -586,7 +589,7 @@ export const GameplayStore = signalStore(
       if (action?.code) {
         executeAction({actionCode: action.code, actionType: 'USE_WITH'});
       } else {
-        setFeedbackMessage('Non puoi combinare questi due oggetti.');
+        setFeedbackMessage(i18n.t('gameplay.feedback.cannotCombine'));
       }
     };
 
@@ -604,13 +607,12 @@ export const GameplayStore = signalStore(
           return saveService.createSave(advId, currentState, saveName).pipe(
             tap({
               next: () => {
-                setFeedbackMessage('Partita salvata con successo!');
+                setFeedbackMessage(i18n.t('gameplay.feedback.saved'));
                 fetchSaves(advId);
               },
               error: (err) => {
                 console.error('Errore durante il salvataggio:', err);
-                setFeedbackMessage('Errore durante il salvataggio della partita.');
-              }
+                setFeedbackMessage(i18n.t('gameplay.feedback.saveError'));              }
             })
           );
         })

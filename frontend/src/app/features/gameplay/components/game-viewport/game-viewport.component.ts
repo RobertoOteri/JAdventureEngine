@@ -4,11 +4,12 @@ import { Scene, Item, ActionType } from '../../../../core/models';
 import { GameTimerComponent } from '../game-timer/game-timer.component';
 import { GameInputOverlayComponent } from '../game-input-overlay/game-input-overlay.component';
 import { InputOverlayState } from '../../store/gameplay.store';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-game-viewport',
   standalone: true,
-  imports: [CommonModule, GameTimerComponent, GameInputOverlayComponent],
+  imports: [CommonModule, GameTimerComponent, GameInputOverlayComponent, TranslatePipe],
   templateUrl: './game-viewport.component.html',
   styleUrl: './game-viewport.component.css'
 })

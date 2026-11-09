@@ -1,16 +1,21 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import { Component, input, output, signal, computed, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameSaveDto } from '../../../../core/models';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-game-pause-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, TranslatePipe],
   templateUrl: './game-pause-modal.component.html',
   styleUrl: './game-pause-modal.component.css'
 })
 export class GamePauseModalComponent {
+
+  private readonly i18n = inject(TranslationService);
+
   saves = input<GameSaveDto[]>([]);
 
   resume = output<void>();
@@ -38,7 +43,7 @@ export class GamePauseModalComponent {
 
   onConfirmSave(): void {
     const trimmed = this.saveSlotName.trim();
-    this.save.emit(trimmed || 'Salvataggio rapido');
+    this.save.emit(trimmed || this.i18n.t('gameplay.pause.quickSaveName'));
     this.setMode('MENU');
   }
 

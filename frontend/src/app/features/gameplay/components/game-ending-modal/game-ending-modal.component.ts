@@ -1,5 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { LeaderboardComponent } from '../../../../features/leaderboard/leaderboard.component';
+import {TranslatePipe} from '../../../../core/i18n/translate.pipe';
 import { formatPlayTime } from '../../../../core/utils/time.util';
 
 interface ConfettiPiece {
@@ -16,12 +17,12 @@ const CONFETTI_COLORS = ['#ffffff', '#fbbf24', '#e2c05c', '#38bdf8', '#a1a1aa'];
 @Component({
   selector: 'app-game-ending-modal',
   standalone: true,
-  imports: [LeaderboardComponent],
+  imports: [LeaderboardComponent, TranslatePipe],
   templateUrl: './game-ending-modal.component.html',
   styleUrl: './game-ending-modal.component.css'
 })
 export class GameEndingModalComponent {
-  adventureTitle = input<string>('Avventura');
+  adventureTitle = input<string>('');
   adventureId = input.required<number>();
   message = input<string | null>(null);
   playTimeSeconds = input<number>(0);

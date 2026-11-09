@@ -2,7 +2,7 @@
   @if (scene(); as currentScene) {
     <div class="viewport-frame">
       @if (backgroundUrl()) {
-        <img [src]="backgroundUrl()" alt="Sfondo Scena" class="scene-background" />
+        <img [src]="backgroundUrl()" [alt]="'gameplay.viewport.backgroundAlt' | t" class="scene-background" />
       }
 
       <app-game-timer [playTimeSeconds]="playTimeSeconds()" />
@@ -64,7 +64,7 @@
   } @else {
     <div class="viewport-empty">
       <i class="bi bi-image empty-icon"></i>
-      <p>Caricamento della scena in corso...</p>
+      <p>{{ 'gameplay.viewport.loading' | t }}</p>
     </div>
   }
 </div>

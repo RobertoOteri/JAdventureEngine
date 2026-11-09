@@ -2,8 +2,7 @@
   <div class="dialogue-composition">
 
     @if (hasChoices()) {
-      <ul class="choices-list" [class.revealed]="isTypingComplete()" aria-label="Risposte possibili">
-        @for (choice of node().choices; track choice.id ?? $index) {
+      <ul class="choices-list" [class.revealed]="isTypingComplete()" [attr.aria-label]="'gameplay.dialogue.choicesAria' | t">        @for (choice of node().choices; track choice.id ?? $index) {
           <li class="choice-item" [style.--index]="$index">
             <button
               type="button"
@@ -27,7 +26,7 @@
 
     @if (!hasChoices() && isTypingComplete()) {
       <button type="button" class="continue-btn" (click)="onClose($event)">
-        <span>Continua</span>
+        <span>{{ 'gameplay.dialogue.continue' | t }}</span>
         <svg class="choice-arrow" viewBox="0 0 12 12" aria-hidden="true">
           <path d="M2 1 L10 6 L2 11 Z" />
         </svg>

@@ -1,7 +1,7 @@
 <div class="gameplay-shell">
   <app-game-topbar
-    [adventureTitle]="adventureDetails()?.title || 'Avventura Grafica'"
-    [sceneName]="store.currentScene()?.name || 'In attesa...'"
+    [adventureTitle]="adventureDetails()?.title ?? ''"
+    [sceneName]="store.currentScene()?.name || ('gameplay.waiting' | t)"
     [inventoryCount]="store.inventoryCount()"
     (openInventory)="store.setInventoryOpen(true)"
     (openPauseMenu)="store.setPauseMenuOpen(true)"
@@ -83,7 +83,7 @@
 
   @if (store.isCompleted()) {
     <app-game-ending-modal
-      [adventureTitle]="adventureDetails()?.title || 'Avventura'"
+      [adventureTitle]="adventureDetails()?.title ?? ''"
       [adventureId]="store.adventureId() ?? 0"
       [message]="store.endingMessage()"
       [playTimeSeconds]="store.gameState()?.playTime || 0"
@@ -94,7 +94,7 @@
 
   @if (isLaunchModalOpen()) {
     <app-game-launch-modal
-      [adventureTitle]="adventureDetails()?.title || 'Avventura'"
+      [adventureTitle]="adventureDetails()?.title ?? ''"
       [saves]="store.savesList()"
       (startNew)="onStartNew()"
       (continueGame)="onContinue()"

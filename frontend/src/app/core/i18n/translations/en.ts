@@ -218,4 +218,82 @@ export const en: Translations = {
     playersOne: '1 player on the leaderboard',
     empty: 'Nobody has completed this story yet. Be the first!'
   },
+
+  gameplay: {
+    waiting: 'Waiting...',
+    timer: 'Play time',
+    topbar: {
+      back: 'Back to the adventure list',
+      lobby: 'Lobby',
+      openInventory: 'Open inventory',
+      bag: 'Bag',
+      pauseMenu: 'Pause menu (ESC)',
+      menu: 'Menu'
+    },
+    viewport: {
+      backgroundAlt: 'Scene background',
+      loading: 'Loading scene...'
+    },
+    dialogue: {
+      choicesAria: 'Possible answers',
+      continue: 'Continue'
+    },
+    inventory: {
+      aria: 'Inventory',
+      backpack: 'Backpack',
+      noDetails: 'Nothing special about this item.',
+      empty: 'Your pouch is completely empty...',
+      medallion: "Hero's backpack",
+      close: 'Close backpack'
+    },
+    radial: {
+      lookAt: 'Look at {item}',
+      pickUp: 'Pick up {item}',
+      use: 'Use {item}',
+      open: 'Open {item}',
+      talkTo: 'Talk to {item}',
+      move: 'Move {item}',
+      interact: 'Interact with {item}'
+    },
+    drag: {
+      useOn: 'Use {item} on {target}',
+      useWith: 'Use {item} with…'
+    },
+    pause: {
+      title: 'Pause Menu',
+      subtitle: 'Manage your game session',
+      resumeTitle: 'Resume game',
+      resume: 'Resume game',
+      save: 'Save game',
+      load: 'Load game',
+      exit: 'Exit to adventure list',
+      saveName: 'Save name',
+      saveNamePlaceholder: 'e.g. Before the locked door...',
+      back: 'Back',
+      confirmSave: 'Confirm save',
+      quickSaveName: 'Quick save'
+    },
+    ending: {
+      aria: 'End of the adventure',
+      kicker: 'Adventure completed',
+      time: 'Time taken',
+      leaderboard: 'View leaderboard',
+      continue: 'Resume from last save',
+      exit: 'Back to adventures'
+    },
+    feedback: {
+      startError: 'Unable to start the game.',
+      noSaveToContinue: 'No save found to continue from.',
+      loadError: 'Error while loading the save.',
+      invalidSession: 'Error: invalid game session.',
+      actionDone: 'Done.',
+      nothingHappens: 'Nothing happens.',
+      actionNotAllowed: "You can't do that here.",
+      dialogueError: 'Unable to continue the dialogue.',
+      noEffect: "It doesn't seem to have any effect.",
+      cannotCombine: "You can't combine these two items.",
+      saved: 'Game saved successfully!',
+      saveError: 'Error while saving the game.'
+    }
+  },
 };
