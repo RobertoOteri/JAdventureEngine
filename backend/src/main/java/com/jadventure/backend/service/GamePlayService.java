@@ -37,7 +37,7 @@ public class GamePlayService {
 
         String initialSceneCode = adventure.getInitialSceneCode();
         if (initialSceneCode == null || initialSceneCode.isBlank()) {
-            throw new ResourceNotFoundException("L'avventura non ha una scena iniziale configurata");
+            throw new ResourceNotFoundException("error.adventure.noStartScene");
         }
 
         SceneDto initialScene = sceneService.getSceneByCode(adventureId, initialSceneCode);

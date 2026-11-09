@@ -77,7 +77,7 @@ public class DialogueNodeService {
 
     private Item findItem(Long itemId) {
         return itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item non trovato: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
     }
 
     private void linkTargets(Long adventureId, DialogueNodeDto dto, DialogueNode node,
@@ -96,6 +96,6 @@ public class DialogueNodeService {
             return node;
         }
         return nodeRepository.findByCodeAndItemGraphicAdventureId(code, adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Nodo di destinazione inesistente: " + code));
+                .orElseThrow(() -> new ResourceNotFoundException("error.dialogue.targetNodeNotFound", code));
     }
 }

@@ -19,15 +19,15 @@ public class ItemDto {
 
     private Long id;
 
-    @NotBlank(message = "Il codice dell'item è obbligatorio")
-    @Size(max = 50, message = "Il codice dell'item non può superare i 50 caratteri")
+    @NotBlank(message = "{validation.item.code.required}")
+    @Size(max = 50, message = "{validation.item.code.size}")
     private String code;
 
-    @NotBlank(message = "Il nome dell'item è obbligatorio")
-    @Size(max = 100, message = "Il nome dell'item non può superare i 100 caratteri")
+    @NotBlank(message = "{validation.item.name.required}")
+    @Size(max = 100, message = "{validation.item.name.size}")
     private String name;
 
-    @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")
+    @Size(max = 1000, message = "{validation.description.size}")
     private String description;
 
     private String imageUrl;

@@ -19,12 +19,12 @@ public class SceneDto {
 
     private Long id;
 
-    @NotBlank(message = "Il codice della scena è obbligatorio")
-    @Size(max = 50, message = "Il codice della scena non può superare i 50 caratteri")
+    @NotBlank(message = "{validation.scene.code.required}")
+    @Size(max = 50, message = "{validation.scene.code.size}")
     private String code;
 
-    @NotBlank(message = "Il nome della scena è obbligatorio")
-    @Size(max = 100, message = "Il nome della scena non può superare i 100 caratteri")
+    @NotBlank(message = "{validation.scene.name.required}")
+    @Size(max = 100, message = "{validation.scene.name.size}")
     private String name;
 
     private String backgroundImageUrl;

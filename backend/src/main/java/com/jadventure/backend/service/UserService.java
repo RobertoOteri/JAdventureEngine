@@ -3,6 +3,7 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.user.UserDto;
 import com.jadventure.backend.dto.user.UpdateProfileRequest;
 import com.jadventure.backend.exception.EmailAlreadyExistsException;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.mapper.UserMapper;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.UserRepository;
@@ -34,7 +35,7 @@ public class UserService {
         String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
         if (userRepository.existsByEmailAndIdNot(email, user.getId())) {
-            throw new EmailAlreadyExistsException("L'email '" + email + "' è già associata a un account");
+            throw new EmailAlreadyExistsException("error.auth.emailTaken", email);
         }
 
         userMapper.updateProfile(request, user);
@@ -46,7 +47,7 @@ public class UserService {
     @Transactional
     public UserDto updateAvatar(MultipartFile avatar) {
         if (avatar == null || avatar.isEmpty()) {
-            throw new IllegalArgumentException("Seleziona un'immagine");
+            throw new InvalidOperationException("error.upload.imageRequired");
         }
 
         User user = authService.getCurrentUser();

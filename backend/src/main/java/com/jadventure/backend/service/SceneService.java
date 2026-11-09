@@ -2,6 +2,7 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ItemMapper;
 import com.jadventure.backend.mapper.SceneMapper;
@@ -35,21 +36,21 @@ public class SceneService {
     @Transactional(readOnly = true)
     public SceneDto getSceneById(Long sceneId) {
         Scene scene = sceneRepository.findById(sceneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.scene.notFoundById", sceneId));
         return sceneMapper.toDto(scene);
     }
 
     @Transactional(readOnly = true)
     public SceneDto getSceneByCode(Long adventureId, String sceneCode) {
         Scene scene = sceneRepository.findByGraphicAdventureIdAndCode(adventureId, sceneCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata: " + sceneCode));
+                .orElseThrow(() -> new ResourceNotFoundException("error.scene.notFoundByCode", sceneCode));
         return sceneMapper.toDto(scene);
     }
 
     @Transactional
     public void deleteSceneById(Long sceneId) {
         Scene scene = sceneRepository.findById(sceneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.scene.notFoundById", sceneId));
 
         authService.validateEditable(
                 scene.getGraphicAdventure().getAuthor().getUsername(),
@@ -60,13 +61,13 @@ public class SceneService {
     @Transactional
     public ItemDto addItem(Long sceneId, ItemDto itemDto, MultipartFile image) {
         Scene scene = sceneRepository.findById(sceneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Scena non trovata con ID: " + sceneId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.scene.notFoundById", sceneId));
 
         GraphicAdventure adventure = scene.getGraphicAdventure();
         authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
 
         if (itemDto.getHotspot() == null || itemDto.getHotspot().getPoints() == null || itemDto.getHotspot().getPoints().isBlank()) {
-            throw new IllegalArgumentException("Un oggetto aggiunto alla scena deve avere un hotspot con dei punti validi");
+            throw new InvalidOperationException("error.item.hotspotRequired");
         }
 
         Item item = itemMapper.toEntity(itemDto);

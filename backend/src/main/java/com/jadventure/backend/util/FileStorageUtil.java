@@ -1,5 +1,6 @@
 package com.jadventure.backend.util;
 
+import com.jadventure.backend.exception.InvalidOperationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +53,7 @@ public class FileStorageUtil {
         String extension = extractExtension(file.getOriginalFilename());
 
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new IllegalArgumentException("Formato file non supportato. Estensioni consentite: " + ALLOWED_EXTENSIONS);
+            throw new InvalidOperationException("error.upload.unsupportedFormat", ALLOWED_EXTENSIONS);
         }
 
         try {
@@ -75,7 +76,7 @@ public class FileStorageUtil {
 
     private String extractExtension(String filename) {
         if (filename == null || !filename.contains(".")) {
-            throw new IllegalArgumentException("Il file caricato non ha un'estensione valida");
+            throw new InvalidOperationException("error.upload.missingExtension");
         }
         return filename.substring(filename.lastIndexOf('.')).toLowerCase();
     }

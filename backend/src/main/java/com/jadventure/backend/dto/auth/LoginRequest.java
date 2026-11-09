@@ -12,10 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "Inserisci username o email")
+    @NotBlank(message = "{validation.login.identifier.required}")
     private String identifier;
 
-    @NotBlank(message = "La password è obbligatoria")
+    @NotBlank(message = "{validation.password.required}")
     private String password;
 }
 

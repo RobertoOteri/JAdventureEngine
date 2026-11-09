@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class HotspotDto {
 
-    @Size(max = 1000, message = "I punti non possono superare i 1000 caratteri")
+    @Size(max = 1000, message = "{validation.hotspot.points.size}")
 
     private String points;
     private Integer posX;

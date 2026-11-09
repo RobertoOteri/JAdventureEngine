@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 public class PreconditionDto {
     private Long id;
 
-    @NotNull(message = "Il tipo di precondizione è obbligatorio")
+    @NotNull(message = "{validation.precondition.type.required}")
     private PreconditionType type;
 
-    @NotBlank(message = "La chiave richiesta è obbligatoria")
+    @NotBlank(message = "{validation.precondition.key.required}")
     private String requiredKey;
 
     private String expectedValue;

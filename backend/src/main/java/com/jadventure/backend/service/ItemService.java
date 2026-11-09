@@ -3,6 +3,7 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.item.HotspotDto;
 import com.jadventure.backend.dto.item.ItemDto;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.mapper.ItemMapper;
@@ -40,14 +41,14 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ItemDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
         return itemMapper.toDto(item);
     }
 
     @Transactional
     public ItemDto updateItem(ItemDto dto, MultipartFile image) {
         Item item = itemRepository.findById(dto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + dto.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", dto.getId()));
 
         GraphicAdventure adventure = item.getGraphicAdventure();
         authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
@@ -68,7 +69,7 @@ public class ItemService {
     @Transactional
     public void deleteItemById(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
 
         authService.validateEditable(
                 item.getGraphicAdventure().getAuthor().getUsername(),
@@ -79,7 +80,7 @@ public class ItemService {
     @Transactional
     public ActionDto addAction(Long itemId, ActionDto actionDto) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Oggetto non trovato con ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
 
         authService.validateEditable(
                 item.getGraphicAdventure().getAuthor().getUsername(),
@@ -109,19 +110,19 @@ public class ItemService {
     public void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
         if (actionDto.getType() == ActionType.USE_WITH) {
             if (actionDto.getTargetItemCode() == null || actionDto.getTargetItemCode().isBlank()) {
-                throw new IllegalArgumentException("Per l'azione USE_WITH è obbligatorio specificare targetItemCode");
+                throw new InvalidOperationException("error.action.useWithTargetRequired");
             }
             boolean duplicateUseWith = existingActions.stream()
                     .anyMatch(a -> a.getType() == ActionType.USE_WITH
                             && actionDto.getTargetItemCode().equalsIgnoreCase(a.getTargetItemCode()));
             if (duplicateUseWith) {
-                throw new IllegalArgumentException("Esiste già un'azione USE_WITH verso l'oggetto: " + actionDto.getTargetItemCode());
+                throw new InvalidOperationException("error.action.duplicateUseWith", actionDto.getTargetItemCode());
             }
         } else {
             boolean typeAlreadyUsed = existingActions.stream()
                     .anyMatch(existing -> existing.getType() == actionDto.getType());
             if (typeAlreadyUsed) {
-                throw new IllegalArgumentException("L'oggetto ha già un'azione di tipo " + actionDto.getType());
+                throw new InvalidOperationException("error.action.duplicateType", actionDto.getType());
             }
         }
     }

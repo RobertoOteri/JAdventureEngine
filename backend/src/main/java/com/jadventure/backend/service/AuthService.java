@@ -3,6 +3,7 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.auth.AuthResponse;
 import com.jadventure.backend.dto.auth.LoginRequest;
 import com.jadventure.backend.dto.auth.RegisterRequest;
+import com.jadventure.backend.exception.ConflictException;
 import com.jadventure.backend.exception.EmailAlreadyExistsException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.exception.UsernameAlreadyExistsException;
@@ -39,7 +40,7 @@ public class AuthService {
 
         User user = userRepository.findByUsernameOrEmail(identifier, normalizeEmail(identifier))
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
-                .orElseThrow(() -> new BadCredentialsException("Credenziali non valide"));
+                .orElseThrow(() -> new BadCredentialsException("error.auth.invalidCredentials"));
 
         return new AuthResponse(jwtService.generateToken(user.getUsername()), user.getUsername());
     }
@@ -49,10 +50,10 @@ public class AuthService {
         String email = normalizeEmail(request.getEmail());
 
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UsernameAlreadyExistsException("L'username '" + request.getUsername() + "' è già in uso");
+            throw new UsernameAlreadyExistsException("error.auth.usernameTaken", request.getUsername());
         }
         if (userRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException("L'email '" + email + "' è già associata a un account");
+            throw new EmailAlreadyExistsException("error.auth.emailTaken", email);
         }
 
         User user = userMapper.toEntity(request);
@@ -72,7 +73,7 @@ public class AuthService {
 
     public String getCurrentUsername() {
         if (!isUserLoggedIn()) {
-            throw new AccessDeniedException("Operazione non consentita: utente non autenticato");
+            throw new AccessDeniedException("error.auth.notAuthenticated");
         }
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
@@ -81,20 +82,20 @@ public class AuthService {
     public User getCurrentUser() {
         String username = getCurrentUsername();
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Utente autenticato non trovato: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("error.user.authenticatedNotFound", username));
     }
 
     public void validateEditable(String ownerUsername, AdventureStatus status) {
         validateOwnership(ownerUsername);
         if (status != AdventureStatus.DRAFT) {
-            throw new IllegalStateException("Questa versione è pubblicata e non può essere modificata");
+            throw new ConflictException("error.adventure.versionPublished");
         }
     }
 
     private void validateOwnership(String ownerUsername) {
         String currentUsername = getCurrentUsername();
         if (ownerUsername == null || !ownerUsername.equals(currentUsername)) {
-            throw new AccessDeniedException("Accesso negato: non sei il proprietario di questa risorsa");
+            throw new AccessDeniedException("error.auth.notOwner");
         }
     }
 

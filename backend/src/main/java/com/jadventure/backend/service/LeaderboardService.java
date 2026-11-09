@@ -27,7 +27,7 @@ public class LeaderboardService {
     @Transactional(readOnly = true)
     public List<LeaderboardEntryDto> getLeaderboardForAdventure(Long adventureId) {
         if (!graphicAdventureRepository.existsById(adventureId)) {
-            throw new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId);
+            throw new ResourceNotFoundException("error.adventure.notFoundById", adventureId);
         }
 
         List<LeaderboardEntry> entries = leaderboardEntryRepository
@@ -48,7 +48,7 @@ public class LeaderboardService {
         }
 
         GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.adventure.notFoundById", adventureId));
 
         LeaderboardEntry newEntry = LeaderboardEntry.builder()
                 .user(currentUser)

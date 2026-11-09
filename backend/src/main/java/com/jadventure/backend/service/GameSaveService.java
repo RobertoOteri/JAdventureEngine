@@ -3,6 +3,7 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.game.GameSaveDto;
 import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.dto.item.ItemDto;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GameSaveMapper;
 import com.jadventure.backend.model.GameSave;
@@ -38,10 +39,10 @@ public class GameSaveService {
 
         graphicAdventureService.getAdventureById(adventureId);
         GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + adventureId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.adventure.notFoundById", adventureId));
 
         if (gameStateDto == null || gameStateDto.getCurrentScene() == null) {
-            throw new IllegalArgumentException("Stato di gioco mancante");
+            throw new InvalidOperationException("error.game.stateMissing");
         }
 
         GameSaveDto saveDto = GameSaveDto.builder()
@@ -63,12 +64,12 @@ public class GameSaveService {
         User user = authService.getCurrentUser();
 
         if (gameStateDto == null || gameStateDto.getCurrentScene() == null) {
-            throw new IllegalArgumentException("Stato di gioco mancante");
+            throw new InvalidOperationException("error.game.stateMissing");
         }
 
         GameSave save = gameSaveRepository
                 .findFirstByUserUsernameAndGraphicAdventureIdAndAutoSaveTrue(user.getUsername(), adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Autosave non trovato per questa avventura"));
+                .orElseThrow(() -> new ResourceNotFoundException("error.save.autosaveNotFound"));
 
         save.setName("Salvataggio automatico");
 
@@ -126,13 +127,13 @@ public class GameSaveService {
     @Transactional(readOnly = true)
     public GameSave findLatestSave(String username, Long adventureId) {
         return gameSaveRepository.findFirstByUserUsernameAndGraphicAdventureIdOrderBySavedAtDesc(username, adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Nessun salvataggio trovato per l'avventura: " + adventureId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.save.noneForAdventure", adventureId));
     }
 
     @Transactional(readOnly = true)
     public GameSave findSaveByUser(String saveCode) {
         User user = authService.getCurrentUser();
         return gameSaveRepository.findByCodeAndUserUsername(saveCode, user.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Salvataggio non trovato: " + saveCode));
+                .orElseThrow(() -> new ResourceNotFoundException("error.save.notFound", saveCode));
     }
 }

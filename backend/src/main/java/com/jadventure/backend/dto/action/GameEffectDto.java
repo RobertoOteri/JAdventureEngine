@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class GameEffectDto {
     private Long id;
 
-    @NotNull(message = "Il tipo di effetto è obbligatorio")
+    @NotNull(message = "{validation.effect.type.required}")
     private EffectType type;
 
     private String targetValue;

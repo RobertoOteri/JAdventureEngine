@@ -19,10 +19,10 @@ public class ActionDto {
 
     private Long id;
 
-    @Size(max = 255, message = "Il codice non può superare i 255 caratteri")
+    @Size(max = 255, message = "{validation.action.code.size}")
     private String code;
 
-    @NotNull(message = "Il tipo d'azione è obbligatorio")
+    @NotNull(message = "{validation.action.type.required}")
     private ActionType type;
 
     private String successMessage;

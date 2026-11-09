@@ -14,19 +14,19 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateProfileRequest {
 
-    @NotBlank(message = "Il nome è obbligatorio")
-    @Size(max = 50, message = "Il nome può contenere al massimo 50 caratteri")
+    @NotBlank(message = "{validation.firstName.required}")
+    @Size(max = 50, message = "{validation.firstName.size}")
     private String firstName;
 
-    @NotBlank(message = "Il cognome è obbligatorio")
-    @Size(max = 50, message = "Il cognome può contenere al massimo 50 caratteri")
+    @NotBlank(message = "{validation.lastName.required}")
+    @Size(max = 50, message = "{validation.lastName.size}")
     private String lastName;
 
-    @NotBlank(message = "L'email è obbligatoria")
-    @Email(message = "Inserisci un indirizzo email valido")
-    @Size(max = 255, message = "L'email può contenere al massimo 255 caratteri")
+    @NotBlank(message = "{validation.email.required}")
+    @Email(message = "{validation.email.invalid}")
+    @Size(max = 255, message = "{validation.email.size}")
     private String email;
 
-    @Size(max = 500, message = "La biografia può contenere al massimo 500 caratteri")
+    @Size(max = 500, message = "{validation.bio.size}")
     private String bio;
 }

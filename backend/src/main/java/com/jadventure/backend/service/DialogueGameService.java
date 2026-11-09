@@ -5,10 +5,12 @@ import com.jadventure.backend.dto.dialogue.DialogueChoiceRequestDto;
 import com.jadventure.backend.dto.dialogue.DialogueNodeDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
 import com.jadventure.backend.dto.game.GameStateDto;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.DialogueNodeMapper;
 import com.jadventure.backend.repository.DialogueNodeRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -63,16 +65,16 @@ public class DialogueGameService {
         GameStateDto state = request.getGameState();
 
         if (state.getCurrentScene() == null || state.getCurrentDialogueNodeCode() == null) {
-            throw new IllegalArgumentException("Nessun dialogo in corso");
+            throw new InvalidOperationException("error.dialogue.noneActive");
         }
 
         DialogueChoiceDto choice = loadNode(adventureId, state.getCurrentDialogueNodeCode()).getChoices().stream()
                 .filter(c -> request.getChoiceId().equals(c.getId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Scelta non valida per il nodo corrente"));
+                .orElseThrow(() -> new InvalidOperationException("error.dialogue.invalidChoice"));
 
         if (!isAvailable(state, choice)) {
-            throw new IllegalArgumentException("Scelta non disponibile");
+            throw new InvalidOperationException("error.dialogue.choiceUnavailable");
         }
 
         if (StringUtils.hasText(choice.getNextNodeCode())) {
@@ -95,7 +97,7 @@ public class DialogueGameService {
 
     private DialogueNodeDto loadNode(Long adventureId, String code) {
         return nodeMapper.toDto(nodeRepository.findByCodeAndItemGraphicAdventureId(code, adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("Nodo di dialogo non trovato: " + code)));
+                .orElseThrow(() -> new ResourceNotFoundException("error.dialogue.nodeNotFound", code)));
     }
 
     private boolean isAvailable(GameStateDto state, DialogueChoiceDto choice) {

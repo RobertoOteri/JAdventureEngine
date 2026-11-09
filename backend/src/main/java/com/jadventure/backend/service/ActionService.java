@@ -5,6 +5,7 @@ import com.jadventure.backend.dto.dialogue.DialogueNodeDto;
 import com.jadventure.backend.dto.game.GameActionDto;
 import com.jadventure.backend.dto.game.GameActionResultDto;
 import com.jadventure.backend.dto.game.GameStateDto;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.model.Action;
@@ -36,15 +37,15 @@ public class ActionService {
         GameStateDto stateDto = gameActionDto.getGameState();
 
         if (adventureId == null || stateDto == null || stateDto.getCurrentScene() == null) {
-            throw new IllegalArgumentException("Stato di gioco o avventura mancante");
+            throw new InvalidOperationException("error.game.stateOrAdventureMissing");
         }
 
         if (stateDto.isCompleted()) {
-            throw new IllegalArgumentException("L'avventura è già conclusa");
+            throw new InvalidOperationException("error.game.alreadyEnded");
         }
 
         if (stateDto.getCurrentDialogueNodeCode() != null) {
-            throw new IllegalArgumentException("Non puoi compiere azioni durante un dialogo");
+            throw new InvalidOperationException("error.action.duringDialogue");
         }
 
         Action actionEntity = actionRepository.findByCodeAndItemGraphicAdventureId(gameActionDto.getActionCode(), adventureId)
@@ -98,14 +99,14 @@ public class ActionService {
     @Transactional(readOnly = true)
     public ActionDto getActionById(Long actionId) {
         Action action = actionRepository.findById(actionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.action.notFoundById", actionId));
         return actionMapper.toDto(action);
     }
 
     @Transactional
     public ActionDto updateAction(ActionDto dto) {
         Action action = actionRepository.findById(dto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + dto.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("error.action.notFoundById", dto.getId()));
 
         authService.validateEditable(
                 action.getItem().getGraphicAdventure().getAuthor().getUsername(),
@@ -121,7 +122,7 @@ public class ActionService {
     @Transactional
     public void deleteActionById(Long actionId) {
         Action action = actionRepository.findById(actionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Azione non trovata con ID: " + actionId));
+                .orElseThrow(() -> new ResourceNotFoundException("error.action.notFoundById", actionId));
 
         authService.validateEditable(
                 action.getItem().getGraphicAdventure().getAuthor().getUsername(),

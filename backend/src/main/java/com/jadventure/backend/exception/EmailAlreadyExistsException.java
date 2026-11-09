@@ -1,7 +1,7 @@
 package com.jadventure.backend.exception;
 
-public class EmailAlreadyExistsException extends RuntimeException {
-    public EmailAlreadyExistsException(String message) {
-        super(message);
+public class EmailAlreadyExistsException extends LocalizedException {
+    public EmailAlreadyExistsException(String messageKey, Object... args) {
+        super(messageKey, args);
     }
 }

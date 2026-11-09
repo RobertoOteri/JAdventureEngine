@@ -3,6 +3,8 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
+import com.jadventure.backend.exception.ConflictException;
+import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.*;
 import com.jadventure.backend.model.GraphicAdventure;
@@ -72,7 +74,7 @@ public class GraphicAdventureService {
     public GraphicAdventureDto createAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
         String title = dto.getTitle();
         if (graphicAdventureRepository.existsByTitle(title)) {
-            throw new IllegalArgumentException("Esiste già un'avventura con questo titolo");
+            throw new InvalidOperationException("error.adventure.titleTaken");
         }
 
         String code = generateUniqueCode(title);
@@ -101,7 +103,7 @@ public class GraphicAdventureService {
         GraphicAdventure adventure = findOwnedDraft(dto.getId());
 
         if (graphicAdventureRepository.existsByTitleAndCodeNot(dto.getTitle(), adventure.getCode())) {
-            throw new IllegalArgumentException("Esiste già un'avventura con questo titolo");
+            throw new InvalidOperationException("error.adventure.titleTaken");
         }
 
         adventure.setTitle(dto.getTitle());
@@ -131,14 +133,14 @@ public class GraphicAdventureService {
         GraphicAdventure published = findOwnedDraft(adventureId);
 
         if (published.getScenes().isEmpty()) {
-            throw new IllegalStateException("Impossibile pubblicare: l'avventura non contiene scene");
+            throw new ConflictException("error.adventure.publishNoScenes");
         }
 
         boolean initialSceneValid = published.getInitialSceneCode() != null
                 && published.getScenes().stream()
                 .anyMatch(s -> s.getCode().equals(published.getInitialSceneCode()));
         if (!initialSceneValid) {
-            throw new IllegalStateException("Impossibile pubblicare: scena iniziale non impostata o non valida");
+            throw new ConflictException("error.adventure.publishInvalidStartScene");
         }
 
         published.setStatus(AdventureStatus.PUBLISHED);
@@ -196,14 +198,14 @@ public class GraphicAdventureService {
 
     private GraphicAdventure findAdventureById(Long id) {
         return graphicAdventureRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Avventura non trovata con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("error.adventure.notFoundById", id));
     }
 
     private GraphicAdventure findReadableAdventure(Long id) {
         GraphicAdventure adventure = findAdventureById(id);
         boolean isAuthor = adventure.getAuthor().getUsername().equals(authService.getCurrentUsername());
         if (!isAuthor && adventure.getStatus() != AdventureStatus.PUBLISHED) {
-            throw new ResourceNotFoundException("Avventura non trovata con ID: " + id);
+            throw new ResourceNotFoundException("error.adventure.notFoundById", id);
         }
         return adventure;
     }
