@@ -1,4 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { LanguageSwitchComponent } from '../language-switch/language-switch.component';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -8,7 +10,7 @@ import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, UserAvatarComponent],
+  imports: [CommonModule, RouterModule, UserAvatarComponent, TranslatePipe, LanguageSwitchComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })

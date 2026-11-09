@@ -8,8 +8,7 @@
     [attr.aria-label]="placeholder()"
   />
   @if (value()) {
-    <button type="button" class="clear-btn" (click)="clear()" aria-label="Cancella ricerca">
-      <i class="bi bi-x-lg"></i>
+    <button type="button" class="clear-btn" (click)="clear()" [attr.aria-label]="'searchBar.clear' | t">      <i class="bi bi-x-lg"></i>
     </button>
   }
 </label>

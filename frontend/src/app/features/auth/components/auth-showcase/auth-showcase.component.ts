@@ -1,4 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { TranslationKey } from '../../../../core/i18n/i18n.types';
 
 const COVERS: readonly string[] = [
   '/showcase/fantasy_slide.jpg',
@@ -9,14 +11,14 @@ const COVERS: readonly string[] = [
   '/showcase/messy_room_slide.jpg'
 ];
 
-const FEATURES: readonly string[] = [
-  'Gioca le avventure create dagli altri giocatori.',
-  'Crea la tua avventura: scene, oggetti e dialoghi.',
-  'Scrivi dialoghi con scelte che cambiano la storia.',
-  'Pubblica e aggiorna le tue avventure con nuove versioni.',
-  'Sfida gli altri giocatori in classifica.',
-  'Batti il tuo record di tempo.',
-  'Salva la partita e riprendi quando vuoi.'
+const FEATURES: readonly TranslationKey[] = [
+  'authShowcase.play',
+  'authShowcase.create',
+  'authShowcase.dialogues',
+  'authShowcase.publish',
+  'authShowcase.leaderboard',
+  'authShowcase.record',
+  'authShowcase.save'
 ];
 
 const INTERVAL_MS = 5500;
@@ -24,6 +26,7 @@ const INTERVAL_MS = 5500;
 @Component({
   selector: 'app-auth-showcase',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './auth-showcase.component.html',
   styleUrl: './auth-showcase.component.css'
 })

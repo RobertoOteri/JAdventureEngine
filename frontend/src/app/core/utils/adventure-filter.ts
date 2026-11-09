@@ -1,4 +1,6 @@
 import { GraphicAdventureDto } from '../models';
+import { FilterOption } from '../../shared/ui/filter-select/filter-select.component';
+
 
 export type AdventureSort = 'recent' | 'oldest' | 'title-asc' | 'title-desc';
 export type PublicationFilter = 'all' | 'never' | 'published';
@@ -9,17 +11,17 @@ export interface AdventureFilter {
   publication?: PublicationFilter;
 }
 
-export const ADVENTURE_SORT_OPTIONS: { value: AdventureSort; label: string }[] = [
-  { value: 'recent', label: 'Più recenti' },
-  { value: 'oldest', label: 'Meno recenti' },
-  { value: 'title-asc', label: 'Titolo A-Z' },
-  { value: 'title-desc', label: 'Titolo Z-A' }
+export const ADVENTURE_SORT_OPTIONS: FilterOption<AdventureSort>[] = [
+  { value: 'recent', labelKey: 'adventureFilter.sort.recent' },
+  { value: 'oldest', labelKey: 'adventureFilter.sort.oldest' },
+  { value: 'title-asc', labelKey: 'adventureFilter.sort.titleAsc' },
+  { value: 'title-desc', labelKey: 'adventureFilter.sort.titleDesc' }
 ];
 
-export const PUBLICATION_OPTIONS: { value: PublicationFilter; label: string }[] = [
-  { value: 'all', label: 'Tutte' },
-  { value: 'never', label: 'Inedite' },
-  { value: 'published', label: 'Pubblicate' }
+export const PUBLICATION_OPTIONS: FilterOption<PublicationFilter>[] = [
+  { value: 'all', labelKey: 'adventureFilter.publication.all' },
+  { value: 'never', labelKey: 'adventureFilter.publication.never' },
+  { value: 'published', labelKey: 'adventureFilter.publication.published' }
 ];
 
 export function filterAdventures(

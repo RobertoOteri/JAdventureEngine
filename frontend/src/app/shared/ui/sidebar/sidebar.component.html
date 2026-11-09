@@ -12,7 +12,7 @@
       class="nav-item"
     >
       <i class="bi bi-collection-play nav-icon"></i>
-      <span>Libreria</span>
+      <span>{{ 'sidebar.library' | t }}</span>
     </a>
 
     <a
@@ -21,16 +21,26 @@
       class="nav-item"
     >
       <i class="bi bi-hammer nav-icon"></i>
-      <span>Le mie storie</span>
+      <span>{{ 'sidebar.myStories' | t }}</span>
     </a>
   </nav>
 
+  <div class="sidebar-lang">
+    <app-language-switch />
+  </div>
+
   <div class="sidebar-user">
-    <a routerLink="/profile" routerLinkActive="active" class="user-link" title="Il mio profilo">
+    <a routerLink="/profile" routerLinkActive="active" class="user-link" [title]="'sidebar.myProfile' | t">
       <app-user-avatar [src]="user()?.avatarUrl" [name]="username()" [size]="32" />
       <span class="user-name">{{ username() }}</span>
     </a>
-    <button type="button" class="btn-logout" (click)="logout()" title="Esci" aria-label="Esci">
+    <button
+      type="button"
+      class="btn-logout"
+      (click)="logout()"
+      [title]="'sidebar.logout' | t"
+      [attr.aria-label]="'sidebar.logout' | t"
+    >
       <i class="bi bi-box-arrow-right"></i>
     </button>
   </div>

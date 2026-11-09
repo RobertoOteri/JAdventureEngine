@@ -6,11 +6,11 @@
           <i class="bi bi-folder2-open"></i>
         </div>
         <div>
-          <h3>Carica Partita</h3>
-          <span class="modal-subtitle">{{ adventureTitle() }}</span>
+          <h3>{{ 'gameSaves.title' | t }}</h3>
+          <span class="modal-subtitle">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</span>
         </div>
       </div>
-      <button type="button" class="btn-close" (click)="close.emit()" title="Chiudi finestra">
+      <button type="button" class="btn-close" (click)="close.emit()" [title]="'common.closeWindow' | t">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
@@ -20,18 +20,17 @@
       @if (autoSave(); as auto) {
         <div class="save-section-group">
           <span class="section-label">
-            <i class="bi bi-lightning-charge-fill"></i> Autosalvataggio
+            <i class="bi bi-lightning-charge-fill"></i> {{ 'gameSaves.autosave' | t }}
           </span>
           <div class="save-row autosave-row" (click)="selectSave.emit(auto.code)">
             <div class="save-info">
-              <strong class="save-title">{{ auto.name }}</strong>
+              <strong class="save-title">{{ 'gameSaves.autosaveName' | t }}</strong>
               <span class="save-meta">
-                <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ auto.gameState?.currentScene?.code }}</strong>
-              </span>
+              <i class="bi bi-calendar3"></i> {{ auto.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ auto.gameState?.currentScene?.code }}</strong>              </span>
             </div>
-            <button type="button" class="btn-select-save" title="Carica l'autosave">
+            <button type="button" class="btn-select-save" [title]="'gameSaves.loadAutosave' | t">
               <i class="bi bi-box-arrow-in-right"></i>
-              <span>Carica</span>
+              <span>{{ 'common.load' | t }}</span>
             </button>
           </div>
         </div>
@@ -39,7 +38,7 @@
 
       <div class="save-section-group">
         <span class="section-label">
-          <i class="bi bi-journal-bookmark-fill"></i> Salvataggi Manuali
+          <i class="bi bi-journal-bookmark-fill"></i> {{ 'gameSaves.manual' | t }}
         </span>
         <div class="saves-list">
           @for (save of manualSaves(); track save.code) {
@@ -47,17 +46,17 @@
               <div class="save-info">
                 <strong class="save-title">{{ save.name }}</strong>
                 <span class="save-meta">
-                  <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • Stanza: <strong>{{ save.gameState?.currentScene?.code }}</strong>
+                  <i class="bi bi-calendar3"></i> {{ save.savedAt | date:'dd/MM/yyyy HH:mm' }} • {{ 'gameSaves.room' | t }}: <strong>{{ save.gameState?.currentScene?.code }}</strong>
                 </span>
               </div>
               <button type="button" class="btn-select-save" title="Carica questo salvataggio">
                 <i class="bi bi-box-arrow-in-right"></i>
-                <span>Carica</span>
+                <span>{{ 'common.load' | t }}</span>
               </button>
             </div>
           } @empty {
             <div class="empty-saves-inline">
-              <p>Nessun salvataggio manuale presente.</p>
+              <p>{{ 'gameSaves.noManual' | t }}</p>
             </div>
           }
         </div>
@@ -66,13 +65,12 @@
       @if (!autoSave() && saves().length === 0) {
         <div class="empty-saves">
           <i class="bi bi-inbox icon-empty"></i>
-          <p>Nessun salvataggio trovato per questa avventura.</p>
+          <p>{{ 'gameSaves.none' | t }}</p>
         </div>
       }
     </div>
 
     <footer class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="close.emit()">Chiudi</button>
-    </footer>
+      <button type="button" class="btn-cancel" (click)="close.emit()">{{ 'common.close' | t }}</button>    </footer>
   </div>
 </div>

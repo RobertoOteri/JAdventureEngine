@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { GameSaveDto } from '../../../core/models';
 import { GameSavesModalComponent } from '../game-saves-modal/game-saves-modal.component';
 import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-game-launch-modal',
@@ -10,13 +11,14 @@ import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-m
   imports: [
     CommonModule,
     GameSavesModalComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    TranslatePipe
   ],
   templateUrl: './game-launch-modal.component.html',
   styleUrl: './game-launch-modal.component.css'
 })
 export class GameLaunchModalComponent {
-  adventureTitle = input<string>('Avventura Grafica');
+  adventureTitle = input<string>('');
   saves = input<GameSaveDto[]>([]);
 
   startNew = output<void>();

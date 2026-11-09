@@ -1,4 +1,5 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -9,7 +10,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([jwtInterceptor])
+      withInterceptors([languageInterceptor, jwtInterceptor])
     )
   ]
 };

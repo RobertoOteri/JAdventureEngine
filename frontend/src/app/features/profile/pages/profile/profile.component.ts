@@ -1,5 +1,6 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from '../../../../core/services/user.service';
 import { httpErrorMessage } from '../../../../core/utils/http-error.util';
@@ -19,6 +20,8 @@ const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 export class ProfileComponent {
   private readonly userService = inject(UserService);
   private readonly fb = inject(FormBuilder).nonNullable;
+
+  private readonly i18n = inject(TranslationService);
 
   readonly user = this.userService.currentUser;
 
@@ -74,7 +77,7 @@ export class ProfileComponent {
       next: () => this.avatarSaving.set(false),
       error: (err: HttpErrorResponse) => {
         this.avatarSaving.set(false);
-        this.avatarError.set(httpErrorMessage(err));
+        this.avatarError.set(httpErrorMessage(err, this.i18n));
       }
     });
   }
@@ -86,7 +89,7 @@ export class ProfileComponent {
       next: () => this.avatarSaving.set(false),
       error: (err: HttpErrorResponse) => {
         this.avatarSaving.set(false);
-        this.avatarError.set(httpErrorMessage(err));
+        this.avatarError.set(httpErrorMessage(err, this.i18n));
       }
     });
   }
@@ -114,7 +117,7 @@ export class ProfileComponent {
         },
         error: (err: HttpErrorResponse) => {
           this.profileSaving.set(false);
-          this.profileError.set(httpErrorMessage(err));
+          this.profileError.set(httpErrorMessage(err, this.i18n));
         }
       });
   }

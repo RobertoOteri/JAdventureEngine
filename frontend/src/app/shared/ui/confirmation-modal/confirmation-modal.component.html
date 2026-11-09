@@ -6,21 +6,21 @@
           <i class="bi" [class.bi-exclamation-triangle-fill]="isDestructive()" [class.bi-info-circle-fill]="!isDestructive()"></i>
         </div>
         <div>
-          <h3>{{ title() }}</h3>
+          <h3>{{ title() || ('confirmation.defaultTitle' | t) }}</h3>
         </div>
       </div>
-      <button type="button" class="btn-close" (click)="cancel.emit()" title="Chiudi finestra">
+      <button type="button" class="btn-close" (click)="cancel.emit()" [title]="'common.closeWindow' | t">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
 
     <div class="modal-body">
-      <p class="confirm-message">{{ message() }}</p>
+      <p class="confirm-message">{{ message() || ('confirmation.defaultMessage' | t) }}</p>
     </div>
 
     <footer class="modal-footer">
       <button type="button" class="btn-cancel" (click)="cancel.emit()">
-        {{ cancelText() }}
+        {{ cancelText() || ('common.cancel' | t) }}
       </button>
       <button
         type="button"
@@ -29,7 +29,7 @@
         (click)="confirm.emit()"
       >
         <i class="bi" [class.bi-trash3]="isDestructive()" [class.bi-check-lg]="!isDestructive()"></i>
-        <span>{{ confirmText() }}</span>
+        <span>{{ confirmText() || ('common.confirm' | t) }}</span>
       </button>
     </footer>
   </div>

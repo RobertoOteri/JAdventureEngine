@@ -21,7 +21,7 @@
       type="button"
       class="play-pill"
       (click)="onPlay($event)"
-      title="Avvia gioco"
+      [title]="'adventureCard.play' | t"
     >
       <i class="bi bi-play-fill play-arrow"></i>
     </button>
@@ -35,7 +35,7 @@
         type="button"
         class="btn-icon-action info"
         (click)="onInfo($event)"
-        title="Dettagli e Sinossi"
+        [title]="'adventureCard.details' | t"
       >
         <i class="bi bi-search"></i>
       </button>
@@ -45,7 +45,7 @@
           type="button"
           class="btn-icon-action edit"
           (click)="onEdit($event)"
-          title="Modifica Avventura"
+          [title]="'adventureCard.edit' | t"
         >
           <i class="bi bi-pencil"></i>
         </button>
@@ -53,7 +53,7 @@
           type="button"
           class="btn-icon-action delete"
           (click)="onDelete($event)"
-          title="Elimina Avventura"
+          [title]="'adventureCard.delete' | t"
         >
           <i class="bi bi-trash"></i>
         </button>

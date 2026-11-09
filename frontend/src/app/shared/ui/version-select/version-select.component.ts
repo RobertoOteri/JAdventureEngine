@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { GraphicAdventureDto } from '../../../core/models';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-version-select',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslatePipe],
   templateUrl: './version-select.component.html',
   styleUrl: './version-select.component.css'
 })

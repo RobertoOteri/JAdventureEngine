@@ -23,6 +23,12 @@
   padding: 6rem 3rem 3rem;
 }
 
+.auth-lang {
+  position: absolute;
+  top: 2rem;
+  left: 3rem;
+}
+
 .mode-switch {
   position: absolute;
   top: 2rem;

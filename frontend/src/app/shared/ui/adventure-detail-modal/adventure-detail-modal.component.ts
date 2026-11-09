@@ -4,11 +4,12 @@ import { GraphicAdventureDto } from '../../../core/models';
 import { AdventureService } from '../../../core/services/adventure.service';
 import { LeaderboardComponent } from '../../../features/leaderboard/leaderboard.component';
 import { VersionSelectComponent } from '../version-select/version-select.component';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-adventure-detail-modal',
   standalone: true,
-  imports: [CommonModule, DatePipe, LeaderboardComponent, VersionSelectComponent],
+  imports: [CommonModule, DatePipe, LeaderboardComponent, VersionSelectComponent, TranslatePipe],
   templateUrl: './adventure-detail-modal.component.html',
   styleUrl: './adventure-detail-modal.component.css'
 })

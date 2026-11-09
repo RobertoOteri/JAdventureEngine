@@ -1,18 +1,23 @@
-import { Component, input, output, signal, effect, viewChild, ElementRef } from '@angular/core';
+import { Component, input, output, signal, effect, viewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-file-dropzone',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe, TranslatePipe],
   templateUrl: './file-dropzone.component.html',
   styleUrl: './file-dropzone.component.css'
 })
 export class FileDropzoneComponent {
-  readonly label = input<string>('Immagine');
-  readonly dropTitle = input<string>("Trascina un'immagine qui");
-  readonly dropSubtitle = input<string>('oppure clicca per sfogliare');
-  readonly hint = input<string>('Formati supportati: PNG, JPG, WEBP (Max 5MB)');
+
+  private readonly i18n = inject(TranslationService);
+
+  readonly label = input<string | undefined>(undefined);
+  readonly dropTitle = input<string | undefined>(undefined);
+  readonly dropSubtitle = input<string | undefined>(undefined);
+  readonly hint = input<string | undefined>(undefined);
 
   readonly accept = input<string>('image/*');
   readonly maxSizeBytes = input<number>(5 * 1024 * 1024);
@@ -69,12 +74,12 @@ export class FileDropzoneComponent {
 
   private processFile(file: File): void {
     if (!file.type.startsWith('image/')) {
-      this.error.set('Seleziona un formato immagine valido (PNG, JPG, WEBP).');
+      this.error.set(this.i18n.t('fileDropzone.invalidFormat'));
       return;
     }
 
     if (file.size > this.maxSizeBytes()) {
-      this.error.set('Il file supera la dimensione massima consentita.');
+      this.error.set(this.i18n.t('fileDropzone.tooLarge'));
       return;
     }
 

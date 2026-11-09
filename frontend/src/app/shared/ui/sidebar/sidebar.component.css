@@ -133,3 +133,8 @@
   background: rgba(239, 68, 68, 0.12);
   color: #f87171;
 }
+
+.sidebar-lang {
+  margin-top: auto;
+  padding: 0 0.5rem 0.75rem;
+}

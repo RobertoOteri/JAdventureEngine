@@ -6,11 +6,11 @@
           <i class="bi bi-controller"></i>
         </div>
         <div>
-          <h3>{{ adventureTitle() }}</h3>
-          <span class="modal-subtitle">Seleziona come iniziare a giocare</span>
+          <h3>{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h3>
+          <span class="modal-subtitle">{{ 'gameLaunch.subtitle' | t }}</span>
         </div>
       </div>
-      <button type="button" class="btn-close" (click)="cancel.emit()" title="Chiudi finestra">
+      <button type="button" class="btn-close" (click)="cancel.emit()" [title]="'common.closeWindow' | t">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
@@ -22,14 +22,14 @@
           class="btn-launch-option primary"
           [disabled]="!hasSaves()"
           (click)="continueGame.emit()"
-          [title]="hasSaves() ? 'Riprendi dall\'ultimo salvataggio effettuato' : 'Nessun salvataggio precedente trovato'"
+          [title]="(hasSaves() ? 'gameLaunch.continueHint' : 'gameLaunch.noPreviousSave') | t"
         >
           <div class="option-icon-box green">
             <i class="bi bi-play-circle-fill"></i>
           </div>
           <div class="option-texts">
-            <span class="option-title">Continua Partita</span>
-            <span class="option-desc">Riprendi dall'ultimo punto salvato</span>
+            <span class="option-title">{{ 'gameLaunch.continueTitle' | t }}</span>
+            <span class="option-desc">{{ 'gameLaunch.continueDesc' | t }}</span>
           </div>
         </button>
 
@@ -38,14 +38,14 @@
           class="btn-launch-option"
           [disabled]="!hasSaves()"
           (click)="isSavesModalOpen.set(true)"
-          [title]="hasSaves() ? 'Visualizza tutti i salvataggi' : 'Nessun salvataggio disponibile'"
+          [title]="(hasSaves() ? 'gameLaunch.loadHint' : 'gameLaunch.noSaves') | t"
         >
           <div class="option-icon-box cyan">
             <i class="bi bi-folder2-open"></i>
           </div>
           <div class="option-texts">
-            <span class="option-title">Carica Partita</span>
-            <span class="option-desc">Scegli tra gli slot salvati ({{ saves().length }})</span>
+            <span class="option-title">{{ 'gameLaunch.loadTitle' | t }}</span>
+            <span class="option-desc">{{ 'gameLaunch.loadDesc' | t: { count: saves().length } }}</span>
           </div>
         </button>
 
@@ -54,8 +54,8 @@
             <i class="bi bi-stars"></i>
           </div>
           <div class="option-texts">
-            <span class="option-title">Nuova Partita</span>
-            <span class="option-desc">Inizia l'avventura dal principio</span>
+            <span class="option-title">{{ 'gameLaunch.newTitle' | t }}</span>
+            <span class="option-desc">{{ 'gameLaunch.newDesc' | t }}</span>
           </div>
         </button>
       </div>
@@ -74,10 +74,10 @@
 
 @if (isConfirmOverwriteOpen()) {
   <app-confirmation-modal
-    title="Avviare una Nuova Partita?"
-    message="Attenzione: avviando una nuova partita cancellerai tutti i salvataggi di questa avventura. Sei sicuro di voler continuare?"
-    confirmText="Sì, ricomincia"
-    cancelText="Annulla"
+    [title]="'gameLaunch.confirmNewTitle' | t"
+    [message]="'gameLaunch.confirmNewMessage' | t"
+    [confirmText]="'gameLaunch.confirmNewOk' | t"
+    [cancelText]="'common.cancel' | t"
     [isDestructive]="true"
     (confirm)="onConfirmNewGame()"
     (cancel)="isConfirmOverwriteOpen.set(false)"

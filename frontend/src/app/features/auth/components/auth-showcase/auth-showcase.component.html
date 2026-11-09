@@ -11,7 +11,7 @@
 
   <div class="caption">
     @for (text of [feature()]; track text) {
-      <p class="feature" aria-live="polite">{{ text }}</p>
+      <p class="feature" aria-live="polite">{{ text | t }}</p>
     }
 
     <div class="dots">

@@ -8,7 +8,7 @@
       [attr.aria-checked]="option.value === value()"
       (click)="select(option.value)"
     >
-      {{ option.label }}
+      {{ option.labelKey | t }}
     </button>
   }
 </div>

@@ -2,9 +2,11 @@
   <app-auth-showcase class="auth-showcase" />
 
   <main class="auth-main">
+    <app-language-switch class="auth-lang" />
+
     <app-segmented-control
       class="mode-switch"
-      ariaLabel="Accedi o registrati"
+      [ariaLabel]="'auth.modeAriaLabel' | t"
       [compact]="true"
       [options]="modeOptions"
       [value]="mode"
@@ -17,15 +19,15 @@
         <span>JAdventure</span>
       </div>
 
-      <h1>{{ isLogin ? 'Bentornato' : 'Crea un account' }}</h1>
+      <h1>{{ (isLogin ? 'auth.loginTitle' : 'auth.registerTitle') | t }}</h1>
       <p class="subtitle">
-        {{ isLogin ? 'Accedi per giocare e continuare le tue avventure.' : 'Ti servirà per creare avventure e comparire in classifica.' }}
+        {{ (isLogin ? 'auth.loginSubtitle' : 'auth.registerSubtitle') | t }}
       </p>
 
-      @if (successMessage()) {
+      @if (successMessage(); as successKey) {
         <div class="success-banner">
           <i class="bi bi-check-circle-fill"></i>
-          <span>{{ successMessage() }}</span>
+          <span>{{ successKey | t }}</span>
         </div>
       }
 
@@ -39,7 +41,7 @@
       @if (isLogin) {
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
           <div class="field-group">
-            <label for="identifier">Username o email</label>
+            <label for="identifier">{{ 'auth.identifier' | t }}</label>
             <input
               id="identifier"
               type="text"
@@ -54,7 +56,7 @@
           </div>
 
           <div class="field-group">
-            <label for="login-password">Password</label>
+            <label for="login-password">{{ 'auth.password' | t }}</label>
             <div class="password-wrap">
               <input
                 id="login-password"
@@ -68,7 +70,7 @@
                 type="button"
                 class="btn-eye"
                 (click)="togglePassword()"
-                [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+                [attr.aria-label]="(showPassword() ? 'auth.hidePassword' : 'auth.showPassword') | t"
               >
                 <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
               </button>
@@ -82,7 +84,7 @@
             @if (authService.isLoading()) {
               <span class="spinner"></span>
             } @else {
-              Accedi
+              {{ 'auth.submitLogin' | t }}
             }
           </button>
         </form>
@@ -90,7 +92,7 @@
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
           <div class="field-row">
             <div class="field-group">
-              <label for="firstName">Nome</label>
+              <label for="firstName">{{ 'auth.firstName' | t }}</label>
               <input
                 id="firstName"
                 type="text"
@@ -105,7 +107,7 @@
             </div>
 
             <div class="field-group">
-              <label for="lastName">Cognome</label>
+              <label for="lastName">{{ 'auth.lastName' | t }}</label>
               <input
                 id="lastName"
                 type="text"
@@ -121,7 +123,7 @@
           </div>
 
           <div class="field-group">
-            <label for="username">Username</label>
+            <label for="username">{{ 'auth.username' | t }}</label>
             <input
               id="username"
               type="text"
@@ -133,12 +135,12 @@
             @if (showError(registerForm.controls.username)) {
               <span class="error-hint">{{ errorFor(registerForm.controls.username) }}</span>
             } @else {
-              <span class="field-hint">È il nome che vedono gli altri giocatori.</span>
+              <span class="field-hint">{{ 'auth.usernameHint' | t }}</span>
             }
           </div>
 
           <div class="field-group">
-            <label for="email">Email</label>
+            <label for="email">{{ 'auth.email' | t }}</label>
             <input
               id="email"
               type="email"
@@ -153,7 +155,7 @@
           </div>
 
           <div class="field-group">
-            <label for="register-password">Password</label>
+            <label for="register-password">{{ 'auth.password' | t }}</label>
             <div class="password-wrap">
               <input
                 id="register-password"
@@ -167,7 +169,7 @@
                 type="button"
                 class="btn-eye"
                 (click)="togglePassword()"
-                [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+                [attr.aria-label]="(showPassword() ? 'auth.hidePassword' : 'auth.showPassword') | t"
               >
                 <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
               </button>
@@ -175,12 +177,12 @@
             @if (showError(registerForm.controls.password)) {
               <span class="error-hint">{{ errorFor(registerForm.controls.password) }}</span>
             } @else {
-              <span class="field-hint">Almeno 8 caratteri.</span>
+              <span class="field-hint">{{ 'auth.passwordHint' | t }}</span>
             }
           </div>
 
           <div class="field-group">
-            <label for="confirmPassword">Conferma password</label>
+            <label for="confirmPassword">{{ 'auth.confirmPassword' | t }}</label>
             <input
               id="confirmPassword"
               class="studio-input"
@@ -192,7 +194,7 @@
             @if (showError(registerForm.controls.confirmPassword)) {
               <span class="error-hint">{{ errorFor(registerForm.controls.confirmPassword) }}</span>
             } @else if (showMismatch()) {
-              <span class="error-hint">Le password non coincidono.</span>
+              <span class="error-hint">{{ 'auth.passwordMismatch' | t }}</span>
             }
           </div>
 
@@ -200,7 +202,7 @@
             @if (authService.isLoading()) {
               <span class="spinner"></span>
             } @else {
-              Crea account
+              {{ 'auth.submitRegister' | t }}
             }
           </button>
         </form>

@@ -1,9 +1,11 @@
 import { Component, input, model } from '@angular/core';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { FilterOption } from '../filter-select/filter-select.component';
 
 @Component({
   selector: 'app-segmented-control',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './segmented-control.component.html',
   styleUrl: './segmented-control.component.css'
 })
