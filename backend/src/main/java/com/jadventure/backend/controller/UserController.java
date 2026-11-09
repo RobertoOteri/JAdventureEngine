@@ -1,6 +1,6 @@
 package com.jadventure.backend.controller;
 
-import com.jadventure.backend.dto.auth.UserDto;
+import com.jadventure.backend.dto.user.UserDto;
 import com.jadventure.backend.dto.user.UpdateProfileRequest;
 import com.jadventure.backend.service.UserService;
 import jakarta.validation.Valid;

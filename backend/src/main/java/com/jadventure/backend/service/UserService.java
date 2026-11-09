@@ -1,6 +1,6 @@
 package com.jadventure.backend.service;
 
-import com.jadventure.backend.dto.auth.UserDto;
+import com.jadventure.backend.dto.user.UserDto;
 import com.jadventure.backend.dto.user.UpdateProfileRequest;
 import com.jadventure.backend.exception.EmailAlreadyExistsException;
 import com.jadventure.backend.mapper.UserMapper;

@@ -1,4 +1,4 @@
-package com.jadventure.backend.dto.auth;
+package com.jadventure.backend.dto.user;
 
 import lombok.*;
 

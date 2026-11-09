@@ -2,14 +2,12 @@ package com.jadventure.backend.controller;
 
 import com.jadventure.backend.dto.auth.AuthResponse;
 import com.jadventure.backend.dto.auth.LoginRequest;
-import com.jadventure.backend.dto.auth.LogoutResponse;
 import com.jadventure.backend.dto.auth.RegisterRequest;
 import com.jadventure.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +28,5 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logout() {
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(new LogoutResponse("Logout effettuato con successo"));
     }
 }

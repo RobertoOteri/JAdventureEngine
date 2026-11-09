@@ -1,7 +1,7 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.auth.RegisterRequest;
-import com.jadventure.backend.dto.auth.UserDto;
+import com.jadventure.backend.dto.user.UserDto;
 import com.jadventure.backend.dto.user.UpdateProfileRequest;
 import com.jadventure.backend.model.User;
 import org.mapstruct.Mapper;
