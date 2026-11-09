@@ -4,12 +4,14 @@
   <main class="content-body">
     <header class="masthead">
       <div class="masthead-text">
-        <h1>Le Mie Avventure</h1>
+        <h1>{{ 'myAdventures.title' | t }}</h1>
         <span class="counter">
           @if (hasActiveFilters()) {
-            {{ filteredAdventures().length }} di {{ adventures().length }} progetti
+            {{ 'myAdventures.countFiltered' | t: { shown: filteredAdventures().length, total: adventures().length } }}
+          } @else if (adventures().length === 1) {
+            {{ 'myAdventures.countOne' | t }}
           } @else {
-            {{ adventures().length }} progetti personali
+            {{ 'myAdventures.count' | t: { count: adventures().length } }}
           }
         </span>
       </div>
@@ -18,8 +20,8 @@
         type="button"
         class="fab-add"
         (click)="goToCreate()"
-        title="Crea nuova avventura"
-        aria-label="Crea nuova avventura"
+        [title]="'myAdventures.create' | t"
+        [attr.aria-label]="'myAdventures.create' | t"
       >
         <i class="bi bi-plus-lg fab-cross"></i>
       </button>
@@ -31,11 +33,11 @@
       <app-search-bar
         [value]="query()"
         (valueChange)="query.set($event)"
-        placeholder="Cerca tra le tue avventure"
+        [placeholder]="'myAdventures.searchPlaceholder' | t"
       />
       <div class="toolbar-filters">
         <app-segmented-control
-          ariaLabel="Stato di pubblicazione"
+          [ariaLabel]="'myAdventures.publicationAriaLabel' | t"
           [options]="publicationOptions"
           [value]="publication()"
           (valueChange)="publication.set($event)"
@@ -49,10 +51,10 @@
       </div>
     </div>
 
-    @if (errorMessage()) {
+    @if (errorMessage(); as errorKey) {
       <div class="empty-wrap">
         <i class="bi bi-exclamation-triangle-fill empty-icon error"></i>
-        <p class="error-text">{{ errorMessage() }}</p>
+        <p class="error-text">{{ errorKey | t }}</p>
       </div>
     } @else if (isLoading()) {
       <div class="empty-wrap">
@@ -73,17 +75,17 @@
           @if (adventures().length > 0) {
             <div class="empty-wrap">
               <i class="bi bi-search empty-icon"></i>
-              <p>Nessun'avventura corrisponde ai filtri.</p>
+              <p>{{ 'myAdventures.noMatch' | t }}</p>
               <button type="button" class="btn-create-first" (click)="resetFilters()">
-                <i class="bi bi-x-lg"></i> Azzera filtri
+                <i class="bi bi-x-lg"></i> {{ 'myAdventures.resetFilters' | t }}
               </button>
             </div>
           } @else {
             <div class="empty-wrap">
               <i class="bi bi-folder-plus empty-icon"></i>
-              <p>Non hai ancora creato nessuna avventura.</p>
+              <p>{{ 'myAdventures.empty' | t }}</p>
               <button type="button" class="btn-create-first" (click)="goToCreate()">
-                <i class="bi bi-plus-lg"></i> Comincia ora
+                <i class="bi bi-plus-lg"></i> {{ 'myAdventures.startNow' | t }}
               </button>
             </div>
           }

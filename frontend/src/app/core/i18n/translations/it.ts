@@ -65,6 +65,57 @@ export const it = {
       published: 'Pubblicate'
     }
   },
+
+  library: {
+    title: 'Libreria Avventure',
+    countFiltered: '{shown} di {total} titoli',
+    count: '{count} titoli registrati',
+    countOne: '1 titolo registrato',
+    searchPlaceholder: 'Cerca per titolo, descrizione o autore',
+    noMatch: "Nessun'avventura corrisponde alla ricerca.",
+    resetSearch: 'Azzera ricerca',
+    empty: "Nessun'avventura pubblicata nella libreria."
+  },
+  myAdventures: {
+    title: 'Le Mie Avventure',
+    countFiltered: '{shown} di {total} progetti',
+    count: '{count} progetti personali',
+    countOne: '1 progetto personale',
+    create: 'Crea nuova avventura',
+    searchPlaceholder: 'Cerca tra le tue avventure',
+    publicationAriaLabel: 'Stato di pubblicazione',
+    noMatch: "Nessun'avventura corrisponde ai filtri.",
+    resetFilters: 'Azzera filtri',
+    empty: 'Non hai ancora creato nessuna avventura.',
+    startNow: 'Comincia ora',
+    loadError: 'Impossibile caricare le tue avventure.',
+    confirmDelete: 'Sei sicuro di voler eliminare definitivamente "{title}"?',
+    deleteError: "Errore durante l'eliminazione dell'avventura."
+  },
+  adventureForm: {
+    newBadge: 'Nuova Avventura',
+    editBadge: 'Modifica Avventura',
+    saving: 'Salvataggio...',
+    saveChanges: 'Salva Modifiche',
+    createAndEdit: 'Crea ed entra in Editor',
+    newTitle: 'Nuova Storia',
+    editTitle: 'Modifica Dettagli',
+    newSubtitle: "Definisci l'identità del gioco. Potrai creare le scene nell'editor subito dopo.",
+    editSubtitle: 'Aggiorna titolo, sinossi o locandina del tuo gioco.',
+    titleLabel: "Titolo dell'Avventura *",
+    titlePlaceholder: 'es. Il Segreto del Faro Abbandonato',
+    titleRequired: 'Il titolo è obbligatorio.',
+    titleMaxLength: 'Il titolo non può superare i 100 caratteri.',
+    startScene: 'Scena Iniziale di Partenza',
+    noStartScene: '-- Nessuna scena iniziale --',
+    startSceneHint: 'Questa è la prima stanza mostrata ai giocatori quando avviano una nuova partita.',
+    synopsis: 'Sinossi / Ambientazione',
+    synopsisPlaceholder: "Descrivi l'atmosfera, l'incipit della storia e i suoi misteri...",
+    coverLabel: 'Locandina / Copertina (16:9)',
+    coverDropTitle: "Trascina la copertina dell'avventura",
+    saveError: "Errore durante il salvataggio dell'avventura."
+  },
+
   authShowcase: {
     play: 'Gioca le avventure create dagli altri giocatori.',
     create: 'Crea la tua avventura: scene, oggetti e dialoghi.',

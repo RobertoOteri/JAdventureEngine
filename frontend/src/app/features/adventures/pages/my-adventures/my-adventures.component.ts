@@ -8,6 +8,9 @@ import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adv
 import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
 import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { TranslationKey } from '../../../../core/i18n/i18n.types';
 import { SegmentedControlComponent } from '../../../../shared/ui/segmented-control/segmented-control.component';
 import {
   ADVENTURE_SORT_OPTIONS,
@@ -27,7 +30,8 @@ import {
     AdventureDetailModalComponent,
     SearchBarComponent,
     FilterSelectComponent,
-    SegmentedControlComponent
+    SegmentedControlComponent,
+    TranslatePipe
   ],
   templateUrl: './my-adventures.component.html',
   styleUrl: './my-adventures.component.css'
@@ -36,9 +40,11 @@ export class MyAdventuresComponent implements OnInit {
   private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
 
+  private readonly i18n = inject(TranslationService);
+
   readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly isLoading = signal<boolean>(false);
-  readonly errorMessage = signal<string | null>(null);
+  readonly errorMessage = signal<TranslationKey | null>(null);
   readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
 
   readonly query = signal('');
@@ -73,7 +79,7 @@ export class MyAdventuresComponent implements OnInit {
       },
       error: (err: unknown) => {
         console.error('Errore caricamento avventure personali:', err);
-        this.errorMessage.set('Impossibile caricare le tue avventure.');
+        this.errorMessage.set('myAdventures.loadError');
         this.isLoading.set(false);
       }
     });
@@ -107,7 +113,7 @@ export class MyAdventuresComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`Sei sicuro di voler eliminare definitivamente "${adv.title}"?`)) {
+    if (!confirm(this.i18n.t('myAdventures.confirmDelete', { title: adv.title }))) {
       return;
     }
 
@@ -120,7 +126,7 @@ export class MyAdventuresComponent implements OnInit {
       },
       error: (err: unknown) => {
         console.error('Errore eliminazione avventura:', err);
-        alert("Errore durante l'eliminazione dell'avventura.");
+        alert(this.i18n.t('myAdventures.deleteError'));
       }
     });
   }

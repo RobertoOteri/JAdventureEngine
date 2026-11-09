@@ -67,6 +67,57 @@ export const en: Translations = {
       published: 'Published'
     }
   },
+
+  library: {
+    title: 'Adventure Library',
+    countFiltered: '{shown} of {total} titles',
+    count: '{count} titles available',
+    countOne: '1 title available',
+    searchPlaceholder: 'Search by title, description or author',
+    noMatch: 'No adventures match your search.',
+    resetSearch: 'Clear search',
+    empty: 'No adventures published in the library yet.'
+  },
+  myAdventures: {
+    title: 'My Adventures',
+    countFiltered: '{shown} of {total} projects',
+    count: '{count} personal projects',
+    countOne: '1 personal project',
+    create: 'Create new adventure',
+    searchPlaceholder: 'Search your adventures',
+    publicationAriaLabel: 'Publication status',
+    noMatch: 'No adventures match the filters.',
+    resetFilters: 'Clear filters',
+    empty: "You haven't created any adventures yet.",
+    startNow: 'Get started',
+    loadError: 'Unable to load your adventures.',
+    confirmDelete: 'Are you sure you want to permanently delete "{title}"?',
+    deleteError: 'Error while deleting the adventure.'
+  },
+  adventureForm: {
+    newBadge: 'New Adventure',
+    editBadge: 'Edit Adventure',
+    saving: 'Saving...',
+    saveChanges: 'Save changes',
+    createAndEdit: 'Create and open Editor',
+    newTitle: 'New Story',
+    editTitle: 'Edit Details',
+    newSubtitle: "Define your game's identity. You'll be able to create scenes in the editor right after.",
+    editSubtitle: "Update your game's title, synopsis or poster.",
+    titleLabel: 'Adventure title *',
+    titlePlaceholder: 'e.g. The Secret of the Abandoned Lighthouse',
+    titleRequired: 'Title is required.',
+    titleMaxLength: 'Title cannot exceed 100 characters.',
+    startScene: 'Starting scene',
+    noStartScene: '-- No starting scene --',
+    startSceneHint: 'This is the first room players see when they start a new game.',
+    synopsis: 'Synopsis / Setting',
+    synopsisPlaceholder: 'Describe the atmosphere, the opening of the story and its mysteries...',
+    coverLabel: 'Poster / Cover (16:9)',
+    coverDropTitle: 'Drag the adventure cover here',
+    saveError: 'Error while saving the adventure.'
+  },
+
   authShowcase: {
     play: 'Play adventures created by other players.',
     create: 'Create your own adventure: scenes, items and dialogues.',

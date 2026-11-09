@@ -5,11 +5,13 @@ import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { GraphicAdventureDto, Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
+import { TranslationService } from '../../../../core/i18n/translation.service';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-adventure-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent],
+  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent, TranslatePipe],
   templateUrl: './adventure-create.component.html',
   styleUrl: './adventure-create.component.css',
   host: {
@@ -21,6 +23,8 @@ export class AdventureCreateComponent {
   private readonly fb = inject(FormBuilder);
   private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
+
+  private readonly i18n = inject(TranslationService);
 
   readonly isModal = input<boolean>(false);
   readonly initialAdventure = input<GraphicAdventureDto | null>(null);
@@ -105,7 +109,7 @@ export class AdventureCreateComponent {
       error: (err: any) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(
-          err?.error?.message || err?.error?.detail || "Errore durante il salvataggio dell'avventura."
+          err?.error?.message || err?.error?.detail || this.i18n.t('adventureForm.saveError')
         );
       }
     });

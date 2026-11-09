@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { GraphicAdventureDto } from '../../../../core/models';
@@ -23,7 +24,8 @@ import {
     AdventureCardComponent,
     AdventureDetailModalComponent,
     SearchBarComponent,
-    FilterSelectComponent
+    FilterSelectComponent,
+    TranslatePipe
   ],
   templateUrl: './adventure-list.component.html',
   styleUrl: './adventure-list.component.css'

@@ -4,11 +4,11 @@
       <div class="topbar-left">
         <button type="button" class="btn-back" (click)="onCancel()">
           <i class="bi" [class.bi-arrow-left]="!isModal()" [class.bi-x-lg]="isModal()"></i>
-          <span>Annulla</span>
+          <span>{{ 'common.cancel' | t }}</span>
         </button>
         <div class="crumb-separator">/</div>
         <span class="badge-title">
-          {{ initialAdventure() ? 'Modifica Avventura' : 'Nuova Avventura' }}
+          {{ (initialAdventure() ? 'adventureForm.editBadge' : 'adventureForm.newBadge') | t }}
         </span>
       </div>
 
@@ -21,9 +21,9 @@
         >
           @if (isSubmitting()) {
             <span class="spinner-btn"></span>
-            <span>Salvataggio...</span>
+            <span>{{ 'adventureForm.saving' | t }}</span>
           } @else {
-            <span>{{ initialAdventure() ? 'Salva Modifiche' : 'Crea ed entra in Editor' }}</span>
+            <span>{{ (initialAdventure() ? 'adventureForm.saveChanges' : 'adventureForm.createAndEdit') | t }}</span>
             <i class="bi" [class.bi-check-lg]="initialAdventure()" [class.bi-arrow-right]="!initialAdventure()"></i>
           }
         </button>
@@ -41,64 +41,64 @@
       <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">
         <section class="meta-column">
           <div class="column-header">
-            <h1>{{ initialAdventure() ? 'Modifica Dettagli' : 'Nuova Storia' }}</h1>
+            <h1>{{ (initialAdventure() ? 'adventureForm.editTitle' : 'adventureForm.newTitle') | t }}</h1>
             <p class="subtitle">
-              {{ initialAdventure() ? 'Aggiorna titolo, sinossi o locandina del tuo gioco.' : 'Definisci l\'identità del gioco. Potrai creare le scene nell\'editor subito dopo.' }}
+              {{ (initialAdventure() ? 'adventureForm.editSubtitle' : 'adventureForm.newSubtitle') | t }}
             </p>
           </div>
 
           <div class="field-group">
-            <label for="title">Titolo dell'Avventura *</label>
+            <label for="title">{{ 'adventureForm.titleLabel' | t }}</label>
             <input
               id="title"
               type="text"
               formControlName="title"
               class="studio-input"
-              placeholder="es. Il Segreto del Faro Abbandonato"
+              [placeholder]="'adventureForm.titlePlaceholder' | t"
               [class.input-error]="form.get('title')?.touched && form.get('title')?.invalid"
             />
             @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
-              <span class="error-hint">Il titolo è obbligatorio.</span>
+              <span class="error-hint">{{ 'adventureForm.titleRequired' | t }}</span>
             }
             @if (form.get('title')?.touched && form.get('title')?.errors?.['maxlength']) {
-              <span class="error-hint">Il titolo non può superare i 100 caratteri.</span>
+              <span class="error-hint">{{ 'adventureForm.titleMaxLength' | t }}</span>
             }
           </div>
 
           @if (initialAdventure()) {
             <div class="field-group">
-              <label for="initialSceneCode">Scena Iniziale di Partenza</label>
+              <label for="initialSceneCode">{{ 'adventureForm.startScene' | t }}</label>
               <select
                 id="initialSceneCode"
                 formControlName="initialSceneCode"
                 class="studio-select"
               >
-                <option value="">-- Nessuna scena iniziale --</option>
+                <option value="">{{ 'adventureForm.noStartScene' | t }}</option>
                 @for (scene of scenes(); track scene.code) {
                   <option [value]="scene.code">
                     {{ scene.name }} ({{ scene.code }})
                   </option>
                 }
               </select>
-              <span class="field-hint">Questa è la prima stanza mostrata ai giocatori quando avviano una nuova partita.</span>
+              <span class="field-hint">{{ 'adventureForm.startSceneHint' | t }}</span>
             </div>
           }
 
           <div class="field-group flex-fill">
-            <label for="description">Sinossi / Ambientazione</label>
+            <label for="description">{{ 'adventureForm.synopsis' | t }}</label>
             <textarea
               id="description"
               formControlName="description"
               class="studio-textarea"
-              placeholder="Descrivi l'atmosfera, l'incipit della storia e i suoi misteri..."
+              [placeholder]="'adventureForm.synopsisPlaceholder' | t"
             ></textarea>
           </div>
         </section>
 
         <section class="preview-column">
           <app-file-dropzone
-            label="Locandina / Copertina (16:9)"
-            dropTitle="Trascina la copertina dell'avventura"
+            [label]="'adventureForm.coverLabel' | t"
+            [dropTitle]="'adventureForm.coverDropTitle' | t"
             (fileChange)="onFileChange($event)"
           />
         </section>

@@ -4,12 +4,14 @@
   <main class="content-body">
     <header class="masthead">
       <div class="masthead-text">
-        <h1>Libreria Avventure</h1>
+        <h1>{{ 'library.title' | t }}</h1>
         <span class="counter">
           @if (hasActiveFilters()) {
-            {{ filteredAdventures().length }} di {{ adventures().length }} titoli
+            {{ 'library.countFiltered' | t: { shown: filteredAdventures().length, total: adventures().length } }}
+          } @else if (adventures().length === 1) {
+            {{ 'library.countOne' | t }}
           } @else {
-            {{ adventures().length }} titoli registrati
+            {{ 'library.count' | t: { count: adventures().length } }}
           }
         </span>
       </div>
@@ -21,7 +23,7 @@
       <app-search-bar
         [value]="query()"
         (valueChange)="query.set($event)"
-        placeholder="Cerca per titolo, descrizione o autore"
+        [placeholder]="'library.searchPlaceholder' | t"
       />
       <div class="toolbar-filters">
         <app-filter-select
@@ -49,15 +51,15 @@
           @if (adventures().length > 0) {
             <div class="empty-wrap">
               <i class="bi bi-search empty-icon"></i>
-              <p>Nessun'avventura corrisponde alla ricerca.</p>
+              <p>{{ 'library.noMatch' | t }}</p>
               <button type="button" class="btn-create-first" (click)="resetFilters()">
-                <i class="bi bi-x-lg"></i> Azzera ricerca
+                <i class="bi bi-x-lg"></i> {{ 'library.resetSearch' | t }}
               </button>
             </div>
           } @else {
             <div class="empty-wrap">
               <i class="bi bi-journal-album empty-icon"></i>
-              <p>Nessun'avventura pubblicata nella libreria.</p>
+              <p>{{ 'library.empty' | t }}</p>
             </div>
           }
         }
