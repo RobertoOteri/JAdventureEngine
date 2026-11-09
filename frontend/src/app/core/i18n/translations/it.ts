@@ -743,4 +743,12 @@ export const it = {
     myProfile: 'Il mio profilo',
     logout: 'Esci'
   },
+
+  footer: {
+    phone: 'Telefono',
+    instagram: 'Instagram',
+    email: 'Email',
+    rights: '© {year} Tutti i diritti riservati'
+  },
+
 };

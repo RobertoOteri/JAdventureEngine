@@ -1,11 +1,13 @@
-<div class="app-shell">
+<div class="app-shell" #shell (scroll)="onScroll($event)">
   <app-topbar [scrolled]="isScrolled()" />
 
   <div class="app-body">
     <app-sidebar />
 
-    <main class="app-content" #content (scroll)="onScroll($event)">
+    <main class="app-content">
       <router-outlet />
     </main>
   </div>
+
+  <app-footer />
 </div>

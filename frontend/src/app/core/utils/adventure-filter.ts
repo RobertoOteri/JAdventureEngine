@@ -70,7 +70,6 @@ function dateOf(adventure: GraphicAdventureDto): number {
   return Date.parse(adventure.publishedAt ?? adventure.createdAt ?? '') || 0;
 }
 
-/** minuscolo e senza accenti: "Città" trova "citta" */
 function normalize(text: string): string {
   return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
 }

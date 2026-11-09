@@ -4,16 +4,17 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { TopbarComponent } from '../topbar/topbar.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { FooterComponent } from '../footer/footer.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, TopbarComponent, SidebarComponent],
+  imports: [RouterOutlet, TopbarComponent, SidebarComponent, FooterComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })
 export class MainLayoutComponent {
-  private readonly content = viewChild<ElementRef<HTMLElement>>('content');
+  private readonly shell = viewChild<ElementRef<HTMLElement>>('shell');
 
   readonly isScrolled = signal(false);
 
@@ -24,7 +25,7 @@ export class MainLayoutComponent {
       takeUntilDestroyed()
     )
       .subscribe(() => {
-        this.content()?.nativeElement.scrollTo({ top: 0 });
+        this.shell()?.nativeElement.scrollTo({ top: 0 });
         this.isScrolled.set(false);
       });
   }

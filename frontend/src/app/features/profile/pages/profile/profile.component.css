@@ -1,24 +1,22 @@
 :host {
-  display: block;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
   color: #e6e8ec;
 }
 
 .shell-layout {
   display: flex;
-  height: 100%;
+  flex: 1;
   width: 100%;
-  overflow: hidden;
 }
 
 .content-body {
   flex: 1;
   min-width: 0;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 2.25rem 3.5rem 2rem;
-  overflow-y: auto;
 }
 
 .masthead {

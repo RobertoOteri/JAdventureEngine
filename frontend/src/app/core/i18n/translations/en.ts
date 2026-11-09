@@ -744,4 +744,11 @@ export const en: Translations = {
     myProfile: 'My profile',
     logout: 'Log out'
   },
+
+  footer: {
+    phone: 'Phone',
+    instagram: 'Instagram',
+    email: 'Email',
+    rights: '© {year} All rights reserved'
+  },
 };

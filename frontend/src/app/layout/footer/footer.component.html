@@ -1,0 +1,37 @@
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-title">JAdventure<span class="footer-accent">Engine</span></span>
+      <span class="footer-rights">{{ 'footer.rights' | t: { year: year } }}</span>
+    </div>
+
+    <div class="contacts">
+      @if (contacts.phone) {
+        <a class="contact" [href]="phoneHref" [attr.aria-label]="'footer.phone' | t">
+          <i class="bi bi-telephone"></i>
+          <span>{{ contacts.phone }}</span>
+        </a>
+      }
+
+      @if (contacts.instagram) {
+        <a
+          class="contact"
+          [href]="instagramHref"
+          target="_blank"
+          rel="noopener noreferrer"
+          [attr.aria-label]="'footer.instagram' | t"
+        >
+          <i class="bi bi-instagram"></i>
+          <span>&#64;{{ contacts.instagram }}</span>
+        </a>
+      }
+
+      @if (contacts.email) {
+        <a class="contact" [href]="emailHref" [attr.aria-label]="'footer.email' | t">
+          <i class="bi bi-envelope"></i>
+          <span>{{ contacts.email }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</footer>
