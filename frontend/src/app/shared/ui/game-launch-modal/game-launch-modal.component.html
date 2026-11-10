@@ -1,65 +1,61 @@
-<div class="modal-backdrop" (click)="cancel.emit()">
-  <div class="modal-dialog-box" (click)="$event.stopPropagation()">
-    <header class="modal-header">
-      <div class="modal-header-left">
-        <div class="icon-wrap">
-          <i class="bi bi-controller"></i>
-        </div>
-        <div>
-          <h3>{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h3>
-          <span class="modal-subtitle">{{ 'gameLaunch.subtitle' | t }}</span>
-        </div>
-      </div>
-      <button type="button" class="btn-close" (click)="cancel.emit()" [title]="'common.closeWindow' | t">
-        <i class="bi bi-x-lg"></i>
+<div class="launch-screen">
+  <div class="scene-bg" aria-hidden="true">
+    @if (coverUrl()) {
+      <img [src]="coverUrl()" alt="" class="scene-img" />
+    }
+  </div>
+
+  <div class="launch-content">
+    <span class="launch-kicker">{{ 'gameLaunch.subtitle' | t }}</span>
+    <h1 class="launch-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h1>
+
+    <div class="launch-options">
+      <button
+        type="button"
+        class="option"
+        [class.primary]="hasSaves()"
+        [disabled]="!hasSaves()"
+        (click)="continueGame.emit()"
+        [title]="(hasSaves() ? 'gameLaunch.continueHint' : 'gameLaunch.noPreviousSave') | t"
+      >
+        <span class="option-icon"><i class="bi bi-play-fill"></i></span>
+        <span class="option-title">{{ 'gameLaunch.continueTitle' | t }}</span>
+        <span class="option-desc">{{ 'gameLaunch.continueDesc' | t }}</span>
       </button>
-    </header>
 
-    <div class="modal-body custom-scroll">
-      <div class="launch-options">
-        <button
-          type="button"
-          class="btn-launch-option primary"
-          [disabled]="!hasSaves()"
-          (click)="continueGame.emit()"
-          [title]="(hasSaves() ? 'gameLaunch.continueHint' : 'gameLaunch.noPreviousSave') | t"
-        >
-          <div class="option-icon-box green">
-            <i class="bi bi-play-circle-fill"></i>
-          </div>
-          <div class="option-texts">
-            <span class="option-title">{{ 'gameLaunch.continueTitle' | t }}</span>
-            <span class="option-desc">{{ 'gameLaunch.continueDesc' | t }}</span>
-          </div>
-        </button>
+      <button
+        type="button"
+        class="option"
+        [disabled]="!hasSaves()"
+        (click)="isSavesModalOpen.set(true)"
+        [title]="(hasSaves() ? 'gameLaunch.loadHint' : 'gameLaunch.noSaves') | t"
+      >
+        <span class="option-icon">
+          <i class="bi bi-folder2-open"></i>
+          @if (hasSaves()) {
+            <span class="option-count">{{ saves().length }}</span>
+          }
+        </span>
+        <span class="option-title">{{ 'gameLaunch.loadTitle' | t }}</span>
+        <span class="option-desc">{{ 'gameLaunch.loadHint' | t }}</span>
+      </button>
 
-        <button
-          type="button"
-          class="btn-launch-option"
-          [disabled]="!hasSaves()"
-          (click)="isSavesModalOpen.set(true)"
-          [title]="(hasSaves() ? 'gameLaunch.loadHint' : 'gameLaunch.noSaves') | t"
-        >
-          <div class="option-icon-box cyan">
-            <i class="bi bi-folder2-open"></i>
-          </div>
-          <div class="option-texts">
-            <span class="option-title">{{ 'gameLaunch.loadTitle' | t }}</span>
-            <span class="option-desc">{{ 'gameLaunch.loadDesc' | t: { count: saves().length } }}</span>
-          </div>
-        </button>
-
-        <button type="button" class="btn-launch-option new-game" (click)="onNewGameClick()">
-          <div class="option-icon-box amber">
-            <i class="bi bi-stars"></i>
-          </div>
-          <div class="option-texts">
-            <span class="option-title">{{ 'gameLaunch.newTitle' | t }}</span>
-            <span class="option-desc">{{ 'gameLaunch.newDesc' | t }}</span>
-          </div>
-        </button>
-      </div>
+      <button
+        type="button"
+        class="option"
+        [class.primary]="!hasSaves()"
+        (click)="onNewGameClick()"
+      >
+        <span class="option-icon"><i class="bi bi-stars"></i></span>
+        <span class="option-title">{{ 'gameLaunch.newTitle' | t }}</span>
+        <span class="option-desc">{{ 'gameLaunch.newDesc' | t }}</span>
+      </button>
     </div>
+
+    <button type="button" class="btn-back" (click)="cancel.emit()">
+      <i class="bi bi-arrow-left"></i>
+      <span>{{ 'gameplay.ending.exit' | t }}</span>
+    </button>
   </div>
 </div>
 
@@ -83,4 +79,3 @@
     (cancel)="isConfirmOverwriteOpen.set(false)"
   />
 }
-

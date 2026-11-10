@@ -95,6 +95,7 @@
   @if (isLaunchModalOpen()) {
     <app-game-launch-modal
       [adventureTitle]="adventureDetails()?.title ?? ''"
+      [coverUrl]="adventureDetails()?.coverImageUrl ?? ''"
       [saves]="store.savesList()"
       (startNew)="onStartNew()"
       (continueGame)="onContinue()"

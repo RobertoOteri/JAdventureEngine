@@ -19,6 +19,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 })
 export class GameLaunchModalComponent {
   adventureTitle = input<string>('');
+  coverUrl = input<string>('');
   saves = input<GameSaveDto[]>([]);
 
   startNew = output<void>();

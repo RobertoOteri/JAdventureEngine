@@ -1,6 +1,7 @@
 <section
   class="inventory-tray"
   [class.is-closed]="!open()"
+  [class.is-booting]="!hasOpened()"
   [class.is-collapsed]="isDragging() && !isPeekingExpanded()"
   [attr.aria-hidden]="!open()"
   role="dialog"

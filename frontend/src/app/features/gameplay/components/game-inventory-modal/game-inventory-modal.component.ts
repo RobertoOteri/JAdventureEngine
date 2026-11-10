@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, input, output, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Item } from '../../../../core/models';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
@@ -24,9 +24,20 @@ export class GameInventoryModalComponent {
   slotHover = output<{ name: string; code: string } | null>();
   slotDrop = output<string>();
 
+  /** Diventa true alla prima apertura: prima di allora il vassoio resta nascosto senza animazioni. */
+  readonly hasOpened = signal<boolean>(false);
+
   readonly isPeekingExpanded = signal<boolean>(false);
   readonly selectedCode = signal<string | null>(null);
   readonly hoveredCode = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      if (this.open()) {
+        this.hasOpened.set(true);
+      }
+    });
+  }
 
   private pendingDrag: { item: Item; x: number; y: number } | null = null;
   private dragStarted = false;

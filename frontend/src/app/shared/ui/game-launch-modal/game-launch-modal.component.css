@@ -1,156 +1,285 @@
-.modal-backdrop {
+/* Schermata di avvio: copertina sfocata a tutto schermo, titolo e tre scelte senza riquadri */
+
+.launch-screen {
   position: fixed;
   inset: 0;
-  background: rgba(4, 6, 10, 0.85);
-  backdrop-filter: blur(8px);
   z-index: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2rem;
+  overflow-y: auto;
+  background: var(--bg-app);
+  animation: fadeIn 0.35s ease-out;
 }
 
-.modal-dialog-box {
+/* ---------- Copertina a tutto schermo ---------- */
+
+.scene-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(80% 60% at 50% 40%, rgba(201, 164, 92, 0.1), transparent 70%);
+}
+
+.scene-img {
   width: 100%;
-  max-width: 520px;
-  background: #0f1118;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.15) brightness(0.5);
+  transform: scale(1.1);
+}
+
+.scene-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(75% 65% at 50% 50%, rgba(8, 10, 15, 0.2) 0%, rgba(8, 10, 15, 0.82) 100%),
+    linear-gradient(180deg, rgba(8, 10, 15, 0) 60%, rgba(8, 10, 15, 0.6) 100%);
+}
+
+/* ---------- Contenuto ---------- */
+
+.launch-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
-}
-
-.modal-header {
-  padding: 1.25rem 1.6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #131622;
+  width: 100%;
+  max-width: 880px;
+  text-align: center;
+  animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modal-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.icon-wrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 1.15rem;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.15rem;
+.launch-kicker {
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #ffffff;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-strong);
 }
 
-.modal-subtitle {
-  font-size: 0.8rem;
-  color: #8b92a0;
+.launch-title {
+  max-width: 100%;
+  margin: 0.75rem 0 2.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--text-primary);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  overflow-wrap: anywhere;
 }
 
-.btn-close {
-  background: transparent;
-  border: none;
-  color: #71717a;
-  font-size: 1.15rem;
-  cursor: pointer;
-}
-
-.btn-close:hover {
-  color: #ffffff;
-}
-
-.modal-body {
-  padding: 1.6rem;
-}
+/* ---------- Le tre scelte: colonna compatta stile menu ---------- */
 
 .launch-options {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 420px;
 }
 
-.btn-launch-option {
-  display: flex;
+.option {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
   align-items: center;
-  gap: 1.1rem;
-  background: #141720;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
-  color: #ffffff;
-  cursor: pointer;
+  column-gap: 0.9rem;
+  row-gap: 0.1rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background: rgba(14, 17, 24, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text-body);
+  font: inherit;
   text-align: left;
-  transition: all 0.15s ease;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-launch-option:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.22);
-  transform: translateY(-1px);
-}
-
-.btn-launch-option:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.option-icon-box {
-  width: 44px;
-  height: 44px;
+.option-icon {
+  position: relative;
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--brass-line);
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  flex-shrink: 0;
+  background: rgba(201, 164, 92, 0.08);
+  color: var(--brass);
+  font-size: 1.05rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.option-icon-box.green {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #34d399;
-}
-
-.option-icon-box.cyan {
-  background: rgba(6, 182, 212, 0.12);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  color: #38bdf8;
-}
-
-.option-icon-box.amber {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
-}
-
-.option-texts {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.option-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--brass);
+  color: var(--on-brass);
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
 }
 
 .option-title {
+  align-self: end;
   font-size: 0.95rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .option-desc {
-  font-size: 0.78rem;
-  color: #8b92a0;
+  grid-column: 2;
+  align-self: start;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Freccia a destra di ogni scelta */
+.option::after {
+  content: '\F285';
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  font-family: 'bootstrap-icons';
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--brass-line);
+  background: rgba(20, 24, 33, 0.78);
+  transform: translateX(3px);
+}
+
+.option:hover:not(:disabled) .option-icon {
+  border-color: var(--brass-strong);
+  background: var(--brass-tint-strong);
+}
+
+.option:hover:not(:disabled)::after {
+  color: var(--brass);
+  transform: translateX(2px);
+}
+
+/* Scelta consigliata: ottone pieno, prima della lista */
+.option.primary {
+  order: -1;
+  margin-bottom: 0.4rem;
+  padding: 0.85rem 1.1rem;
+  border-color: transparent;
+  background: var(--brass);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.option.primary .option-icon {
+  width: 40px;
+  height: 40px;
+  border-color: rgba(26, 21, 11, 0.25);
+  background: rgba(26, 21, 11, 0.12);
+  color: var(--on-brass);
+  font-size: 1.25rem;
+}
+
+.option.primary .option-title {
+  font-size: 1.05rem;
+  color: var(--on-brass);
+}
+
+.option.primary .option-desc {
+  color: rgba(26, 21, 11, 0.7);
+}
+
+.option.primary::after {
+  color: var(--on-brass);
+}
+
+.option.primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--brass-light);
+}
+
+.option.primary:hover:not(:disabled) .option-icon {
+  border-color: rgba(26, 21, 11, 0.3);
+  background: rgba(26, 21, 11, 0.16);
+}
+
+.option.primary:hover:not(:disabled)::after {
+  color: var(--on-brass);
+}
+
+.option:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ---------- Ritorno alla libreria ---------- */
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.45rem 0.75rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.option:focus-visible,
+.btn-back:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* ---------- Animazioni ---------- */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launch-screen,
+  .launch-content {
+    animation: none;
+  }
+
+  .option,
+  .option:hover:not(:disabled) {
+    transition: none;
+    transform: none;
+  }
 }
