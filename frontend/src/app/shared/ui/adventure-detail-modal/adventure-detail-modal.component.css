@@ -144,9 +144,11 @@
 
 .adventure-title {
   margin: 0 0 0.6rem;
-  font-size: 1.8rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
   color: var(--text-primary);
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }

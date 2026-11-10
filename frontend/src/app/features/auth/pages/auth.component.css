@@ -73,7 +73,7 @@ h1 {
   gap: 0.6rem;
   margin-bottom: 1rem;
   padding: 0.65rem 0.9rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--danger-tint);
   border: 1px solid var(--danger-line);
   color: var(--danger);
@@ -87,7 +87,7 @@ h1 {
   gap: 0.6rem;
   margin-bottom: 1rem;
   padding: 0.65rem 0.9rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--success-tint);
   border: 1px solid rgba(74, 222, 128, 0.35);
   color: var(--success);
@@ -122,7 +122,7 @@ label {
   padding: 0 0.9rem;
   background: var(--surface-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   color: var(--text-primary);
   font-size: 0.92rem;
   outline: none;
@@ -189,7 +189,7 @@ label {
   background: var(--brass);
   color: var(--on-brass);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;

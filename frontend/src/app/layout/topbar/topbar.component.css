@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   height: 76px;
-  background: #151922;
+  background: var(--surface-topbar);
   border-bottom: 1px solid rgba(201, 164, 92, 0.4);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
   transition: box-shadow 0.2s ease;
@@ -53,7 +53,7 @@
   max-width: 220px;
   height: 40px;
   padding: 0 0.75rem 0 0.35rem;
-  border-radius: 9px;
+  border-radius: var(--radius);
   text-decoration: none;
   transition: background-color 0.15s ease;
 }
@@ -94,7 +94,7 @@
   width: 38px;
   height: 38px;
   border: none;
-  border-radius: 9px;
+  border-radius: var(--radius);
   background: transparent;
   color: #7d828d;
   font-size: 1.1rem;

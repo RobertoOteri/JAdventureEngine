@@ -31,7 +31,7 @@
   width: 100%;
   background: var(--surface-3);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 1.1rem;
   box-sizing: border-box;
 }
@@ -70,7 +70,7 @@
   color: var(--text-primary);
   background: var(--surface-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   outline: none;
   transition: border-color 0.15s ease;
 }

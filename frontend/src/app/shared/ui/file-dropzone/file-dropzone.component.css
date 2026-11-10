@@ -99,7 +99,7 @@
   position: relative;
   flex: 1;
   min-height: 280px;
-  border-radius: 14px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: #000000;
   border: 1px solid var(--border-subtle);
@@ -135,7 +135,7 @@
   color: var(--text-primary);
   background: rgba(21, 25, 34, 0.88);
   padding: 0.35rem 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   white-space: nowrap;
   overflow: hidden;
@@ -155,7 +155,7 @@
   border: 1px solid var(--danger-line);
   color: var(--danger);
   padding: 0.45rem 0.9rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;

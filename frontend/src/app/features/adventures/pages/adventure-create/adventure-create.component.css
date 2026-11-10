@@ -22,7 +22,7 @@
 
 .workspace-topbar {
   height: 56px;
-  background: #151922;
+  background: var(--surface-topbar);
   border-bottom: 1px solid var(--brass-line);
   display: flex;
   align-items: center;
@@ -45,7 +45,7 @@
   background: transparent;
   border: 1px solid var(--border);
   padding: 0.4rem 0.85rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 600;
@@ -69,7 +69,7 @@
   color: var(--brass-light);
   background: var(--surface-3);
   padding: 0.25rem 0.65rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .topbar-actions {
@@ -88,7 +88,7 @@
   font-weight: 700;
   font-size: 0.85rem;
   padding: 0.5rem 1.25rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: all 0.15s ease;
@@ -132,7 +132,7 @@
   border: 1px solid var(--danger-line);
   color: var(--danger);
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
@@ -189,7 +189,7 @@ label {
 .studio-input {
   background: var(--surface-input);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.75rem 0.95rem;
   color: var(--text-primary);
   font-size: 0.92rem;
@@ -207,7 +207,7 @@ label {
 .studio-textarea {
   background: var(--surface-input);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.85rem 0.95rem;
   color: var(--text-primary);
   font-size: 0.9rem;
@@ -268,7 +268,7 @@ label {
   max-width: 92vw;
   background-color: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
 }
@@ -286,7 +286,7 @@ label {
 
 .modal-container .workspace-body::-webkit-scrollbar-thumb {
   background: var(--surface-4);
-  border-radius: 10px;
+  border-radius: var(--radius);
 }
 
 .modal-container .studio-layout {
@@ -307,7 +307,7 @@ label {
 .studio-select {
   background: var(--surface-input);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.75rem 0.95rem;
   color: var(--text-primary);
   font-size: 0.92rem;

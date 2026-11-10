@@ -170,7 +170,7 @@
   width: 64px;
   height: 64px;
   border: 1px solid var(--brass-line);
-  border-radius: 18px;
+  border-radius: var(--radius-xl);
   background: var(--brass-tint);
   color: var(--brass);
   font-size: 1.8rem;

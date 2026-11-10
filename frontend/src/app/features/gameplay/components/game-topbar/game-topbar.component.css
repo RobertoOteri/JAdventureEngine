@@ -14,7 +14,7 @@
   height: 60px;
   padding: 0 1.25rem;
   box-sizing: border-box;
-  background: #151922;
+  background: var(--surface-topbar);
   border-bottom: 1px solid var(--brass-line);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
 }

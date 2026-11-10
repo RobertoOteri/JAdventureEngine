@@ -16,7 +16,7 @@
   padding: 0.6rem 0.8rem;
   background: var(--surface-1);
   border: 1px solid var(--brass-line);
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .rule-type-col,
@@ -33,7 +33,7 @@
   color: var(--text-primary);
   background: var(--surface-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -122,7 +122,7 @@
   cursor: pointer;
   background: var(--brass-tint);
   border: 1px solid var(--brass-line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 0.15s ease;
 }
 

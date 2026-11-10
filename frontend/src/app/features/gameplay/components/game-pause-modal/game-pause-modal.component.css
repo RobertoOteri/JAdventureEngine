@@ -133,7 +133,7 @@
   width: 34px;
   height: 34px;
   border: 1px solid var(--brass-line);
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--brass-tint);
   color: var(--brass);
   font-size: 1rem;

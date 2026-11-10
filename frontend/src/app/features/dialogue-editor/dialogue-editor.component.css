@@ -19,7 +19,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1.25rem;
-  background: #151922;
+  background: var(--surface-topbar);
   border-bottom: 1px solid var(--brass-line);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
@@ -61,7 +61,7 @@
   cursor: pointer;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: all 0.15s ease;
 }
 
@@ -96,7 +96,7 @@
   cursor: pointer;
   background: var(--brass);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 0.15s ease;
 }
 

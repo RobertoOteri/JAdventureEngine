@@ -92,7 +92,7 @@
   flex-shrink: 0;
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius);
   transition: border-color 0.15s ease;
 }
 
@@ -249,7 +249,7 @@
   color: var(--text-primary);
   background: var(--surface-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   outline: none;
   transition: border-color 0.15s ease;
 }
