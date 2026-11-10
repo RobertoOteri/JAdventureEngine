@@ -10,7 +10,7 @@ import { ActionService } from '../../../core/services/action.service';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { ACTION_TYPE_KEYS } from '../../../core/i18n/enum-labels';
-import {apiErrorMessage} from '../../../core/utils/http-error.util';
+import { NotificationService } from '../../../core/services/notification.service';
 
 export interface EditorState {
   adventure: GraphicAdventureDto | null;
@@ -21,7 +21,6 @@ export interface EditorState {
   pendingItemCode: string | null;
   isLoading: boolean;
   isSaving: boolean;
-  feedbackMessage: string | null;
 }
 
 const initialState: EditorState = {
@@ -32,8 +31,7 @@ const initialState: EditorState = {
   selectedItem: null,
   pendingItemCode: null,
   isLoading: false,
-  isSaving: false,
-  feedbackMessage: null
+  isSaving: false
 };
 
 export const EditorStore = signalStore(
@@ -69,7 +67,8 @@ export const EditorStore = signalStore(
     itemService = inject(ItemService),
     actionService = inject(ActionService),
     dialogueService = inject(DialogueService),
-    i18n = inject(TranslationService)
+    i18n = inject(TranslationService),
+    notifications = inject(NotificationService)
   ) => {
 
     const resetState = (): void => {
@@ -152,7 +151,6 @@ export const EditorStore = signalStore(
         tap(() =>
           patchState(store, {
             isLoading: true,
-            feedbackMessage: null,
             adventure: null,
             scenes: [],
             currentScene: null,
@@ -176,9 +174,9 @@ export const EditorStore = signalStore(
               })
             );
           } else {
+            notifications.error(i18n.t('sceneEditor.feedback.invalidAdventureId'));
             patchState(store, {
-              isLoading: false,
-              feedbackMessage: i18n.t('sceneEditor.feedback.invalidAdventureId')
+              isLoading: false
             });
             return of(null);
           }
@@ -244,15 +242,14 @@ export const EditorStore = signalStore(
                             }
                           }
                         },
-                        error: (err) => console.error('Errore caricamento oggetti avventura:', err)
+                        error: (err) => notifications.httpError(err)
                       });
                     }
                   },
                   error: (err: any) => {
-                    console.error('Errore caricamento scene:', err);
+                    notifications.httpError(err, 'sceneEditor.feedback.scenesLoadError');
                     patchState(store, {
-                      isLoading: false,
-                      feedbackMessage: i18n.t('sceneEditor.feedback.scenesLoadError')
+                      isLoading: false
                     });
                   }
                 })
@@ -260,10 +257,9 @@ export const EditorStore = signalStore(
             }),
             tap({
               error: (err: any) => {
-                console.error('Errore caricamento avventura:', err);
+                notifications.httpError(err, 'sceneEditor.feedback.adventureLoadError');
                 patchState(store, {
-                  isLoading: false,
-                  feedbackMessage: i18n.t('sceneEditor.feedback.adventureLoadError')
+                  isLoading: false
                 });
               }
             })
@@ -286,7 +282,7 @@ export const EditorStore = signalStore(
           next: (allItems) => {
             patchState(store, { adventureItems: allItems });
           },
-          error: (err) => console.error('Errore caricamento oggetti:', err)
+          error: (err) => notifications.httpError(err)
         });
       },
 
@@ -312,7 +308,7 @@ export const EditorStore = signalStore(
               });
             },
             error: (err: any) => {
-              console.error('Errore eliminazione scena:', err);
+              notifications.httpError(err);
               patchState(store, { isSaving: false });
             }
           })
@@ -335,23 +331,20 @@ export const EditorStore = signalStore(
       },
 
       updateAdventureDetails(formData: FormData): Observable<GraphicAdventureDto> {
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return adventureService.updateAdventure(formData).pipe(
           tap({
             next: (updatedAdv) => {
+              notifications.success(i18n.t('sceneEditor.feedback.detailsSaved'));
               patchState(store, {
                 adventure: updatedAdv,
-                isSaving: false,
-                feedbackMessage: i18n.t('sceneEditor.feedback.detailsSaved')
+                isSaving: false
               });
             },
             error: (err: any) => {
-              console.error('Errore aggiornamento avventura:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.detailsSaveError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.detailsSaveError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -363,7 +356,7 @@ export const EditorStore = signalStore(
           throw new Error('Nessuna scena selezionata.');
         }
 
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return sceneService.addItemToScene(sceneId, formData).pipe(
           switchMap((savedItem) => {
@@ -374,10 +367,8 @@ export const EditorStore = signalStore(
                   tap((allItems) => {
                     const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
                     updateItemInState(freshItem);
-                    patchState(store, {
-                      isSaving: false,
-                      feedbackMessage: i18n.t('sceneEditor.feedback.itemSaved', { name: freshItem.name })
-                    });
+                    notifications.success(i18n.t('sceneEditor.feedback.itemSaved', { name: freshItem.name }));
+                    patchState(store, { isSaving: false });
                   }),
                   switchMap(() => of(savedItem))
                 );
@@ -385,19 +376,14 @@ export const EditorStore = signalStore(
             }
 
             updateItemInState(savedItem);
-            patchState(store, {
-              isSaving: false,
-              feedbackMessage: i18n.t('sceneEditor.feedback.itemSaved', { name: savedItem.name })
-            });
+            notifications.success(i18n.t('sceneEditor.feedback.itemSaved', { name: savedItem.name }));
+            patchState(store, { isSaving: false });
             return of(savedItem);
           }),
           tap({
             error: (err: any) => {
-              console.error('Errore salvataggio item:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.saveError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.saveError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -409,7 +395,7 @@ export const EditorStore = signalStore(
           throw new Error('Nessuna avventura selezionata.');
         }
 
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return adventureService.addItem(adventureId, formData).pipe(
           switchMap((savedItem) => {
@@ -420,11 +406,11 @@ export const EditorStore = signalStore(
                   tap((allItems) => {
                     const freshItem = allItems.find((i) => i.code === savedItem.code) ?? savedItem;
                     const currentList = store.adventureItems() ?? [];
+                    notifications.success(i18n.t('sceneEditor.feedback.globalItemSaved', { name: freshItem.name }));
                     patchState(store, {
                       adventureItems: [...currentList.filter(i => i.code !== freshItem.code), freshItem],
                       selectedItem: freshItem,
-                      isSaving: false,
-                      feedbackMessage: i18n.t('sceneEditor.feedback.globalItemSaved', { name: freshItem.name })
+                      isSaving: false
                     });
                   }),
                   switchMap(() => of(savedItem))
@@ -433,44 +419,36 @@ export const EditorStore = signalStore(
             }
 
             const currentList = store.adventureItems() ?? [];
+            notifications.success(i18n.t('sceneEditor.feedback.globalItemSaved', { name: savedItem.name }));
             patchState(store, {
               adventureItems: [...currentList, savedItem],
               selectedItem: savedItem,
-              isSaving: false,
-              feedbackMessage: i18n.t('sceneEditor.feedback.globalItemSaved', { name: savedItem.name })
+              isSaving: false
             });
             return of(savedItem);
           }),
           tap({
             error: (err: any) => {
-              console.error('Errore salvataggio oggetto inventario:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.itemSaveError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.itemSaveError');
+              patchState(store, { isSaving: false });
             }
           })
         );
       },
 
       updateItem(formData: FormData): Observable<Item> {
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return itemService.updateItem(formData).pipe(
           tap({
             next: (updatedItem) => {
               updateItemInState(updatedItem);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: i18n.t('sceneEditor.feedback.itemUpdated', { name: updatedItem.name })
-              });
+              notifications.success(i18n.t('sceneEditor.feedback.itemUpdated', { name: updatedItem.name }));
+              patchState(store, { isSaving: false });
             },
             error: (err: any) => {
-              console.error('Errore aggiornamento item:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.updateError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.updateError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -503,7 +481,7 @@ export const EditorStore = signalStore(
               });
             },
             error: (err: any) => {
-              console.error('Errore eliminazione item:', err);
+              notifications.httpError(err);
               patchState(store, { isSaving: false });
             }
           })
@@ -516,17 +494,14 @@ export const EditorStore = signalStore(
           throw new Error('Nessuna avventura caricata.');
         }
 
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return adventureService.publish(adventureId).pipe(
           tap({
             next: () => patchState(store, { isSaving: false }),
             error: (err: any) => {
-              console.error('Errore pubblicazione:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.publishError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.publishError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -562,17 +537,12 @@ export const EditorStore = signalStore(
 
                 updateItemInState({ ...itemToUpdate, actions: updatedActions });
               }
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: i18n.t('sceneEditor.feedback.actionAdded', { type: i18n.t(ACTION_TYPE_KEYS[savedAction.type]) })
-              });
+              notifications.success(i18n.t('sceneEditor.feedback.actionAdded', { type: i18n.t(ACTION_TYPE_KEYS[savedAction.type]) }));
+              patchState(store, { isSaving: false });
             },
             error: (err: any) => {
-              console.error('Errore aggiunta azione:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.actionSaveError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.actionSaveError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -601,17 +571,12 @@ export const EditorStore = signalStore(
                 actions: updatedItemActions
               });
 
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: i18n.t('sceneEditor.feedback.actionUpdated', { type: i18n.t(ACTION_TYPE_KEYS[updatedAction.type]) })
-              });
+              notifications.success(i18n.t('sceneEditor.feedback.actionUpdated', { type: i18n.t(ACTION_TYPE_KEYS[updatedAction.type]) }));
+              patchState(store, { isSaving: false });
             },
             error: (err: any) => {
-              console.error('Errore aggiornamento azione:', err);
-              patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n) || i18n.t('sceneEditor.feedback.actionUpdateError')
-              });
+              notifications.httpError(err, 'sceneEditor.feedback.actionUpdateError');
+              patchState(store, { isSaving: false });
             }
           })
         );
@@ -633,7 +598,10 @@ export const EditorStore = signalStore(
               }
               patchState(store, { isSaving: false });
             },
-            error: () => patchState(store, { isSaving: false })
+            error: (err) => {
+              notifications.httpError(err);
+              patchState(store, { isSaving: false });
+            }
           })
         );
       }

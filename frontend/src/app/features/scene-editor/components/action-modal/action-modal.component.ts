@@ -19,6 +19,7 @@ import {
 } from '../textbox-placer/textbox-placer.component';
 import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { nodeLabel } from '../../../../core/utils/node-label';
 
 @Component({
@@ -31,6 +32,7 @@ import { nodeLabel } from '../../../../core/utils/node-label';
 export class ActionModalComponent {
 
   private readonly i18n = inject(TranslationService);
+  private readonly notifications = inject(NotificationService);
 
   readonly store = inject(EditorStore);
 
@@ -343,7 +345,7 @@ export class ActionModalComponent {
 
   onSubmit(): void {
     if (this.actionType === 'USE_WITH' && !this.targetItemCode) {
-      alert("Seleziona l'elemento bersaglio con cui interagire.");
+      this.notifications.warning(this.i18n.t('actionModal.targetRequired'));
       return;
     }
 

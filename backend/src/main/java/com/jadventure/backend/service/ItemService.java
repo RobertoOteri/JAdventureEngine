@@ -3,6 +3,7 @@ package com.jadventure.backend.service;
 import com.jadventure.backend.dto.action.ActionDto;
 import com.jadventure.backend.dto.item.HotspotDto;
 import com.jadventure.backend.dto.item.ItemDto;
+import com.jadventure.backend.exception.ConflictException;
 import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
@@ -36,6 +37,13 @@ public class ItemService {
     private final AuthService authService;
 
     @Transactional(readOnly = true)
+    public void validateCodeAvailable(Long adventureId, String code) {
+        if (itemRepository.existsByGraphicAdventureIdAndCode(adventureId, code)) {
+            log.error("Item code {} already in use in adventure {}", code, adventureId);
+            throw new ConflictException("error.item.codeTaken", code);
+        }
+    }
+
     public List<ItemDto> getAdventureItems(Long adventureId) {
         log.info("Executing getAdventureItems with adventureId: {}", adventureId);
         List<ItemDto> items = itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureId(adventureId));

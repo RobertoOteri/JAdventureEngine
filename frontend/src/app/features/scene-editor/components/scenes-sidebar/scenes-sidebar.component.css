@@ -42,8 +42,6 @@
   background: linear-gradient(90deg, transparent, var(--brass-line), transparent);
 }
 
-/* ---------- Intestazioni di sezione ---------- */
-
 .sidebar-header {
   flex-shrink: 0;
   display: flex;
@@ -97,8 +95,6 @@
   border-color: var(--brass);
   color: var(--on-brass);
 }
-
-/* ---------- Scene ---------- */
 
 .scenes-list {
   flex: 1;
@@ -209,7 +205,6 @@
   background: var(--danger-tint);
 }
 
-/* ---------- Oggetti ---------- */
 
 .objects-list {
   flex: 1;

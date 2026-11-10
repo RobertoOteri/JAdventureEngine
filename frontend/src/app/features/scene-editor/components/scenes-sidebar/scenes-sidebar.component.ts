@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EditorStore } from '../../store/editor.store';
 import { Item, Scene } from '../../../../core/models';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { ConfirmService } from '../../../../core/services/confirm.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 export interface SidebarItemEntry {
@@ -30,6 +31,7 @@ export interface SidebarItemGroup {
 })
 export class ScenesSidebarComponent {
   private readonly i18n = inject(TranslationService);
+  private readonly confirm = inject(ConfirmService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly store = inject(EditorStore);
@@ -138,7 +140,7 @@ export class ScenesSidebarComponent {
     }
   }
 
-  deleteScene(event: MouseEvent, scene: Scene): void {
+  async deleteScene(event: MouseEvent, scene: Scene): Promise<void> {
     event.stopPropagation();
 
     if (!scene.id) {
@@ -149,7 +151,12 @@ export class ScenesSidebarComponent {
     const advId = this.getAdventureId();
     if (!advId) return;
 
-    if (confirm(this.i18n.t('sceneEditor.sidebar.confirmDeleteScene', { name: scene.name }))) {
+    const confirmed = await this.confirm.ask({
+      title: this.i18n.t('confirmation.deleteTitle'),
+      message: this.i18n.t('sceneEditor.sidebar.confirmDeleteScene', { name: scene.name }),
+      confirmText: this.i18n.t('common.delete')
+    });
+    if (confirmed) {
       this.store.deleteScene(scene.id).subscribe({
         next: () => {
           const remaining = this.store.scenes();
@@ -159,7 +166,7 @@ export class ScenesSidebarComponent {
             void this.router.navigate(['/editor', advId]);
           }
         },
-        error: (err: any) => console.error(err)
+        error: () => undefined
       });
     }
   }

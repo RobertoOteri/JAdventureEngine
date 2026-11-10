@@ -19,6 +19,7 @@ import { FilterOption } from '../../../shared/ui/filter-select/filter-select.com
 import { LanguageSwitchComponent } from '../../../shared/ui/language-switch/language-switch.component';
 import { AuthShowcaseComponent } from '../components/auth-showcase/auth-showcase.component';
 import { BrandLogoComponent } from '../../../shared/ui/brand-logo/brand-logo.component';
+import { AlertComponent } from '../../../shared/ui/alert/alert.component';
 
 type AuthMode = 'login' | 'register';
 
@@ -39,7 +40,8 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
     AuthShowcaseComponent,
     LanguageSwitchComponent,
     TranslatePipe,
-    BrandLogoComponent
+    BrandLogoComponent,
+    AlertComponent
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
@@ -50,7 +52,8 @@ export class AuthComponent {
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly i18n = inject(TranslationService);
 
-  readonly mode: AuthMode = inject(ActivatedRoute).snapshot.data['mode'] ?? 'login';
+  private readonly route = inject(ActivatedRoute);
+  readonly mode: AuthMode = this.route.snapshot.data['mode'] ?? 'login';
   readonly isLogin = this.mode === 'login';
 
   readonly modeOptions: FilterOption<AuthMode>[] = [
@@ -96,9 +99,14 @@ export class AuthComponent {
     }
   }
 
+  private redirectUrl(): string {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    return returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/adventures';
+  }
+
   switchMode(mode: AuthMode): void {
     if (mode !== this.mode) {
-      void this.router.navigate(['/', mode]);
+      void this.router.navigate(['/', mode], { queryParamsHandling: 'preserve' });
     }
   }
 
@@ -151,7 +159,7 @@ export class AuthComponent {
 
     if (this.isLogin) {
       this.authService.login(this.loginForm.getRawValue()).subscribe({
-        next: () => void this.router.navigate(['/adventures']),
+        next: () => void this.router.navigateByUrl(this.redirectUrl()),
         error: (err: HttpErrorResponse) => this.errorMessage.set(httpErrorMessage(err, this.i18n))
       });
       return;
@@ -160,7 +168,10 @@ export class AuthComponent {
     const payload = this.registerPayload();
     this.authService.register(payload).subscribe({
       next: () =>
-        void this.router.navigate(['/login'], { state: { registeredUsername: payload.username } }),
+        void this.router.navigate(['/login'], {
+          state: { registeredUsername: payload.username },
+          queryParamsHandling: 'preserve'
+        }),
       error: (err: HttpErrorResponse) => this.errorMessage.set(httpErrorMessage(err, this.i18n))
     });
   }

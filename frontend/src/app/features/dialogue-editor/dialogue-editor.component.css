@@ -70,10 +70,6 @@
   background: var(--surface-3);
 }
 
-.feedback {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-}
 
 .dirty-badge {
   padding: 0.15rem 0.5rem;

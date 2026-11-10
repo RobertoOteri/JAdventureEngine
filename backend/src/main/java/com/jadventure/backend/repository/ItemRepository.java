@@ -17,4 +17,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findAllByGraphicAdventureIdAndCodeIn(Long adventureId, Collection<String> codes);
 
+    boolean existsByGraphicAdventureIdAndCode(Long adventureId, String code);
+
 }

@@ -31,10 +31,7 @@
 
   <main class="workspace-body custom-scroll">
     @if (errorMessage()) {
-      <div class="error-banner">
-        <i class="bi bi-exclamation-triangle-fill banner-icon"></i>
-        <span>{{ errorMessage() }}</span>
-      </div>
+      <app-alert class="page-alert" type="error">{{ errorMessage() }}</app-alert>
     }
 
     <form [formGroup]="form" class="studio-layout" (ngSubmit)="onSubmit()">

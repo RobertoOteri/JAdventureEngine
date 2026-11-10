@@ -26,12 +26,9 @@
   animation: pop-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
-/* La lista dei salvataggi ha bisogno di più spazio */
 .modal-dialog-box:has(.load-list-container) {
   max-width: 580px;
 }
-
-/* ---------- Header ---------- */
 
 .modal-header {
   display: flex;
@@ -102,8 +99,6 @@
   overflow-y: auto;
 }
 
-/* ---------- Menu ---------- */
-
 .pause-actions-list {
   display: flex;
   flex-direction: column;
@@ -170,7 +165,6 @@
   transform: translateX(2px);
 }
 
-/* Riprendi: scelta principale in ottone pieno */
 .pause-option.primary {
   margin-bottom: 0.25rem;
   border-color: transparent;
@@ -199,7 +193,6 @@
   background: rgba(26, 21, 11, 0.16);
 }
 
-/* Esci: tono di pericolo */
 .pause-option.danger .option-icon {
   border-color: var(--danger-line);
   background: var(--danger-tint);
@@ -224,8 +217,6 @@
   margin: 0.35rem 0;
   background: var(--border-subtle);
 }
-
-/* ---------- Salvataggio ---------- */
 
 .save-form-container,
 .load-list-container {
@@ -315,8 +306,6 @@
   background: var(--brass-light);
   border-color: var(--brass-light);
 }
-
-/* ---------- Caricamento ---------- */
 
 .saves-list {
   max-height: 380px;

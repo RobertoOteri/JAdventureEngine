@@ -13,4 +13,6 @@ public interface SceneRepository extends JpaRepository<Scene, Long> {
     List<Scene> findAllByGraphicAdventureId(Long adventureId);
 
     Optional<Scene> findByGraphicAdventureIdAndCode(Long adventureId, String code);
+
+    boolean existsByGraphicAdventureIdAndCode(Long adventureId, String code);
 }

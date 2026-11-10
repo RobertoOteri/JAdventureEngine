@@ -34,6 +34,8 @@ import java.util.Map;
 public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
+    private final SceneService sceneService;
+    private final ItemService itemService;
     private final GraphicAdventureMapper graphicAdventureMapper;
     private final SceneMapper sceneMapper;
     private final ItemMapper itemMapper;
@@ -188,6 +190,8 @@ public class GraphicAdventureService {
         log.info("Executing addScene with adventureId: {}, sceneCode: {}", adventureId, sceneDto.getCode());
         GraphicAdventure adventure = findOwnedDraft(adventureId);
 
+        sceneService.validateCodeAvailable(adventureId, sceneDto.getCode());
+
         Scene scene = sceneMapper.toEntity(sceneDto);
 
         String path = String.format(FileStorageUtil.PATH_SCENE_BACKGROUND,
@@ -214,6 +218,8 @@ public class GraphicAdventureService {
         log.info("Executing addItem with adventureId: {}, itemCode: {}, image provided: {}",
                 adventureId, itemDto.getCode(), image != null && !image.isEmpty());
         GraphicAdventure adventure = findOwnedDraft(adventureId);
+
+        itemService.validateCodeAvailable(adventureId, itemDto.getCode());
 
         Item item = itemMapper.toEntity(itemDto);
         item.setHotspot(null);

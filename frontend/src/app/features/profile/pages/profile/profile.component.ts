@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from '../../../../core/services/user.service';
 import { httpErrorMessage } from '../../../../core/utils/http-error.util';
 import { UserAvatarComponent } from '../../../../shared/ui/user-avatar/user-avatar.component';
+import { AlertComponent } from '../../../../shared/ui/alert/alert.component';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
@@ -13,7 +14,7 @@ const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, UserAvatarComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, UserAvatarComponent, AlertComponent, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

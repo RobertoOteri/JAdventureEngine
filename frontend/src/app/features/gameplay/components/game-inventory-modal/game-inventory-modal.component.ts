@@ -24,7 +24,6 @@ export class GameInventoryModalComponent {
   slotHover = output<{ name: string; code: string } | null>();
   slotDrop = output<string>();
 
-  /** Diventa true alla prima apertura: prima di allora il vassoio resta nascosto senza animazioni. */
   readonly hasOpened = signal<boolean>(false);
 
   readonly isPeekingExpanded = signal<boolean>(false);

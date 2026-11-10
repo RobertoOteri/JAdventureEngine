@@ -2,6 +2,7 @@ import { Translations } from '../i18n.types';
 
 export const en: Translations = {
   common: {
+    delete: 'Delete',
     invalidValue: 'Invalid value',
     close: 'Close',
     closeWindow: 'Close window',
@@ -14,6 +15,7 @@ export const en: Translations = {
     label: 'Language'
   },
   errors: {
+    sessionExpired: 'Your session has expired. Please sign in again to continue.',
     serverUnreachable: 'Unable to reach the server. Please try again shortly.',
     generic: 'Something went wrong. Please try again.'
   },
@@ -144,6 +146,7 @@ export const en: Translations = {
     playNow: 'Play now'
   },
   confirmation: {
+    deleteTitle: 'Confirm deletion',
     defaultTitle: 'Are you sure?',
     defaultMessage: 'This action cannot be undone.'
   },
@@ -302,6 +305,8 @@ export const en: Translations = {
   },
 
   dialogueEditor: {
+    leaveTitle: 'Unsaved changes',
+    leaveConfirm: 'Leave without saving',
     back: 'Back to editor',
     title: 'Dialogues of {name}',
     fallbackItem: 'item',
@@ -391,7 +396,8 @@ export const en: Translations = {
       noScene: 'No room selected',
       confirmPublishTitle: 'Publish the draft?',
       confirmPublishMessage: 'The draft will become version {version}, playable by everyone. Published versions remain available and you will keep working on a new draft.',
-      publishError: 'Publishing failed'
+      publishError: 'Publishing failed',
+      publishSuccess: 'Adventure published. You are now editing a new draft.'
     },
     sidebar: {
       scenes: 'Scenes ({count})',
@@ -541,6 +547,7 @@ export const en: Translations = {
   },
 
   actionModal: {
+    targetRequired: 'Select the target item to interact with.',
     editTitle: 'Edit Game Action',
     newTitle: 'New Game Action',
     subtitle: 'Assign a behavior to element',
@@ -584,7 +591,8 @@ export const en: Translations = {
       generic: {
         internal: 'An internal server error occurred',
         badRequest: 'Invalid request',
-        conflict: 'Unable to complete the operation'
+        conflict: 'Unable to complete the operation',
+        duplicate: 'An element with this data already exists'
       },
       validation: {
         generic: 'Invalid data'
@@ -610,11 +618,13 @@ export const en: Translations = {
       },
       scene: {
         notFoundById: 'Scene not found with ID: {0}',
-        notFoundByCode: 'Scene not found: {0}'
+        notFoundByCode: 'Scene not found: {0}',
+        codeTaken: "A scene with code '{0}' already exists in this adventure"
       },
       item: {
         notFoundById: 'Item not found with ID: {0}',
-        hotspotRequired: 'An item added to the scene must have a hotspot with valid points'
+        hotspotRequired: 'An item added to the scene must have a hotspot with valid points',
+        codeTaken: "An item with code '{0}' already exists in this adventure"
       },
       action: {
         notFoundById: 'Action not found with ID: {0}',

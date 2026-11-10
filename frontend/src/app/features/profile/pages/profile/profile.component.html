@@ -29,7 +29,7 @@
             <h2 class="identity-name">{{ u.firstName }} {{ u.lastName }}</h2>
             <span class="identity-username">&#64;{{ u.username }}</span>
             @if (avatarError()) {
-              <p class="form-error"><i class="bi bi-exclamation-circle"></i> {{ avatarError() }}</p>
+              <app-alert class="form-alert" type="error" [compact]="true">{{ avatarError() }}</app-alert>
             }
           </div>
 
@@ -129,7 +129,7 @@
 
           <div class="actions">
             @if (profileError()) {
-              <p class="form-error"><i class="bi bi-exclamation-circle"></i> {{ profileError() }}</p>
+              <app-alert class="form-alert" type="error" [compact]="true">{{ profileError() }}</app-alert>
             }
             <button type="button" class="btn-ghost" [disabled]="profileSaving() || profileForm.pristine"
                     (click)="resetForm()">

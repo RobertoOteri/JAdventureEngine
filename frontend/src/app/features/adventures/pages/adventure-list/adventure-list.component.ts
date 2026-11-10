@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { GraphicAdventureDto } from '../../../../core/models';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
 import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
@@ -31,6 +32,7 @@ import {
 export class AdventureListComponent implements OnInit {
   private readonly adventureService = inject(AdventureService);
   private readonly router = inject(Router);
+  private readonly notifications = inject(NotificationService);
 
   readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly loading = signal<boolean>(true);
@@ -61,7 +63,7 @@ export class AdventureListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Errore caricamento avventure:', err);
+        this.notifications.httpError(err);
         this.loading.set(false);
       }
     });

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { GraphicAdventureDto, Scene } from '../../../../core/models';
 import { FileDropzoneComponent } from '../../../../shared/ui/file-dropzone/file-dropzone.component';
+import { AlertComponent } from '../../../../shared/ui/alert/alert.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import {apiErrorMessage} from '../../../../core/utils/http-error.util';
@@ -12,7 +13,7 @@ import {apiErrorMessage} from '../../../../core/utils/http-error.util';
 @Component({
   selector: 'app-adventure-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, FileDropzoneComponent, AlertComponent, TranslatePipe],
   templateUrl: './adventure-create.component.html',
   styleUrl: './adventure-create.component.css',
   host: {

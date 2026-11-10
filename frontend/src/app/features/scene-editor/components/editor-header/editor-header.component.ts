@@ -5,7 +5,7 @@ import { EditorStore } from '../../store/editor.store';
 import { ConfirmationModalComponent } from '../../../../shared/ui/confirmation-modal/confirmation-modal.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
-import {apiErrorMessage} from '../../../../core/utils/http-error.util';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-editor-header',
@@ -16,6 +16,7 @@ import {apiErrorMessage} from '../../../../core/utils/http-error.util';
 })
 export class EditorHeaderComponent {
   private readonly i18n = inject(TranslationService);
+  private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
   readonly store = inject(EditorStore);
 
@@ -25,7 +26,6 @@ export class EditorHeaderComponent {
   readonly editAdventureRequested = output<void>();
 
   readonly isPublishConfirmOpen = signal<boolean>(false);
-  readonly publishError = signal<string | null>(null);
 
   goBackToAdventures(): void {
     this.router.navigate(['/adventures/my']);
@@ -33,7 +33,6 @@ export class EditorHeaderComponent {
 
   confirmPublish(): void {
     this.isPublishConfirmOpen.set(false);
-    this.publishError.set(null);
 
     const currentSceneCode = this.store.currentScene()?.code;
 
@@ -42,9 +41,10 @@ export class EditorHeaderComponent {
         const target = currentSceneCode
           ? ['/editor', newDraft.id, currentSceneCode]
           : ['/editor', newDraft.id];
+        this.notifications.success(this.i18n.t('sceneEditor.header.publishSuccess'));
         void this.router.navigate(target);
       },
-      error: (err: any) =>
-        this.publishError.set(apiErrorMessage(err, this.i18n) || this.i18n.t('sceneEditor.header.publishError'))    });
+      error: () => undefined
+    });
   }
 }

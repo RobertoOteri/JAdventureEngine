@@ -1,0 +1,21 @@
+<div class="toast-stack" aria-live="polite">
+  @for (toast of notifications.toasts(); track toast.id) {
+    <div
+      class="toast"
+      [attr.data-type]="toast.type"
+      [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+    >
+      <span class="toast-icon"><i class="bi {{ iconFor(toast.type) }}"></i></span>
+      <p class="toast-message">{{ toast.message }}</p>
+      <button
+        type="button"
+        class="toast-close"
+        (click)="notifications.dismiss(toast.id)"
+        [attr.aria-label]="'common.close' | t"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <span class="toast-progress" [style.animation-duration.ms]="toast.duration"></span>
+    </div>
+  }
+</div>

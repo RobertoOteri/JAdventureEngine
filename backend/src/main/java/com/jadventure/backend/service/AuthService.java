@@ -4,6 +4,7 @@ import com.jadventure.backend.dto.auth.AuthResponse;
 import com.jadventure.backend.dto.auth.LoginRequest;
 import com.jadventure.backend.dto.auth.RegisterRequest;
 import com.jadventure.backend.exception.ConflictException;
+import com.jadventure.backend.exception.UnauthorizedException;
 import com.jadventure.backend.exception.EmailAlreadyExistsException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.exception.UsernameAlreadyExistsException;
@@ -90,7 +91,7 @@ public class AuthService {
         log.debug("Executing getCurrentUsername");
         if (!isUserLoggedIn()) {
             log.error("Cannot get current username: user is not authenticated");
-            throw new AccessDeniedException("error.auth.notAuthenticated");
+            throw new UnauthorizedException("error.auth.notAuthenticated");
         }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         log.debug("Executed getCurrentUsername: {}", username);

@@ -15,7 +15,6 @@
   box-sizing: border-box;
 }
 
-/* ---------- Intestazione ---------- */
 
 .masthead {
   display: flex;
@@ -61,8 +60,6 @@
   background: linear-gradient(90deg, var(--brass-line), var(--border-subtle) 35%, transparent);
 }
 
-/* ---------- Barra strumenti ---------- */
-
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -84,15 +81,11 @@
   margin-left: auto;
 }
 
-/* ---------- Catalogo ---------- */
-
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
-
-/* ---------- Stati vuoto e caricamento ---------- */
 
 .empty-wrap {
   grid-column: 1 / -1;

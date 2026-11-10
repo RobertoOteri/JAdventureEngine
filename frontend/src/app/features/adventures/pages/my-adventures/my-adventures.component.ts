@@ -8,6 +8,8 @@ import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-d
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
 import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../core/services/confirm.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { TranslationKey } from '../../../../core/i18n/i18n.types';
 import { SegmentedControlComponent } from '../../../../shared/ui/segmented-control/segmented-control.component';
@@ -39,6 +41,8 @@ export class MyAdventuresComponent implements OnInit {
   private readonly router = inject(Router);
 
   private readonly i18n = inject(TranslationService);
+  private readonly notifications = inject(NotificationService);
+  private readonly confirm = inject(ConfirmService);
 
   readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly isLoading = signal<boolean>(false);
@@ -104,13 +108,18 @@ export class MyAdventuresComponent implements OnInit {
     void this.router.navigate(['/editor', adv.id, sceneCode]);
   }
 
-  onDeleteAdventure(adv: GraphicAdventureDto): void {
+  async onDeleteAdventure(adv: GraphicAdventureDto): Promise<void> {
     if (!adv.id) {
       console.error('ID avventura mancante per l\'eliminazione.');
       return;
     }
 
-    if (!confirm(this.i18n.t('myAdventures.confirmDelete', { title: adv.title }))) {
+    const confirmed = await this.confirm.ask({
+      title: this.i18n.t('confirmation.deleteTitle'),
+      message: this.i18n.t('myAdventures.confirmDelete', { title: adv.title }),
+      confirmText: this.i18n.t('common.delete')
+    });
+    if (!confirmed) {
       return;
     }
 
@@ -121,10 +130,7 @@ export class MyAdventuresComponent implements OnInit {
           this.selectedAdventure.set(null);
         }
       },
-      error: (err: unknown) => {
-        console.error('Errore eliminazione avventura:', err);
-        alert(this.i18n.t('myAdventures.deleteError'));
-      }
+      error: (err: unknown) => this.notifications.httpError(err, 'myAdventures.deleteError')
     });
   }
 

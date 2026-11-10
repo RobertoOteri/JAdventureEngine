@@ -18,6 +18,7 @@ import {
 } from '../../../core/models';
 import { TextBoxDetail } from '../../../core/models/textbox-detail.model';
 import {apiErrorMessage} from '../../../core/utils/http-error.util';
+import { NotificationService } from '../../../core/services/notification.service';
 
 export interface RadialMenuState {
   isOpen: boolean;
@@ -120,7 +121,8 @@ export const GameplayStore = signalStore(
     saveService = inject(GameSaveService),
     actionService = inject(ActionService),
     dialogueService = inject(DialogueService),
-    i18n = inject(TranslationService)
+    i18n = inject(TranslationService),
+    notifications = inject(NotificationService)
   ) => {
     let feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -321,9 +323,8 @@ export const GameplayStore = signalStore(
             ),
             tap({
               error: (err) => {
-                console.error('Errore avvio nuova partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage(i18n.t('gameplay.feedback.startError'));
+                notifications.httpError(err, 'gameplay.feedback.startError');
               }
             })
           )
@@ -372,9 +373,8 @@ export const GameplayStore = signalStore(
             ),
             tap({
               error: (err) => {
-                console.error('Errore ripresa partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage(i18n.t('gameplay.feedback.noSaveToContinue'));
+                notifications.httpError(err, 'gameplay.feedback.noSaveToContinue');
               }
             })
           )
@@ -410,10 +410,8 @@ export const GameplayStore = signalStore(
                 }
               },
               error: (err) => {
-                console.error('Errore caricamento partita:', err);
                 patchState(store, {isLoading: false});
-                setFeedbackMessage(i18n.t('gameplay.feedback.loadError'));
-
+                notifications.httpError(err, 'gameplay.feedback.loadError');
               }
             })
           )
@@ -606,12 +604,12 @@ export const GameplayStore = signalStore(
           return saveService.createSave(advId, currentState, saveName).pipe(
             tap({
               next: () => {
-                setFeedbackMessage(i18n.t('gameplay.feedback.saved'));
+                notifications.success(i18n.t('gameplay.feedback.saved'));
                 fetchSaves(advId);
               },
               error: (err) => {
-                console.error('Errore durante il salvataggio:', err);
-                setFeedbackMessage(i18n.t('gameplay.feedback.saveError'));              }
+                notifications.httpError(err, 'gameplay.feedback.saveError');
+              }
             })
           );
         })

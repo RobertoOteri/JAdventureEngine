@@ -1,5 +1,6 @@
 export const it = {
   common: {
+    delete: 'Elimina',
     invalidValue: 'Valore non valido',
     close: 'Chiudi',
     closeWindow: 'Chiudi finestra',
@@ -12,6 +13,7 @@ export const it = {
     label: 'Lingua'
   },
   errors: {
+    sessionExpired: 'La sessione è scaduta. Accedi di nuovo per continuare.',
     serverUnreachable: 'Impossibile contattare il server. Riprova tra poco.',
     generic: 'Si è verificato un errore. Riprova.'
   },
@@ -142,6 +144,7 @@ export const it = {
     playNow: 'Gioca Ora'
   },
   confirmation: {
+    deleteTitle: 'Conferma eliminazione',
     defaultTitle: 'Sei sicuro?',
     defaultMessage: 'Questa operazione non può essere annullata.'
   },
@@ -300,6 +303,8 @@ export const it = {
   },
 
   dialogueEditor: {
+    leaveTitle: 'Modifiche non salvate',
+    leaveConfirm: 'Esci senza salvare',
     back: "Torna all'editor",
     title: 'Dialoghi di {name}',
     fallbackItem: 'oggetto',
@@ -390,7 +395,8 @@ export const it = {
       noScene: 'Stanza non selezionata',
       confirmPublishTitle: 'Pubblicare la bozza?',
       confirmPublishMessage: 'La bozza diventerà la versione {version}, giocabile da tutti. Le versioni già pubblicate restano disponibili e continuerai a lavorare su una nuova bozza.',
-      publishError: 'Pubblicazione non riuscita'
+      publishError: 'Pubblicazione non riuscita',
+      publishSuccess: 'Avventura pubblicata. Ora stai modificando una nuova bozza.'
     },
     sidebar: {
       scenes: 'Scene ({count})',
@@ -539,6 +545,7 @@ export const it = {
     empty: 'Seleziona un oggetto dalla colonna di sinistra o creane uno nuovo con il tasto <strong>+</strong>.'
   },
   actionModal: {
+    targetRequired: "Seleziona l'elemento bersaglio con cui interagire.",
     editTitle: 'Modifica Azione di Gioco',
     newTitle: 'Nuova Azione di Gioco',
     subtitle: "Assegna un comportamento all'elemento",
@@ -583,7 +590,8 @@ export const it = {
       generic: {
         internal: 'Si è verificato un errore interno del server',
         badRequest: 'Richiesta non valida',
-        conflict: "Impossibile completare l'operazione"
+        conflict: "Impossibile completare l'operazione",
+        duplicate: 'Esiste già un elemento con questi dati'
       },
       validation: {
         generic: 'Dati non validi'
@@ -609,11 +617,13 @@ export const it = {
       },
       scene: {
         notFoundById: 'Scena non trovata con ID: {0}',
-        notFoundByCode: 'Scena non trovata: {0}'
+        notFoundByCode: 'Scena non trovata: {0}',
+        codeTaken: "Esiste già una scena con il codice '{0}' in questa avventura"
       },
       item: {
         notFoundById: 'Oggetto non trovato con ID: {0}',
-        hotspotRequired: 'Un oggetto aggiunto alla scena deve avere un hotspot con dei punti validi'
+        hotspotRequired: 'Un oggetto aggiunto alla scena deve avere un hotspot con dei punti validi',
+        codeTaken: "Esiste già un oggetto con il codice '{0}' in questa avventura"
       },
       action: {
         notFoundById: 'Azione non trovata con ID: {0}',

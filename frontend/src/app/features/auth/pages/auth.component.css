@@ -10,7 +10,6 @@
   min-height: 100vh;
 }
 
-/* Il carosello resta fermo a tutto schermo mentre scorre il form */
 .auth-showcase {
   flex: 0 0 58%;
   position: sticky;
@@ -67,32 +66,8 @@ h1 {
   color: var(--text-muted);
 }
 
-.error-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+.form-alert {
   margin-bottom: 1rem;
-  padding: 0.65rem 0.9rem;
-  border-radius: var(--radius);
-  background: var(--danger-tint);
-  border: 1px solid var(--danger-line);
-  color: var(--danger);
-  font-size: 0.84rem;
-  font-weight: 500;
-}
-
-.success-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-  padding: 0.65rem 0.9rem;
-  border-radius: var(--radius);
-  background: var(--success-tint);
-  border: 1px solid rgba(74, 222, 128, 0.35);
-  color: var(--success);
-  font-size: 0.84rem;
-  font-weight: 500;
 }
 
 .field-row {

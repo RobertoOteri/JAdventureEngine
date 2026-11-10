@@ -34,6 +34,7 @@
   --danger-line: rgba(239, 68, 68, 0.35);
   --success: #4ade80;
   --success-tint: rgba(74, 222, 128, 0.12);
+  --success-line: rgba(74, 222, 128, 0.35);
   --warning: #fbbf24;
   --info: #8fb8c9;
   --info-tint: rgba(143, 184, 201, 0.12);

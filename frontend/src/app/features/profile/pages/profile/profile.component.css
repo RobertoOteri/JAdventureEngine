@@ -215,7 +215,7 @@
   border-radius: 999px;
 }
 
-.identity-text .form-error {
+.identity-text .form-alert {
   margin-top: 0.5rem;
 }
 
@@ -492,16 +492,8 @@ label {
   box-shadow: var(--focus-ring);
 }
 
-.form-error {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.88rem;
-  color: var(--danger);
-}
 
-.actions .form-error {
+.actions .form-alert {
   margin-right: auto;
 }
 

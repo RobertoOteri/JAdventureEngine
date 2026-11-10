@@ -3,6 +3,7 @@ import { DialogueEditorStore } from '../../store/dialogue-editor.store';
 import { nodeLabel } from '../../../../core/utils/node-label';
 import { DialogueNode } from '../../../../core/models';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { ConfirmService } from '../../../../core/services/confirm.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 @Component({
@@ -15,11 +16,17 @@ import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 export class DialogueNodeListComponent {
   readonly store = inject(DialogueEditorStore);
   private readonly i18n = inject(TranslationService);
+  private readonly confirm = inject(ConfirmService);
   readonly nodeLabel = (node: DialogueNode) => nodeLabel(node, this.i18n);
 
-  onRemove(event: Event, code: string): void {
+  async onRemove(event: Event, code: string): Promise<void> {
     event.stopPropagation();
-    if (confirm(this.i18n.t('dialogueEditor.confirmDeleteNode'))) {
+    const confirmed = await this.confirm.ask({
+      title: this.i18n.t('confirmation.deleteTitle'),
+      message: this.i18n.t('dialogueEditor.confirmDeleteNode'),
+      confirmText: this.i18n.t('common.delete')
+    });
+    if (confirmed) {
       this.store.removeNode(code);
     }
   }

@@ -60,7 +60,6 @@
   z-index: 10;
 }
 
-/* Aree interattive invisibili: si scoprono solo dal cursore */
 .hotspot-polygon {
   fill: transparent;
   stroke: none;

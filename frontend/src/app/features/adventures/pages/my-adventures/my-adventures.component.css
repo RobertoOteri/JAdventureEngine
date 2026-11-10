@@ -15,8 +15,6 @@
   box-sizing: border-box;
 }
 
-/* ---------- Intestazione ---------- */
-
 .masthead {
   display: flex;
   justify-content: space-between;
@@ -61,8 +59,6 @@
   background: linear-gradient(90deg, var(--brass-line), var(--border-subtle) 35%, transparent);
 }
 
-/* ---------- Nuova avventura ---------- */
-
 .btn-new {
   flex-shrink: 0;
   display: inline-flex;
@@ -105,8 +101,6 @@
   box-shadow: var(--focus-ring);
 }
 
-/* ---------- Errore ---------- */
-
 .empty-icon.error {
   border-color: var(--danger-line);
   background: var(--danger-tint);
@@ -116,8 +110,6 @@
 .empty-wrap .error-text {
   color: var(--danger);
 }
-
-/* ---------- Barra strumenti ---------- */
 
 .toolbar {
   display: flex;
@@ -140,15 +132,11 @@
   margin-left: auto;
 }
 
-/* ---------- Catalogo ---------- */
-
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
-
-/* ---------- Stati vuoto e caricamento ---------- */
 
 .empty-wrap {
   grid-column: 1 / -1;

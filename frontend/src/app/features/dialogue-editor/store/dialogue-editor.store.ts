@@ -6,7 +6,7 @@ import { DialogueChoice, DialogueNode, GameEffect } from '../../../core/models';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import { sanitizeNodes } from '../../../core/utils/sanitize-nodes';
 import { TranslationService } from '../../../core/i18n/translation.service';
-import {apiErrorMessage} from '../../../core/utils/http-error.util';
+import { NotificationService } from '../../../core/services/notification.service';
 
 export interface DialogueEditorState {
   itemId: number | null;
@@ -15,7 +15,6 @@ export interface DialogueEditorState {
   isLoading: boolean;
   isSaving: boolean;
   isDirty: boolean;
-  feedbackMessage: string | null;
 }
 
 const initialState: DialogueEditorState = {
@@ -24,8 +23,7 @@ const initialState: DialogueEditorState = {
   selectedNodeCode: null,
   isLoading: false,
   isSaving: false,
-  isDirty: false,
-  feedbackMessage: null
+  isDirty: false
 };
 
 export const DialogueEditorStore = signalStore(
@@ -37,9 +35,14 @@ export const DialogueEditorStore = signalStore(
     )
   })),
 
-  withMethods((store, dialogueService = inject(DialogueService), i18n = inject(TranslationService)) => {
+  withMethods((
+    store,
+    dialogueService = inject(DialogueService),
+    i18n = inject(TranslationService),
+    notifications = inject(NotificationService)
+  ) => {
     const patchNodes = (update: (nodes: DialogueNode[]) => DialogueNode[]): void => {
-      patchState(store, { nodes: update(store.nodes()), isDirty: true, feedbackMessage: null });
+      patchState(store, { nodes: update(store.nodes()), isDirty: true });
     };
 
     const patchNode = (code: string, update: (node: DialogueNode) => DialogueNode): void => {
@@ -64,10 +67,9 @@ export const DialogueEditorStore = signalStore(
                 })
               ),
               catchError((err) => {
-                console.error('Errore caricamento dialoghi:', err);
+                notifications.httpError(err, 'dialogueEditor.feedback.loadError');
                 patchState(store, {
-                  isLoading: false,
-                  feedbackMessage: i18n.t('dialogueEditor.feedback.loadError')
+                  isLoading: false
                 });
                 return EMPTY;
               })
@@ -151,22 +153,22 @@ export const DialogueEditorStore = signalStore(
           throw new Error('Nessun oggetto selezionato.');
         }
 
-        patchState(store, { isSaving: true, feedbackMessage: null });
+        patchState(store, { isSaving: true });
 
         return dialogueService.saveAll(itemId, sanitizeNodes(store.nodes())).pipe(
           tap({
-            next: (nodes) =>
+            next: (nodes) => {
+              notifications.success(i18n.t('dialogueEditor.feedback.saved'));
               patchState(store, {
                 nodes,
                 isDirty: false,
-                isSaving: false,
-                feedbackMessage: i18n.t('dialogueEditor.feedback.saved')
-              }),
+                isSaving: false
+              });
+            },
             error: (err: any) => {
-              console.error('Errore salvataggio dialoghi:', err);
+              notifications.httpError(err, 'dialogueEditor.feedback.saveError');
               patchState(store, {
-                isSaving: false,
-                feedbackMessage: apiErrorMessage(err, i18n)|| i18n.t('dialogueEditor.feedback.saveError')
+                isSaving: false
               });
             }
           })

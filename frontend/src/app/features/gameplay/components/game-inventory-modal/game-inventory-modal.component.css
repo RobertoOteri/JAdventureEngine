@@ -371,8 +371,6 @@
   }
 }
 
-/* Finché l'inventario non è mai stato aperto resta nascosto e senza transizioni:
-   evita che compaia per un istante all'avvio della partita */
 .inventory-tray.is-booting {
   visibility: hidden !important;
 }

@@ -10,7 +10,6 @@ export function apiErrorMessage(err: unknown, i18n: TranslationService): string 
   if (!apiError?.code) {
     return null;
   }
-  // ["12", "USE"] → { "0": "12", "1": "USE" }, per i segnaposto {0}, {1}
   const params = Object.fromEntries((apiError.params ?? []).map((value, index) => [String(index), value]));
   return i18n.tryT(`api.${apiError.code}`, params);
 }

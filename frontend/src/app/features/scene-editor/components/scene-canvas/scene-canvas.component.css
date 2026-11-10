@@ -77,7 +77,6 @@
   pointer-events: auto;
 }
 
-/* Hotspot: ottone con contorno scuro, leggibili su qualsiasi sfondo */
 .hotspot-polygon {
   fill: rgba(217, 178, 106, 0.14);
   stroke: var(--brass);
@@ -98,13 +97,11 @@
   stroke-width: 2.5;
 }
 
-/* Oggetti inizialmente nascosti: tratteggiati */
 .hotspot-polygon.is-ghost-polygon {
   fill: rgba(217, 178, 106, 0.05);
   stroke-dasharray: 6 5;
 }
 
-/* Gli altri oggetti mentre se ne modifica uno */
 .hotspot-polygon.is-dimmed {
   opacity: 0.3;
 }
@@ -370,8 +367,6 @@
   outline: none;
   box-shadow: var(--focus-ring);
 }
-
-/* ---------- Caricamento ---------- */
 
 .editor-loading-overlay {
   display: flex;

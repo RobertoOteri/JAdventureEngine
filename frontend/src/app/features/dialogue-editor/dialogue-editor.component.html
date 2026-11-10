@@ -15,9 +15,6 @@
     </div>
 
     <div class="header-right">
-      @if (store.feedbackMessage(); as message) {
-        <span class="feedback">{{ message }}</span>
-      }
       @if (store.isDirty()) {
         <span class="dirty-badge">{{ 'dialogueEditor.unsaved' | t }}</span>
       }

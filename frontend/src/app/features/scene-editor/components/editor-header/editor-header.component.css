@@ -5,7 +5,6 @@
   z-index: 100;
 }
 
-/* Barra superiore dell'editor, allineata alla topbar dell'app */
 .editor-navbar {
   display: flex;
   align-items: center;
@@ -31,7 +30,6 @@
   flex-shrink: 0;
 }
 
-/* Ritorno alle avventure */
 .btn-nav-back {
   flex-shrink: 0;
   display: inline-flex;
@@ -63,7 +61,6 @@
   background: var(--border);
 }
 
-/* Titolo, versione e scena corrente */
 .adventure-title-group {
   display: flex;
   align-items: center;
@@ -146,7 +143,6 @@
   text-overflow: ellipsis;
 }
 
-/* Vertici del poligono in disegno */
 .draft-pill {
   display: inline-flex;
   align-items: center;
@@ -185,7 +181,6 @@
   background: var(--brass-tint);
 }
 
-/* Pubblicazione */
 .btn-publish {
   display: inline-flex;
   align-items: center;
@@ -211,19 +206,6 @@
 .btn-publish:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-.publish-error {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  max-width: 320px;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--danger-line);
-  border-radius: var(--radius-sm);
-  background: var(--danger-tint);
-  color: var(--danger);
-  font-size: 0.78rem;
 }
 
 .btn-nav-back:focus-visible,

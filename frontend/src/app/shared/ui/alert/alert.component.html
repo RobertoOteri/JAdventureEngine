@@ -1,0 +1,9 @@
+<div
+  class="alert"
+  [class.compact]="compact()"
+  [attr.data-type]="type()"
+  [attr.role]="type() === 'error' ? 'alert' : 'status'"
+>
+  <i class="bi {{ icon() }} alert-icon"></i>
+  <div class="alert-content"><ng-content /></div>
+</div>

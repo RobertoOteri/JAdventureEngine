@@ -2,6 +2,7 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
+import com.jadventure.backend.exception.ConflictException;
 import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ItemMapper;
@@ -25,12 +26,20 @@ import java.util.List;
 public class SceneService {
 
     private final SceneRepository sceneRepository;
+    private final ItemService itemService;
     private final SceneMapper sceneMapper;
     private final ItemMapper itemMapper;
     private final FileStorageUtil fileStorageUtil;
     private final AuthService authService;
 
     @Transactional(readOnly = true)
+    public void validateCodeAvailable(Long adventureId, String code) {
+        if (sceneRepository.existsByGraphicAdventureIdAndCode(adventureId, code)) {
+            log.error("Scene code {} already in use in adventure {}", code, adventureId);
+            throw new ConflictException("error.scene.codeTaken", code);
+        }
+    }
+
     public List<SceneDto> getScenesByAdventure(Long adventureId) {
         log.info("Executing getScenesByAdventure with adventureId: {}", adventureId);
         List<SceneDto> scenes = sceneMapper.toDtoList(sceneRepository.findAllByGraphicAdventureId(adventureId));
@@ -98,6 +107,8 @@ public class SceneService {
             log.error("Cannot add item {} to scene {}: hotspot is required", itemDto.getCode(), sceneId);
             throw new InvalidOperationException("error.item.hotspotRequired");
         }
+
+        itemService.validateCodeAvailable(adventure.getId(), itemDto.getCode());
 
         Item item = itemMapper.toEntity(itemDto);
         item.setGraphicAdventure(adventure);

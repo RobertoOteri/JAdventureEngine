@@ -24,17 +24,11 @@
       </p>
 
       @if (successMessage(); as successKey) {
-        <div class="success-banner">
-          <i class="bi bi-check-circle-fill"></i>
-          <span>{{ successKey | t }}</span>
-        </div>
+        <app-alert class="form-alert" type="success">{{ successKey | t }}</app-alert>
       }
 
       @if (errorMessage()) {
-        <div class="error-banner">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          <span>{{ errorMessage() }}</span>
-        </div>
+        <app-alert class="form-alert" type="error">{{ errorMessage() }}</app-alert>
       }
 
       @if (isLogin) {
