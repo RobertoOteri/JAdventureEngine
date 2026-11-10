@@ -388,8 +388,7 @@ export const it = {
       editInfo: 'Modifica informazioni avventura',
       draftTitle: 'Stai modificando questa bozza: i giocatori vedono solo le versioni pubblicate',
       draft: 'Bozza v{version}',
-      vertices: '{count} vertici',
-      undoVertex: 'Annulla ultimo vertice',
+
       publishTitle: 'Rendi giocabile la bozza attuale come nuova versione',
       publish: 'Pubblica',
       noScene: 'Stanza non selezionata',
@@ -453,6 +452,8 @@ export const it = {
       addScene: 'Aggiungi Scena'
     },
     gizmo: {
+      vertices: '{count} vertici',
+      undoVertex: 'Annulla ultimo vertice (Ctrl+Z)',
       select: 'Selezione (Cursore)',
       move: 'Sposta Sprite (Assi X/Y)',
       scale: 'Ridimensiona Sprite',

@@ -189,6 +189,15 @@
   z-index: 20;
 }
 
+.scale-center-cube {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--brass-light) !important;
+  cursor: nwse-resize;
+}
+
 .gizmo-axis,
 .scale-axis {
   position: absolute;

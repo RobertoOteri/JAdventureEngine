@@ -34,16 +34,6 @@
   </div>
 
   <div class="navbar-right">
-    @if (draftPointsCount() > 0) {
-      <div class="draft-pill">
-        <i class="bi bi-vector-pen"></i>
-        <span>{{ 'sceneEditor.header.vertices' | t: { count: draftPointsCount() } }}</span>
-        <button type="button" class="btn-undo-point" (click)="undoPoint.emit()" [title]="'sceneEditor.header.undoVertex' | t">
-          <i class="bi bi-arrow-counterclockwise"></i>
-        </button>
-      </div>
-    }
-
 
     <button
       type="button"

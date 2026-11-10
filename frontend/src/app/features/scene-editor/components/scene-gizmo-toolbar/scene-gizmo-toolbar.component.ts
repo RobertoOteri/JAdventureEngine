@@ -14,8 +14,10 @@ export type UnityGizmoTool = 'SELECT' | 'MOVE' | 'SCALE' | 'HOTSPOT';
 export class SceneGizmoToolbarComponent {
   readonly activeTool = input<UnityGizmoTool>('SELECT');
   readonly hasSprite = input<boolean>(false);
+  readonly draftPointsCount = input<number>(0);
 
   readonly toolChange = output<UnityGizmoTool>();
+  readonly undoPoint = output<void>();
 
   selectTool(tool: UnityGizmoTool): void {
     this.toolChange.emit(tool);

@@ -389,8 +389,7 @@ export const en: Translations = {
       editInfo: 'Edit adventure details',
       draftTitle: 'You are editing this draft: players only see published versions',
       draft: 'Draft v{version}',
-      vertices: '{count} vertices',
-      undoVertex: 'Undo last vertex',
+
       publishTitle: 'Make the current draft playable as a new version',
       publish: 'Publish',
       noScene: 'No room selected',
@@ -454,6 +453,8 @@ export const en: Translations = {
       addScene: 'Add Scene'
     },
     gizmo: {
+      vertices: '{count} vertices',
+      undoVertex: 'Undo last vertex (Ctrl+Z)',
       select: 'Select (Cursor)',
       move: 'Move sprite (X/Y axes)',
       scale: 'Resize sprite',

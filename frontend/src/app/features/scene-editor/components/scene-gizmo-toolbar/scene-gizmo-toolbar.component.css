@@ -61,3 +61,21 @@
   margin: 0 0.15rem;
   background: var(--border);
 }
+
+.btn-tool:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-tool:disabled:hover {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.vertex-count {
+  padding: 0 0.45rem 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brass-light);
+  white-space: nowrap;
+}

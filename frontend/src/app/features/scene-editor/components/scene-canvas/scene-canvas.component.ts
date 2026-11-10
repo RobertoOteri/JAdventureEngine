@@ -59,6 +59,7 @@ export class SceneCanvasComponent {
   private startPos = { x: 0, y: 0 };
   private startDimensions = { w: 0, h: 0 };
   private currentDelta = { x: 0, y: 0 };
+  private startPoints: Point2D[] = [];
 
   readonly showUnityToolbar = computed(() => {
     return this.isEditingOrCreating() || this.previewSpriteUrl() !== null;
@@ -161,6 +162,7 @@ export class SceneCanvasComponent {
     this.startMouse = { x: event.clientX, y: event.clientY };
     this.startPos = { x: this.spritePosX(), y: this.spritePosY() };
     this.currentDelta = { x: 0, y: 0 };
+    this.startPoints = this.draftPoints();
   }
 
   startScaleDrag(event: MouseEvent, axis: 'X' | 'Y' | 'BOTH'): void {
@@ -174,6 +176,7 @@ export class SceneCanvasComponent {
     this.startDimensions = { w: this.spriteWidth(), h: this.spriteHeight() };
     this.startPos = { x: this.spritePosX(), y: this.spritePosY() };
     this.currentDelta = { x: 0, y: 0 };
+    this.startPoints = this.draftPoints();
   }
 
   @HostListener('window:mousemove', ['$event'])
@@ -195,6 +198,7 @@ export class SceneCanvasComponent {
       const pxX = (this.currentDelta.x / 1000) * rect.width;
       const pxY = (this.currentDelta.y / 1000) * rect.height;
       targetEl.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+      this.applyToDraft(this.currentDelta.x, this.currentDelta.y, 1, 1);
     } else {
       let factorX = 1;
       let factorY = 1;
@@ -211,6 +215,7 @@ export class SceneCanvasComponent {
 
       targetEl.style.transform = `scale(${factorX}, ${factorY})`;
       targetEl.style.transformOrigin = 'top left';
+      this.applyToDraft(0, 0, factorX, factorY);
     }
   }
 
@@ -238,6 +243,15 @@ export class SceneCanvasComponent {
       nextH = Math.max(20, Math.min(1000 - this.startPos.y, this.startDimensions.h + this.currentDelta.y));
     }
 
+    this.applyToDraft(
+      nextPosX - this.startPos.x,
+      nextPosY - this.startPos.y,
+      nextW / this.startDimensions.w || 1,
+      nextH / this.startDimensions.h || 1,
+      this.gizmoAction === 'SCALE'
+    );
+    this.startPoints = [];
+
     this.gizmoAction = null;
     this.dragAxis = null;
 
@@ -247,6 +261,22 @@ export class SceneCanvasComponent {
       width: Math.round(nextW),
       height: Math.round(nextH)
     });
+  }
+
+  private applyToDraft(dx: number, dy: number, factorX: number, factorY: number, isScale = this.gizmoAction === 'SCALE'): void {
+    if (this.startPoints.length === 0) return;
+
+    const clamp = (value: number) => Math.max(0, Math.min(1000, Math.round(value)));
+    const originX = this.startPos.x;
+    const originY = this.startPos.y;
+
+    this.draftPoints.set(
+      this.startPoints.map((p) =>
+        isScale
+          ? { x: clamp(originX + (p.x - originX) * factorX), y: clamp(originY + (p.y - originY) * factorY) }
+          : { x: clamp(p.x + dx), y: clamp(p.y + dy) }
+      )
+    );
   }
 
   @HostListener('window:keydown', ['$event'])

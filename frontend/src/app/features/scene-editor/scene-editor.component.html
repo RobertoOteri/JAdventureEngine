@@ -1,7 +1,5 @@
 <div class="editor-shell">
   <app-editor-header
-    [draftPointsCount]="canvasRef?.draftPoints()?.length || 0"
-    (undoPoint)="canvasRef?.undoLastPoint()"
     (editAdventureRequested)="openAdventureModal()"
   />
 

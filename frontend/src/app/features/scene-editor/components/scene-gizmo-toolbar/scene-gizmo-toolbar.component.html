@@ -44,4 +44,20 @@
   >
     <i class="bi bi-pencil-fill icon-tool"></i>
   </button>
+
+  <div class="tool-divider"></div>
+
+  <button
+    type="button"
+    class="btn-tool btn-undo"
+    [disabled]="draftPointsCount() === 0"
+    (click)="undoPoint.emit()"
+    [title]="'sceneEditor.gizmo.undoVertex' | t"
+  >
+    <i class="bi bi-arrow-counterclockwise icon-tool"></i>
+  </button>
+
+  @if (draftPointsCount() > 0) {
+    <span class="vertex-count">{{ 'sceneEditor.gizmo.vertices' | t: { count: draftPointsCount() } }}</span>
+  }
 </div>

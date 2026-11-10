@@ -16,7 +16,9 @@
         <app-scene-gizmo-toolbar
           [activeTool]="activeTool()"
           [hasSprite]="currentHasSprite()"
+          [draftPointsCount]="draftPoints().length"
           (toolChange)="setTool($event)"
+          (undoPoint)="undoLastPoint()"
         />
       }
 

@@ -51,7 +51,7 @@
             {{ (editingItemCode() ? 'inspector.editItem' : 'inspector.newItem') | t }}
           </span>
           @if (draftPointsCount() > 0) {
-            <span class="tag-points-count">{{ 'sceneEditor.header.vertices' | t: { count: draftPointsCount() } }}</span>
+            <span class="tag-points-count">{{ 'sceneEditor.gizmo.vertices' | t: { count: draftPointsCount() } }}</span>
           } @else {
             <span class="tag-points-count">{{ 'inspector.noVertices' | t }}</span>
           }

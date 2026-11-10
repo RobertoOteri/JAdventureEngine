@@ -20,9 +20,7 @@ export class EditorHeaderComponent {
   private readonly router = inject(Router);
   readonly store = inject(EditorStore);
 
-  readonly draftPointsCount = input<number>(0);
 
-  readonly undoPoint = output<void>();
   readonly editAdventureRequested = output<void>();
 
   readonly isPublishConfirmOpen = signal<boolean>(false);
