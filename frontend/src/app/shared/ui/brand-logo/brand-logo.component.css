@@ -1,7 +1,5 @@
 :host {
   --brand-mark-size: 44px;
-  --brand-mark-radius: 11px;
-  --brand-icon-size: 1.4rem;
   --brand-name-size: 1.55rem;
 
   display: inline-flex;
@@ -10,41 +8,40 @@
 }
 
 :host(.size-sm) {
-  --brand-mark-size: 34px;
-  --brand-mark-radius: 9px;
-  --brand-icon-size: 1.1rem;
+  --brand-mark-size: 36px;
   --brand-name-size: 1.2rem;
 
   gap: 0.6rem;
 }
 
 :host(.size-lg) {
-  --brand-mark-size: 54px;
-  --brand-mark-radius: 13px;
-  --brand-icon-size: 1.75rem;
+  --brand-mark-size: 52px;
   --brand-name-size: 2rem;
 
   gap: 1rem;
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
-  width: var(--brand-mark-size);
   height: var(--brand-mark-size);
-  border: 1px solid #b8914f;
-  border-radius: var(--brand-mark-radius);
-  background: #1c2029;
-  color: #d9b26a;
-  font-size: var(--brand-icon-size);
-  transition: border-color 0.2s ease, color 0.2s ease, transform 0.35s ease;
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.brand-mark-img {
+  display: block;
+  height: var(--brand-mark-size);
+  width: auto;
+  max-width: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+  user-select: none;
 }
 
 :host(:hover) .brand-mark {
-  border-color: #d9b26a;
-  color: #e8c47e;
-  transform: rotate(-12deg);
+  transform: rotate(-4deg) scale(1.05);
+  filter: brightness(1.08);
 }
 
 .brand-name {
