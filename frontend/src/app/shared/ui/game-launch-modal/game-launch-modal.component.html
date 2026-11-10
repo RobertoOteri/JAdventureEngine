@@ -9,48 +9,54 @@
     <span class="launch-kicker">{{ 'gameLaunch.subtitle' | t }}</span>
     <h1 class="launch-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h1>
 
-    <div class="launch-options">
-      <button
-        type="button"
-        class="option"
-        [class.primary]="hasSaves()"
-        [disabled]="!hasSaves()"
-        (click)="continueGame.emit()"
-        [title]="(hasSaves() ? 'gameLaunch.continueHint' : 'gameLaunch.noPreviousSave') | t"
-      >
-        <span class="option-icon"><i class="bi bi-play-fill"></i></span>
-        <span class="option-title">{{ 'gameLaunch.continueTitle' | t }}</span>
-        <span class="option-desc">{{ 'gameLaunch.continueDesc' | t }}</span>
-      </button>
+    @if (loading()) {
+      <div class="launch-loading" aria-busy="true">
+        <span class="launch-spinner"></span>
+      </div>
+    } @else {
+      <div class="launch-options">
+        <button
+          type="button"
+          class="option"
+          [class.primary]="hasSaves()"
+          [disabled]="!hasSaves()"
+          (click)="continueGame.emit()"
+          [title]="(hasSaves() ? 'gameLaunch.continueHint' : 'gameLaunch.noPreviousSave') | t"
+        >
+          <span class="option-icon"><i class="bi bi-play-fill"></i></span>
+          <span class="option-title">{{ 'gameLaunch.continueTitle' | t }}</span>
+          <span class="option-desc">{{ 'gameLaunch.continueDesc' | t }}</span>
+        </button>
 
-      <button
-        type="button"
-        class="option"
-        [disabled]="!hasSaves()"
-        (click)="isSavesModalOpen.set(true)"
-        [title]="(hasSaves() ? 'gameLaunch.loadHint' : 'gameLaunch.noSaves') | t"
-      >
-        <span class="option-icon">
-          <i class="bi bi-folder2-open"></i>
-          @if (hasSaves()) {
-            <span class="option-count">{{ saves().length }}</span>
-          }
-        </span>
-        <span class="option-title">{{ 'gameLaunch.loadTitle' | t }}</span>
-        <span class="option-desc">{{ 'gameLaunch.loadHint' | t }}</span>
-      </button>
+        <button
+          type="button"
+          class="option"
+          [disabled]="!hasSaves()"
+          (click)="isSavesModalOpen.set(true)"
+          [title]="(hasSaves() ? 'gameLaunch.loadHint' : 'gameLaunch.noSaves') | t"
+        >
+          <span class="option-icon">
+            <i class="bi bi-folder2-open"></i>
+            @if (hasSaves()) {
+              <span class="option-count">{{ saves().length }}</span>
+            }
+          </span>
+          <span class="option-title">{{ 'gameLaunch.loadTitle' | t }}</span>
+          <span class="option-desc">{{ 'gameLaunch.loadHint' | t }}</span>
+        </button>
 
-      <button
-        type="button"
-        class="option"
-        [class.primary]="!hasSaves()"
-        (click)="onNewGameClick()"
-      >
-        <span class="option-icon"><i class="bi bi-stars"></i></span>
-        <span class="option-title">{{ 'gameLaunch.newTitle' | t }}</span>
-        <span class="option-desc">{{ 'gameLaunch.newDesc' | t }}</span>
-      </button>
-    </div>
+        <button
+          type="button"
+          class="option"
+          [class.primary]="!hasSaves()"
+          (click)="onNewGameClick()"
+        >
+          <span class="option-icon"><i class="bi bi-stars"></i></span>
+          <span class="option-title">{{ 'gameLaunch.newTitle' | t }}</span>
+          <span class="option-desc">{{ 'gameLaunch.newDesc' | t }}</span>
+        </button>
+      </div>
+    }
 
     <button type="button" class="btn-back" (click)="cancel.emit()">
       <i class="bi bi-arrow-left"></i>

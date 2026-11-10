@@ -48,6 +48,7 @@ export interface GameplayState {
   currentSaveCode: string | null;
   gameState: GameStateDto | null;
   savesList: GameSaveDto[];
+  areSavesLoaded: boolean;
   isLoading: boolean;
   feedbackMessage: string | null;
   endingMessage: string | null;
@@ -89,6 +90,7 @@ const initialState: GameplayState = {
   currentSaveCode: null,
   gameState: null,
   savesList: [],
+  areSavesLoaded: false,
   isLoading: false,
   feedbackMessage: null,
   endingMessage: null,
@@ -241,8 +243,8 @@ export const GameplayStore = signalStore(
         switchMap((adventureId) =>
           saveService.getSavesForAdventure(adventureId).pipe(
             tap({
-              next: (savesList) => patchState(store, {savesList}),
-              error: (err) => console.error('Errore recupero lista salvataggi:', err)
+              next: (savesList) => patchState(store, {savesList, areSavesLoaded: true}),
+              error: () => patchState(store, {areSavesLoaded: true})
             })
           )
         )

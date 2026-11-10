@@ -97,6 +97,7 @@
       [adventureTitle]="adventureDetails()?.title ?? ''"
       [coverUrl]="adventureDetails()?.coverImageUrl ?? ''"
       [saves]="store.savesList()"
+      [loading]="!store.areSavesLoaded()"
       (startNew)="onStartNew()"
       (continueGame)="onContinue()"
       (loadSave)="onLoadSave($event)"

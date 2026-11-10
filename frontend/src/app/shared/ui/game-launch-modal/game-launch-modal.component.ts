@@ -21,6 +21,7 @@ export class GameLaunchModalComponent {
   adventureTitle = input<string>('');
   coverUrl = input<string>('');
   saves = input<GameSaveDto[]>([]);
+  loading = input<boolean>(false);
 
   startNew = output<void>();
   continueGame = output<void>();
