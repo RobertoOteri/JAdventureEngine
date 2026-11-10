@@ -1,35 +1,49 @@
+:host {
+  display: block;
+}
+
 .version-select {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 0.85rem;
-  color: #a1a1aa;
+  gap: 0.85rem;
 }
 
 .version-label {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  flex-shrink: 0;
   font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brass-strong);
 }
 
 select {
   flex: 1;
-  background: #131622;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  padding: 0.45rem 0.6rem;
+  min-width: 0;
+  height: 40px;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  background: rgba(11, 13, 18, 0.45);
+  color: var(--text-body);
   font-size: 0.88rem;
   cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+select:focus,
+select:open {
+  outline: none;
+  border-color: var(--brass-strong);
+  box-shadow: var(--focus-ring);
 }
 
 select:disabled {
+  opacity: 1;
   cursor: default;
-  opacity: 0.85;
-}
-
-select:focus {
-  outline: none;
-  border-color: rgba(251, 191, 36, 0.6);
+  color: var(--text-secondary);
 }

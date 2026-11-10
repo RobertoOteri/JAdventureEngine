@@ -1,6 +1,19 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-card">
-    <button type="button" class="btn-close" (click)="close.emit()" [title]="'common.close' | t" [attr.aria-label]="'common.close' | t">      <i class="bi bi-x-lg"></i>
+    <div class="ambient" aria-hidden="true">
+      @if (adventure().coverImageUrl) {
+        <img [src]="adventure().coverImageUrl" alt="" class="ambient-img" />
+      }
+    </div>
+
+    <button
+      type="button"
+      class="btn-close"
+      (click)="close.emit()"
+      [title]="'common.close' | t"
+      [attr.aria-label]="'common.close' | t"
+    >
+      <i class="bi bi-x-lg"></i>
     </button>
 
     <div class="modal-banner">
@@ -11,7 +24,6 @@
           <i class="bi bi-image banner-icon"></i>
         </div>
       }
-      <div class="banner-overlay"></div>
       <span class="badge-code">{{ adventure().code }}</span>
     </div>
 
@@ -77,4 +89,3 @@
     (close)="isLeaderboardOpen.set(false)"
   />
 }
-
