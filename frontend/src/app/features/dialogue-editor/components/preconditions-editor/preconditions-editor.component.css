@@ -14,8 +14,8 @@
   gap: 0.65rem;
   align-items: center;
   padding: 0.6rem 0.8rem;
-  background: #0c0e14;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: var(--surface-1);
+  border: 1px solid var(--brass-line);
   border-radius: 8px;
 }
 
@@ -30,9 +30,9 @@
   box-sizing: border-box;
   padding: 0.55rem 0.75rem;
   font-size: 0.85rem;
-  color: #ffffff;
-  background: #141720;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  background: var(--surface-input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.15s ease;
@@ -40,7 +40,8 @@
 
 .studio-input:focus,
 .studio-select:focus {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: var(--brass-dim);
+  box-shadow: var(--focus-ring);
 }
 
 .flag-grid {
@@ -56,7 +57,7 @@
   overflow-y: hidden;
   padding-bottom: 4px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 .flag-grid::-webkit-scrollbar {
@@ -64,7 +65,7 @@
 }
 
 .flag-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--surface-4);
   border-radius: 4px;
 }
 
@@ -80,7 +81,7 @@
   padding: 0 0.2rem;
   font-size: 1rem;
   font-weight: 700;
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .btn-del-rule {
@@ -88,7 +89,7 @@
   align-items: center;
   justify-content: center;
   font-size: 0.95rem;
-  color: #71717a;
+  color: var(--text-muted);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -96,7 +97,7 @@
 }
 
 .btn-del-rule:hover {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .empty-rules {
@@ -106,7 +107,7 @@
   padding: 0.4rem 0.25rem;
   font-size: 0.8rem;
   font-style: italic;
-  color: #a89269;
+  color: var(--brass-dim);
 }
 
 .btn-add-rule {
@@ -117,16 +118,16 @@
   padding: 0.4rem 0.8rem;
   font-size: 0.76rem;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--brass-light);
   cursor: pointer;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: var(--brass-tint);
+  border: 1px solid var(--brass-line);
   border-radius: 6px;
   transition: background 0.15s ease;
 }
 
 .btn-add-rule:hover {
-  background: rgba(245, 158, 11, 0.22);
+  background: var(--brass-tint-strong);
 }
 
 @media (max-width: 720px) {

@@ -34,6 +34,10 @@
   --success: #4ade80;
   --success-tint: rgba(74, 222, 128, 0.12);
   --warning: #fbbf24;
+  --info: #8fb8c9;
+  --info-tint: rgba(143, 184, 201, 0.12);
+  --info-tint-strong: rgba(143, 184, 201, 0.2);
+  --info-line: rgba(143, 184, 201, 0.35);
 
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-display: 'Pixelify Sans', var(--font-sans);

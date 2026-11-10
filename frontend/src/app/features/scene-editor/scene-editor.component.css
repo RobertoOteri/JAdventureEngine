@@ -2,8 +2,8 @@
   display: block;
   height: 100vh;
   width: 100%;
-  background-color: #080a0f;
-  color: #fafafa;
+  background-color: var(--bg-app);
+  color: var(--text-body);
   overflow: hidden;
 }
 
@@ -28,44 +28,43 @@
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 17, 23, 0.95);
+  background: rgba(21, 25, 34, 0.94);
   backdrop-filter: blur(10px);
-  border: 1px solid #fbbf24;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
+  border: 1px solid var(--brass-line);
+  padding: 0.65rem 0.65rem 0.65rem 1.1rem;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 1.5rem;
   z-index: 200;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-popover);
 }
 
 .banner-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #fbbf24;
+  color: var(--brass-light);
   font-size: 0.85rem;
   font-weight: 500;
 }
 
 .btn-confirm-textbox {
-  background: #fbbf24;
-  color: #09090b;
+  background: var(--brass);
+  color: var(--on-brass);
   border: none;
   font-weight: 600;
   font-size: 0.85rem;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .btn-confirm-textbox:hover {
-  background: #f59e0b;
-  transform: scale(1.02);
+  background: var(--brass-light);
 }
 

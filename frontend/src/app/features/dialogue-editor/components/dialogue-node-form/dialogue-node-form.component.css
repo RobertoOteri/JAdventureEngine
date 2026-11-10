@@ -7,7 +7,7 @@
 
 .node-form {
   height: 100%;
-  background: #0b0d12;
+  background: var(--bg-app);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -23,14 +23,14 @@
   gap: 1rem;
   box-sizing: border-box;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 .form-card {
   max-width: 780px;
   width: 100%;
-  background: #131622;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-3);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 1.1rem;
   box-sizing: border-box;
@@ -47,19 +47,19 @@
   margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fafafa;
+  color: var(--text-primary);
 }
 
 .card-hint {
   margin: -0.4rem 0 0.75rem;
   font-size: 0.76rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .node-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .studio-input {
@@ -67,16 +67,17 @@
   box-sizing: border-box;
   padding: 0.6rem 0.8rem;
   font-size: 0.86rem;
-  color: #ffffff;
-  background: #141720;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  background: var(--surface-input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.15s ease;
 }
 
 .studio-input:focus {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: var(--brass-dim);
+  box-shadow: var(--focus-ring);
 }
 
 .studio-textarea {
@@ -96,10 +97,10 @@
   padding: 2.5rem;
   text-align: center;
   font-size: 0.82rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .empty-icon {
   font-size: 2rem;
-  color: #3f3f46;
+  color: var(--text-faint);
 }

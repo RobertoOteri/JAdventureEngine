@@ -11,7 +11,9 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
-  background: #080a0f;
+  background:
+    radial-gradient(70% 60% at 50% 45%, rgba(201, 164, 92, 0.05), transparent 70%),
+    var(--bg-app);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,10 +25,10 @@
 
 .canvas-stage {
   position: relative;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
-  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 18px 50px rgba(0, 0, 0, 0.75);
+  border-radius: var(--radius);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brass-line);
   background: transparent;
   line-height: 0;
   max-width: 100%;
@@ -34,7 +36,7 @@
 }
 
 .canvas-stage.drag-over-active {
-  outline: 2px dashed #ffffff;
+  outline: 2px dashed var(--brass);
   outline-offset: -2px;
 }
 
@@ -75,20 +77,44 @@
   pointer-events: auto;
 }
 
+/* Hotspot: ottone con contorno scuro, leggibili su qualsiasi sfondo */
 .hotspot-polygon {
-  fill: rgba(255, 255, 255, 0.15);
-  stroke: #ffffff;
+  fill: rgba(217, 178, 106, 0.14);
+  stroke: var(--brass);
   stroke-width: 1.5;
+  paint-order: stroke;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9));
   cursor: pointer;
+  transition: fill 0.15s ease, stroke-width 0.15s ease, opacity 0.15s ease;
 }
 
 .hotspot-polygon:hover {
-  fill: rgba(255, 255, 255, 0.3);
+  fill: rgba(217, 178, 106, 0.28);
 }
 
 .hotspot-polygon.selected {
-  fill: rgba(255, 255, 255, 0.4);
+  fill: rgba(243, 220, 166, 0.32);
+  stroke: var(--brass-light);
   stroke-width: 2.5;
+}
+
+/* Oggetti inizialmente nascosti: tratteggiati */
+.hotspot-polygon.is-ghost-polygon {
+  fill: rgba(217, 178, 106, 0.05);
+  stroke-dasharray: 6 5;
+}
+
+/* Gli altri oggetti mentre se ne modifica uno */
+.hotspot-polygon.is-dimmed {
+  opacity: 0.3;
+}
+
+.editor-sprite-item.is-ghost-hidden {
+  opacity: 0.45;
+}
+
+.editor-sprite-item.is-dimmed {
+  opacity: 0.3;
 }
 
 .stage-svg.svg-drawing-active {
@@ -102,22 +128,22 @@
 }
 
 .draft-polygon-live {
-  fill: rgba(255, 255, 255, 0.25) !important;
+  fill: rgba(217, 178, 106, 0.22) !important;
   stroke: none;
   pointer-events: none;
 }
 
 .draft-polyline-live {
   fill: none;
-  stroke: #ffffff !important;
+  stroke: var(--brass-light) !important;
   stroke-width: 2;
   stroke-dasharray: 4 4;
   pointer-events: none;
 }
 
 .draft-point {
-  fill: #ffffff !important;
-  stroke: #09090b !important;
+  fill: var(--brass-light) !important;
+  stroke: var(--on-brass) !important;
   stroke-width: 1.5;
   pointer-events: none;
 }
@@ -128,7 +154,8 @@
   z-index: 50;
   user-select: none;
   will-change: transform;
-  border: 1px dashed rgba(255, 255, 255, 0.6);
+  border: 1px dashed var(--brass);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
 .gizmo-image {
@@ -157,9 +184,9 @@
   transform: translate(-50%, -50%);
   width: 14px;
   height: 14px;
-  background: #ffffff !important;
-  border: 2px solid #09090b !important;
-  border-radius: 2px;
+  background: var(--brass) !important;
+  border: 2px solid var(--on-brass) !important;
+  border-radius: 3px;
   cursor: move;
   pointer-events: auto;
   z-index: 20;
@@ -197,7 +224,8 @@
 
 .axis-line,
 .scale-line {
-  background: #ffffff !important;
+  background: var(--brass-light) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
 }
 
 .axis-x .axis-line,
@@ -220,26 +248,27 @@
 
 .axis-x .axis-arrow {
   border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent #ffffff !important;
+  border-color: transparent transparent transparent var(--brass-light) !important;
 }
 
 .axis-y .axis-arrow {
   border-width: 0 5px 8px 5px;
-  border-color: transparent transparent #ffffff transparent !important;
+  border-color: transparent transparent var(--brass-light) transparent !important;
 }
 
 .scale-cube {
   width: 8px;
   height: 8px;
-  background: #ffffff !important;
-  border: 1px solid #09090b !important;
-  border-radius: 1px;
+  background: var(--brass-light) !important;
+  border: 1px solid var(--on-brass) !important;
+  border-radius: 2px;
 }
 
 .drop-zone-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(8, 9, 12, 0.6);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,11 +277,13 @@
 }
 
 .drop-zone-badge {
-  background: #09090b;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  background: var(--surface-3);
+  border: 1px dashed var(--brass);
+  color: var(--text-primary);
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius-lg);
+  line-height: 1.2;
+  box-shadow: var(--shadow-popover);
   font-weight: 500;
   font-size: 0.9rem;
   display: inline-flex;
@@ -275,23 +306,31 @@
 }
 
 .empty-stage-icon {
-  font-size: 3.5rem;
-  color: #52525b;
-  line-height: 1;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
   margin-bottom: 0.5rem;
+  border: 1px solid var(--brass-line);
+  border-radius: 20px;
+  background: var(--brass-tint);
+  color: var(--brass);
+  font-size: 2.1rem;
+  line-height: 1;
 }
 
 .scene-empty-stage h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
 }
 
 .scene-empty-stage p {
   font-size: 0.92rem;
-  color: #71717a;
+  color: var(--text-secondary);
   margin: 0 0 0.8rem 0;
   max-width: 340px;
   line-height: 1.4;
@@ -301,23 +340,61 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #ffffff;
-  color: #09090b;
+  background: var(--brass);
+  color: var(--on-brass);
   border: none;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.85rem;
   padding: 0.6rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .btn-create-first-scene:hover {
-  background: #e4e4e7;
+  background: var(--brass-light);
   transform: translateY(-1px);
 }
 
 .btn-create-first-scene i {
   font-size: 0.95rem;
+}
+
+.drop-zone-badge .icon-drop {
+  font-size: 1.15rem;
+  color: var(--brass);
+}
+
+.btn-create-first-scene:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------- Caricamento ---------- */
+
+.editor-loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.editor-loading-overlay p {
+  margin: 0;
+}
+
+.spinner {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--brass-tint-strong);
+  border-top-color: var(--brass);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

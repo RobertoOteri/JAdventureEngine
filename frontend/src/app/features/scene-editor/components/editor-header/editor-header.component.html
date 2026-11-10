@@ -25,6 +25,11 @@
           {{ 'sceneEditor.header.draft' | t: { version: version } }}
         </span>
       }
+
+      <span class="scene-tag">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>{{ store.currentScene()?.name || ('sceneEditor.header.noScene' | t) }}</span>
+      </span>
     </div>
   </div>
 
@@ -56,13 +61,6 @@
       <i class="bi bi-rocket-takeoff"></i>
       <span>{{ 'sceneEditor.header.publish' | t }}</span>
     </button>
-
-    <div class="status-indicator">
-      <span class="status-dot"></span>
-      <span class="scene-active-tag">
-        {{ store.currentScene()?.name || ('sceneEditor.header.noScene' | t) }}
-      </span>
-    </div>
   </div>
 </header>
 

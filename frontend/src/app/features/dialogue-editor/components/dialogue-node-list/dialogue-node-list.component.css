@@ -10,8 +10,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #0f1117;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-1);
+  border-right: 1px solid var(--border-subtle);
   overflow: hidden;
 }
 
@@ -21,9 +21,9 @@
   justify-content: space-between;
   margin: 0.6rem;
   padding: 0.75rem 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border: 1px dashed var(--border-strong);
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .header-title {
@@ -34,7 +34,7 @@
 
 .icon-header {
   font-size: 0.85rem;
-  color: #71717a;
+  color: var(--brass);
 }
 
 .list-header h2 {
@@ -43,7 +43,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .btn-add-node {
@@ -53,17 +53,17 @@
   padding: 0.3rem 0.6rem;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   cursor: pointer;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--border);
   border-radius: 3px;
   transition: all 0.15s ease;
 }
 
 .btn-add-node:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--surface-3);
+  border-color: var(--border-strong);
 }
 
 .nodes {
@@ -75,7 +75,7 @@
   flex-direction: column;
   gap: 0.45rem;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 .node-card {
@@ -85,21 +85,21 @@
   gap: 0.5rem;
   padding: 0.6rem 0.8rem;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .node-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--surface-3);
+  border-color: var(--border);
 }
 
 .node-card.active {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: inset 3px 0 0 #ffffff;
+  background: var(--brass-tint);
+  border-color: var(--brass-line);
+  box-shadow: inset 3px 0 0 var(--brass);
 }
 
 .node-card-main {
@@ -111,7 +111,7 @@
 
 .node-card-text {
   font-size: 0.82rem;
-  color: #f4f4f5;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,12 +119,12 @@
 
 .node-card-text.is-empty {
   font-style: italic;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .node-card-meta {
   font-size: 0.7rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .btn-del-node {
@@ -134,7 +134,7 @@
   justify-content: center;
   padding: 4px 6px;
   font-size: 0.78rem;
-  color: #71717a;
+  color: var(--text-muted);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -148,8 +148,8 @@
 }
 
 .btn-del-node:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  background: var(--danger-tint);
 }
 
 .nodes-empty {
@@ -158,10 +158,10 @@
   gap: 0.5rem;
   padding: 0.8rem 0.6rem;
   font-size: 0.78rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .icon-empty {
   font-size: 0.95rem;
-  color: #52525b;
+  color: var(--text-faint);
 }
