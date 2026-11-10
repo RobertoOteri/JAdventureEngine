@@ -1,32 +1,33 @@
 <header class="game-navbar">
   <div class="navbar-left">
-    <button type="button" class="btn-nav-action" (click)="goBack.emit()" [title]="'gameplay.topbar.back' | t">
+    <button type="button" class="btn-back" (click)="goBack.emit()" [title]="'gameplay.topbar.back' | t">
       <i class="bi bi-chevron-left"></i>
       <span>{{ 'gameplay.topbar.lobby' | t }}</span>
     </button>
 
     <div class="nav-divider"></div>
 
-    <div class="adventure-title-group">
-      <h1 class="adventure-main-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h1>
+    <div class="title-group">
+      <h1 class="adventure-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h1>
+      @if (sceneName()) {
+        <span class="scene-tag">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>{{ sceneName() }}</span>
+        </span>
+      }
     </div>
   </div>
 
   <div class="navbar-right">
-    <div class="status-indicator">
-      <span class="status-dot"></span>
-      <span class="scene-active-tag">{{ sceneName() }}</span>
-    </div>
-
-    <button type="button" class="btn-inventory-trigger" (click)="openInventory.emit()" [title]="'gameplay.topbar.openInventory' | t">
+    <button type="button" class="btn-bar btn-inventory" (click)="openInventory.emit()" [title]="'gameplay.topbar.openInventory' | t">
       <i class="bi bi-briefcase-fill"></i>
-      <span>{{ 'gameplay.topbar.bag' | t }}</span>
+      <span class="btn-label">{{ 'gameplay.topbar.bag' | t }}</span>
       <span class="inventory-badge">{{ inventoryCount() }}</span>
     </button>
 
-    <button type="button" class="btn-menu-trigger" (click)="openPauseMenu.emit()" [title]="'gameplay.topbar.pauseMenu' | t">
+    <button type="button" class="btn-bar" (click)="openPauseMenu.emit()" [title]="'gameplay.topbar.pauseMenu' | t">
       <i class="bi bi-list"></i>
-      <span>{{ 'gameplay.topbar.menu' | t }}</span>
+      <span class="btn-label">{{ 'gameplay.topbar.menu' | t }}</span>
     </button>
   </div>
 </header>

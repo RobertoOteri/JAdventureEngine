@@ -28,3 +28,18 @@
 :host(.is-dragging-item) ::ng-deep * {
   cursor: none !important;
 }
+
+/* ---------- Cursore da avventura grafica ---------- */
+/* Freccia d'ottone ovunque nel gioco; sugli elementi interattivi compare la scintilla */
+
+:host {
+  cursor: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%231a150b%22%20transform%3D%22translate%281%201%29%22%20opacity%3D%220.55%22%2F%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%23d9b26a%22%20stroke%3D%22%231a150b%22%20stroke-width%3D%222%22%20stroke-linejoin%3D%22miter%22%2F%3E%3Cpath%20d%3D%22M5%207%20L5%2019%20L8%2016%22%20fill%3D%22none%22%20stroke%3D%22%23f3dca6%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E') 3 3, auto;
+}
+
+:host(:not(.is-dragging-item)) ::ng-deep :is(button, a, [role='button'], label, select, .hotspot-polygon):not(:disabled) {
+  cursor: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%231a150b%22%20transform%3D%22translate%281%201%29%22%20opacity%3D%220.55%22%2F%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%23d9b26a%22%20stroke%3D%22%231a150b%22%20stroke-width%3D%222%22%20stroke-linejoin%3D%22miter%22%2F%3E%3Cpath%20d%3D%22M5%207%20L5%2019%20L8%2016%22%20fill%3D%22none%22%20stroke%3D%22%23f3dca6%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M25%202%20L26.5%206.5%20L31%208%20L26.5%209.5%20L25%2014%20L23.5%209.5%20L19%208%20L23.5%206.5%20Z%22%20fill%3D%22%23f3dca6%22%20stroke%3D%22%231a150b%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E') 3 3, pointer !important;
+}
+
+:host(:not(.is-dragging-item)) ::ng-deep :is(button, select):disabled {
+  cursor: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%231a150b%22%20transform%3D%22translate%281%201%29%22%20opacity%3D%220.55%22%2F%3E%3Cpath%20d%3D%22M3%203%20L3%2025%20L9%2019%20L13%2028%20L17%2026%20L13%2018%20L21%2018%20Z%22%20fill%3D%22%23d9b26a%22%20stroke%3D%22%231a150b%22%20stroke-width%3D%222%22%20stroke-linejoin%3D%22miter%22%2F%3E%3Cpath%20d%3D%22M5%207%20L5%2019%20L8%2016%22%20fill%3D%22none%22%20stroke%3D%22%23f3dca6%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E') 3 3, auto !important;
+}

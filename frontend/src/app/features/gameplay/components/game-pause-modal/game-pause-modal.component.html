@@ -18,26 +18,26 @@
     <div class="modal-body custom-scroll">
       @if (mode() === 'MENU') {
         <div class="pause-actions-list">
-          <button type="button" class="btn-pause-option primary" (click)="resume.emit()">
-            <i class="bi bi-play-fill"></i>
-            <span>{{ 'gameplay.pause.resume' | t }}</span>
+          <button type="button" class="pause-option primary" (click)="resume.emit()">
+            <span class="option-icon"><i class="bi bi-play-fill"></i></span>
+            <span class="option-title">{{ 'gameplay.pause.resume' | t }}</span>
           </button>
 
-          <button type="button" class="btn-pause-option" (click)="setMode('SAVE_FORM')">
-            <i class="bi bi-floppy-fill"></i>
-            <span>{{ 'gameplay.pause.save' | t }}</span>
+          <button type="button" class="pause-option" (click)="setMode('SAVE_FORM')">
+            <span class="option-icon"><i class="bi bi-floppy-fill"></i></span>
+            <span class="option-title">{{ 'gameplay.pause.save' | t }}</span>
           </button>
 
-          <button type="button" class="btn-pause-option" (click)="setMode('LOAD_LIST')">
-            <i class="bi bi-folder2-open"></i>
-            <span>{{ 'gameplay.pause.load' | t }}</span>
+          <button type="button" class="pause-option" (click)="setMode('LOAD_LIST')">
+            <span class="option-icon"><i class="bi bi-folder2-open"></i></span>
+            <span class="option-title">{{ 'gameplay.pause.load' | t }}</span>
           </button>
 
           <div class="pause-divider"></div>
 
-          <button type="button" class="btn-pause-option danger" (click)="exit.emit()">
-            <i class="bi bi-box-arrow-left"></i>
-            <span>{{ 'gameplay.pause.exit' | t }}</span>
+          <button type="button" class="pause-option danger" (click)="exit.emit()">
+            <span class="option-icon"><i class="bi bi-box-arrow-left"></i></span>
+            <span class="option-title">{{ 'gameplay.pause.exit' | t }}</span>
           </button>
         </div>
       }
