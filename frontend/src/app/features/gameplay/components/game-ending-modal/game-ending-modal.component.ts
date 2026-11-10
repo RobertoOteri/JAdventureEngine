@@ -12,7 +12,7 @@ interface ConfettiPiece {
   color: string;
 }
 
-const CONFETTI_COLORS = ['#ffffff', '#fbbf24', '#e2c05c', '#38bdf8', '#a1a1aa'];
+const CONFETTI_COLORS = ['#d9b26a', '#e3c27f', '#f3dca6', '#b8914f', '#efe6d2', '#8fb8c9'];
 
 @Component({
   selector: 'app-game-ending-modal',
