@@ -15,6 +15,7 @@ import com.jadventure.backend.model.enums.AdventureStatus;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class GraphicAdventureService {
 
     private final GraphicAdventureRepository graphicAdventureRepository;
@@ -40,40 +42,54 @@ public class GraphicAdventureService {
 
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getAllAdventures() {
+        log.info("Executing getAllAdventures");
         Map<String, GraphicAdventure> latestByCode = new LinkedHashMap<>();
         graphicAdventureRepository.findAllByStatusOrderByCodeAscVersionNumberDesc(AdventureStatus.PUBLISHED)
                 .forEach(adventure -> latestByCode.putIfAbsent(adventure.getCode(), adventure));
 
-        return graphicAdventureMapper.toDtoList(new ArrayList<>(latestByCode.values()));
+        List<GraphicAdventureDto> adventures = graphicAdventureMapper.toDtoList(new ArrayList<>(latestByCode.values()));
+        log.info("Executed getAllAdventures: found {} published adventures", adventures.size());
+        return adventures;
     }
 
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getMyAdventures() {
+        log.info("Executing getMyAdventures");
         String username = authService.getCurrentUsername();
-        return graphicAdventureMapper.toDtoList(
+        List<GraphicAdventureDto> adventures = graphicAdventureMapper.toDtoList(
                 graphicAdventureRepository.findAllByAuthorUsernameAndStatusOrderByCreatedAtDesc(
                         username, AdventureStatus.DRAFT)
         );
+        log.info("Executed getMyAdventures: found {} draft adventures for user {}", adventures.size(), username);
+        return adventures;
     }
 
     @Transactional(readOnly = true)
     public List<GraphicAdventureDto> getPublishedVersions(Long adventureId) {
+        log.info("Executing getPublishedVersions with adventureId: {}", adventureId);
         GraphicAdventure adventure = findReadableAdventure(adventureId);
-        return graphicAdventureMapper.toDtoList(
+        List<GraphicAdventureDto> versions = graphicAdventureMapper.toDtoList(
                 graphicAdventureRepository.findAllByCodeAndStatusOrderByVersionNumberDesc(
                         adventure.getCode(), AdventureStatus.PUBLISHED)
         );
+        log.info("Executed getPublishedVersions: found {} published versions for adventure {}", versions.size(), adventure.getCode());
+        return versions;
     }
 
     @Transactional(readOnly = true)
     public GraphicAdventureDto getAdventureById(Long adventureId) {
-        return graphicAdventureMapper.toDto(findReadableAdventure(adventureId));
+        log.info("Executing getAdventureById with adventureId: {}", adventureId);
+        GraphicAdventureDto adventure = graphicAdventureMapper.toDto(findReadableAdventure(adventureId));
+        log.info("Executed getAdventureById: returning adventure {}", adventure);
+        return adventure;
     }
 
     @Transactional
     public GraphicAdventureDto createAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
+        log.info("Executing createAdventure with adventure: {}, coverImage provided: {}", dto, coverImage != null && !coverImage.isEmpty());
         String title = dto.getTitle();
         if (graphicAdventureRepository.existsByTitle(title)) {
+            log.error("Cannot create adventure: title '{}' is already taken", title);
             throw new InvalidOperationException("error.adventure.titleTaken");
         }
 
@@ -95,14 +111,18 @@ public class GraphicAdventureService {
             adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
         }
 
-        return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
+        GraphicAdventureDto created = graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
+        log.info("Executed createAdventure: returning adventure {}", created);
+        return created;
     }
 
     @Transactional
     public GraphicAdventureDto updateAdventure(GraphicAdventureDto dto, MultipartFile coverImage) {
+        log.info("Executing updateAdventure with adventure: {}, coverImage provided: {}", dto, coverImage != null && !coverImage.isEmpty());
         GraphicAdventure adventure = findOwnedDraft(dto.getId());
 
         if (graphicAdventureRepository.existsByTitleAndCodeNot(dto.getTitle(), adventure.getCode())) {
+            log.error("Cannot update adventure {}: title '{}' is already taken", dto.getId(), dto.getTitle());
             throw new InvalidOperationException("error.adventure.titleTaken");
         }
 
@@ -119,20 +139,26 @@ public class GraphicAdventureService {
             adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
         }
 
-        return graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
+        GraphicAdventureDto updated = graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
+        log.info("Executed updateAdventure: returning adventure {}", updated);
+        return updated;
     }
 
     @Transactional
     public void deleteAdventureById(Long adventureId) {
+        log.info("Executing deleteAdventureById with adventureId: {}", adventureId);
         GraphicAdventure adventure = findOwnedDraft(adventureId);
         graphicAdventureRepository.deleteAll(graphicAdventureRepository.findAllByCode(adventure.getCode()));
+        log.info("Executed deleteAdventureById: all versions of adventure {} deleted", adventure.getCode());
     }
 
     @Transactional
     public GraphicAdventureDto publish(Long adventureId) {
+        log.info("Executing publish with adventureId: {}", adventureId);
         GraphicAdventure published = findOwnedDraft(adventureId);
 
         if (published.getScenes().isEmpty()) {
+            log.error("Cannot publish adventure {}: it has no scenes", adventureId);
             throw new ConflictException("error.adventure.publishNoScenes");
         }
 
@@ -140,6 +166,7 @@ public class GraphicAdventureService {
                 && published.getScenes().stream()
                 .anyMatch(s -> s.getCode().equals(published.getInitialSceneCode()));
         if (!initialSceneValid) {
+            log.error("Cannot publish adventure {}: initial scene '{}' is not valid", adventureId, published.getInitialSceneCode());
             throw new ConflictException("error.adventure.publishInvalidStartScene");
         }
 
@@ -150,11 +177,15 @@ public class GraphicAdventureService {
 
         GraphicAdventure newDraft = createNextDraft(published);
 
-        return graphicAdventureMapper.toDto(newDraft);
+        GraphicAdventureDto newDraftDto = graphicAdventureMapper.toDto(newDraft);
+        log.info("Executed publish: adventure {} published as version {}, returning new draft {}",
+                published.getCode(), published.getVersionNumber(), newDraftDto);
+        return newDraftDto;
     }
 
     @Transactional
     public SceneDto addScene(Long adventureId, SceneDto sceneDto, MultipartFile backgroundImage) {
+        log.info("Executing addScene with adventureId: {}, sceneCode: {}", adventureId, sceneDto.getCode());
         GraphicAdventure adventure = findOwnedDraft(adventureId);
 
         Scene scene = sceneMapper.toEntity(sceneDto);
@@ -173,11 +204,15 @@ public class GraphicAdventureService {
 
         graphicAdventureRepository.saveAndFlush(adventure);
 
-        return sceneMapper.toDto(scene);
+        SceneDto created = sceneMapper.toDto(scene);
+        log.info("Executed addScene: scene {} created with code {} in adventure {}", created.getId(), created.getCode(), adventureId);
+        return created;
     }
 
     @Transactional
     public ItemDto addItem(Long adventureId, ItemDto itemDto, MultipartFile image) {
+        log.info("Executing addItem with adventureId: {}, itemCode: {}, image provided: {}",
+                adventureId, itemDto.getCode(), image != null && !image.isEmpty());
         GraphicAdventure adventure = findOwnedDraft(adventureId);
 
         Item item = itemMapper.toEntity(itemDto);
@@ -193,18 +228,24 @@ public class GraphicAdventureService {
         adventure.getItems().add(item);
         graphicAdventureRepository.saveAndFlush(adventure);
 
-        return itemMapper.toDto(item);
+        ItemDto created = itemMapper.toDto(item);
+        log.info("Executed addItem: item {} created with code {} in adventure {}", created.getId(), created.getCode(), adventureId);
+        return created;
     }
 
     private GraphicAdventure findAdventureById(Long id) {
         return graphicAdventureRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("error.adventure.notFoundById", id));
+                .orElseThrow(() -> {
+                    log.error("Adventure with id {} not found", id);
+                    return new ResourceNotFoundException("error.adventure.notFoundById", id);
+                });
     }
 
     private GraphicAdventure findReadableAdventure(Long id) {
         GraphicAdventure adventure = findAdventureById(id);
         boolean isAuthor = adventure.getAuthor().getUsername().equals(authService.getCurrentUsername());
         if (!isAuthor && adventure.getStatus() != AdventureStatus.PUBLISHED) {
+            log.error("Adventure {} is not readable: it is a draft of another user", id);
             throw new ResourceNotFoundException("error.adventure.notFoundById", id);
         }
         return adventure;
@@ -221,7 +262,9 @@ public class GraphicAdventureService {
         draft.setVersionNumber(adventure.getVersionNumber() + 1);
         draft.setStatus(AdventureStatus.DRAFT);
 
-        return graphicAdventureRepository.save(draft);
+        GraphicAdventure savedDraft = graphicAdventureRepository.save(draft);
+        log.debug("Created new draft version {} for adventure {}", savedDraft.getVersionNumber(), savedDraft.getCode());
+        return savedDraft;
     }
 
     private String generateUniqueCode(String input) {

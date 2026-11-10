@@ -8,6 +8,7 @@ import com.jadventure.backend.model.Item;
 import com.jadventure.backend.repository.DialogueNodeRepository;
 import com.jadventure.backend.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class DialogueNodeService {
 
     private final DialogueNodeRepository nodeRepository;
@@ -30,11 +32,15 @@ public class DialogueNodeService {
 
     @Transactional(readOnly = true)
     public List<DialogueNodeDto> findByItem(Long itemId) {
-        return dialogueNodeMapper.toDtoList(findItem(itemId).getDialogueNodes());
+        log.info("Executing findByItem with itemId: {}", itemId);
+        List<DialogueNodeDto> nodes = dialogueNodeMapper.toDtoList(findItem(itemId).getDialogueNodes());
+        log.info("Executed findByItem: found {} dialogue nodes for item {}", nodes.size(), itemId);
+        return nodes;
     }
 
     @Transactional
     public List<DialogueNodeDto> saveAll(Long itemId, List<DialogueNodeDto> dtos) {
+        log.info("Executing saveAll with itemId: {}, number of nodes: {}", itemId, dtos.size());
         Item item = findItem(itemId);
 
         authService.validateEditable(
@@ -72,12 +78,17 @@ public class DialogueNodeService {
             item.getDialogueNodes().removeAll(removed);
         }
 
-        return dialogueNodeMapper.toDtoList(item.getDialogueNodes());
+        List<DialogueNodeDto> result = dialogueNodeMapper.toDtoList(item.getDialogueNodes());
+        log.info("Executed saveAll for item {}: {} nodes saved, {} nodes removed", itemId, result.size(), removed.size());
+        return result;
     }
 
     private Item findItem(Long itemId) {
         return itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", itemId);
+                    return new ResourceNotFoundException("error.item.notFoundById", itemId);
+                });
     }
 
     private void linkTargets(Long adventureId, DialogueNodeDto dto, DialogueNode node,
@@ -96,6 +107,9 @@ public class DialogueNodeService {
             return node;
         }
         return nodeRepository.findByCodeAndItemGraphicAdventureId(code, adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.dialogue.targetNodeNotFound", code));
+                .orElseThrow(() -> {
+                    log.error("Target dialogue node {} not found in adventure {}", code, adventureId);
+                    return new ResourceNotFoundException("error.dialogue.targetNodeNotFound", code);
+                });
     }
 }

@@ -9,6 +9,7 @@ import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GraphicAdventureRepository;
 import com.jadventure.backend.repository.LeaderboardEntryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class LeaderboardService {
 
     private final LeaderboardEntryRepository leaderboardEntryRepository;
@@ -26,29 +28,39 @@ public class LeaderboardService {
 
     @Transactional(readOnly = true)
     public List<LeaderboardEntryDto> getLeaderboardForAdventure(Long adventureId) {
+        log.info("Executing getLeaderboardForAdventure with adventureId: {}", adventureId);
         if (!graphicAdventureRepository.existsById(adventureId)) {
+            log.error("Adventure with id {} not found", adventureId);
             throw new ResourceNotFoundException("error.adventure.notFoundById", adventureId);
         }
 
         List<LeaderboardEntry> entries = leaderboardEntryRepository
                 .findTop15ByGraphicAdventureIdOrderByPlayTimeAscCompletedAtAsc(adventureId);
 
-        return leaderboardEntryMapper.toDtoList(entries);
+        List<LeaderboardEntryDto> leaderboard = leaderboardEntryMapper.toDtoList(entries);
+        log.info("Executed getLeaderboardForAdventure: found {} entries for adventure {}", leaderboard.size(), adventureId);
+        return leaderboard;
     }
 
     @Transactional
     public void createLeaderboardEntry(Long adventureId, long playTime) {
+        log.info("Executing createLeaderboardEntry with adventureId: {}, playTime: {}", adventureId, playTime);
         User currentUser = authService.getCurrentUser();
 
         boolean alreadyCompleted = leaderboardEntryRepository
                 .existsByUserUsernameAndGraphicAdventureId(currentUser.getUsername(), adventureId);
 
         if (alreadyCompleted) {
+            log.info("Executed createLeaderboardEntry: user {} already has an entry for adventure {}, nothing to do",
+                    currentUser.getUsername(), adventureId);
             return;
         }
 
         GraphicAdventure adventure = graphicAdventureRepository.findById(adventureId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.adventure.notFoundById", adventureId));
+                .orElseThrow(() -> {
+                    log.error("Adventure with id {} not found", adventureId);
+                    return new ResourceNotFoundException("error.adventure.notFoundById", adventureId);
+                });
 
         LeaderboardEntry newEntry = LeaderboardEntry.builder()
                 .user(currentUser)
@@ -58,6 +70,8 @@ public class LeaderboardService {
                 .build();
 
         leaderboardEntryRepository.save(newEntry);
+        log.info("Executed createLeaderboardEntry: entry created for user {} on adventure {} with playTime {}",
+                currentUser.getUsername(), adventureId, playTime);
     }
 
 }

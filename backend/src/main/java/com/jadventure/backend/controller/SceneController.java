@@ -4,6 +4,7 @@ import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.service.SceneService;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/scenes")
+@Log4j2
 public class SceneController {
 
     private final SceneService sceneService;
@@ -24,17 +26,25 @@ public class SceneController {
 
     @GetMapping
     public ResponseEntity<List<SceneDto>> getScenes(@RequestParam Long adventureId) {
-        return ResponseEntity.ok(sceneService.getScenesByAdventure(adventureId));
+        log.info("Received GET request for the list of scenes of adventure {}", adventureId);
+        List<SceneDto> scenes = sceneService.getScenesByAdventure(adventureId);
+        log.info("Returning {} scenes for adventure {}", scenes.size(), adventureId);
+        return ResponseEntity.ok(scenes);
     }
 
     @GetMapping("/{sceneId}")
     public ResponseEntity<SceneDto> getSceneById(@PathVariable Long sceneId) {
-        return ResponseEntity.ok(sceneService.getSceneById(sceneId));
+        log.info("Received GET request for scene {}", sceneId);
+        SceneDto scene = sceneService.getSceneById(sceneId);
+        log.info("Returning scene {}", sceneId);
+        return ResponseEntity.ok(scene);
     }
 
     @DeleteMapping("/{sceneId}")
     public ResponseEntity<Void> deleteSceneById(@PathVariable Long sceneId) {
+        log.info("Received DELETE request for scene {}", sceneId);
         sceneService.deleteSceneById(sceneId);
+        log.info("Scene {} deleted successfully", sceneId);
         return ResponseEntity.noContent().build();
     }
 
@@ -43,7 +53,9 @@ public class SceneController {
             @PathVariable Long sceneId,
             @Valid @RequestPart("data") ItemDto itemDto,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(sceneService.addItem(sceneId, itemDto, image));
+        log.info("Received POST request to add an item to scene {}", sceneId);
+        ItemDto created = sceneService.addItem(sceneId, itemDto, image);
+        log.info("Item added to scene {} with id {}", sceneId, created.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 }

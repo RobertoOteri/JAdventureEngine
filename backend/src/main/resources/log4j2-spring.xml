@@ -1,0 +1,42 @@
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="CONSOLE_LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{[%t]}{faint} %clr{%-5level} %clr{%logger{36}}{cyan} %clr{-}{faint} %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_LOG_PATTERN}"/>
+        </Console>
+
+        <RollingFile name="FileAppender"
+                     fileName="logs/test-execution.log"
+                     filePattern="logs/archived/test-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <SpringProfile name="dev">
+            <Logger name="com.jadventure.backend" level="debug" additivity="false">
+                <AppenderRef ref="ConsoleAppender"/>
+            </Logger>
+            <Root level="info">
+                <AppenderRef ref="ConsoleAppender"/>
+            </Root>
+        </SpringProfile>
+
+        <SpringProfile name="test">
+            <Logger name="com.jadventure.backend" level="info" additivity="false">
+                <AppenderRef ref="FileAppender"/>
+            </Logger>
+            <Root level="info">
+                <AppenderRef ref="FileAppender"/>
+            </Root>
+        </SpringProfile>
+    </Loggers>
+</Configuration>

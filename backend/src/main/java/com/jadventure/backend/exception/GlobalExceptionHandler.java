@@ -1,6 +1,7 @@
 package com.jadventure.backend.exception;
 
 import com.jadventure.backend.dto.ErrorResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestControllerAdvice
+@Log4j2
 public class GlobalExceptionHandler {
 
     private static final String ERROR_CODE_PREFIX = "error.";
@@ -36,22 +38,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Bad request: {}", ex.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Bad Request", "error.generic.badRequest");
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+        log.warn("Invalid state: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, "Conflict", "error.generic.conflict");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Invalid credentials");
         return build(HttpStatus.UNAUTHORIZED, "Unauthorized",
                 codeOrDefault(ex.getMessage(), "error.auth.invalidCredentials"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
         return build(HttpStatus.FORBIDDEN, "Forbidden",
                 codeOrDefault(ex.getMessage(), "error.auth.forbidden"));
     }
@@ -62,12 +68,13 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .findFirst()
                 .orElse("error.validation.generic");
+        log.warn("Validation failed: {}", code);
         return build(HttpStatus.BAD_REQUEST, "Bad Request", code);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        ex.printStackTrace();
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "error.generic.internal");
     }
 

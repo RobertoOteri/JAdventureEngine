@@ -15,6 +15,7 @@ import com.jadventure.backend.model.enums.ActionType;
 import com.jadventure.backend.repository.ItemRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ItemService {
 
     private final ItemRepository itemRepository;
@@ -35,20 +37,33 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemDto> getAdventureItems(Long adventureId) {
-        return itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureId(adventureId));
+        log.info("Executing getAdventureItems with adventureId: {}", adventureId);
+        List<ItemDto> items = itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureId(adventureId));
+        log.info("Executed getAdventureItems: found {} items for adventure {}", items.size(), adventureId);
+        return items;
     }
 
     @Transactional(readOnly = true)
     public ItemDto getItemById(Long itemId) {
+        log.info("Executing getItemById with itemId: {}", itemId);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
-        return itemMapper.toDto(item);
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", itemId);
+                    return new ResourceNotFoundException("error.item.notFoundById", itemId);
+                });
+        ItemDto itemDto = itemMapper.toDto(item);
+        log.info("Executed getItemById: returning item {} with code {}", itemDto.getId(), itemDto.getCode());
+        return itemDto;
     }
 
     @Transactional
     public ItemDto updateItem(ItemDto dto, MultipartFile image) {
+        log.info("Executing updateItem with itemId: {}, image provided: {}", dto.getId(), image != null && !image.isEmpty());
         Item item = itemRepository.findById(dto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", dto.getId()));
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", dto.getId());
+                    return new ResourceNotFoundException("error.item.notFoundById", dto.getId());
+                });
 
         GraphicAdventure adventure = item.getGraphicAdventure();
         authService.validateEditable(adventure.getAuthor().getUsername(), adventure.getStatus());
@@ -63,24 +78,35 @@ public class ItemService {
             item.setImageUrl(dto.getImageUrl());
         }
 
-        return itemMapper.toDto(itemRepository.save(item));
+        ItemDto updated = itemMapper.toDto(itemRepository.save(item));
+        log.info("Executed updateItem: item {} updated with code {}", updated.getId(), updated.getCode());
+        return updated;
     }
 
     @Transactional
     public void deleteItemById(Long itemId) {
+        log.info("Executing deleteItemById with itemId: {}", itemId);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", itemId);
+                    return new ResourceNotFoundException("error.item.notFoundById", itemId);
+                });
 
         authService.validateEditable(
                 item.getGraphicAdventure().getAuthor().getUsername(),
                 item.getGraphicAdventure().getStatus());
         itemRepository.delete(item);
+        log.info("Executed deleteItemById: item {} deleted", itemId);
     }
 
     @Transactional
     public ActionDto addAction(Long itemId, ActionDto actionDto) {
+        log.info("Executing addAction with itemId: {}, action: {}", itemId, actionDto);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("error.item.notFoundById", itemId));
+                .orElseThrow(() -> {
+                    log.error("Item with id {} not found", itemId);
+                    return new ResourceNotFoundException("error.item.notFoundById", itemId);
+                });
 
         authService.validateEditable(
                 item.getGraphicAdventure().getAuthor().getUsername(),
@@ -94,37 +120,48 @@ public class ItemService {
 
         itemRepository.saveAndFlush(item);
 
-        return actionMapper.toDto(action);
+        ActionDto created = actionMapper.toDto(action);
+        log.info("Executed addAction: returning action {} added to item {}", created, itemId);
+        return created;
     }
 
     @Transactional(readOnly = true)
     public List<ItemDto> loadPlayerInventory(Long adventureId, Collection<String> itemCodes) {
+        log.info("Executing loadPlayerInventory with adventureId: {}, itemCodes: {}", adventureId, itemCodes);
         if (itemCodes == null || itemCodes.isEmpty()) {
+            log.info("Executed loadPlayerInventory: no item codes, returning empty inventory");
             return Collections.emptyList();
         }
-        return itemMapper.toDtoList(
+        List<ItemDto> inventory = itemMapper.toDtoList(
                 itemRepository.findAllByGraphicAdventureIdAndCodeIn(adventureId, itemCodes)
         );
+        log.info("Executed loadPlayerInventory: returning {} items", inventory.size());
+        return inventory;
     }
 
     public void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
+        log.debug("Executing validateActionUniqueness with action: {}", actionDto);
         if (actionDto.getType() == ActionType.USE_WITH) {
             if (actionDto.getTargetItemCode() == null || actionDto.getTargetItemCode().isBlank()) {
+                log.error("Invalid USE_WITH action: target item code is required");
                 throw new InvalidOperationException("error.action.useWithTargetRequired");
             }
             boolean duplicateUseWith = existingActions.stream()
                     .anyMatch(a -> a.getType() == ActionType.USE_WITH
                             && actionDto.getTargetItemCode().equalsIgnoreCase(a.getTargetItemCode()));
             if (duplicateUseWith) {
+                log.error("Duplicate USE_WITH action for target item {}", actionDto.getTargetItemCode());
                 throw new InvalidOperationException("error.action.duplicateUseWith", actionDto.getTargetItemCode());
             }
         } else {
             boolean typeAlreadyUsed = existingActions.stream()
                     .anyMatch(existing -> existing.getType() == actionDto.getType());
             if (typeAlreadyUsed) {
+                log.error("Duplicate action: the item already has an action of type {}", actionDto.getType());
                 throw new InvalidOperationException("error.action.duplicateType", actionDto.getType());
             }
         }
+        log.debug("Executed validateActionUniqueness: action is unique");
     }
 
     private void copyItemProperties(Item item, ItemDto dto) {
