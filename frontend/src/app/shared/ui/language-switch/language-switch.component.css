@@ -17,7 +17,7 @@
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: #8b92a0;
+  color: var(--text-muted);
   font: inherit;
   font-size: 0.74rem;
   font-weight: 700;
@@ -28,12 +28,12 @@
 
 .lang-trigger:hover,
 .is-open .lang-trigger {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  background: var(--surface-3);
+  color: var(--text-primary);
 }
 
 .lang-trigger:focus-visible {
-  outline: 2px solid #d9b26a;
+  outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
 
@@ -56,10 +56,10 @@
   height: 36px;
   gap: 0.5rem;
   padding: 0 0.8rem;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-subtle);
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #d4d8e0;
+  background: var(--surface-3);
+  color: var(--text-body);
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0;
@@ -67,9 +67,9 @@
 
 .is-full .lang-trigger:hover,
 .is-full.is-open .lang-trigger {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.07);
-  color: #ffffff;
+  border-color: var(--border);
+  background: var(--surface-4);
+  color: var(--text-primary);
 }
 
 .lang-menu {
@@ -82,10 +82,10 @@
   gap: 2px;
   min-width: 190px;
   padding: 0.4rem;
-  background: #151821;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-popover);
   transform-origin: top left;
   animation: menu-in-down 0.16s ease-out;
 }
@@ -113,7 +113,7 @@
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: #5f6675;
+  color: var(--text-faint);
 }
 
 .lang-option {
@@ -125,7 +125,7 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #c3c8d2;
+  color: var(--text-body);
   font: inherit;
   font-size: 0.88rem;
   font-weight: 600;
@@ -136,13 +136,13 @@
 
 .lang-option:hover,
 .lang-option:focus-visible {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  background: var(--surface-3);
+  color: var(--text-primary);
   outline: none;
 }
 
 .lang-option.selected {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .option-code {
@@ -152,10 +152,10 @@
   min-width: 28px;
   height: 20px;
   padding: 0 0.3rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #8b92a0;
+  background: var(--surface-3);
+  color: var(--text-muted);
   font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -163,9 +163,9 @@
 }
 
 .lang-option.selected .option-code {
-  border-color: rgba(201, 164, 92, 0.45);
-  background: rgba(201, 164, 92, 0.14);
-  color: #e3c27f;
+  border-color: var(--brass-line);
+  background: var(--brass-tint);
+  color: var(--brass-light);
 }
 
 .option-name {
@@ -173,7 +173,7 @@
 }
 
 .option-check {
-  color: #d9b26a;
+  color: var(--brass);
   font-size: 1rem;
 }
 
