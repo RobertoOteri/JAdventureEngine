@@ -131,7 +131,9 @@ export const it = {
     play: 'Avvia gioco',
     details: 'Dettagli e Sinossi',
     edit: 'Modifica Avventura',
-    delete: 'Elimina Avventura'
+    delete: 'Elimina Avventura',
+    version: 'v{version}',
+    draftVersion: 'Bozza v{version}'
   },
   adventureDetail: {
     synopsis: 'Sinossi & Dettagli',

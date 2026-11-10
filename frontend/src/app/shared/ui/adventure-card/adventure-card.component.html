@@ -14,7 +14,11 @@
 
   <div class="plate-shade"></div>
 
-  <span class="plate-slug">{{ adventure().code }}</span>
+  @if (adventure().versionNumber; as version) {
+    <span class="plate-version" [class.is-draft]="adventure().status === 'DRAFT'">
+      {{ (adventure().status === 'DRAFT' ? 'adventureCard.draftVersion' : 'adventureCard.version') | t: { version: version } }}
+    </span>
+  }
 
   <div class="plate-bottom">
     <button

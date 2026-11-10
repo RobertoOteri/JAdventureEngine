@@ -133,7 +133,9 @@ export const en: Translations = {
     play: 'Start game',
     details: 'Details and synopsis',
     edit: 'Edit adventure',
-    delete: 'Delete adventure'
+    delete: 'Delete adventure',
+    version: 'v{version}',
+    draftVersion: 'Draft v{version}'
   },
   adventureDetail: {
     synopsis: 'Synopsis & Details',
