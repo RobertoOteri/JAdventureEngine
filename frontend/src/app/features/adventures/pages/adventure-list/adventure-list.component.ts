@@ -48,7 +48,6 @@ export class AdventureListComponent implements OnInit {
     })
   );
 
-  readonly hasActiveFilters = computed(() => !!this.query());
 
   ngOnInit(): void {
     this.loadAdventures();

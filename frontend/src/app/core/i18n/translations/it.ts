@@ -69,20 +69,18 @@ export const it = {
   },
 
   library: {
+    kicker: 'Esplora',
     title: 'Libreria Avventure',
-    countFiltered: '{shown} di {total} titoli',
-    count: '{count} titoli registrati',
-    countOne: '1 titolo registrato',
+    subtitle: 'Scegli una storia, entra nella scena e inizia a giocare.',
     searchPlaceholder: 'Cerca per titolo, descrizione o autore',
     noMatch: "Nessun'avventura corrisponde alla ricerca.",
     resetSearch: 'Azzera ricerca',
     empty: "Nessun'avventura pubblicata nella libreria."
   },
   myAdventures: {
+    kicker: 'Laboratorio',
     title: 'Le Mie Avventure',
-    countFiltered: '{shown} di {total} progetti',
-    count: '{count} progetti personali',
-    countOne: '1 progetto personale',
+    subtitle: 'Crea, modifica e pubblica le tue avventure.',
     create: 'Crea nuova avventura',
     searchPlaceholder: 'Cerca tra le tue avventure',
     publicationAriaLabel: 'Stato di pubblicazione',
@@ -192,6 +190,7 @@ export const it = {
   },
 
   profile: {
+    kicker: 'Account',
     title: 'Il mio profilo',
     subtitle: 'La tua foto e i tuoi dati personali',
     changePhoto: 'Cambia foto',

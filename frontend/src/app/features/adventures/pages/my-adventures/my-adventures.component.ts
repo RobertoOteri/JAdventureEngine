@@ -60,7 +60,6 @@ export class MyAdventuresComponent implements OnInit {
     })
   );
 
-  readonly hasActiveFilters = computed(() => !!this.query() || this.publication() !== 'all');
 
   ngOnInit(): void {
     this.loadAdventures();

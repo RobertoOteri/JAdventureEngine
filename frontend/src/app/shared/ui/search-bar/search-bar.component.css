@@ -9,31 +9,29 @@
   height: 42px;
   padding: 0 0.85rem;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-bar:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: var(--border-strong);
 }
 
 .search-bar:focus-within {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(251, 191, 36, 0.6);
-  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
+  border-color: var(--brass-dim);
+  box-shadow: var(--focus-ring);
 }
 
 .search-icon {
-  color: #636b7b;
+  color: var(--text-muted);
   font-size: 0.9rem;
   transition: color 0.2s ease;
 }
 
 .search-bar:focus-within .search-icon {
-  color: #fbbf24;
+  color: var(--brass);
 }
 
 input {
@@ -42,12 +40,12 @@ input {
   background: transparent;
   border: none;
   outline: none;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
 input::placeholder {
-  color: #636b7b;
+  color: var(--text-faint);
 }
 
 .clear-btn {
@@ -58,14 +56,14 @@ input::placeholder {
   height: 22px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  color: #a1a1aa;
+  background: var(--surface-4);
+  color: var(--text-secondary);
   font-size: 0.65rem;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .clear-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
+  background: var(--brass-tint-strong);
+  color: var(--brass-light);
 }

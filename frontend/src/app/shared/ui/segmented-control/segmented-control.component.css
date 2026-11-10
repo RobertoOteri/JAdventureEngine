@@ -9,9 +9,9 @@
   height: 42px;
   padding: 4px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 .segmented.full {
@@ -29,7 +29,7 @@
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: #8b92a0;
+  color: var(--text-secondary);
   font-size: 0.84rem;
   font-weight: 600;
   white-space: nowrap;
@@ -50,17 +50,17 @@
 }
 
 .segment:hover:not(.active) {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  background: var(--surface-4);
 }
 
 .segment.active {
-  background: #ffffff;
-  color: #0b0c10;
+  background: var(--brass);
+  color: var(--on-brass);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .segment:focus-visible {
-  outline: 2px solid rgba(251, 191, 36, 0.7);
+  outline: 2px solid var(--brass);
   outline-offset: 1px;
 }

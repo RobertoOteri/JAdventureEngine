@@ -3,26 +3,14 @@
   <main class="content-body">
     <header class="masthead">
       <div class="masthead-text">
+        <span class="kicker">{{ 'myAdventures.kicker' | t }}</span>
         <h1>{{ 'myAdventures.title' | t }}</h1>
-        <span class="counter">
-          @if (hasActiveFilters()) {
-            {{ 'myAdventures.countFiltered' | t: { shown: filteredAdventures().length, total: adventures().length } }}
-          } @else if (adventures().length === 1) {
-            {{ 'myAdventures.countOne' | t }}
-          } @else {
-            {{ 'myAdventures.count' | t: { count: adventures().length } }}
-          }
-        </span>
+        <p class="subtitle">{{ 'myAdventures.subtitle' | t }}</p>
       </div>
 
-      <button
-        type="button"
-        class="fab-add"
-        (click)="goToCreate()"
-        [title]="'myAdventures.create' | t"
-        [attr.aria-label]="'myAdventures.create' | t"
-      >
-        <i class="bi bi-plus-lg fab-cross"></i>
+      <button type="button" class="btn-new" (click)="goToCreate()">
+        <i class="bi bi-plus-lg"></i>
+        <span>{{ 'myAdventures.create' | t }}</span>
       </button>
     </header>
 
@@ -56,7 +44,7 @@
         <p class="error-text">{{ errorKey | t }}</p>
       </div>
     } @else if (isLoading()) {
-      <div class="empty-wrap">
+      <div class="empty-wrap loader-wrap">
         <div class="loader"></div>
       </div>
     } @else {

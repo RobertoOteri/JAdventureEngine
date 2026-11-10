@@ -71,20 +71,18 @@ export const en: Translations = {
   },
 
   library: {
+    kicker: 'Explore',
     title: 'Adventure Library',
-    countFiltered: '{shown} of {total} titles',
-    count: '{count} titles available',
-    countOne: '1 title available',
+    subtitle: 'Pick a story, step into the scene and start playing.',
     searchPlaceholder: 'Search by title, description or author',
     noMatch: 'No adventures match your search.',
     resetSearch: 'Clear search',
     empty: 'No adventures published in the library yet.'
   },
   myAdventures: {
+    kicker: 'Workshop',
     title: 'My Adventures',
-    countFiltered: '{shown} of {total} projects',
-    count: '{count} personal projects',
-    countOne: '1 personal project',
+    subtitle: 'Create, edit and publish your adventures.',
     create: 'Create new adventure',
     searchPlaceholder: 'Search your adventures',
     publicationAriaLabel: 'Publication status',
@@ -194,6 +192,7 @@ export const en: Translations = {
   },
 
   profile: {
+    kicker: 'Account',
     title: 'My profile',
     subtitle: 'Your photo and personal details',
     changePhoto: 'Change photo',

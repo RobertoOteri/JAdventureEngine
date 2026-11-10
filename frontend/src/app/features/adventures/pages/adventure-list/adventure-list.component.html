@@ -3,16 +3,9 @@
   <main class="content-body">
     <header class="masthead">
       <div class="masthead-text">
+        <span class="kicker">{{ 'library.kicker' | t }}</span>
         <h1>{{ 'library.title' | t }}</h1>
-        <span class="counter">
-          @if (hasActiveFilters()) {
-            {{ 'library.countFiltered' | t: { shown: filteredAdventures().length, total: adventures().length } }}
-          } @else if (adventures().length === 1) {
-            {{ 'library.countOne' | t }}
-          } @else {
-            {{ 'library.count' | t: { count: adventures().length } }}
-          }
-        </span>
+        <p class="subtitle">{{ 'library.subtitle' | t }}</p>
       </div>
     </header>
 
@@ -35,7 +28,7 @@
     </div>
 
     @if (loading()) {
-      <div class="empty-wrap">
+      <div class="empty-wrap loader-wrap">
         <div class="loader"></div>
       </div>
     } @else {
