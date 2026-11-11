@@ -138,8 +138,7 @@ public class ActionService {
                 action.getItem().getGraphicAdventure().getAuthor().getUsername(),
                 action.getItem().getGraphicAdventure().getStatus());
 
-        itemService.validateActionUniqueness(action.getItem().getActions(), dto);
-
+        itemService.validateActionUniqueness(action.getItem().getActions(), dto, action.getId());
         actionMapper.updateEntityFromDto(dto, action);
 
         ActionDto updated = actionMapper.toDto(actionRepository.save(action));

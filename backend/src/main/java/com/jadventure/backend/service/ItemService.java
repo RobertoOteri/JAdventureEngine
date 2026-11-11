@@ -120,7 +120,7 @@ public class ItemService {
                 item.getGraphicAdventure().getAuthor().getUsername(),
                 item.getGraphicAdventure().getStatus());
 
-        validateActionUniqueness(item.getActions(), actionDto);
+        validateActionUniqueness(item.getActions(), actionDto, null);
 
         Action action = actionMapper.toEntity(actionDto);
         action.setItem(item);
@@ -147,14 +147,19 @@ public class ItemService {
         return inventory;
     }
 
-    public void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto) {
-        log.debug("Executing validateActionUniqueness with action: {}", actionDto);
+    public void validateActionUniqueness(List<Action> existingActions, ActionDto actionDto, Long excludedActionId) {
+        log.debug("Executing validateActionUniqueness with action: {}, excludedActionId: {}", actionDto, excludedActionId);
+
+        List<Action> otherActions = existingActions.stream()
+                .filter(a -> excludedActionId == null || !excludedActionId.equals(a.getId()))
+                .toList();
+
         if (actionDto.getType() == ActionType.USE_WITH) {
             if (actionDto.getTargetItemCode() == null || actionDto.getTargetItemCode().isBlank()) {
                 log.error("Invalid USE_WITH action: target item code is required");
                 throw new InvalidOperationException("error.action.useWithTargetRequired");
             }
-            boolean duplicateUseWith = existingActions.stream()
+            boolean duplicateUseWith = otherActions.stream()
                     .anyMatch(a -> a.getType() == ActionType.USE_WITH
                             && actionDto.getTargetItemCode().equalsIgnoreCase(a.getTargetItemCode()));
             if (duplicateUseWith) {
@@ -162,7 +167,7 @@ public class ItemService {
                 throw new InvalidOperationException("error.action.duplicateUseWith", actionDto.getTargetItemCode());
             }
         } else {
-            boolean typeAlreadyUsed = existingActions.stream()
+            boolean typeAlreadyUsed = otherActions.stream()
                     .anyMatch(existing -> existing.getType() == actionDto.getType());
             if (typeAlreadyUsed) {
                 log.error("Duplicate action: the item already has an action of type {}", actionDto.getType());
