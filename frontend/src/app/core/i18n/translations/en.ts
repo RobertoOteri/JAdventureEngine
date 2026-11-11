@@ -155,7 +155,13 @@ export const en: Translations = {
     noDescription: 'No description provided for this graphic adventure.',
     notPublished: 'Not published yet: you can play it as a preview.',
     leaderboard: 'Leaderboard',
-    playNow: 'Play now'
+    playNow: 'Play now',
+    version: 'Version',
+    by: 'by',
+    author: 'Author',
+    publishedAt: 'Published on',
+    createdAt: 'Created on',
+    code: 'Code'
   },
   confirmation: {
     deleteTitle: 'Confirm deletion',
@@ -298,8 +304,11 @@ export const en: Translations = {
       kicker: 'Adventure completed',
       time: 'Time taken',
       leaderboard: 'View leaderboard',
-      continue: 'Resume from last save',
-      exit: 'Back to adventures'
+      exit: 'Back to adventures',
+      rateTitle: 'How was the adventure?',
+      sendReview: 'Send review',
+      reviewThanks: 'Thanks for your review!',
+      seeReviews: 'See the reviews'
     },
     feedback: {
       startError: 'Unable to start the game.',
@@ -672,6 +681,12 @@ export const en: Translations = {
         imageRequired: 'Please select an image',
         missingExtension: 'The uploaded file has no valid extension',
         unsupportedFormat: 'Unsupported file format. Allowed extensions: {0}'
+      },
+      review: {
+        ownAdventure: 'You cannot review your own adventure',
+        notPublished: 'You can only review published adventures',
+        notPlayed: 'You must have played this adventure to review it',
+        notFound: 'Review not found'
       }
     },
     validation: {
@@ -762,6 +777,15 @@ export const en: Translations = {
         points: {
           size: 'Points cannot exceed 1000 characters'
         }
+      },
+      review: {
+        rating: {
+          required: 'The rating is required',
+          range: 'The rating must be between 1 and 5'
+        },
+        comment: {
+          tooLong: 'The comment can be at most 2000 characters long'
+        }
       }
     }
   },
@@ -777,5 +801,45 @@ export const en: Translations = {
     instagram: 'Instagram',
     email: 'Email',
     rights: '© {year} All rights reserved'
+  },
+  reviews: {
+    stars: {
+      aria: 'Rating: {value} out of 5',
+      groupAria: 'Rating',
+      rate: 'Rate {value} out of 5'
+    },
+    title: 'Reviews',
+    noReviews: 'No reviews yet',
+    countOne: '1 review',
+    countMany: '{count} reviews',
+    loadError: 'Could not load the reviews.',
+    saveError: 'Could not save the review.',
+    deleteError: 'Could not delete the review.',
+    writeTitle: 'Write a review',
+    editTitle: 'Edit your review',
+    writeHint: 'Tell other players what you think of this adventure.',
+    pickRating: 'Pick a rating',
+    commentPlaceholder: 'Write a comment (optional)',
+    publish: 'Publish',
+    update: 'Update',
+    published: 'Review published.',
+    updated: 'Review updated.',
+    deleted: 'Review deleted.',
+    yourReview: 'Your review',
+    edit: 'Edit',
+    onVersion: 'On version {number}',
+    deleteTitle: 'Delete the review?',
+    deleteMessage: 'Your review will be permanently removed.',
+    playToReview: 'Play this adventure to be able to review it.',
+    playersTitle: 'Player reviews',
+    badgeCompleted: 'Completed',
+    loadMore: 'Load more',
+    ratingLabels: {
+      r1: 'Terrible',
+      r2: 'Poor',
+      r3: 'Fair',
+      r4: 'Good',
+      r5: 'Excellent'
+    }
   },
 };

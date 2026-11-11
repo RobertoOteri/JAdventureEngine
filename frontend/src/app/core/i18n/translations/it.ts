@@ -153,7 +153,13 @@ export const it = {
     noDescription: 'Nessuna descrizione fornita per questa avventura grafica.',
     notPublished: 'Non ancora pubblicata: puoi giocarla come anteprima.',
     leaderboard: 'Classifica',
-    playNow: 'Gioca Ora'
+    playNow: 'Gioca Ora',
+    version: 'Versione',
+    by: 'di',
+    author: 'Autore',
+    publishedAt: 'Pubblicata il',
+    createdAt: 'Creata il',
+    code: 'Codice'
   },
   confirmation: {
     deleteTitle: 'Conferma eliminazione',
@@ -296,8 +302,11 @@ export const it = {
       kicker: 'Avventura completata',
       time: 'Tempo impiegato',
       leaderboard: 'Visualizza la classifica',
-      continue: "Riprendi dall'ultimo salvataggio",
-      exit: 'Torna alle avventure'
+      exit: 'Torna alle avventure',
+      rateTitle: "Com'è stata l'avventura?",
+      sendReview: 'Invia recensione',
+      reviewThanks: 'Grazie per la tua recensione!',
+      seeReviews: 'Vedi le recensioni'
     },
     feedback: {
       startError: 'Impossibile avviare la partita.',
@@ -671,6 +680,12 @@ export const it = {
         imageRequired: "Seleziona un'immagine",
         missingExtension: "Il file caricato non ha un'estensione valida",
         unsupportedFormat: 'Formato file non supportato. Estensioni consentite: {0}'
+      },
+      review: {
+        ownAdventure: 'Non puoi recensire una tua avventura',
+        notPublished: 'Puoi recensire solo avventure pubblicate',
+        notPlayed: 'Devi aver giocato questa avventura per recensirla',
+        notFound: 'Recensione non trovata'
       }
     },
     validation: {
@@ -761,6 +776,15 @@ export const it = {
         points: {
           size: 'I punti non possono superare i 1000 caratteri'
         }
+      },
+      review: {
+        rating: {
+          required: 'Il voto è obbligatorio',
+          range: 'Il voto deve essere compreso tra 1 e 5'
+        },
+        comment: {
+          tooLong: 'Il commento può contenere al massimo 2000 caratteri'
+        }
       }
     }
   },
@@ -778,4 +802,44 @@ export const it = {
     rights: '© {year} Tutti i diritti riservati'
   },
 
+  reviews: {
+    stars: {
+      aria: 'Valutazione: {value} su 5',
+      groupAria: 'Valutazione',
+      rate: 'Assegna {value} su 5'
+    },
+    title: 'Recensioni',
+    noReviews: 'Ancora nessuna recensione',
+    countOne: '1 recensione',
+    countMany: '{count} recensioni',
+    loadError: 'Impossibile caricare le recensioni.',
+    saveError: 'Impossibile salvare la recensione.',
+    deleteError: 'Impossibile eliminare la recensione.',
+    writeTitle: 'Scrivi una recensione',
+    editTitle: 'Modifica la tua recensione',
+    writeHint: 'Racconta agli altri giocatori cosa ne pensi di questa avventura.',
+    pickRating: 'Seleziona un voto',
+    commentPlaceholder: 'Scrivi un commento (facoltativo)',
+    publish: 'Pubblica',
+    update: 'Aggiorna',
+    published: 'Recensione pubblicata.',
+    updated: 'Recensione aggiornata.',
+    deleted: 'Recensione eliminata.',
+    yourReview: 'La tua recensione',
+    edit: 'Modifica',
+    onVersion: 'Sulla versione {number}',
+    deleteTitle: 'Eliminare la recensione?',
+    deleteMessage: 'La tua recensione verrà rimossa definitivamente.',
+    playToReview: 'Gioca questa avventura per poterla recensire.',
+    playersTitle: 'Le recensioni dei giocatori',
+    badgeCompleted: 'Completata',
+    loadMore: 'Carica altre',
+    ratingLabels: {
+      r1: 'Pessima',
+      r2: 'Scarsa',
+      r3: 'Discreta',
+      r4: 'Buona',
+      r5: 'Eccellente'
+    }
+  },
 };

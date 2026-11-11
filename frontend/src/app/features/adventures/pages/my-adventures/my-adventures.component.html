@@ -56,7 +56,7 @@
             (play)="playAdventure($event)"
             (edit)="onEditAdventure($event)"
             (delete)="onDeleteAdventure($event)"
-            (info)="selectedAdventure.set($event)"
+            (info)="openDetail($event)"
           />
         } @empty {
           @if (adventures().length > 0) {
@@ -80,12 +80,4 @@
       </div>
     }
   </main>
-
-  @if (selectedAdventure()) {
-    <app-adventure-detail-modal
-      [adventure]="selectedAdventure()!"
-      (close)="selectedAdventure.set(null)"
-      (play)="onPlayVersion($event)"
-    />
-  }
 </div>

@@ -24,7 +24,6 @@ export class GameLaunchModalComponent {
   coverUrl = input<string>('');
   saves = input<GameSaveDto[]>([]);
   loading = input<boolean>(false);
-  /** Versioni tra cui scegliere: il selettore compare solo se ce n'è più di una. */
   versions = input<GraphicAdventureDto[]>([]);
   selectedVersionId = input<number | null>(null);
 

@@ -1,0 +1,35 @@
+@if (readonly()) {
+  <span
+    class="stars"
+    [attr.data-size]="size()"
+    role="img"
+    [attr.aria-label]="'reviews.stars.aria' | t: { value: value() ?? 0 }"
+  >
+    @for (star of stars; track star) {
+      <i class="bi star {{ iconFor(star) }}" aria-hidden="true"></i>
+    }
+  </span>
+} @else {
+  <div
+    class="stars interactive"
+    [class.previewing]="hovered() !== null"
+    [attr.data-size]="size()"
+    role="radiogroup"
+    [attr.aria-label]="'reviews.stars.groupAria' | t"
+    (mouseleave)="hovered.set(null)"
+  >
+    @for (star of stars; track star) {
+      <button
+        type="button"
+        class="star-button"
+        role="radio"
+        [attr.aria-checked]="value() === star"
+        [attr.aria-label]="'reviews.stars.rate' | t: { value: star }"
+        (mouseenter)="hovered.set(star)"
+        (click)="rate(star)"
+      >
+        <i class="bi star {{ iconFor(star) }}" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+}

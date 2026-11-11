@@ -1,0 +1,156 @@
+@if (loading()) {
+  <div class="loader-wrap">
+    <div class="loader"></div>
+  </div>
+} @else if (adventure(); as adv) {
+  <section class="hero">
+    @if (adv.coverImageUrl) {
+      <img [src]="adv.coverImageUrl" [alt]="adv.title" class="hero-img" />
+    } @else {
+      <div class="hero-fallback">
+        <i class="bi bi-image"></i>
+      </div>
+    }
+    <div class="hero-shade" aria-hidden="true"></div>
+
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <span class="kicker">{{ 'common.graphicAdventure' | t }}</span>
+        <h1 class="adventure-title">{{ adv.title }}</h1>
+        <p class="byline">
+          {{ 'adventureDetail.by' | t }} <strong>{{ adv.authorUsername }}</strong>
+        </p>
+
+        <div class="actions">
+          <button type="button" class="btn-play" (click)="play()">
+            <i class="bi bi-play-fill"></i>
+            <span>{{ 'adventureDetail.playNow' | t }}</span>
+          </button>
+          <button
+            type="button"
+            class="btn-glass"
+            [disabled]="!hasLeaderboard()"
+            (click)="isLeaderboardOpen.set(true)"
+          >
+            <i class="bi bi-trophy-fill"></i>
+            <span>{{ 'adventureDetail.leaderboard' | t }}</span>
+          </button>
+          @if (!isDraft()) {
+            <button
+              type="button"
+              class="btn-glass btn-favorite"
+              [class.is-active]="isFavorite()"
+              [attr.aria-pressed]="isFavorite()"
+              [title]="(isFavorite() ? 'adventureCard.removeFavorite' : 'adventureCard.addFavorite') | t"
+              [attr.aria-label]="(isFavorite() ? 'adventureCard.removeFavorite' : 'adventureCard.addFavorite') | t"
+              (click)="toggleFavorite()"
+            >
+              <i class="bi" [class.bi-star-fill]="isFavorite()" [class.bi-star]="!isFavorite()"></i>
+            </button>
+          }
+        </div>
+
+        @if (isDraft()) {
+          <p class="draft-note">
+            <i class="bi bi-info-circle"></i>
+            <span>{{ 'adventureDetail.notPublished' | t }}</span>
+          </p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <div class="container body">
+    <dl class="facts">
+      <div class="fact">
+        <dt><i class="bi bi-person"></i> {{ 'adventureDetail.author' | t }}</dt>
+        <dd>{{ adv.authorUsername }}</dd>
+      </div>
+      <div class="fact">
+        @if (adv.publishedAt) {
+          <dt><i class="bi bi-calendar3"></i> {{ 'adventureDetail.publishedAt' | t }}</dt>
+          <dd>{{ adv.publishedAt | date: 'dd/MM/yyyy' }}</dd>
+        } @else {
+          <dt><i class="bi bi-calendar3"></i> {{ 'adventureDetail.createdAt' | t }}</dt>
+          <dd>{{ adv.createdAt | date: 'dd/MM/yyyy' }}</dd>
+        }
+      </div>
+      <div class="fact">
+        <dt><i class="bi bi-layers"></i> {{ 'adventureDetail.version' | t }}</dt>
+        <dd>{{ adv.versionNumber ?? 1 }}</dd>
+      </div>
+      <div class="fact">
+        <dt><i class="bi bi-hash"></i> {{ 'adventureDetail.code' | t }}</dt>
+        <dd class="mono" [title]="adv.code">{{ adv.code }}</dd>
+      </div>
+    </dl>
+
+    <section class="section">
+      <h2 class="section-title">{{ 'adventureDetail.synopsis' | t }}</h2>
+      <p class="synopsis-text">
+        {{ adv.description || ('adventureDetail.noDescription' | t) }}
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">{{ 'reviews.title' | t }}</h2>
+
+      @if (summary(); as s) {
+        <div class="rating-summary">
+          <div class="rating-score">
+            <span class="score-value" [class.empty]="s.reviewCount === 0">{{ formattedAverage() }}</span>
+            <app-star-rating [value]="s.averageRating ?? 0" [readonly]="true" />
+            <span class="score-count">
+              @if (s.reviewCount === 0) {
+                {{ 'reviews.noReviews' | t }}
+              } @else if (s.reviewCount === 1) {
+                {{ 'reviews.countOne' | t }}
+              } @else {
+                {{ 'reviews.countMany' | t: { count: s.reviewCount } }}
+              }
+            </span>
+          </div>
+
+          <div class="rating-bars">
+            @for (stars of starLevels; track stars) {
+              <div class="bar-row">
+                <span class="bar-label">
+                  {{ stars }} <i class="bi bi-star-fill"></i>
+                </span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="barPercent(stars)"></div>
+                </div>
+                <span class="bar-count">{{ s.distribution[stars] ?? 0 }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="summary-loading">
+          <div class="loader small"></div>
+        </div>
+      }
+
+      @if (!isDraft() && adv.id) {
+        <app-my-review
+          class="my-review-block"
+          [adventureId]="adv.id"
+          [isAuthor]="isAuthor()"
+          (changed)="reloadSummary()"
+        />
+      }
+
+      @if (adv.id) {
+        <app-review-list class="review-list-block" [adventureId]="adv.id" />
+      }
+    </section>
+  </div>
+}
+
+@if (isLeaderboardOpen() && adventure()?.id; as versionId) {
+  <app-leaderboard
+    [adventureId]="versionId"
+    [adventureTitle]="adventure()!.title"
+    (close)="isLeaderboardOpen.set(false)"
+  />
+}

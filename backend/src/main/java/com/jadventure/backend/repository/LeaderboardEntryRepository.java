@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -14,4 +15,9 @@ public interface LeaderboardEntryRepository extends JpaRepository<LeaderboardEnt
 
     @EntityGraph(attributePaths = "user")
     List<LeaderboardEntry> findTop15ByGraphicAdventureIdOrderByPlayTimeAscCompletedAtAsc(Long adventureId);
+
+    boolean existsByUserUsernameAndGraphicAdventureCode(String username, String adventureCode);
+
+    @EntityGraph(attributePaths = "user")
+    List<LeaderboardEntry> findAllByGraphicAdventureCodeAndUserUsernameIn(String adventureCode, Collection<String> usernames);
 }

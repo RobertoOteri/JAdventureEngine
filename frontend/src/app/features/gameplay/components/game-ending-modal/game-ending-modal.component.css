@@ -46,7 +46,7 @@
 .ending-box {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 640px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -217,6 +217,146 @@
   background: var(--surface-4);
 }
 
+.review-prompt {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+  border: 1px dashed var(--brass-line);
+  border-radius: var(--radius-lg);
+  background: rgba(11, 13, 18, 0.35);
+}
+
+.prompt-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.prompt-extra {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  animation: fade-in 0.25s ease both;
+}
+
+.prompt-comment {
+  width: 100%;
+  min-height: 74px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-input);
+  box-sizing: border-box;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: left;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.prompt-comment::placeholder {
+  color: var(--text-faint);
+}
+
+.prompt-comment:focus {
+  border-color: var(--brass-dim);
+  box-shadow: var(--focus-ring);
+}
+
+.btn-send {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 1.2rem;
+  border: 1px solid var(--brass-line);
+  border-radius: var(--radius);
+  background: var(--brass-tint);
+  color: var(--brass-light);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-send:hover:not(:disabled) {
+  background: var(--brass-tint-strong);
+  border-color: var(--brass-dim);
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--brass-tint-strong);
+  border-top-color: var(--brass-light);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.review-thanks {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--brass-line);
+  border-radius: var(--radius-lg);
+  background: var(--brass-tint);
+  color: var(--text-body);
+  font-size: 0.88rem;
+  animation: fade-in 0.3s ease both;
+}
+
+.thanks-star {
+  color: var(--brass);
+}
+
+.link-reviews {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brass-light);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link-reviews:hover {
+  text-decoration: underline;
+}
+
+.btn-send:focus-visible,
+.link-reviews:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -232,7 +372,7 @@
   100% { transform: scale(1.25); opacity: 0; }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .ending-box {
     padding: 3.3rem 1.2rem 1.5rem;
   }

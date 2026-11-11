@@ -1,0 +1,268 @@
+:host {
+  display: block;
+}
+
+.review-form,
+.my-review {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+}
+
+.review-form {
+  border-color: var(--brass-line);
+  background:
+    linear-gradient(180deg, var(--brass-tint) 0%, transparent 60%),
+    var(--surface-1);
+}
+
+.form-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.form-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.rating-pick {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rating-label {
+  color: var(--brass-light);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.rating-label.placeholder {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.comment-field {
+  position: relative;
+}
+
+.comment-input {
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  padding: 0.85rem 0.95rem 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-input);
+  box-sizing: border-box;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.comment-input::placeholder {
+  color: var(--text-faint);
+}
+
+.comment-input:focus {
+  border-color: var(--brass-dim);
+  box-shadow: var(--focus-ring);
+}
+
+.counter {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.55rem;
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.btn-primary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 1.1rem;
+  border-radius: var(--radius);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary {
+  border: none;
+  background: var(--brass);
+  color: var(--on-brass);
+  font-weight: 700;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brass-light);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(26, 21, 11, 0.3);
+  border-top-color: var(--on-brass);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.my-review {
+  gap: 0.8rem;
+  border-left: 3px solid var(--brass);
+}
+
+.my-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.my-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.my-tools {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btn-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-tool:hover {
+  border-color: var(--brass-line);
+  color: var(--brass-light);
+}
+
+.btn-tool.danger:hover {
+  border-color: var(--danger-line);
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.my-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.my-meta {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.my-comment {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.locked-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.locked-note i {
+  color: var(--brass-dim);
+  font-size: 1rem;
+}
+
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.btn-tool:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 700px) {
+  .review-form,
+  .my-review {
+    padding: 1.1rem 1.15rem;
+  }
+
+  .rating-pick {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+}

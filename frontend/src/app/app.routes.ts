@@ -27,6 +27,15 @@ export const routes: Routes = [
   },
 
   {
+    path: 'adventures/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/adventures/pages/adventure-create/adventure-create.component').then(
+        (m) => m.AdventureCreateComponent
+      )
+  },
+
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -54,6 +63,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'adventures/:adventureId',
+        loadComponent: () =>
+          import('./features/adventures/pages/adventure-detail/adventure-detail.component').then(
+            (m) => m.AdventureDetailComponent
+          )
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/pages/profile/profile.component').then(
@@ -63,14 +79,6 @@ export const routes: Routes = [
     ]
   },
 
-  {
-    path: 'adventures/new',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/adventures/pages/adventure-create/adventure-create.component').then(
-        (m) => m.AdventureCreateComponent
-      )
-  },
   {
     path: 'adventures/:adventureId/scenes/new',
     canActivate: [authGuard],

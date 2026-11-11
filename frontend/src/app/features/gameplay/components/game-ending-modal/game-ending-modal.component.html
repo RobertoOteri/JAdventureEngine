@@ -33,14 +33,48 @@
       <p class="ending-message">{{ message() }}</p>
     }
 
+    @if (reviewState() === 'ask') {
+      <div class="review-prompt">
+        <span class="prompt-title">{{ 'gameplay.ending.rateTitle' | t }}</span>
+        <app-star-rating [value]="reviewRating()" (valueChange)="onReviewRatingChange($event)" size="lg" />
+
+        @if (reviewRating() > 0) {
+          <div class="prompt-extra">
+            <textarea
+              class="prompt-comment"
+              rows="3"
+              [value]="reviewComment()"
+              [attr.maxlength]="reviewMaxLength"
+              [placeholder]="'reviews.commentPlaceholder' | t"
+              [attr.aria-label]="'reviews.commentPlaceholder' | t"
+              (input)="onReviewCommentInput($event)"
+            ></textarea>
+            <button type="button" class="btn-send" [disabled]="reviewSaving()" (click)="sendReview()">
+              @if (reviewSaving()) {
+                <span class="spinner" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-send-fill"></i>
+              }
+              <span>{{ 'gameplay.ending.sendReview' | t }}</span>
+            </button>
+          </div>
+        }
+      </div>
+    } @else if (reviewState() === 'done') {
+      <div class="review-thanks">
+        <i class="bi bi-star-fill thanks-star"></i>
+        <span>{{ 'gameplay.ending.reviewThanks' | t }}</span>
+        <button type="button" class="link-reviews" (click)="openReviews.emit()">
+          {{ 'gameplay.ending.seeReviews' | t }}
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    }
+
     <div class="ending-actions">
       <button type="button" class="btn primary" (click)="isLeaderboardOpen.set(true)">
         <i class="bi bi-trophy-fill"></i>
         <span>{{ 'gameplay.ending.leaderboard' | t }}</span>
-      </button>
-      <button type="button" class="btn secondary" (click)="continueGame.emit()">
-        <i class="bi bi-arrow-counterclockwise"></i>
-        <span>{{ 'gameplay.ending.continue' | t }}</span>
       </button>
       <button type="button" class="btn ghost" (click)="exit.emit()">
         <i class="bi bi-box-arrow-left"></i>

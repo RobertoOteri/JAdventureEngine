@@ -240,15 +240,7 @@ public class GraphicAdventureService {
         return created;
     }
 
-    private GraphicAdventure findAdventureById(Long id) {
-        return graphicAdventureRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Adventure with id {} not found", id);
-                    return new ResourceNotFoundException("error.adventure.notFoundById", id);
-                });
-    }
-
-    private GraphicAdventure findReadableAdventure(Long id) {
+    public GraphicAdventure findReadableAdventure(Long id) {
         GraphicAdventure adventure = findAdventureById(id);
         boolean isAuthor = adventure.getAuthor().getUsername().equals(authService.getCurrentUsername());
         if (!isAuthor && adventure.getStatus() != AdventureStatus.PUBLISHED) {
@@ -256,6 +248,14 @@ public class GraphicAdventureService {
             throw new ResourceNotFoundException("error.adventure.notFoundById", id);
         }
         return adventure;
+    }
+
+    private GraphicAdventure findAdventureById(Long id) {
+        return graphicAdventureRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Adventure with id {} not found", id);
+                    return new ResourceNotFoundException("error.adventure.notFoundById", id);
+                });
     }
 
     private GraphicAdventure findOwnedDraft(Long id) {

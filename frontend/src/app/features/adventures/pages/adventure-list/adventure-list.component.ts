@@ -7,7 +7,6 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { FavoriteService } from '../../../../core/services/favorite.service';
 import { GraphicAdventureDto } from '../../../../core/models';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
-import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
 import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
 import {
@@ -22,7 +21,6 @@ import {
   imports: [
     CommonModule,
     AdventureCardComponent,
-    AdventureDetailModalComponent,
     SearchBarComponent,
     FilterSelectComponent,
     TranslatePipe
@@ -38,7 +36,6 @@ export class AdventureListComponent implements OnInit {
 
   readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly loading = signal<boolean>(true);
-  readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
 
   readonly query = signal('');
   readonly sort = signal<AdventureSort>('recent');
@@ -80,7 +77,7 @@ export class AdventureListComponent implements OnInit {
     this.router.navigate(['/adventures', adv.id, 'play']);
   }
 
-  onPlayVersion(adventureId: number): void {
-    this.router.navigate(['/adventures', adventureId, 'play']);
+  openDetail(adv: GraphicAdventureDto): void {
+    void this.router.navigate(['/adventures', adv.id]);
   }
 }

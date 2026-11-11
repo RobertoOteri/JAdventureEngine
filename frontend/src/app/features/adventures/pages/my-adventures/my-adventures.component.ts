@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { GraphicAdventureDto } from '../../../../core/models';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
-import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
 import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
@@ -27,7 +26,6 @@ import {
   imports: [
     CommonModule,
     AdventureCardComponent,
-    AdventureDetailModalComponent,
     SearchBarComponent,
     FilterSelectComponent,
     SegmentedControlComponent,
@@ -47,7 +45,6 @@ export class MyAdventuresComponent implements OnInit {
   readonly adventures = signal<GraphicAdventureDto[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<TranslationKey | null>(null);
-  readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
 
   readonly query = signal('');
   readonly publication = signal<PublicationFilter>('all');
@@ -126,15 +123,12 @@ export class MyAdventuresComponent implements OnInit {
     this.adventureService.deleteAdventure(adv.id).subscribe({
       next: () => {
         this.adventures.update((prev) => prev.filter((a) => a.id !== adv.id));
-        if (this.selectedAdventure()?.id === adv.id) {
-          this.selectedAdventure.set(null);
-        }
       },
       error: (err: unknown) => this.notifications.httpError(err, 'myAdventures.deleteError')
     });
   }
 
-  onPlayVersion(adventureId: number): void {
-    void this.router.navigate(['/adventures', adventureId, 'play']);
+  openDetail(adv: GraphicAdventureDto): void {
+    void this.router.navigate(['/adventures', adv.id]);
   }
 }

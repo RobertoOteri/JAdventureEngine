@@ -47,7 +47,6 @@ export class GameplayComponent implements OnInit, OnDestroy {
   readonly store = inject(GameplayStore);
 
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
-  /** Versioni giocabili: quelle pubblicate, più la bozza se si sta aprendo un'anteprima. */
   readonly versions = signal<GraphicAdventureDto[]>([]);
   readonly isLaunchModalOpen = signal<boolean>(true);
 
@@ -123,7 +122,6 @@ export class GameplayComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Cambia la versione da giocare: i salvataggi sono legati alla versione, quindi vanno ricaricati. */
   onVersionChange(versionId: number): void {
     const version = this.versions().find((v) => v.id === versionId);
     if (!version || versionId === this.store.adventureId()) {
@@ -191,6 +189,13 @@ export class GameplayComponent implements OnInit, OnDestroy {
     this.store.syncAutoSave();
     this.store.resetStore();
     void this.router.navigate(['/adventures']);
+  }
+
+  onOpenReviews(): void {
+    const id = this.store.adventureId();
+    this.store.syncAutoSave();
+    this.store.resetStore();
+    void this.router.navigate(id ? ['/adventures', id] : ['/adventures']);
   }
 
   @HostListener('window:mousemove', ['$event'])

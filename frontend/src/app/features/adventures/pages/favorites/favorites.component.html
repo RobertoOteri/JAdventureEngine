@@ -39,7 +39,7 @@
             [showFavorite]="true"
             [isFavorite]="true"
             (play)="onPlayAdventure($event)"
-            (info)="selectedAdventure.set($event)"
+            (info)="openDetail($event)"
             (favoriteToggle)="favoriteService.toggle($event)"
           />
         } @empty {
@@ -64,12 +64,4 @@
       </div>
     }
   </main>
-
-  @if (selectedAdventure()) {
-    <app-adventure-detail-modal
-      [adventure]="selectedAdventure()!"
-      (close)="selectedAdventure.set(null)"
-      (play)="onPlayVersion($event)"
-    />
-  }
 </div>

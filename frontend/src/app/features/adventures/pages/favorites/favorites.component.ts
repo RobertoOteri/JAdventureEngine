@@ -4,7 +4,6 @@ import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { FavoriteService } from '../../../../core/services/favorite.service';
 import { GraphicAdventureDto } from '../../../../core/models';
 import { AdventureCardComponent } from '../../../../shared/ui/adventure-card/adventure-card.component';
-import { AdventureDetailModalComponent } from '../../../../shared/ui/adventure-detail-modal/adventure-detail-modal.component';
 import { SearchBarComponent } from '../../../../shared/ui/search-bar/search-bar.component';
 import { FilterSelectComponent } from '../../../../shared/ui/filter-select/filter-select.component';
 import {
@@ -19,20 +18,16 @@ import {
   imports: [
     RouterLink,
     AdventureCardComponent,
-    AdventureDetailModalComponent,
     SearchBarComponent,
     FilterSelectComponent,
     TranslatePipe
   ],
   templateUrl: './favorites.component.html',
-  // Stesso layout della Libreria: riuso il suo foglio di stile invece di duplicarlo.
   styleUrl: '../adventure-list/adventure-list.component.css'
 })
 export class FavoritesComponent implements OnInit {
   private readonly router = inject(Router);
   readonly favoriteService = inject(FavoriteService);
-
-  readonly selectedAdventure = signal<GraphicAdventureDto | null>(null);
 
   readonly query = signal('');
   readonly sort = signal<AdventureSort>('title-asc');
@@ -58,7 +53,7 @@ export class FavoritesComponent implements OnInit {
     this.router.navigate(['/adventures', adv.id, 'play']);
   }
 
-  onPlayVersion(adventureId: number): void {
-    this.router.navigate(['/adventures', adventureId, 'play']);
+  openDetail(adv: GraphicAdventureDto): void {
+    void this.router.navigate(['/adventures', adv.id]);
   }
 }

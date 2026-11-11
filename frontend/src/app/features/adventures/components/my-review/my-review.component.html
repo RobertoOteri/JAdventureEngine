@@ -1,0 +1,79 @@
+@if (loading()) {
+} @else if (showForm()) {
+  <form class="review-form" (submit)="submit($event)">
+    <div class="form-head">
+      <h3 class="form-title">{{ (review() ? 'reviews.editTitle' : 'reviews.writeTitle') | t }}</h3>
+      <p class="form-hint">{{ 'reviews.writeHint' | t }}</p>
+    </div>
+
+    <div class="rating-pick">
+      <app-star-rating [value]="draftRating()" (valueChange)="onRatingChange($event)" size="lg" />
+      <span class="rating-label" [class.placeholder]="!ratingLabel()">
+        {{ ratingLabel() || ('reviews.pickRating' | t) }}
+      </span>
+    </div>
+
+    <div class="comment-field">
+      <textarea
+        class="comment-input"
+        rows="4"
+        [value]="draftComment()"
+        [attr.maxlength]="maxLength"
+        [placeholder]="'reviews.commentPlaceholder' | t"
+        [attr.aria-label]="'reviews.commentPlaceholder' | t"
+        (input)="onCommentInput($event)"
+      ></textarea>
+      <span class="counter">{{ draftComment().length }} / {{ maxLength }}</span>
+    </div>
+
+    <div class="form-actions">
+      @if (review()) {
+        <button type="button" class="btn-ghost" (click)="cancelEdit()">
+          {{ 'common.cancel' | t }}
+        </button>
+      }
+      <button type="submit" class="btn-primary" [disabled]="draftRating() < 1 || saving()">
+        @if (saving()) {
+          <span class="spinner" aria-hidden="true"></span>
+        } @else {
+          <i class="bi bi-send-fill"></i>
+        }
+        <span>{{ (review() ? 'reviews.update' : 'reviews.publish') | t }}</span>
+      </button>
+    </div>
+  </form>
+} @else if (review(); as r) {
+  <article class="my-review">
+    <header class="my-head">
+      <span class="my-label">{{ 'reviews.yourReview' | t }}</span>
+      <div class="my-tools">
+        @if (canReview()) {
+          <button type="button" class="btn-tool" (click)="startEdit()">
+            <i class="bi bi-pencil"></i>
+            <span>{{ 'reviews.edit' | t }}</span>
+          </button>
+        }
+        <button type="button" class="btn-tool danger" (click)="remove()">
+          <i class="bi bi-trash"></i>
+          <span>{{ 'common.delete' | t }}</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="my-rating">
+      <app-star-rating [value]="r.rating" [readonly]="true" />
+      <span class="my-meta">
+        {{ 'reviews.onVersion' | t: { number: r.versionNumber ?? 1 } }} · {{ r.updatedAt | date: 'dd/MM/yyyy' }}
+      </span>
+    </div>
+
+    @if (r.comment) {
+      <p class="my-comment">{{ r.comment }}</p>
+    }
+  </article>
+} @else if (!isAuthor()) {
+  <p class="locked-note">
+    <i class="bi bi-controller"></i>
+    <span>{{ 'reviews.playToReview' | t }}</span>
+  </p>
+}

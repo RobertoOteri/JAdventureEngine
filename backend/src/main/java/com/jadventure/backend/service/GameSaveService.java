@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -172,4 +173,11 @@ public class GameSaveService {
         log.info("Executed findSaveByUser: returning save {} of user {}", saveCode, user.getUsername());
         return save;
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasPlayed(String username, String adventureCode) {
+        log.debug("Executing hasPlayed with username: {}, adventureCode: {}", username, adventureCode);
+        return gameSaveRepository.existsByUserUsernameAndGraphicAdventureCode(username, adventureCode);
+    }
+
 }

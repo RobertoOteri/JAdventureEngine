@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +75,24 @@ public class LeaderboardService {
         leaderboardEntryRepository.save(newEntry);
         log.info("Executed createLeaderboardEntry: entry created for user {} on adventure {} with playTime {}",
                 currentUser.getUsername(), adventureId, playTime);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasCompleted(String username, String adventureCode) {
+        log.debug("Executing hasCompleted with username: {}, adventureCode: {}", username, adventureCode);
+        return leaderboardEntryRepository.existsByUserUsernameAndGraphicAdventureCode(username, adventureCode);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> findUsernamesWhoCompleted(String adventureCode, Collection<String> usernames) {
+        log.debug("Executing findUsernamesWhoCompleted with adventureCode: {}, {} usernames", adventureCode, usernames.size());
+        if (usernames.isEmpty()) {
+            return Set.of();
+        }
+        return leaderboardEntryRepository.findAllByGraphicAdventureCodeAndUserUsernameIn(adventureCode, usernames)
+                .stream()
+                .map(entry -> entry.getUser().getUsername())
+                .collect(Collectors.toSet());
     }
 
 }

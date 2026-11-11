@@ -13,3 +13,4 @@ export * from './textbox.model';
 export * from './dialogue-choice.model';
 export * from './dialogue-node.model';
 export * from './user.model';
+export * from './review.model';

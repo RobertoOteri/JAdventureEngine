@@ -17,7 +17,6 @@ export class VersionSelectComponent {
 
   readonly selectedChange = output<number>();
 
-  /** La versione "più recente" è la prima pubblicata: un'eventuale bozza in cima non conta. */
   readonly latestPublishedId = computed(
     () => this.versions().find((v) => v.status === 'PUBLISHED')?.id ?? null
   );
