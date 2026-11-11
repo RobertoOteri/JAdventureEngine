@@ -39,5 +39,5 @@ public class Precondition {
     private Action action;
 
     @Embedded
-    private TextBoxDetail textBoxDetail;
+    private TextBox textBox;
 }

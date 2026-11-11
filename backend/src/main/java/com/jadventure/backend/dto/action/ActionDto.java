@@ -1,6 +1,7 @@
 package com.jadventure.backend.dto.action;
 
 import com.jadventure.backend.model.enums.ActionType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,9 +31,11 @@ public class ActionDto {
 
     private String targetItemCode;
 
+    @Valid
     @Builder.Default
     private List<PreconditionDto> preconditions = new ArrayList<>();
 
+    @Valid
     @Builder.Default
     private List<GameEffectDto> effects = new ArrayList<>();
 }

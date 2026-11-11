@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextBoxDetail {
+public class TextBox {
 
     @Column(name = "pos_x")
     private Integer posX;
@@ -18,14 +18,17 @@ public class TextBoxDetail {
     @Column(name = "pos_y")
     private Integer posY;
 
+    @Column(name = "width")
     private Integer width;
+
+    @Column(name = "height")
     private Integer height;
 
-    @Column(name = "font_family")
+    @Column(name = "font_family", length = 100)
     private String fontFamily;
 
     @Column(name = "font_size")
-    private String fontSize;
+    private Integer fontSize;
 
     @Column(name = "color", length = 20)
     private String color;

@@ -16,7 +16,7 @@ import {
   GameActionResultDto,
   DialogueNode
 } from '../../../core/models';
-import { TextBoxDetail } from '../../../core/models/textbox-detail.model';
+import { TextBox, normalizeTextBox } from '../../../core/models/textbox.model';
 import {apiErrorMessage} from '../../../core/utils/http-error.util';
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -39,7 +39,7 @@ export interface DraggedItemState {
 export interface InputOverlayState {
   actionCode: string;
   actionType: ActionType;
-  box: TextBoxDetail;
+  box: TextBox;
   value: string;
 }
 
@@ -74,15 +74,6 @@ const initialDraggedState: DraggedItemState = {
   y: 0,
   targetHoveredName: null,
   targetHoveredCode: null
-};
-
-const FALLBACK_TEXTBOX: TextBoxDetail = {
-  posX: 350,
-  posY: 450,
-  width: 300,
-  height: 80,
-  fontFamily: 'Arial',
-  fontSize: '32px'
 };
 
 const initialState: GameplayState = {
@@ -161,13 +152,13 @@ export const GameplayStore = signalStore(
     const openInputOverlay = (
       actionCode: string,
       actionType: ActionType,
-      box?: TextBoxDetail | null
+      box?: TextBox | null
     ): void => {
       patchState(store, {
         inputOverlay: {
           actionCode,
           actionType,
-          box: box ?? FALLBACK_TEXTBOX,
+          box: normalizeTextBox(box),
           value: ''
         }
       });

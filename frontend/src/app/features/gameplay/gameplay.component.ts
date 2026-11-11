@@ -146,7 +146,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
       this.store.openInputOverlay(
         actionData.actionCode,
         actionData.actionType,
-        inputPrecondition.textBoxDetail
+        inputPrecondition.textBox
       );
       return;
     }

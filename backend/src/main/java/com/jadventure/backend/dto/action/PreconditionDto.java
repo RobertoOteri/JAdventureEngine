@@ -1,6 +1,7 @@
 package com.jadventure.backend.dto.action;
 
 import com.jadventure.backend.model.enums.PreconditionType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -24,5 +25,6 @@ public class PreconditionDto {
     private String expectedValue;
     private String failureMessage;
 
-    private TextBoxDetailDto textBoxDetail;
+    @Valid
+    private TextBoxDto textBox;
 }

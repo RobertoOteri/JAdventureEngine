@@ -1,4 +1,4 @@
-import {TextBoxDetail} from './textbox-detail.model';
+import {TextBox} from './textbox.model';
 
 export type ActionType =
   | 'LOOK_AT'
@@ -32,7 +32,7 @@ export interface Precondition {
   requiredKey: string;
   expectedValue?: string;
   failureMessage?: string;
-  textBoxDetail?: TextBoxDetail;
+  textBox?: TextBox;
 }
 
 export interface GameEffect {

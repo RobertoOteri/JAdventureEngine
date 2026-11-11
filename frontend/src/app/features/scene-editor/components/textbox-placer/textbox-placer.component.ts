@@ -1,25 +1,11 @@
 import { Component, ElementRef, computed, inject, input, model, viewChild } from '@angular/core';
-import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
+import { TEXTBOX_GRID as GRID, TextBox } from '../../../../core/models/textbox.model';
 import { TranslationService } from '../../../../core/i18n/translation.service';
-
-export type { TextBoxDetail };
-
-export const DEFAULT_TEXTBOX_DETAIL: TextBoxDetail = {
-  posX: 400,
-  posY: 460,
-  width: 200,
-  height: 60,
-  fontFamily: 'Arial',
-  fontSize: '16px',
-  color: '#ffffff'
-};
 
 type DragMode = 'move' | 'resize' | 'draw';
 
-const GRID = 1000;
 const MIN_W = 60;
 const MIN_H = 30;
-const DEFAULT_COLOR = '#ffffff';
 
 const clamp = (v: number, min: number, max: number): number => Math.max(min, Math.min(max, v));
 
@@ -32,7 +18,7 @@ const clamp = (v: number, min: number, max: number): number => Math.max(min, Mat
 export class TextBoxPlacerComponent {
   private readonly i18n = inject(TranslationService);
   readonly backgroundUrl = input.required<string>();
-  readonly box = model.required<TextBoxDetail>();
+  readonly box = model.required<TextBox>();
   readonly sampleText = input<string>('');
 
   readonly isPlaceholder = computed(() => this.sampleText().trim().length === 0);
@@ -40,7 +26,7 @@ export class TextBoxPlacerComponent {
     () => this.sampleText().trim() || this.i18n.t('sceneEditor.textboxPlaceholder')
   );
 
-  readonly textColor = computed(() => this.box().color || DEFAULT_COLOR);
+  readonly textColor = computed(() => this.box().color);
 
   readonly isDarkText = computed(() => {
     const hex = this.textColor().replace('#', '');
@@ -52,9 +38,7 @@ export class TextBoxPlacerComponent {
   });
 
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
-  private drag: { mode: DragMode; start: { x: number; y: number }; origin: TextBoxDetail } | null = null;
-
-  readonly fontPx = computed(() => parseInt(this.box().fontSize ?? '16', 10) || 16);
+  private drag: { mode: DragMode; start: { x: number; y: number }; origin: TextBox } | null = null;
 
   private toGrid(e: PointerEvent): { x: number; y: number } {
     const rect = this.stage().nativeElement.getBoundingClientRect();

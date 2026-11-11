@@ -7,10 +7,8 @@ import {
   input,
   output
 } from '@angular/core';
-import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
+import { TEXTBOX_GRID, TextBox } from '../../../../core/models/textbox.model';
 
-const REFERENCE_WIDTH = 1000;
-const DEFAULT_COLOR = '#ffffff';
 
 @Component({
   selector: 'app-game-input-overlay',
@@ -21,21 +19,18 @@ const DEFAULT_COLOR = '#ffffff';
 export class GameInputOverlayComponent implements AfterViewInit {
   @ViewChild('field', { static: true }) field!: ElementRef<HTMLInputElement>;
 
-  readonly box = input.required<TextBoxDetail>();
+  readonly box = input.required<TextBox>();
   readonly value = input<string>('');
 
   readonly valueChange = output<string>();
   readonly submitted = output<void>();
   readonly dismissed = output<void>();
 
-  readonly fontFamily = computed(() => this.box().fontFamily ?? 'Arial');
+  readonly fontFamily = computed(() => this.box().fontFamily);
 
-  readonly color = computed(() => this.box().color || DEFAULT_COLOR);
+  readonly color = computed(() => this.box().color);
 
-  readonly fontSize = computed(() => {
-    const px = parseFloat(this.box().fontSize ?? '16') || 16;
-    return `${(px / REFERENCE_WIDTH) * 100}cqw`;
-  });
+  readonly fontSize = computed(() => `${(this.box().fontSize / TEXTBOX_GRID) * 100}cqw`);
 
   ngAfterViewInit(): void {
     this.field.nativeElement.focus();

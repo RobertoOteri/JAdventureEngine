@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { EditorStore } from '../../store/editor.store';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { TranslationKey } from '../../../../core/i18n/i18n.types';
+import { TextBoxPlacerComponent } from '../textbox-placer/textbox-placer.component';
+import { TEXTBOX_GRID, TextBox, normalizeTextBox } from '../../../../core/models/textbox.model';
 import { ACTION_TYPE_KEYS, EFFECT_TYPE_KEYS, PRECONDITION_TYPE_KEYS } from '../../../../core/i18n/enum-labels';
 import {
   Action,
@@ -13,11 +15,6 @@ import {
   PreconditionType,
   DialogueNode
 } from '../../../../core/models';
-import {
-  DEFAULT_TEXTBOX_DETAIL,
-  TextBoxPlacerComponent
-} from '../textbox-placer/textbox-placer.component';
-import { TextBoxDetail } from '../../../../core/models/textbox-detail.model';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { nodeLabel } from '../../../../core/utils/node-label';
@@ -133,9 +130,9 @@ export class ActionModalComponent {
         this.actionSuccessMsg = existing.successMessage || '';
 
         const clonedPreconditions = existing.preconditions ? structuredClone(existing.preconditions) : [];
-        const processedPreconditions = clonedPreconditions.map((p: any) => ({
+        const processedPreconditions = clonedPreconditions.map((p: Precondition) => ({
           ...p,
-          textBoxDetail: this.normalizeBox(p.textBoxDetail)
+          textBox: normalizeTextBox(p.textBox)
         }));
 
         this.actionPreconditions.set(processedPreconditions);
@@ -265,7 +262,7 @@ export class ActionModalComponent {
         requiredKey: '',
         expectedValue: '',
         failureMessage: '',
-        textBoxDetail: { ...DEFAULT_TEXTBOX_DETAIL }
+        textBox: normalizeTextBox()
       }
     ]);
   }
@@ -292,34 +289,20 @@ export class ActionModalComponent {
     eff.flagValue = '';
   }
 
-  private normalizeBox(raw?: Partial<TextBoxDetail> | null): TextBoxDetail {
-    const d = DEFAULT_TEXTBOX_DETAIL;
-    return {
-      posX: raw?.posX ?? d.posX,
-      posY: raw?.posY ?? d.posY,
-      width: raw?.width ?? d.width,
-      height: raw?.height ?? d.height,
-      fontFamily: raw?.fontFamily ?? d.fontFamily,
-      fontSize: raw?.fontSize ?? d.fontSize,
-      color: raw?.color ?? '#ffffff'
-    };
-  }
-
-  patchBox(prec: Precondition, patch: Partial<TextBoxDetail>): void {
-    prec.textBoxDetail = { ...this.normalizeBox(prec.textBoxDetail), ...patch };
+  patchBox(prec: Precondition, patch: Partial<TextBox>): void {
+    prec.textBox = { ...normalizeTextBox(prec.textBox), ...patch };
   }
 
   stepFont(prec: Precondition, delta: number): void {
-    const current = parseInt(prec.textBoxDetail?.fontSize ?? '16', 10) || 16;
-    const next = Math.max(10, Math.min(72, current + delta));
-    this.patchBox(prec, { fontSize: `${next}px` });
+    const current = normalizeTextBox(prec.textBox).fontSize;
+    this.patchBox(prec, { fontSize: Math.max(10, Math.min(72, current + delta)) });
   }
 
   centerBox(prec: Precondition): void {
-    const box = this.normalizeBox(prec.textBoxDetail);
+    const box = normalizeTextBox(prec.textBox);
     this.patchBox(prec, {
-      posX: Math.round((1000 - box.width) / 2),
-      posY: Math.round((1000 - box.height) / 2)
+      posX: Math.round((TEXTBOX_GRID - box.width) / 2),
+      posY: Math.round((TEXTBOX_GRID - box.height) / 2)
     });
   }
 
@@ -363,7 +346,7 @@ export class ActionModalComponent {
           requiredKey: p.type === 'INPUT_EQUALS' ? 'INPUT' : p.requiredKey,
           expectedValue: (p.type === 'FLAG_EQUALS' || p.type === 'INPUT_EQUALS') ? (p.expectedValue || undefined) : undefined,
           failureMessage: p.failureMessage || undefined,
-          textBoxDetail: p.type === 'INPUT_EQUALS' ? (p.textBoxDetail || undefined) : undefined
+          textBox: p.type === 'INPUT_EQUALS' ? p.textBox : undefined
         })),
       effects: this.actionEffects()
         .filter((e) => e.type === 'END_ADVENTURE' || !!e.targetValue)

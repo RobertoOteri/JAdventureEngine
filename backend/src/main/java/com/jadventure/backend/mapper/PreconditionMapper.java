@@ -1,9 +1,9 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.action.PreconditionDto;
-import com.jadventure.backend.dto.action.TextBoxDetailDto;
+import com.jadventure.backend.dto.action.TextBoxDto;
 import com.jadventure.backend.model.Precondition;
-import com.jadventure.backend.model.TextBoxDetail;
+import com.jadventure.backend.model.TextBox;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -20,9 +20,11 @@ public interface PreconditionMapper {
     @Mapping(target = "action", ignore = true)
     Precondition toEntity(PreconditionDto dto);
 
-    TextBoxDetailDto toDto(TextBoxDetail entity);
+    TextBoxDto toDto(TextBox entity);
 
-    TextBoxDetail toEntity(TextBoxDetailDto dto);
+    TextBox toEntity(TextBoxDto dto);
+
+    TextBox copy(TextBox source);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "action", ignore = true)
@@ -30,6 +32,4 @@ public interface PreconditionMapper {
 
     List<Precondition> copyList(List<Precondition> source);
 
-
-    TextBoxDetail copy(TextBoxDetail source);
 }

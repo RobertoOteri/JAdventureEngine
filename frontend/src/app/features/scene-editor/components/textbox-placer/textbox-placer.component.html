@@ -22,8 +22,8 @@
     <span
       class="label"
       [class.is-placeholder]="isPlaceholder()"
-      [style.font-family]="b.fontFamily || 'Arial'"
-      [style.font-size]="'calc(' + fontPx() + ' * 0.1cqw)'"
+      [style.font-family]="b.fontFamily"
+      [style.font-size]="'calc(' + b.fontSize + ' * 0.1cqw)'"
       [style.color]="textColor()"
     >{{ displayText() }}</span>
     <div class="handle" (pointerdown)="beginResize($event)"></div>
