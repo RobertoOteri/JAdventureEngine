@@ -28,12 +28,6 @@
     </button>
   }
 
-  @if (adventure().versionNumber; as version) {
-    <span class="plate-version" [class.is-draft]="adventure().status === 'DRAFT'">
-      {{ (adventure().status === 'DRAFT' ? 'adventureCard.draftVersion' : 'adventureCard.version') | t: { version: version } }}
-    </span>
-  }
-
   <div class="plate-bottom">
     <button
       type="button"

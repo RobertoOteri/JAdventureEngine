@@ -1,8 +1,9 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GameSaveDto } from '../../../core/models';
+import { GameSaveDto, GraphicAdventureDto } from '../../../core/models';
 import { GameSavesModalComponent } from '../game-saves-modal/game-saves-modal.component';
 import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
+import { VersionSelectComponent } from '../version-select/version-select.component';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
@@ -12,6 +13,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
     CommonModule,
     GameSavesModalComponent,
     ConfirmationModalComponent,
+    VersionSelectComponent,
     TranslatePipe
   ],
   templateUrl: './game-launch-modal.component.html',
@@ -22,11 +24,15 @@ export class GameLaunchModalComponent {
   coverUrl = input<string>('');
   saves = input<GameSaveDto[]>([]);
   loading = input<boolean>(false);
+  /** Versioni tra cui scegliere: il selettore compare solo se ce n'è più di una. */
+  versions = input<GraphicAdventureDto[]>([]);
+  selectedVersionId = input<number | null>(null);
 
   startNew = output<void>();
   continueGame = output<void>();
   loadSave = output<string>();
   cancel = output<void>();
+  versionChange = output<number>();
 
   isSavesModalOpen = signal<boolean>(false);
   isConfirmOverwriteOpen = signal<boolean>(false);

@@ -1,9 +1,10 @@
 <label class="version-select">
   <span class="version-label">{{ label() }}</span>
   <select (change)="onChange($event)" [disabled]="versions().length < 2">
-    @for (v of versions(); track v.id; let first = $first) {
+    @for (v of versions(); track v.id) {
       <option [value]="v.id" [selected]="v.id === selectedId()">
-        v{{ v.versionNumber }}{{ first ? ' · ' + ('versionSelect.latest' | t) : '' }}{{ v.publishedAt ? ' · ' + (v.publishedAt | date: 'dd/MM/yyyy') : '' }}      </option>
+        v{{ v.versionNumber }}{{ v.status === 'DRAFT' ? ' · ' + ('versionSelect.draft' | t) : '' }}{{ v.id === latestPublishedId() ? ' · ' + ('versionSelect.latest' | t) : '' }}{{ v.publishedAt ? ' · ' + (v.publishedAt | date: 'dd/MM/yyyy') : '' }}
+      </option>
     }
   </select>
 </label>

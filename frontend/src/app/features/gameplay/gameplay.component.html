@@ -98,10 +98,13 @@
       [coverUrl]="adventureDetails()?.coverImageUrl ?? ''"
       [saves]="store.savesList()"
       [loading]="!store.areSavesLoaded()"
+      [versions]="versions()"
+      [selectedVersionId]="store.adventureId()"
       (startNew)="onStartNew()"
       (continueGame)="onContinue()"
       (loadSave)="onLoadSave($event)"
       (cancel)="onExitToLobby()"
+      (versionChange)="onVersionChange($event)"
     />
   }
 </div>

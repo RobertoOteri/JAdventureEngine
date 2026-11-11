@@ -9,6 +9,17 @@
     <span class="launch-kicker">{{ 'gameLaunch.subtitle' | t }}</span>
     <h1 class="launch-title">{{ adventureTitle() || ('common.graphicAdventure' | t) }}</h1>
 
+    @if (versions().length > 1) {
+      <div class="launch-version">
+        <app-version-select
+          [label]="'gameLaunch.version' | t"
+          [versions]="versions()"
+          [selectedId]="selectedVersionId()"
+          (selectedChange)="versionChange.emit($event)"
+        />
+      </div>
+    }
+
     @if (loading()) {
       <div class="launch-loading" aria-busy="true">
         <span class="launch-spinner"></span>

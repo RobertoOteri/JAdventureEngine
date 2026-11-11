@@ -59,28 +59,6 @@
   pointer-events: none;
 }
 
-.plate-version {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  padding: 0.18rem 0.55rem;
-  border: 1px solid var(--brass-line);
-  border-radius: var(--radius-sm);
-  background: rgba(11, 13, 18, 0.8);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: var(--brass-light);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.plate-version.is-draft {
-  border-color: var(--border);
-  color: var(--text-secondary);
-}
-
 .plate-favorite {
   position: absolute;
   top: 10px;

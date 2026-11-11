@@ -47,16 +47,7 @@
         </p>
       </div>
 
-      @if (versions().length > 0) {
-        <div class="version-box">
-          <app-version-select
-            [label]="'adventureDetail.version' | t"
-            [versions]="versions()"
-            [selectedId]="selectedVersionId()"
-            (selectedChange)="selectedVersionId.set($event)"
-          />
-        </div>
-      } @else {
+      @if (isDraft()) {
         <p class="version-empty">{{ 'adventureDetail.notPublished' | t }}</p>
       }
 
@@ -82,7 +73,7 @@
   </div>
 </div>
 
-@if (isLeaderboardOpen() && selectedVersionId(); as versionId) {
+@if (isLeaderboardOpen() && adventure().id; as versionId) {
   <app-leaderboard
     [adventureId]="versionId"
     [adventureTitle]="adventure().title"

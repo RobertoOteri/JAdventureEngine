@@ -145,15 +145,12 @@ export const it = {
     details: 'Dettagli e Sinossi',
     edit: 'Modifica Avventura',
     delete: 'Elimina Avventura',
-    version: 'v{version}',
-    draftVersion: 'Bozza v{version}',
     addFavorite: 'Aggiungi ai preferiti',
     removeFavorite: 'Rimuovi dai preferiti'
   },
   adventureDetail: {
     synopsis: 'Sinossi & Dettagli',
     noDescription: 'Nessuna descrizione fornita per questa avventura grafica.',
-    version: 'Versione',
     notPublished: 'Non ancora pubblicata: puoi giocarla come anteprima.',
     leaderboard: 'Classifica',
     playNow: 'Gioca Ora'
@@ -175,6 +172,7 @@ export const it = {
   },
   gameLaunch: {
     subtitle: 'Seleziona come iniziare a giocare',
+    version: 'Versione',
     continueTitle: 'Continua Partita',
     continueDesc: "Riprendi dall'ultimo punto salvato",
     continueHint: "Riprendi dall'ultimo salvataggio effettuato",
@@ -204,7 +202,8 @@ export const it = {
     clear: 'Cancella ricerca'
   },
   versionSelect: {
-    latest: 'più recente'
+    latest: 'più recente',
+    draft: 'bozza'
   },
 
   profile: {

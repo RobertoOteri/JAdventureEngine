@@ -66,6 +66,12 @@
   overflow-wrap: anywhere;
 }
 
+.launch-version {
+  width: 100%;
+  max-width: 420px;
+  margin: -1rem 0 1.5rem;
+}
+
 .launch-loading {
   display: grid;
   place-items: center;

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { GraphicAdventureDto } from '../../../core/models';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -16,6 +16,11 @@ export class VersionSelectComponent {
   readonly label = input<string>('Versione');
 
   readonly selectedChange = output<number>();
+
+  /** La versione "più recente" è la prima pubblicata: un'eventuale bozza in cima non conta. */
+  readonly latestPublishedId = computed(
+    () => this.versions().find((v) => v.status === 'PUBLISHED')?.id ?? null
+  );
 
   onChange(event: Event): void {
     const value = Number((event.target as HTMLSelectElement).value);

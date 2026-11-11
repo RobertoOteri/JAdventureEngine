@@ -187,7 +187,7 @@ export const GameplayStore = signalStore(
     };
 
     const setAdventureId = (id: number): void => {
-      patchState(store, {adventureId: id});
+      patchState(store, {adventureId: id, savesList: [], areSavesLoaded: false});
     };
 
     const startDragItem = (item: Item, x: number, y: number): void => {

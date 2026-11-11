@@ -147,15 +147,12 @@ export const en: Translations = {
     details: 'Details and synopsis',
     edit: 'Edit adventure',
     delete: 'Delete adventure',
-    version: 'v{version}',
-    draftVersion: 'Draft v{version}',
     addFavorite: 'Add to favorites',
     removeFavorite: 'Remove from favorites'
   },
   adventureDetail: {
     synopsis: 'Synopsis & Details',
     noDescription: 'No description provided for this graphic adventure.',
-    version: 'Version',
     notPublished: 'Not published yet: you can play it as a preview.',
     leaderboard: 'Leaderboard',
     playNow: 'Play now'
@@ -177,6 +174,7 @@ export const en: Translations = {
   },
   gameLaunch: {
     subtitle: 'Choose how to start playing',
+    version: 'Version',
     continueTitle: 'Continue',
     continueDesc: 'Resume from your last save point',
     continueHint: 'Resume from your most recent save',
@@ -206,7 +204,8 @@ export const en: Translations = {
     clear: 'Clear search'
   },
   versionSelect: {
-    latest: 'latest'
+    latest: 'latest',
+    draft: 'draft'
   },
 
   profile: {

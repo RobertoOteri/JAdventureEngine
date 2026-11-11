@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener, HostBinding, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
@@ -42,10 +42,13 @@ export class GameplayComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly adventureService = inject(AdventureService);
+  private readonly location = inject(Location);
 
   readonly store = inject(GameplayStore);
 
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
+  /** Versioni giocabili: quelle pubblicate, più la bozza se si sta aprendo un'anteprima. */
+  readonly versions = signal<GraphicAdventureDto[]>([]);
   readonly isLaunchModalOpen = signal<boolean>(true);
 
   private timerInterval: any = null;
@@ -90,6 +93,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
         this.adventureDetails.set(adv);
         this.store.setAdventureId(advId);
         this.store.fetchSaves(advId);
+        this.loadVersions(adv);
       },
       error: () => void this.router.navigate(['/adventures'])
     });
@@ -106,6 +110,31 @@ export class GameplayComponent implements OnInit, OnDestroy {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
+  }
+
+  private loadVersions(adventure: GraphicAdventureDto): void {
+    if (!adventure.id) {
+      return;
+    }
+    this.adventureService.getPublishedVersions(adventure.id).subscribe({
+      next: (published) =>
+        this.versions.set(adventure.status === 'DRAFT' ? [adventure, ...published] : published),
+      error: () => this.versions.set([])
+    });
+  }
+
+  /** Cambia la versione da giocare: i salvataggi sono legati alla versione, quindi vanno ricaricati. */
+  onVersionChange(versionId: number): void {
+    const version = this.versions().find((v) => v.id === versionId);
+    if (!version || versionId === this.store.adventureId()) {
+      return;
+    }
+    this.adventureDetails.set(version);
+    this.store.setAdventureId(versionId);
+    this.store.fetchSaves(versionId);
+    this.location.replaceState(
+      this.router.serializeUrl(this.router.createUrlTree(['/adventures', versionId, 'play']))
+    );
   }
 
   onStartNew(): void {
