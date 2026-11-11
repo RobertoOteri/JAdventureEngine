@@ -14,6 +14,20 @@
 
   <div class="plate-shade"></div>
 
+  @if (showFavorite()) {
+    <button
+      type="button"
+      class="plate-favorite"
+      [class.is-active]="isFavorite()"
+      [attr.aria-pressed]="isFavorite()"
+      (click)="onToggleFavorite($event)"
+      [title]="(isFavorite() ? 'adventureCard.removeFavorite' : 'adventureCard.addFavorite') | t"
+      [attr.aria-label]="(isFavorite() ? 'adventureCard.removeFavorite' : 'adventureCard.addFavorite') | t"
+    >
+      <i class="bi" [class.bi-star-fill]="isFavorite()" [class.bi-star]="!isFavorite()"></i>
+    </button>
+  }
+
   @if (adventure().versionNumber; as version) {
     <span class="plate-version" [class.is-draft]="adventure().status === 'DRAFT'">
       {{ (adventure().status === 'DRAFT' ? 'adventureCard.draftVersion' : 'adventureCard.version') | t: { version: version } }}

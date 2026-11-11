@@ -5,6 +5,7 @@ import com.jadventure.backend.model.enums.AdventureStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -23,4 +24,8 @@ public interface GraphicAdventureRepository extends JpaRepository <GraphicAdvent
     boolean existsByTitle(String title);
 
     boolean existsByTitleAndCodeNot(String title, String code);
+
+    List<GraphicAdventure> findAllByCodeInAndStatusOrderByCodeAscVersionNumberDesc(Collection<String> codes, AdventureStatus status);
+
+    boolean existsByCodeAndStatus(String code, AdventureStatus status);
 }

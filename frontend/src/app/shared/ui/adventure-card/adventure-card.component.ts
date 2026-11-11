@@ -13,11 +13,14 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 export class AdventureCardComponent {
   readonly adventure = input.required<GraphicAdventureDto>();
   readonly isAuthor = input<boolean>(false);
+  readonly showFavorite = input<boolean>(false);
+  readonly isFavorite = input<boolean>(false);
 
   readonly play = output<GraphicAdventureDto>();
   readonly edit = output<GraphicAdventureDto>();
   readonly delete = output<GraphicAdventureDto>();
   readonly info = output<GraphicAdventureDto>();
+  readonly favoriteToggle = output<GraphicAdventureDto>();
 
   onCardClick(): void {
     if (this.isAuthor()) {
@@ -45,5 +48,10 @@ export class AdventureCardComponent {
   onInfo(event: MouseEvent): void {
     event.stopPropagation();
     this.info.emit(this.adventure());
+  }
+
+  onToggleFavorite(event: MouseEvent): void {
+    event.stopPropagation();
+    this.favoriteToggle.emit(this.adventure());
   }
 }

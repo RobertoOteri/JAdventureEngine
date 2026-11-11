@@ -4,6 +4,9 @@ package com.jadventure.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -42,4 +45,10 @@ public class User {
 
     @Column(length = 1000)
     private String bio;
+
+    @ElementCollection
+    @CollectionTable(name = "user_favorites", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "adventure_code", length = 100)
+    @Builder.Default
+    private Set<String> favoriteAdventureCodes = new HashSet<>();
 }

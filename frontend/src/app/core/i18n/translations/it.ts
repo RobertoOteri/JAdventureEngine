@@ -22,6 +22,7 @@ export const it = {
     newAdventure: 'Nuova avventura',
     library: 'Libreria',
     myStories: 'Le mie storie',
+    favorites: 'Preferiti',
     profile: 'Profilo',
     tagline: 'Crea, gioca, condividi'
   },
@@ -79,6 +80,18 @@ export const it = {
     resetSearch: 'Azzera ricerca',
     empty: "Nessun'avventura pubblicata nella libreria."
   },
+  favorites: {
+    kicker: 'Collezione',
+    title: 'Avventure Preferite',
+    subtitle: 'Le storie che hai segnato con la stellina, sempre nella loro ultima versione.',
+    searchPlaceholder: 'Cerca tra i preferiti',
+    noMatch: 'Nessun preferito corrisponde alla ricerca.',
+    resetSearch: 'Azzera ricerca',
+    empty: "Non hai ancora preferiti: tocca la stellina su un'avventura nella libreria.",
+    goToLibrary: 'Vai alla libreria',
+    loadError: 'Impossibile caricare i preferiti',
+    toggleError: 'Impossibile aggiornare i preferiti'
+  },
   myAdventures: {
     kicker: 'Laboratorio',
     title: 'Le Mie Avventure',
@@ -133,7 +146,9 @@ export const it = {
     edit: 'Modifica Avventura',
     delete: 'Elimina Avventura',
     version: 'v{version}',
-    draftVersion: 'Bozza v{version}'
+    draftVersion: 'Bozza v{version}',
+    addFavorite: 'Aggiungi ai preferiti',
+    removeFavorite: 'Rimuovi dai preferiti'
   },
   adventureDetail: {
     synopsis: 'Sinossi & Dettagli',
@@ -610,6 +625,7 @@ export const it = {
       },
       adventure: {
         notFoundById: 'Avventura non trovata con ID: {0}',
+        notFoundByCode: 'Avventura non trovata con codice: {0}',
         titleTaken: "Esiste già un'avventura con questo titolo",
         noStartScene: "L'avventura non ha una scena iniziale configurata",
         versionPublished: 'Questa versione è pubblicata e non può essere modificata',

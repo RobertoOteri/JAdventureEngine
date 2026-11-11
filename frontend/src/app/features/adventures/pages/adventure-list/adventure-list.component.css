@@ -130,6 +130,7 @@
   color: var(--brass-light);
   font-size: 0.88rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
 }

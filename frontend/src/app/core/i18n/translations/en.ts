@@ -24,6 +24,7 @@ export const en: Translations = {
     newAdventure: 'New adventure',
     library: 'Library',
     myStories: 'My stories',
+    favorites: 'Favorites',
     profile: 'Profile',
     tagline: 'Create, play, share'
   },
@@ -81,6 +82,18 @@ export const en: Translations = {
     resetSearch: 'Clear search',
     empty: 'No adventures published in the library yet.'
   },
+  favorites: {
+    kicker: 'Collection',
+    title: 'Favorite Adventures',
+    subtitle: 'The stories you starred, always in their latest version.',
+    searchPlaceholder: 'Search your favorites',
+    noMatch: 'No favorites match your search.',
+    resetSearch: 'Clear search',
+    empty: 'You have no favorites yet: tap the star on an adventure in the library.',
+    goToLibrary: 'Go to library',
+    loadError: 'Could not load your favorites',
+    toggleError: 'Could not update your favorites'
+  },
   myAdventures: {
     kicker: 'Workshop',
     title: 'My Adventures',
@@ -135,7 +148,9 @@ export const en: Translations = {
     edit: 'Edit adventure',
     delete: 'Delete adventure',
     version: 'v{version}',
-    draftVersion: 'Draft v{version}'
+    draftVersion: 'Draft v{version}',
+    addFavorite: 'Add to favorites',
+    removeFavorite: 'Remove from favorites'
   },
   adventureDetail: {
     synopsis: 'Synopsis & Details',
@@ -611,6 +626,7 @@ export const en: Translations = {
       },
       adventure: {
         notFoundById: 'Adventure not found with ID: {0}',
+        notFoundByCode: 'Adventure not found with code: {0}',
         titleTaken: 'An adventure with this title already exists',
         noStartScene: 'The adventure has no starting scene configured',
         versionPublished: 'This version is published and cannot be modified',

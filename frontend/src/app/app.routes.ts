@@ -40,6 +40,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'adventures/favorites',
+        loadComponent: () =>
+          import('./features/adventures/pages/favorites/favorites.component').then(
+            (m) => m.FavoritesComponent
+          )
+      },
+      {
         path: 'adventures/my',
         loadComponent: () =>
           import('./features/adventures/pages/my-adventures/my-adventures.component').then(

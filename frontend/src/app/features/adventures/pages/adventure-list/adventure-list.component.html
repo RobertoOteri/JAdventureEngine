@@ -36,8 +36,11 @@
         @for (adv of filteredAdventures(); track adv.id ?? adv.code) {
           <app-adventure-card
             [adventure]="adv"
+            [showFavorite]="true"
+            [isFavorite]="favoriteService.favoriteCodes().has(adv.code)"
             (play)="onPlayAdventure($event)"
             (info)="selectedAdventure.set($event)"
+            (favoriteToggle)="favoriteService.toggle($event)"
           />
         } @empty {
           @if (adventures().length > 0) {

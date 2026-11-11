@@ -81,6 +81,52 @@
   color: var(--text-secondary);
 }
 
+.plate-favorite {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  background: rgba(11, 13, 18, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.plate-favorite i {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.plate-favorite:hover {
+  border-color: var(--brass-strong);
+  background: var(--brass-tint-strong);
+  color: var(--brass-light);
+  transform: scale(1.08);
+}
+
+.plate-favorite.is-active {
+  border-color: var(--brass-line);
+  color: var(--brass-light);
+}
+
+.plate-favorite:active {
+  transform: scale(0.92);
+}
+
+.plate-favorite:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
 .plate-bottom {
   position: absolute;
   bottom: 0;
@@ -203,14 +249,16 @@
   .game-plate,
   .plate-art,
   .play-pill,
-  .btn-icon-action {
+  .btn-icon-action,
+  .plate-favorite {
     transition: none;
   }
 
   .game-plate:hover,
   .game-plate:hover .plate-art,
   .game-plate:hover .play-pill,
-  .btn-icon-action:hover {
+  .btn-icon-action:hover,
+  .plate-favorite:hover {
     transform: none;
   }
 }

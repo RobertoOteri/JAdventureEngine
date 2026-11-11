@@ -21,6 +21,7 @@ export class SidebarComponent {
   readonly items: NavItem[] = [
     { path: '/adventures', icon: 'bi-bookshelf', labelKey: 'sidebar.library', exact: true },
     { path: '/adventures/my', icon: 'bi-hammer', labelKey: 'sidebar.myStories' },
+    { path: '/adventures/favorites', icon: 'bi-star', labelKey: 'sidebar.favorites' },
     { path: '/profile', icon: 'bi-person', labelKey: 'sidebar.profile' }
   ];
 }

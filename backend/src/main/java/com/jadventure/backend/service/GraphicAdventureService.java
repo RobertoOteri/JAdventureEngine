@@ -39,6 +39,7 @@ public class GraphicAdventureService {
     private final GraphicAdventureMapper graphicAdventureMapper;
     private final SceneMapper sceneMapper;
     private final ItemMapper itemMapper;
+    private final FavoriteService favoriteService;
     private final AuthService authService;
     private final FileStorageUtil fileStorageUtil;
 

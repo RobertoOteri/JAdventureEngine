@@ -1,0 +1,75 @@
+<div class="shell-layout">
+
+  <main class="content-body">
+    <header class="masthead">
+      <div class="masthead-text">
+        <span class="kicker">{{ 'favorites.kicker' | t }}</span>
+        <h1>{{ 'favorites.title' | t }}</h1>
+        <p class="subtitle">{{ 'favorites.subtitle' | t }}</p>
+      </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <div class="toolbar">
+      <app-search-bar
+        [value]="query()"
+        (valueChange)="query.set($event)"
+        [placeholder]="'favorites.searchPlaceholder' | t"
+      />
+      <div class="toolbar-filters">
+        <app-filter-select
+          icon="bi-sort-down"
+          [options]="sortOptions"
+          [value]="sort()"
+          (valueChange)="sort.set($event)"
+        />
+      </div>
+    </div>
+
+    @if (favoriteService.loading() && favoriteService.favorites().length === 0) {
+      <div class="empty-wrap loader-wrap">
+        <div class="loader"></div>
+      </div>
+    } @else {
+      <div class="catalog-grid">
+        @for (adv of filteredFavorites(); track adv.code) {
+          <app-adventure-card
+            [adventure]="adv"
+            [showFavorite]="true"
+            [isFavorite]="true"
+            (play)="onPlayAdventure($event)"
+            (info)="selectedAdventure.set($event)"
+            (favoriteToggle)="favoriteService.toggle($event)"
+          />
+        } @empty {
+          @if (favoriteService.favorites().length > 0) {
+            <div class="empty-wrap">
+              <i class="bi bi-search empty-icon"></i>
+              <p>{{ 'favorites.noMatch' | t }}</p>
+              <button type="button" class="btn-create-first" (click)="resetFilters()">
+                <i class="bi bi-x-lg"></i> {{ 'favorites.resetSearch' | t }}
+              </button>
+            </div>
+          } @else {
+            <div class="empty-wrap">
+              <i class="bi bi-star empty-icon"></i>
+              <p>{{ 'favorites.empty' | t }}</p>
+              <a routerLink="/adventures" class="btn-create-first">
+                <i class="bi bi-bookshelf"></i> {{ 'favorites.goToLibrary' | t }}
+              </a>
+            </div>
+          }
+        }
+      </div>
+    }
+  </main>
+
+  @if (selectedAdventure()) {
+    <app-adventure-detail-modal
+      [adventure]="selectedAdventure()!"
+      (close)="selectedAdventure.set(null)"
+      (play)="onPlayVersion($event)"
+    />
+  }
+</div>
