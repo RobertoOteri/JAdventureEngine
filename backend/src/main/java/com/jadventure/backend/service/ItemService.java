@@ -126,7 +126,7 @@ public class ItemService {
         action.setItem(item);
         item.getActions().add(action);
 
-        itemRepository.saveAndFlush(item);
+        itemRepository.flush();
 
         ActionDto created = actionMapper.toDto(action);
         log.info("Executed addAction: returning action {} added to item {}", created, itemId);
