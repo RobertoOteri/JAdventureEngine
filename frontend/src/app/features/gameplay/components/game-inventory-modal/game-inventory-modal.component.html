@@ -17,14 +17,34 @@
   }
 
   @if (!isDragging() && focusedItem(); as focused) {
-    <div class="caption-plate">
-      <span class="caption-title">{{ focused.name }}</span>
-      @if (focused.code === selectedItem()?.code) {
-        <p class="caption-desc">
-          {{ focused.description || ('gameplay.inventory.noDetails' | t) }}
-        </p>
-      }
-    </div>
+    @if (focused.code === selectedItem()?.code) {
+      <div class="caption-plate is-detailed">
+        <div class="caption-showcase">
+          <span class="showcase-corner tl"></span>
+          <span class="showcase-corner tr"></span>
+          <span class="showcase-corner bl"></span>
+          <span class="showcase-corner br"></span>
+          @if (focused.imageUrl) {
+            <img class="showcase-img" [src]="focused.imageUrl" [alt]="focused.name" draggable="false" />
+          } @else {
+            <i class="bi bi-box-seam showcase-fallback"></i>
+          }
+        </div>
+
+        <div class="caption-body">
+          <span class="caption-title">{{ focused.name }}</span>
+          <span class="caption-rule" aria-hidden="true"></span>
+          <p class="caption-desc">
+            {{ focused.description || ('gameplay.inventory.noDetails' | t) }}
+          </p>
+        </div>
+      </div>
+    } @else {
+      <!-- Solo passaggio del mouse: targhetta con il nome -->
+      <div class="caption-plate">
+        <span class="caption-title">{{ focused.name }}</span>
+      </div>
+    }
   } @else if (!isDragging() && !items().length) {
     <div class="caption-plate">
       <span class="caption-hint">{{ 'gameplay.inventory.empty' | t }}</span>
