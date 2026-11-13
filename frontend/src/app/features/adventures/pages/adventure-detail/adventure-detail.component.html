@@ -18,7 +18,8 @@
         <span class="kicker">{{ 'common.graphicAdventure' | t }}</span>
         <h1 class="adventure-title">{{ adv.title }}</h1>
         <p class="byline">
-          {{ 'adventureDetail.by' | t }} <strong>{{ adv.authorUsername }}</strong>
+          {{ 'adventureDetail.by' | t }}
+          <a class="author-link" [routerLink]="['/users', adv.authorUsername]">{{ adv.authorUsername }}</a>
         </p>
 
         <div class="actions">
@@ -64,7 +65,9 @@
     <dl class="facts">
       <div class="fact">
         <dt><i class="bi bi-person"></i> {{ 'adventureDetail.author' | t }}</dt>
-        <dd>{{ adv.authorUsername }}</dd>
+        <dd>
+          <a class="author-link" [routerLink]="['/users', adv.authorUsername]">{{ adv.authorUsername }}</a>
+        </dd>
       </div>
       <div class="fact">
         @if (adv.publishedAt) {

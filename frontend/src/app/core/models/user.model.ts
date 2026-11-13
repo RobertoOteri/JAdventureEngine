@@ -6,6 +6,9 @@ export interface UserProfile {
   email: string;
   avatarUrl?: string | null;
   bio?: string | null;
+  publishedAdventures?: number;
+  completedAdventures?: number;
+  reviewsWritten?: number;
 }
 
 export interface UpdateProfileRequest {

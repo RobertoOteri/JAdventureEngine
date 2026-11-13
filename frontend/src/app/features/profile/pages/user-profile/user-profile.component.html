@@ -1,0 +1,88 @@
+@if (loading()) {
+  <div class="loader-wrap">
+    <div class="loader"></div>
+  </div>
+} @else if (user(); as u) {
+  <section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+
+    <div class="container hero-inner">
+      <div class="avatar-ring">
+        <app-user-avatar [src]="u.avatarUrl" [name]="u.username" [size]="112" />
+      </div>
+
+      <div class="identity">
+        <span class="kicker">{{ 'userProfile.kicker' | t }}</span>
+        <h1 class="full-name">{{ fullName() || u.username }}</h1>
+        <div class="identity-meta">
+          <span class="username">&#64;{{ u.username }}</span>
+          <span class="meta-dot" aria-hidden="true"></span>
+          <a class="email" [href]="'mailto:' + u.email">
+            <i class="bi bi-envelope"></i>
+            {{ u.email }}
+          </a>
+        </div>
+      </div>
+
+      @if (isMe()) {
+        <a routerLink="/profile" class="btn-edit">
+          <i class="bi bi-pencil"></i>
+          <span>{{ 'userProfile.edit' | t }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <div class="container body">
+    <dl class="stats">
+      <div class="stat">
+        <dt><i class="bi bi-journal-richtext"></i> {{ 'userProfile.published' | t }}</dt>
+        <dd>{{ u.publishedAdventures ?? 0 }}</dd>
+      </div>
+      <div class="stat">
+        <dt><i class="bi bi-flag-fill"></i> {{ 'userProfile.completed' | t }}</dt>
+        <dd>{{ u.completedAdventures ?? 0 }}</dd>
+      </div>
+      <div class="stat">
+        <dt><i class="bi bi-chat-square-text"></i> {{ 'userProfile.reviews' | t }}</dt>
+        <dd>{{ u.reviewsWritten ?? 0 }}</dd>
+      </div>
+    </dl>
+
+    <section class="section">
+      <h2 class="section-title">{{ 'userProfile.bio' | t }}</h2>
+      @if (u.bio) {
+        <p class="bio-text">{{ u.bio }}</p>
+      } @else {
+        <p class="empty-text">{{ 'userProfile.noBio' | t }}</p>
+      }
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">
+        {{ 'userProfile.adventures' | t }}
+        <span class="section-count">{{ adventures().length }}</span>
+      </h2>
+
+      @if (adventures().length > 0) {
+        <div class="catalog-grid">
+          @for (adv of adventures(); track adv.id) {
+            <app-adventure-card
+              [adventure]="adv"
+              [showFavorite]="true"
+              [isFavorite]="favoriteService.favoriteCodes().has(adv.code)"
+              (play)="playAdventure($event)"
+              (info)="openAdventure($event)"
+              (favoriteToggle)="favoriteService.toggle($event)"
+            />
+          }
+        </div>
+      } @else {
+        <div class="empty-box">
+          <i class="bi bi-journal-album"></i>
+          <p>{{ 'userProfile.noAdventures' | t }}</p>
+        </div>
+      }
+    </section>
+  </div>
+}

@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AdventureService } from '../../../../core/services/adventure.service';
 import { FavoriteService } from '../../../../core/services/favorite.service';
@@ -18,7 +18,7 @@ import { LeaderboardComponent } from '../../../leaderboard/leaderboard.component
 @Component({
   selector: 'app-adventure-detail',
   standalone: true,
-  imports: [DatePipe, TranslatePipe, LeaderboardComponent, StarRatingComponent, MyReviewComponent, ReviewListComponent],
+  imports: [DatePipe, RouterLink, TranslatePipe, LeaderboardComponent, StarRatingComponent, MyReviewComponent, ReviewListComponent],
   templateUrl: './adventure-detail.component.html',
   styleUrl: './adventure-detail.component.css'
 })

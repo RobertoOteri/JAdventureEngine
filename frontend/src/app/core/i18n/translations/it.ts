@@ -225,13 +225,24 @@ export const it = {
     username: 'Username',
     email: 'Email',
     usernameLocked: 'Lo username non si può cambiare',
-    note: "Lo username è visibile agli altri giocatori e non può essere modificato. L'email serve solo per accedere e non viene mostrata.",
+    note: 'Lo username non può essere modificato. Nome, cognome, email e biografia sono visibili agli altri giocatori nel tuo profilo pubblico.',
     bio: 'Biografia',
     bioPlaceholder: 'Racconta qualcosa di te e delle avventure che crei…',
     saving: 'Salvataggio…',
     save: 'Salva modifiche',
     avatarInvalidType: "Usa un'immagine JPG, PNG o WebP.",
     avatarTooLarge: "L'immagine deve pesare al massimo 2 MB."
+  },
+  userProfile: {
+    kicker: 'Profilo giocatore',
+    edit: 'Modifica profilo',
+    published: 'Avventure pubblicate',
+    completed: 'Avventure completate',
+    reviews: 'Recensioni scritte',
+    bio: 'Biografia',
+    noBio: 'Nessuna biografia.',
+    adventures: 'Avventure pubblicate',
+    noAdventures: 'Non ha ancora pubblicato avventure.'
   },
   leaderboard: {
     title: 'Classifica',
@@ -629,7 +640,8 @@ export const it = {
         forbidden: 'Accesso negato'
       },
       user: {
-        authenticatedNotFound: 'Utente autenticato non trovato: {0}'
+        authenticatedNotFound: 'Utente autenticato non trovato: {0}',
+        notFound: 'Utente non trovato: {0}'
       },
       adventure: {
         notFoundById: 'Avventura non trovata con ID: {0}',

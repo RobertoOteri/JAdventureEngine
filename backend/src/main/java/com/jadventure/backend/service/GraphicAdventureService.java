@@ -22,11 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -248,6 +244,32 @@ public class GraphicAdventureService {
             throw new ResourceNotFoundException("error.adventure.notFoundById", id);
         }
         return adventure;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GraphicAdventureDto> getPublishedAdventuresByAuthor(String username) {
+        log.info("Executing getPublishedAdventuresByAuthor with username: {}", username);
+        List<GraphicAdventureDto> adventures = graphicAdventureMapper.toDtoList(findLatestPublishedByAuthor(username));
+        log.info("Executed getPublishedAdventuresByAuthor: found {} published adventures by user {}", adventures.size(), username);
+        return adventures;
+    }
+
+    @Transactional(readOnly = true)
+    public long countPublishedAdventuresByAuthor(String username) {
+        log.debug("Executing countPublishedAdventuresByAuthor with username: {}", username);
+        return findLatestPublishedByAuthor(username).size();
+    }
+
+    private List<GraphicAdventure> findLatestPublishedByAuthor(String username) {
+        Map<String, GraphicAdventure> latestByCode = new LinkedHashMap<>();
+        graphicAdventureRepository
+                .findAllByAuthorUsernameAndStatusOrderByCodeAscVersionNumberDesc(username, AdventureStatus.PUBLISHED)
+                .forEach(adventure -> latestByCode.putIfAbsent(adventure.getCode(), adventure));
+
+        return latestByCode.values().stream()
+                .sorted(Comparator.comparing(GraphicAdventure::getPublishedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
     }
 
     private GraphicAdventure findAdventureById(Long id) {

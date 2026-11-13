@@ -227,13 +227,24 @@ export const en: Translations = {
     username: 'Username',
     email: 'Email',
     usernameLocked: "The username can't be changed",
-    note: 'Your username is visible to other players and cannot be changed. Your email is only used to log in and is never shown.',
+    note: 'Your username cannot be changed. Your name, email and bio are visible to other players on your public profile.',
     bio: 'Bio',
     bioPlaceholder: 'Tell us something about yourself and the adventures you create…',
     saving: 'Saving…',
     save: 'Save changes',
     avatarInvalidType: 'Please use a JPG, PNG or WebP image.',
     avatarTooLarge: 'The image must be 2 MB or smaller.'
+  },
+  userProfile: {
+    kicker: 'Player profile',
+    edit: 'Edit profile',
+    published: 'Published adventures',
+    completed: 'Completed adventures',
+    reviews: 'Reviews written',
+    bio: 'Bio',
+    noBio: 'No bio yet.',
+    adventures: 'Published adventures',
+    noAdventures: 'Has not published any adventures yet.'
   },
   leaderboard: {
     title: 'Leaderboard',
@@ -630,7 +641,8 @@ export const en: Translations = {
         forbidden: 'Access denied'
       },
       user: {
-        authenticatedNotFound: 'Authenticated user not found: {0}'
+        authenticatedNotFound: 'Authenticated user not found: {0}',
+        notFound: 'User not found: {0}'
       },
       adventure: {
         notFoundById: 'Adventure not found with ID: {0}',

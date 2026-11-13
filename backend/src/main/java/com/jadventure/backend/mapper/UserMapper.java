@@ -11,6 +11,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(target = "publishedAdventures", ignore = true)
+    @Mapping(target = "completedAdventures", ignore = true)
+    @Mapping(target = "reviewsWritten", ignore = true)
     UserDto toDto(User entity);
 
     @Mapping(target = "id", ignore = true)

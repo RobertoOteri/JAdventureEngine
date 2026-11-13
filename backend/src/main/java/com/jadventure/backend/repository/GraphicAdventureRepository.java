@@ -28,4 +28,6 @@ public interface GraphicAdventureRepository extends JpaRepository <GraphicAdvent
     List<GraphicAdventure> findAllByCodeInAndStatusOrderByCodeAscVersionNumberDesc(Collection<String> codes, AdventureStatus status);
 
     boolean existsByCodeAndStatus(String code, AdventureStatus status);
+
+    List<GraphicAdventure> findAllByAuthorUsernameAndStatusOrderByCodeAscVersionNumberDesc(String username, AdventureStatus status);
 }

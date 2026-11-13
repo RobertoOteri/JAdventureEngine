@@ -7,10 +7,12 @@
     @for (review of reviews(); track review.id) {
       <li class="review">
         <header class="review-head">
-          <app-user-avatar [src]="review.avatarUrl" [name]="review.username" [size]="40" />
+          <a class="avatar-link" [routerLink]="['/users', review.username]" [attr.aria-label]="review.username">
+            <app-user-avatar [src]="review.avatarUrl" [name]="review.username" [size]="40" />
+          </a>
 
           <div class="identity">
-            <span class="username">{{ review.username }}</span>
+            <a class="username" [routerLink]="['/users', review.username]">{{ review.username }}</a>
             @if (review.completed) {
               <span class="completed-tag">
                 <i class="bi bi-patch-check-fill"></i>

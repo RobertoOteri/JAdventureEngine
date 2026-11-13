@@ -23,4 +23,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @EntityGraph(attributePaths = {"user", "graphicAdventure"})
     Optional<Review> findByUserUsernameAndGraphicAdventureCode(String username, String adventureCode);
+
+    long countByUserUsername(String username);
 }

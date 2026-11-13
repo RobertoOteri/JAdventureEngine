@@ -84,13 +84,38 @@
   min-width: 0;
 }
 
+.avatar-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: box-shadow 0.2s ease;
+}
+
+.avatar-link:hover {
+  box-shadow: 0 0 0 2px var(--brass-line);
+}
+
 .username {
+  align-self: flex-start;
+  max-width: 100%;
   overflow: hidden;
   color: var(--text-primary);
   font-size: 0.92rem;
   font-weight: 700;
+  text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.username:hover {
+  color: var(--brass-light);
+}
+
+.avatar-link:focus-visible,
+.username:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .completed-tag {

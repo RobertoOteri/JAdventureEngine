@@ -2,7 +2,7 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { UpdateProfileRequest, UserProfile } from '../models';
+import { GraphicAdventureDto, UpdateProfileRequest, UserProfile } from '../models';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -11,7 +11,8 @@ import { AuthService } from './auth.service';
 export class UserService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly apiUrl = `${environment.apiUrl}/users/me`;
+  private readonly usersUrl = `${environment.apiUrl}/users`;
+  private readonly apiUrl = `${this.usersUrl}/me`;
 
   private readonly userSignal = signal<UserProfile | null>(null);
   readonly currentUser = this.userSignal.asReadonly();
@@ -46,6 +47,14 @@ export class UserService {
     return this.http.post<UserProfile>(`${this.apiUrl}/avatar`, formData).pipe(
       tap((user) => this.userSignal.set(user))
     );
+  }
+
+  getProfile(username: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.usersUrl}/${encodeURIComponent(username)}`);
+  }
+
+  getPublishedAdventures(username: string): Observable<GraphicAdventureDto[]> {
+    return this.http.get<GraphicAdventureDto[]>(`${this.usersUrl}/${encodeURIComponent(username)}/adventures`);
   }
 
   removeAvatar(): Observable<UserProfile> {

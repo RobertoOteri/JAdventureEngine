@@ -20,4 +20,8 @@ public interface LeaderboardEntryRepository extends JpaRepository<LeaderboardEnt
 
     @EntityGraph(attributePaths = "user")
     List<LeaderboardEntry> findAllByGraphicAdventureCodeAndUserUsernameIn(String adventureCode, Collection<String> usernames);
+
+    @EntityGraph(attributePaths = "graphicAdventure")
+    List<LeaderboardEntry> findAllByUserUsername(String username);
+
 }

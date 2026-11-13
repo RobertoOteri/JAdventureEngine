@@ -149,6 +149,12 @@ public class ReviewService {
         log.info("Executed deleteMyReview: review by user {} on adventure {} deleted", username, code);
     }
 
+    @Transactional(readOnly = true)
+    public long countByUser(String username) {
+        log.debug("Executing countByUser with username: {}", username);
+        return reviewRepository.countByUserUsername(username);
+    }
+
     private Optional<String> findBlockReason(GraphicAdventure adventure, String username) {
         String code = adventure.getCode();
         if (adventure.getAuthor().getUsername().equals(username)) {

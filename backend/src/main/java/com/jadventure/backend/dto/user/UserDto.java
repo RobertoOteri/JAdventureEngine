@@ -15,6 +15,9 @@ public class UserDto {
     private String email;
     private String avatarUrl;
     private String bio;
+    private Long publishedAdventures;
+    private Long completedAdventures;
+    private Long reviewsWritten;
 }
 
 

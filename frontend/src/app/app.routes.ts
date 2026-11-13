@@ -70,6 +70,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'users/:username',
+        loadComponent: () =>
+          import('./features/profile/pages/user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
+          )
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/pages/profile/profile.component').then(

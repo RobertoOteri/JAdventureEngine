@@ -84,6 +84,15 @@ public class LeaderboardService {
     }
 
     @Transactional(readOnly = true)
+    public long countCompletedAdventures(String username) {
+        log.debug("Executing countCompletedAdventures with username: {}", username);
+        return leaderboardEntryRepository.findAllByUserUsername(username).stream()
+                .map(entry -> entry.getGraphicAdventure().getCode())
+                .distinct()
+                .count();
+    }
+
+    @Transactional(readOnly = true)
     public Set<String> findUsernamesWhoCompleted(String adventureCode, Collection<String> usernames) {
         log.debug("Executing findUsernamesWhoCompleted with adventureCode: {}, {} usernames", adventureCode, usernames.size());
         if (usernames.isEmpty()) {

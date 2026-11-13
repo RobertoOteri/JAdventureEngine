@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ReviewDto } from '../../../../core/models';
 import { ReviewService } from '../../../../core/services/review.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -13,7 +14,7 @@ const PAGE_SIZE = 10;
 @Component({
   selector: 'app-review-list',
   standalone: true,
-  imports: [DatePipe, TranslatePipe, StarRatingComponent, UserAvatarComponent],
+  imports: [DatePipe, RouterLink, TranslatePipe, StarRatingComponent, UserAvatarComponent],
   templateUrl: './review-list.component.html',
   styleUrl: './review-list.component.css'
 })
