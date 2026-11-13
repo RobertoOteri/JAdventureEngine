@@ -449,7 +449,8 @@ export const GameplayStore = signalStore(
 
                 if (!completed) {
                   setFeedbackMessage(
-                    result.feedbackMessage || i18n.t(result.success ? 'gameplay.feedback.actionDone' : 'gameplay.feedback.preconditionFailed')                  );
+                    result.feedbackMessage || (result.success ? null : i18n.t('gameplay.feedback.preconditionFailed'))
+                  );
                 }
                 closeRadialMenu();
 

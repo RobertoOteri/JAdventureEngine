@@ -326,7 +326,6 @@ export const en: Translations = {
       noSaveToContinue: 'No save found to continue from.',
       loadError: 'Error while loading the save.',
       invalidSession: 'Error: invalid game session.',
-      actionDone: 'Done.',
       nothingHappens: 'Nothing happens.',
       actionNotAllowed: "You can't do that here.",
       dialogueError: 'Unable to continue the dialogue.',

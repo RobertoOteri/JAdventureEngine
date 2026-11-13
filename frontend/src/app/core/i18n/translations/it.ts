@@ -324,7 +324,6 @@ export const it = {
       noSaveToContinue: 'Nessun salvataggio trovato per continuare.',
       loadError: 'Errore nel caricamento del salvataggio.',
       invalidSession: 'Errore: sessione di gioco non valida.',
-      actionDone: 'Azione eseguita.',
       nothingHappens: 'Non succede nulla.',
       actionNotAllowed: 'Non puoi fare questa azione qui.',
       dialogueError: 'Impossibile proseguire il dialogo.',
