@@ -101,6 +101,21 @@ export const GameplayStore = signalStore(
     inventory: computed<Item[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
     visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
+
+    /** Codici degli oggetti della scena verso cui puntano dei tasti (effetto APPEND_INPUT). */
+    keypadTargetCodes: computed<Set<string>>(() => {
+      const codes = new Set<string>();
+      for (const item of store.gameState()?.currentScene?.items ?? []) {
+        for (const action of item.actions ?? []) {
+          for (const effect of action.effects ?? []) {
+            if (effect.type === 'APPEND_INPUT' && effect.targetValue) {
+              codes.add(effect.targetValue);
+            }
+          }
+        }
+      }
+      return codes;
+    }),
     adventureFlags: computed(() => store.gameState()?.adventureFlags ?? {}),
     isCompleted: computed(() => store.gameState()?.completed ?? false),
     currentSceneBackgroundUrl: computed(() => {

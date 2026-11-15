@@ -66,3 +66,17 @@
   pointer-events: all;
   cursor: pointer;
 }
+
+/* Display del tastierino: stesse coordinate e stile della TextBox dell'INPUT_EQUALS */
+.keypad-display {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 0.3em;
+  overflow: hidden;
+  white-space: nowrap;
+  letter-spacing: 0.15em;
+  pointer-events: none;
+}

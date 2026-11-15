@@ -17,6 +17,7 @@
       [playTimeSeconds]="store.gameState()?.playTime || 0"
       [isDragging]="store.draggedItem.isDragging()"
       [inputOverlay]="store.inputOverlay()"
+      [keypadDisplay]="keypadDisplay()"
       (itemClicked)="store.openRadialMenu($event.item, $event.mouseX, $event.mouseY)"
       (singleActionTriggered)="onExecuteAction($event)"
       (canvasClicked)="store.closeRadialMenu()"

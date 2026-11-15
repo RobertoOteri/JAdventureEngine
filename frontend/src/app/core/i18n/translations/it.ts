@@ -398,6 +398,9 @@ export const it = {
     endAdventureHint: "Termina l'avventura: il giocatore vedrà la schermata di fine.",
     flagKeyPlaceholder: 'Chiave (es. punteggio)',
     flagValuePlaceholder: 'Valore (es. 100 o true)',
+    selectInputTarget: 'Seleziona il tasto Invio (oggetto con «Testo inserito uguale a»)',
+    appendValuePlaceholder: 'Carattere (es. 7)',
+    noInputTargets: 'Nessun oggetto con «Testo inserito uguale a»: crea prima il tasto Invio con quella condizione.',
     remove: 'Rimuovi effetto',
     empty: 'Nessun effetto impostato.',
     add: 'Aggiungi effetto'
@@ -522,7 +525,8 @@ export const it = {
       HIDE_SCENE_ITEM: 'Nascondi elemento',
       END_ADVENTURE: "Termina l'avventura",
       START_DIALOGUE: 'Avvia dialogo',
-      END_DIALOGUE: 'Chiudi dialogo'
+      END_DIALOGUE: 'Chiudi dialogo',
+      APPEND_INPUT: 'Aggiungi al codice'
     },
     preconditionType: {
       HAS_ITEM: "Ha l'oggetto",
@@ -668,7 +672,9 @@ export const it = {
         duplicateType: "L'oggetto ha già un'azione di tipo {0}",
         duplicateUseWith: "Esiste già un'azione USE_WITH verso l'oggetto: {0}",
         useWithTargetRequired: "Per l'azione USE_WITH è obbligatorio specificare targetItemCode",
-        duringDialogue: 'Non puoi compiere azioni durante un dialogo'
+        duringDialogue: 'Non puoi compiere azioni durante un dialogo',
+        appendInputValueRequired: 'Per «Aggiungi al codice» indica il carattere da aggiungere',
+        appendInputTargetInvalid: "L'oggetto {0} non ha un'azione con «Testo inserito uguale a»"
       },
       game: {
         stateMissing: 'Stato di gioco mancante',

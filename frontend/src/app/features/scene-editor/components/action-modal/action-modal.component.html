@@ -335,6 +335,30 @@
                       <span>{{ 'actionModal.noDialogue' | t }}</span>
                     </div>
                   }
+                } @else if (eff.type === 'APPEND_INPUT') {
+                  @if (inputTargetItems().length > 0) {
+                    <div class="set-flag-grid">
+                      <select class="studio-select" [(ngModel)]="eff.targetValue">
+                        <option value="" disabled>{{ 'effectsEditor.selectInputTarget' | t }}</option>
+                        @for (it of inputTargetItems(); track it.code) {
+                          <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                        }
+                      </select>
+                      <span class="equals-sign">+</span>
+                      <input
+                        type="text"
+                        class="studio-input"
+                        maxlength="4"
+                        [(ngModel)]="eff.flagValue"
+                        [placeholder]="'effectsEditor.appendValuePlaceholder' | t"
+                      />
+                    </div>
+                  } @else {
+                    <div class="rule-hint">
+                      <i class="bi bi-keyboard"></i>
+                      <span>{{ 'effectsEditor.noInputTargets' | t }}</span>
+                    </div>
+                  }
                 } @else if (eff.type === 'SET_FLAG') {
                   <div class="set-flag-grid">
                     <input

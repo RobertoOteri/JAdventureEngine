@@ -118,7 +118,8 @@ export class ActionModalComponent {
     'SHOW_SCENE_ITEM',
     'HIDE_SCENE_ITEM',
     'END_ADVENTURE',
-    'START_DIALOGUE'
+    'START_DIALOGUE',
+    'APPEND_INPUT'
   ];
 
   constructor() {
@@ -196,6 +197,26 @@ export class ActionModalComponent {
 
   readonly availableInventoryItems = computed(() => {
     return this.availableItemOptions();
+  });
+
+  /** Oggetti a cui un tasto può aggiungere caratteri: solo quelli con un'azione che ha un INPUT_EQUALS. */
+  readonly inputTargetItems = computed(() => {
+    const scenes = this.store.scenes();
+    const currentScene = this.store.currentScene();
+    const allScenes = scenes.length > 0 ? scenes : (currentScene ? [currentScene] : []);
+    const map = new Map<string, string>();
+
+    for (const scene of allScenes) {
+      for (const it of scene.items || []) {
+        const hasInput = (it.actions || []).some((act) =>
+          (act.preconditions || []).some((p) => p.type === 'INPUT_EQUALS')
+        );
+        if (hasInput && !map.has(it.code)) {
+          map.set(it.code, it.name);
+        }
+      }
+    }
+    return Array.from(map, ([code, name]) => ({ code, name }));
   });
 
   readonly sceneItemsWithHotspot = computed(() => {
@@ -353,7 +374,7 @@ export class ActionModalComponent {
         .map((e) => ({
           type: e.type,
           targetValue: e.type === 'END_ADVENTURE' ? undefined : e.targetValue,
-          flagValue: e.type === 'SET_FLAG' ? e.flagValue : undefined
+          flagValue: e.type === 'SET_FLAG' || e.type === 'APPEND_INPUT' ? e.flagValue : undefined
         }))
     };
 

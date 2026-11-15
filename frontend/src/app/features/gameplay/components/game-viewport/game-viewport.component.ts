@@ -5,6 +5,13 @@ import { GameTimerComponent } from '../game-timer/game-timer.component';
 import { GameInputOverlayComponent } from '../game-input-overlay/game-input-overlay.component';
 import { InputOverlayState } from '../../store/gameplay.store';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
+import { TEXTBOX_GRID, TextBox } from '../../../../core/models/textbox.model';
+
+/** Display del tastierino: posizione e stile della TextBox, più le cifre composte finora. */
+export interface KeypadDisplayState {
+  box: TextBox;
+  value: string;
+}
 
 @Component({
   selector: 'app-game-viewport',
@@ -21,6 +28,7 @@ export class GameViewportComponent {
   playTimeSeconds = input<number>(0);
   isDragging = input<boolean>(false);
   inputOverlay = input<InputOverlayState | null>(null);
+  keypadDisplay = input<KeypadDisplayState | null>(null);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
   singleActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
@@ -30,6 +38,10 @@ export class GameViewportComponent {
   inputValueChange = output<string>();
   inputSubmitted = output<void>();
   inputDismissed = output<void>();
+
+  keypadFontSize(box: TextBox): string {
+    return `${(box.fontSize / TEXTBOX_GRID) * 100}cqw`;
+  }
 
   isItemVisible(item: Item): boolean {
     const visibleCodes = this.visibleItemCodes();

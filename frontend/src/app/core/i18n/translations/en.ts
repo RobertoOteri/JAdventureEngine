@@ -399,6 +399,9 @@ export const en: Translations = {
     endAdventureHint: 'Ends the adventure: the player will see the ending screen.',
     flagKeyPlaceholder: 'Key (e.g. score)',
     flagValuePlaceholder: 'Value (e.g. 100 or true)',
+    selectInputTarget: 'Select the Enter key (item with «Input equals»)',
+    appendValuePlaceholder: 'Character (e.g. 7)',
+    noInputTargets: 'No item with «Input equals»: create the Enter key with that condition first.',
     remove: 'Remove effect',
     empty: 'No effects set.',
     add: 'Add effect'
@@ -523,7 +526,8 @@ export const en: Translations = {
       HIDE_SCENE_ITEM: 'Hide scene item',
       END_ADVENTURE: 'End adventure',
       START_DIALOGUE: 'Start dialogue',
-      END_DIALOGUE: 'End dialogue'
+      END_DIALOGUE: 'End dialogue',
+      APPEND_INPUT: 'Append to code'
     },
     preconditionType: {
       HAS_ITEM: 'Has item',
@@ -669,7 +673,9 @@ export const en: Translations = {
         duplicateType: 'The item already has an action of type {0}',
         duplicateUseWith: 'A USE_WITH action targeting this item already exists: {0}',
         useWithTargetRequired: 'A USE_WITH action requires targetItemCode',
-        duringDialogue: "You can't perform actions during a dialogue"
+        duringDialogue: "You can't perform actions during a dialogue",
+        appendInputValueRequired: 'For «Append to code» enter the character to append',
+        appendInputTargetInvalid: 'Item {0} has no action with «Input equals»'
       },
       game: {
         stateMissing: 'Game state missing',

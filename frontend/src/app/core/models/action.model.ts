@@ -24,7 +24,8 @@ export type EffectType =
   | 'HIDE_SCENE_ITEM'
   | 'END_ADVENTURE'
   | 'START_DIALOGUE'
-  | 'END_DIALOGUE';
+  | 'END_DIALOGUE'
+  | 'APPEND_INPUT';
 
 export interface Precondition {
   id?: number;

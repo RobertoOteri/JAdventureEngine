@@ -38,6 +38,20 @@
         }
       </svg>
 
+      @if (keypadDisplay(); as keypad) {
+        <div
+          class="keypad-display"
+          aria-live="polite"
+          [style.left.%]="keypad.box.posX / 10"
+          [style.top.%]="keypad.box.posY / 10"
+          [style.width.%]="keypad.box.width / 10"
+          [style.height.%]="keypad.box.height / 10"
+          [style.font-family]="keypad.box.fontFamily"
+          [style.font-size]="keypadFontSize(keypad.box)"
+          [style.color]="keypad.box.color"
+        >{{ keypad.value }}</div>
+      }
+
       @if (inputOverlay(); as overlay) {
         <app-game-input-overlay
           [box]="overlay.box"

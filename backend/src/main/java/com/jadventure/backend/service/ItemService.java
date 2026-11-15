@@ -13,6 +13,8 @@ import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.Hotspot;
 import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.enums.ActionType;
+import com.jadventure.backend.model.enums.EffectType;
+import com.jadventure.backend.model.enums.PreconditionType;
 import com.jadventure.backend.repository.ItemRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -121,6 +124,7 @@ public class ItemService {
                 item.getGraphicAdventure().getStatus());
 
         validateActionUniqueness(item.getActions(), actionDto, null);
+        validateAppendInputEffects(item.getGraphicAdventure().getId(), actionDto);
 
         Action action = actionMapper.toEntity(actionDto);
         action.setItem(item);
@@ -175,6 +179,36 @@ public class ItemService {
             }
         }
         log.debug("Executed validateActionUniqueness: action is unique");
+    }
+
+    public void validateAppendInputEffects(Long adventureId, ActionDto actionDto) {
+        log.debug("Executing validateAppendInputEffects for action type {} in adventure {}", actionDto.getType(), adventureId);
+        if (actionDto.getEffects() == null) {
+            return;
+        }
+
+        actionDto.getEffects().stream()
+                .filter(effect -> effect.getType() == EffectType.APPEND_INPUT)
+                .forEach(effect -> {
+                    if (effect.getFlagValue() == null || effect.getFlagValue().isEmpty()) {
+                        log.error("Invalid APPEND_INPUT effect: the value to append is missing");
+                        throw new InvalidOperationException("error.action.appendInputValueRequired");
+                    }
+
+                    String targetCode = effect.getTargetValue();
+                    boolean targetHasInput = targetCode != null && itemRepository
+                            .findAllByGraphicAdventureIdAndCodeIn(adventureId, Set.of(targetCode))
+                            .stream()
+                            .flatMap(item -> item.getActions().stream())
+                            .flatMap(action -> action.getPreconditions().stream())
+                            .anyMatch(precondition -> precondition.getType() == PreconditionType.INPUT_EQUALS);
+
+                    if (!targetHasInput) {
+                        log.error("Invalid APPEND_INPUT effect: item {} has no action with an INPUT_EQUALS precondition", targetCode);
+                        throw new InvalidOperationException("error.action.appendInputTargetInvalid", targetCode);
+                    }
+                });
+        log.debug("Executed validateAppendInputEffects: all APPEND_INPUT effects are valid");
     }
 
     private void copyItemProperties(Item item, ItemDto dto) {

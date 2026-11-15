@@ -10,7 +10,8 @@ export const EFFECT_TYPE_KEYS: Record<EffectType, TranslationKey> = {
   HIDE_SCENE_ITEM: 'enums.effectType.HIDE_SCENE_ITEM',
   END_ADVENTURE: 'enums.effectType.END_ADVENTURE',
   START_DIALOGUE: 'enums.effectType.START_DIALOGUE',
-  END_DIALOGUE: 'enums.effectType.END_DIALOGUE'
+  END_DIALOGUE: 'enums.effectType.END_DIALOGUE',
+  APPEND_INPUT: 'enums.effectType.APPEND_INPUT'
 };
 
 export const PRECONDITION_TYPE_KEYS: Record<PreconditionType, TranslationKey> = {

@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy, HostListener, HostBinding, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, HostBinding, computed, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
-import { Action, ActionType, GraphicAdventureDto } from '../../core/models';
+import { Action, ActionType, GraphicAdventureDto, TYPED_INPUT_FLAG } from '../../core/models';
+import { normalizeTextBox } from '../../core/models/textbox.model';
+import { KeypadDisplayState } from './components/game-viewport/game-viewport.component';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 import { GameTopbarComponent } from './components/game-topbar/game-topbar.component';
@@ -45,6 +47,32 @@ export class GameplayComponent implements OnInit, OnDestroy {
   private readonly location = inject(Location);
 
   readonly store = inject(GameplayStore);
+
+  /**
+   * Display del tastierino: se nella scena c'è un oggetto con INPUT_EQUALS a cui puntano dei tasti,
+   * mostra nella sua TextBox quello che il giocatore ha composto finora.
+   */
+  readonly keypadDisplay = computed<KeypadDisplayState | null>(() => {
+    const targets = this.store.keypadTargetCodes();
+    if (!targets.size) {
+      return null;
+    }
+    for (const item of this.store.currentScene()?.items ?? []) {
+      if (!targets.has(item.code)) {
+        continue;
+      }
+      const textBox = item.actions
+        ?.flatMap((action) => action.preconditions ?? [])
+        .find((precondition) => precondition.type === 'INPUT_EQUALS')?.textBox;
+      if (textBox) {
+        return {
+          box: normalizeTextBox(textBox),
+          value: this.store.adventureFlags()[TYPED_INPUT_FLAG] ?? ''
+        };
+      }
+    }
+    return null;
+  });
 
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
   readonly versions = signal<GraphicAdventureDto[]>([]);
@@ -168,8 +196,14 @@ export class GameplayComponent implements OnInit, OnDestroy {
     }
 
     const inputPrecondition = foundAction?.preconditions?.find((p) => p.type === 'INPUT_EQUALS');
+    const ownerCode = this.store.currentScene()?.items?.find((item) =>
+      item.actions?.some((a) => a.code === actionData.actionCode)
+    )?.code;
 
-    if (inputPrecondition) {
+    // Sugli oggetti usati con un tastierino la combinazione la compongono i tasti: niente casella di testo.
+    const isKeypadTarget = !!ownerCode && this.store.keypadTargetCodes().has(ownerCode);
+
+    if (inputPrecondition && !isKeypadTarget) {
       this.store.openInputOverlay(
         actionData.actionCode,
         actionData.actionType,
