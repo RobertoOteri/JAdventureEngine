@@ -1,0 +1,25 @@
+:host {
+  position: fixed;
+  top: 140px;
+  right: 1.5rem;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.pickup-img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.pickup-img.is-hold {
+  opacity: 1;
+}
+
+.pickup-img.is-leave {
+  opacity: 0;
+}

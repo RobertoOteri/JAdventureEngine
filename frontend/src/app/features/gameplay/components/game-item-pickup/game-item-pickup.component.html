@@ -1,0 +1,12 @@
+@if (shown(); as picked) {
+  @if (picked.imageUrl) {
+    <img
+      class="pickup-img"
+      [class.is-hold]="phase() === 'hold'"
+      [class.is-leave]="phase() === 'leave'"
+      [src]="picked.imageUrl"
+      [alt]="picked.name"
+      draggable="false"
+    />
+  }
+}

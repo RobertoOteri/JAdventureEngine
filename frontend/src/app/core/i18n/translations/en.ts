@@ -491,6 +491,9 @@ export const en: Translations = {
     gizmo: {
       vertices: '{count} vertices',
       undoVertex: 'Undo last vertex (Ctrl+Z)',
+      clearVertices: 'Remove all vertices',
+      hideToolbar: 'Hide toolbar',
+      showToolbar: 'Show toolbar',
       select: 'Select (Cursor)',
       move: 'Move sprite (X/Y axes)',
       scale: 'Resize sprite',

@@ -160,3 +160,67 @@
     display: none;
   }
 }
+
+.btn-inventory.bag-bump {
+  animation: bag-glow 0.9s ease-out;
+}
+
+.btn-inventory.bag-bump i {
+  animation: bag-bounce 0.6s ease-out;
+}
+
+.btn-inventory.bag-bump .inventory-badge {
+  animation: badge-pop 0.6s ease-out;
+}
+
+@keyframes bag-glow {
+  0% {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 0 var(--brass);
+  }
+  40% {
+    border-color: var(--brass);
+    box-shadow: 0 0 14px 2px var(--brass-line);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes bag-bounce {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(0) rotate(8deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-4deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.45);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-inventory.bag-bump,
+  .btn-inventory.bag-bump i,
+  .btn-inventory.bag-bump .inventory-badge {
+    animation: none;
+  }
+}

@@ -19,7 +19,7 @@
   </div>
 
   <div class="navbar-right">
-    <button type="button" class="btn-bar btn-inventory" (click)="openInventory.emit()" [title]="'gameplay.topbar.openInventory' | t">
+    <button type="button" class="btn-bar btn-inventory" [class.bag-bump]="bagBump()" (click)="openInventory.emit()" [title]="'gameplay.topbar.openInventory' | t">
       <i class="bi bi-briefcase-fill"></i>
       <span class="btn-label">{{ 'gameplay.topbar.bag' | t }}</span>
       <span class="inventory-badge">{{ inventoryCount() }}</span>

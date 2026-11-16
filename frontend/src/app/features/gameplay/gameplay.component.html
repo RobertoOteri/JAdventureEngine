@@ -2,7 +2,8 @@
   <app-game-topbar
     [adventureTitle]="adventureDetails()?.title ?? ''"
     [sceneName]="store.currentScene()?.name || ('gameplay.waiting' | t)"
-    [inventoryCount]="store.inventoryCount()"
+    [inventoryCount]="store.bagCount()"
+    [bump]="bagBump()"
     (openInventory)="store.setInventoryOpen(true)"
     (openPauseMenu)="store.setPauseMenuOpen(true)"
     (goBack)="onExitToLobby()"
@@ -26,6 +27,12 @@
       (inputValueChange)="store.setInputValue($event)"
       (inputSubmitted)="store.submitInput()"
       (inputDismissed)="store.closeInputOverlay()"
+    />
+
+    <app-game-item-pickup
+      [item]="store.pickedItems()[0] ?? null"
+      (arrived)="onPickupArrived()"
+      (done)="store.shiftPickedItem()"
     />
 
     <app-game-message-banner

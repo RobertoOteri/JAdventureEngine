@@ -58,6 +58,7 @@ export interface GameplayState {
   activeDialogue: DialogueNode | null;
   radialMenu: RadialMenuState;
   draggedItem: DraggedItemState;
+  pickedItems: Item[];
 }
 
 const initialRadialState: RadialMenuState = {
@@ -90,7 +91,13 @@ const initialState: GameplayState = {
   inputOverlay: null,
   activeDialogue: null,
   radialMenu: initialRadialState,
-  draggedItem: initialDraggedState
+  draggedItem: initialDraggedState,
+  pickedItems: []
+};
+
+const newInventoryItems = (previous: GameStateDto | null, next: GameStateDto): Item[] => {
+  const previousCodes = new Set((previous?.inventory ?? []).map((item) => item.code));
+  return (next.inventory ?? []).filter((item) => !previousCodes.has(item.code));
 };
 
 export const GameplayStore = signalStore(
@@ -100,6 +107,7 @@ export const GameplayStore = signalStore(
     currentScene: computed(() => store.gameState()?.currentScene ?? null),
     inventory: computed<Item[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
+    bagCount: computed(() => Math.max(0, (store.gameState()?.inventory?.length ?? 0) - store.pickedItems().length)),
     visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
 
     /** Codici degli oggetti della scena verso cui puntano dei tasti (effetto APPEND_INPUT). */
@@ -142,6 +150,7 @@ export const GameplayStore = signalStore(
       patchState(store, {feedbackMessage: message});
 
       if (message) {
+        patchState(store, {isInventoryOpen: false});
         feedbackTimer = setTimeout(() => {
           patchState(store, {feedbackMessage: null});
           feedbackTimer = null;
@@ -194,11 +203,11 @@ export const GameplayStore = signalStore(
     };
 
     const toggleInventory = (): void => {
-      patchState(store, (state) => ({isInventoryOpen: !state.isInventoryOpen}));
+      patchState(store, (state) => ({isInventoryOpen: !state.isInventoryOpen && !state.activeDialogue}));
     };
 
     const setInventoryOpen = (isOpen: boolean): void => {
-      patchState(store, {isInventoryOpen: isOpen});
+      patchState(store, {isInventoryOpen: isOpen && !store.activeDialogue()});
     };
 
     const setAdventureId = (id: number): void => {
@@ -300,6 +309,7 @@ export const GameplayStore = signalStore(
             isPauseMenuOpen: false,
             inputOverlay: null,
             activeDialogue: null,
+            pickedItems: [],
             savesList: []
           })
         ),
@@ -350,7 +360,8 @@ export const GameplayStore = signalStore(
             endingMessage: null,
             isPauseMenuOpen: false,
             inputOverlay: null,
-            activeDialogue: null
+            activeDialogue: null,
+            pickedItems: []
           })
         ),
         switchMap((adventureId) =>
@@ -399,7 +410,8 @@ export const GameplayStore = signalStore(
             endingMessage: null,
             isPauseMenuOpen: false,
             inputOverlay: null,
-            activeDialogue: null
+            activeDialogue: null,
+            pickedItems: []
           })
         ),
         switchMap((saveCode) =>
@@ -456,10 +468,14 @@ export const GameplayStore = signalStore(
 
                 if (result.state) {
                   patchState(store, {
+                    pickedItems: [...store.pickedItems(), ...newInventoryItems(store.gameState(), result.state)],
                     gameState: result.state,
                     activeDialogue: completed ? null : (result.dialogue ?? null),
                     endingMessage: completed ? result.feedbackMessage || null : null
                   });
+                  if (store.activeDialogue()) {
+                    setInventoryOpen(false);
+                  }
                 }
 
                 if (!completed) {
@@ -512,9 +528,13 @@ export const GameplayStore = signalStore(
               if (result.state) {
                 const completed = !!result.state.completed;
                 patchState(store, {
+                  pickedItems: [...store.pickedItems(), ...newInventoryItems(store.gameState(), result.state)],
                   gameState: result.state,
                   activeDialogue: completed ? null : (result.dialogue ?? null)
                 });
+                if (store.activeDialogue()) {
+                  setInventoryOpen(false);
+                }
               }
             }),
             catchError((err: any) => {
@@ -638,6 +658,10 @@ export const GameplayStore = signalStore(
       });
     };
 
+    const shiftPickedItem = (): void => {
+      patchState(store, (state) => ({pickedItems: state.pickedItems.slice(1)}));
+    };
+
     const resetStore = (): void => {
       patchState(store, initialState);
     };
@@ -671,6 +695,7 @@ export const GameplayStore = signalStore(
       saveCurrentGame,
       syncAutoSave,
       incrementPlayTime,
+      shiftPickedItem,
       resetStore
     };
   })

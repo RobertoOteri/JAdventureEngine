@@ -79,3 +79,37 @@
   color: var(--brass-light);
   white-space: nowrap;
 }
+
+:host(.is-collapsed) {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.toolbar-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--brass-line);
+  border-left: none;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: rgba(21, 25, 34, 0.9);
+  color: var(--brass);
+  font-size: 0.65rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, width 0.15s ease;
+}
+
+.toolbar-tab:hover {
+  width: 20px;
+  opacity: 1;
+}
+
+.toolbar-tab:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

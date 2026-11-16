@@ -1,63 +1,95 @@
-<div class="gizmo-toolbar-card">
+@if (collapsed()) {
   <button
     type="button"
-    class="btn-tool"
-    [class.active]="activeTool() === 'SELECT'"
-    (click)="selectTool('SELECT')"
-    [title]="'sceneEditor.gizmo.select' | t"
+    class="toolbar-tab"
+    (click)="toggleCollapsed()"
+    [title]="'sceneEditor.gizmo.showToolbar' | t"
   >
-    <i class="bi bi-cursor-fill icon-tool"></i>
+    <i class="bi bi-chevron-right"></i>
   </button>
+} @else {
+  <div class="gizmo-toolbar-card">
+    <button
+      type="button"
+      class="btn-tool"
+      (click)="toggleCollapsed()"
+      [title]="'sceneEditor.gizmo.hideToolbar' | t"
+    >
+      <i class="bi bi-eye-slash-fill icon-tool"></i>
+    </button>
 
-  @if (hasSprite()) {
     <div class="tool-divider"></div>
 
     <button
       type="button"
       class="btn-tool"
-      [class.active]="activeTool() === 'MOVE'"
-      (click)="selectTool('MOVE')"
-      [title]="'sceneEditor.gizmo.move' | t"
+      [class.active]="activeTool() === 'SELECT'"
+      (click)="selectTool('SELECT')"
+      [title]="'sceneEditor.gizmo.select' | t"
     >
-      <i class="bi bi-arrows-move icon-tool"></i>
+      <i class="bi bi-cursor-fill icon-tool"></i>
+    </button>
+
+    @if (hasSprite()) {
+      <div class="tool-divider"></div>
+
+      <button
+        type="button"
+        class="btn-tool"
+        [class.active]="activeTool() === 'MOVE'"
+        (click)="selectTool('MOVE')"
+        [title]="'sceneEditor.gizmo.move' | t"
+      >
+        <i class="bi bi-arrows-move icon-tool"></i>
+      </button>
+
+      <button
+        type="button"
+        class="btn-tool"
+        [class.active]="activeTool() === 'SCALE'"
+        (click)="selectTool('SCALE')"
+        [title]="'sceneEditor.gizmo.scale' | t"
+      >
+        <i class="bi bi-aspect-ratio icon-tool"></i>
+      </button>
+    }
+
+    <div class="tool-divider"></div>
+
+    <button
+      type="button"
+      class="btn-tool"
+      [class.active]="activeTool() === 'HOTSPOT'"
+      (click)="selectTool('HOTSPOT')"
+      [title]="'sceneEditor.gizmo.hotspot' | t"
+    >
+      <i class="bi bi-pencil-fill icon-tool"></i>
+    </button>
+
+    <div class="tool-divider"></div>
+
+    <button
+      type="button"
+      class="btn-tool btn-undo"
+      [disabled]="draftPointsCount() === 0"
+      (click)="undoPoint.emit()"
+      [title]="'sceneEditor.gizmo.undoVertex' | t"
+    >
+      <i class="bi bi-arrow-counterclockwise icon-tool"></i>
     </button>
 
     <button
       type="button"
       class="btn-tool"
-      [class.active]="activeTool() === 'SCALE'"
-      (click)="selectTool('SCALE')"
-      [title]="'sceneEditor.gizmo.scale' | t"
+      [disabled]="draftPointsCount() === 0"
+      (click)="clearPoints.emit()"
+      [title]="'sceneEditor.gizmo.clearVertices' | t"
     >
-      <i class="bi bi-aspect-ratio icon-tool"></i>
+      <i class="bi bi-x-lg icon-tool"></i>
     </button>
-  }
 
-  <div class="tool-divider"></div>
-
-  <button
-    type="button"
-    class="btn-tool"
-    [class.active]="activeTool() === 'HOTSPOT'"
-    (click)="selectTool('HOTSPOT')"
-    [title]="'sceneEditor.gizmo.hotspot' | t"
-  >
-    <i class="bi bi-pencil-fill icon-tool"></i>
-  </button>
-
-  <div class="tool-divider"></div>
-
-  <button
-    type="button"
-    class="btn-tool btn-undo"
-    [disabled]="draftPointsCount() === 0"
-    (click)="undoPoint.emit()"
-    [title]="'sceneEditor.gizmo.undoVertex' | t"
-  >
-    <i class="bi bi-arrow-counterclockwise icon-tool"></i>
-  </button>
-
-  @if (draftPointsCount() > 0) {
-    <span class="vertex-count">{{ 'sceneEditor.gizmo.vertices' | t: { count: draftPointsCount() } }}</span>
-  }
-</div>
+    @if (draftPointsCount() > 0) {
+      <span class="vertex-count">{{ 'sceneEditor.gizmo.vertices' | t: { count: draftPointsCount() } }}</span>
+    }
+  </div>
+}

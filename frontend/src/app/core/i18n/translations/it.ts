@@ -490,6 +490,9 @@ export const it = {
     gizmo: {
       vertices: '{count} vertici',
       undoVertex: 'Annulla ultimo vertice (Ctrl+Z)',
+      clearVertices: 'Rimuovi tutti i vertici',
+      hideToolbar: 'Nascondi barra strumenti',
+      showToolbar: 'Mostra barra strumenti',
       select: 'Selezione (Cursore)',
       move: 'Sposta Sprite (Assi X/Y)',
       scale: 'Ridimensiona Sprite',

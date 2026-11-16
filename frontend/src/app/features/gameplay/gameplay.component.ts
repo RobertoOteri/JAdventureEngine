@@ -18,6 +18,7 @@ import { GameLaunchModalComponent } from '../../shared/ui/game-launch-modal/game
 import { GameMessageBannerComponent } from './components/game-message-banner/game-message-banner.component';
 import { GameDragCursorComponent } from './components/game-drag-cursor/game-drag-cursor.component';
 import { GameDialogueOverlayComponent } from './components/game-dialogue-overlay/game-dialogue-overlay.component';
+import { GameItemPickupComponent } from './components/game-item-pickup/game-item-pickup.component';
 
 @Component({
   selector: 'app-gameplay',
@@ -34,6 +35,7 @@ import { GameDialogueOverlayComponent } from './components/game-dialogue-overlay
     GameMessageBannerComponent,
     GameDragCursorComponent,
     GameDialogueOverlayComponent,
+    GameItemPickupComponent,
     TranslatePipe
   ],
   providers: [GameplayStore],
@@ -77,6 +79,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
   readonly versions = signal<GraphicAdventureDto[]>([]);
   readonly isLaunchModalOpen = signal<boolean>(true);
+  readonly bagBump = signal(0);
 
   private timerInterval: any = null;
 
@@ -223,6 +226,10 @@ export class GameplayComponent implements OnInit, OnDestroy {
     this.store.syncAutoSave();
     this.store.resetStore();
     void this.router.navigate(['/adventures']);
+  }
+
+  onPickupArrived(): void {
+    this.bagBump.update((value) => value + 1);
   }
 
   onOpenReviews(): void {

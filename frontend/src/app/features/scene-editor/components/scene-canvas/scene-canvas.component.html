@@ -19,6 +19,7 @@
           [draftPointsCount]="draftPoints().length"
           (toolChange)="setTool($event)"
           (undoPoint)="undoLastPoint()"
+          (clearPoints)="clearDraftPoints()"
         />
       }
 
