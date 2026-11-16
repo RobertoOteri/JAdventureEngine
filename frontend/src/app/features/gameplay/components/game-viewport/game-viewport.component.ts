@@ -44,11 +44,7 @@ export class GameViewportComponent {
   }
 
   isItemVisible(item: Item): boolean {
-    const visibleCodes = this.visibleItemCodes();
-    if (visibleCodes && visibleCodes.length > 0) {
-      return visibleCodes.includes(item.code);
-    }
-    return item.hotspot?.initiallyVisible ?? true;
+    return (this.visibleItemCodes() ?? []).includes(item.code);
   }
 
   onHotspotMouseDown(event: MouseEvent, item: Item): void {

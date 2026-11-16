@@ -46,9 +46,9 @@ public class GamePlayService {
 
         SceneDto initialScene = sceneService.getSceneByCode(adventureId, initialSceneCode);
 
-        Set<String> visibleItems = (initialScene.getItems() == null)
-                ? Collections.emptySet()
-                : initialScene.getItems().stream()
+        Set<String> visibleItems = sceneService.getScenesByAdventure(adventureId).stream()
+                .filter(scene -> scene.getItems() != null)
+                .flatMap(scene -> scene.getItems().stream())
                 .filter(item -> item.getHotspot() != null && Boolean.TRUE.equals(item.getHotspot().getInitiallyVisible()))
                 .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
