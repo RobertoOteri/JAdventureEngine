@@ -73,7 +73,6 @@
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .choices-list::-webkit-scrollbar {
@@ -84,6 +83,7 @@
   opacity: 1;
   transform: none;
   pointer-events: auto;
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .choices-list.revealed .choice-item {

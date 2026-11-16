@@ -34,6 +34,9 @@ export class GameDialogueOverlayComponent {
   readonly displayedText = signal<string>('');
   readonly isTypingComplete = signal<boolean>(false);
   readonly selectedIndex = signal<number>(0);
+  private readonly typedNode = signal<DialogueNode | null>(null);
+
+  readonly isNodeReady = computed(() => this.isTypingComplete() && this.typedNode() === this.node());
 
   readonly hasChoices = computed(() => (this.node().choices?.length ?? 0) > 0);
 
@@ -65,6 +68,7 @@ export class GameDialogueOverlayComponent {
 
   private startTypewriter(fullText: string): void {
     this.clearTypingTimer();
+    this.typedNode.set(this.node());
     this.displayedText.set('');
     this.isTypingComplete.set(false);
 
