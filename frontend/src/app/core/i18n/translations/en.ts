@@ -705,7 +705,8 @@ export const en: Translations = {
       upload: {
         imageRequired: 'Please select an image',
         missingExtension: 'The uploaded file has no valid extension',
-        unsupportedFormat: 'Unsupported file format. Allowed extensions: {0}'
+        unsupportedFormat: 'Unsupported file format. Allowed extensions: {0}',
+        invalidPath: 'The code may only contain letters, numbers, hyphens and underscores'
       },
       review: {
         ownAdventure: 'You cannot review your own adventure',

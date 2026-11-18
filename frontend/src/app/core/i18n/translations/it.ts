@@ -704,7 +704,8 @@ export const it = {
       upload: {
         imageRequired: "Seleziona un'immagine",
         missingExtension: "Il file caricato non ha un'estensione valida",
-        unsupportedFormat: 'Formato file non supportato. Estensioni consentite: {0}'
+        unsupportedFormat: 'Formato file non supportato. Estensioni consentite: {0}',
+        invalidPath: 'Il codice può contenere solo lettere, numeri, trattini e underscore'
       },
       review: {
         ownAdventure: 'Non puoi recensire una tua avventura',

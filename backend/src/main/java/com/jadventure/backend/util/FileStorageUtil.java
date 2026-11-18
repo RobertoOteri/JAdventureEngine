@@ -11,12 +11,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Component
 public class FileStorageUtil {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".webp");
+    private static final Pattern SAFE_PATH_SEGMENT = Pattern.compile("^[A-Za-z0-9_.-]+$");
 
     public static final String PATH_ADVENTURE_COVER = "%s/v%d/cover";
     public static final String PATH_SCENE_BACKGROUND = "%s/v%d/scenes/%s";
@@ -56,9 +59,16 @@ public class FileStorageUtil {
             throw new InvalidOperationException("error.upload.unsupportedFormat", ALLOWED_EXTENSIONS);
         }
 
-        try {
-            Path destinationFile = this.rootUploadPath.resolve(targetRelativePath + extension);
+        if (!isSafePath(targetRelativePath)) {
+            throw new InvalidOperationException("error.upload.invalidPath");
+        }
 
+        Path destinationFile = this.rootUploadPath.resolve(targetRelativePath + extension).normalize();
+        if (!destinationFile.startsWith(this.rootUploadPath)) {
+            throw new InvalidOperationException("error.upload.invalidPath");
+        }
+
+        try {
             if (destinationFile.getParent() != null) {
                 Files.createDirectories(destinationFile.getParent());
             }
@@ -72,6 +82,13 @@ public class FileStorageUtil {
         } catch (IOException e) {
             throw new IllegalStateException("Errore durante il salvataggio del file in: " + targetRelativePath, e);
         }
+    }
+
+    private boolean isSafePath(String relativePath) {
+        return Arrays.stream(relativePath.split("/"))
+                .allMatch(segment -> SAFE_PATH_SEGMENT.matcher(segment).matches()
+                        && !segment.equals(".")
+                        && !segment.equals(".."));
     }
 
     private String extractExtension(String filename) {
