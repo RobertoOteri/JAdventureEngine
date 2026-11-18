@@ -47,9 +47,13 @@ public class ItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ItemDto> getAdventureItems(Long adventureId) {
         log.info("Executing getAdventureItems with adventureId: {}", adventureId);
-        List<ItemDto> items = itemMapper.toDtoList(itemRepository.findAllByGraphicAdventureId(adventureId));
+        List<Item> entities = itemRepository.findAllByGraphicAdventureId(adventureId);
+        entities.stream().findFirst().ifPresent(item ->
+                authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername()));
+        List<ItemDto> items = itemMapper.toDtoList(entities);
         log.info("Executed getAdventureItems: found {} items for adventure {}", items.size(), adventureId);
         return items;
     }
@@ -62,6 +66,7 @@ public class ItemService {
                     log.error("Item with id {} not found", itemId);
                     return new ResourceNotFoundException("error.item.notFoundById", itemId);
                 });
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
         ItemDto itemDto = itemMapper.toDto(item);
         log.info("Executed getItemById: returning item {} with code {}", itemDto.getId(), itemDto.getCode());
         return itemDto;

@@ -27,7 +27,7 @@ public class SceneController {
     @GetMapping
     public ResponseEntity<List<SceneDto>> getScenes(@RequestParam Long adventureId) {
         log.info("Received GET request for the list of scenes of adventure {}", adventureId);
-        List<SceneDto> scenes = sceneService.getScenesByAdventure(adventureId);
+        List<SceneDto> scenes = sceneService.getOwnedScenesByAdventure(adventureId);
         log.info("Returning {} scenes for adventure {}", scenes.size(), adventureId);
         return ResponseEntity.ok(scenes);
     }

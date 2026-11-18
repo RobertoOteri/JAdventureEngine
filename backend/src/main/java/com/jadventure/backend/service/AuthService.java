@@ -121,7 +121,7 @@ public class AuthService {
         log.debug("Executed validateEditable: adventure is editable");
     }
 
-    private void validateOwnership(String ownerUsername) {
+    public void validateOwnership(String ownerUsername) {
         String currentUsername = getCurrentUsername();
         if (ownerUsername == null || !ownerUsername.equals(currentUsername)) {
             log.error("Access denied: user {} is not the owner (owner: {})", currentUsername, ownerUsername);

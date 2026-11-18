@@ -33,7 +33,9 @@ public class DialogueNodeService {
     @Transactional(readOnly = true)
     public List<DialogueNodeDto> findByItem(Long itemId) {
         log.info("Executing findByItem with itemId: {}", itemId);
-        List<DialogueNodeDto> nodes = dialogueNodeMapper.toDtoList(findItem(itemId).getDialogueNodes());
+        Item item = findItem(itemId);
+        authService.validateOwnership(item.getGraphicAdventure().getAuthor().getUsername());
+        List<DialogueNodeDto> nodes = dialogueNodeMapper.toDtoList(item.getDialogueNodes());
         log.info("Executed findByItem: found {} dialogue nodes for item {}", nodes.size(), itemId);
         return nodes;
     }

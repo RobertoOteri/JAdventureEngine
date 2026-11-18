@@ -48,6 +48,17 @@ public class SceneService {
     }
 
     @Transactional(readOnly = true)
+    public List<SceneDto> getOwnedScenesByAdventure(Long adventureId) {
+        log.info("Executing getOwnedScenesByAdventure with adventureId: {}", adventureId);
+        List<Scene> scenes = sceneRepository.findAllByGraphicAdventureId(adventureId);
+        scenes.stream().findFirst().ifPresent(scene ->
+                authService.validateOwnership(scene.getGraphicAdventure().getAuthor().getUsername()));
+        List<SceneDto> sceneDtos = sceneMapper.toDtoList(scenes);
+        log.info("Executed getOwnedScenesByAdventure: found {} scenes for adventure {}", sceneDtos.size(), adventureId);
+        return sceneDtos;
+    }
+
+    @Transactional(readOnly = true)
     public SceneDto getSceneById(Long sceneId) {
         log.info("Executing getSceneById with sceneId: {}", sceneId);
         Scene scene = sceneRepository.findById(sceneId)
@@ -55,6 +66,7 @@ public class SceneService {
                     log.error("Scene with id {} not found", sceneId);
                     return new ResourceNotFoundException("error.scene.notFoundById", sceneId);
                 });
+        authService.validateOwnership(scene.getGraphicAdventure().getAuthor().getUsername());
         SceneDto sceneDto = sceneMapper.toDto(scene);
         log.info("Executed getSceneById: returning scene {} with code {}", sceneDto.getId(), sceneDto.getCode());
         return sceneDto;

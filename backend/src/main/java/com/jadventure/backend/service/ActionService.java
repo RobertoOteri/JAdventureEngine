@@ -107,7 +107,10 @@ public class ActionService {
     @Transactional(readOnly = true)
     public List<ActionDto> getActionsByItemId(Long itemId) {
         log.info("Executing getActionsByItemId with itemId: {}", itemId);
-        List<ActionDto> actions = actionMapper.toDtoList(actionRepository.findAllByItemId(itemId));
+        List<Action> entities = actionRepository.findAllByItemId(itemId);
+        entities.stream().findFirst().ifPresent(action ->
+                authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername()));
+        List<ActionDto> actions = actionMapper.toDtoList(entities);
         log.info("Executed getActionsByItemId: found {} actions for item {}", actions.size(), itemId);
         return actions;
     }
@@ -120,6 +123,7 @@ public class ActionService {
                     log.error("Action with id {} not found", actionId);
                     return new ResourceNotFoundException("error.action.notFoundById", actionId);
                 });
+        authService.validateOwnership(action.getItem().getGraphicAdventure().getAuthor().getUsername());
         ActionDto actionDto = actionMapper.toDto(action);
         log.info("Executed getActionById: returning action {}", actionDto);
         return actionDto;
