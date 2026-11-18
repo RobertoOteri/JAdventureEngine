@@ -359,6 +359,20 @@
                       <span>{{ 'effectsEditor.noInputTargets' | t }}</span>
                     </div>
                   }
+                } @else if (eff.type === 'CLEAR_INPUT') {
+                  @if (inputTargetItems().length > 0) {
+                    <select class="studio-select" [(ngModel)]="eff.targetValue">
+                      <option value="" disabled>{{ 'effectsEditor.selectInputTarget' | t }}</option>
+                      @for (it of inputTargetItems(); track it.code) {
+                        <option [value]="it.code">{{ it.name }} (#{{ it.code }})</option>
+                      }
+                    </select>
+                  } @else {
+                    <div class="rule-hint">
+                      <i class="bi bi-keyboard"></i>
+                      <span>{{ 'effectsEditor.noInputTargets' | t }}</span>
+                    </div>
+                  }
                 } @else if (eff.type === 'SET_FLAG') {
                   <div class="set-flag-grid">
                     <input

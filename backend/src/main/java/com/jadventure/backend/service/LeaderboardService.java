@@ -65,6 +65,12 @@ public class LeaderboardService {
                     return new ResourceNotFoundException("error.adventure.notFoundById", adventureId);
                 });
 
+        if (adventure.getAuthor().getId().equals(currentUser.getId())) {
+            log.info("Executed createLeaderboardEntry: user {} is the author of adventure {}, no entry created",
+                    currentUser.getUsername(), adventureId);
+            return;
+        }
+
         LeaderboardEntry newEntry = LeaderboardEntry.builder()
                 .user(currentUser)
                 .graphicAdventure(adventure)

@@ -529,7 +529,8 @@ export const it = {
       END_ADVENTURE: "Termina l'avventura",
       START_DIALOGUE: 'Avvia dialogo',
       END_DIALOGUE: 'Chiudi dialogo',
-      APPEND_INPUT: 'Aggiungi al codice'
+      APPEND_INPUT: 'Aggiungi al codice',
+      CLEAR_INPUT: 'Svuota il codice'
     },
     preconditionType: {
       HAS_ITEM: "Ha l'oggetto",

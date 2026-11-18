@@ -530,7 +530,8 @@ export const en: Translations = {
       END_ADVENTURE: 'End adventure',
       START_DIALOGUE: 'Start dialogue',
       END_DIALOGUE: 'End dialogue',
-      APPEND_INPUT: 'Append to code'
+      APPEND_INPUT: 'Append to code',
+      CLEAR_INPUT: 'Clear code'
     },
     preconditionType: {
       HAS_ITEM: 'Has item',

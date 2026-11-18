@@ -431,6 +431,12 @@
 .set-flag-grid input,
 .flag-condition-grid input {
   flex: 1;
+  min-width: 5rem;
+}
+
+.set-flag-grid select {
+  flex: 1;
+  min-width: 0;
 }
 
 .equals-sign {

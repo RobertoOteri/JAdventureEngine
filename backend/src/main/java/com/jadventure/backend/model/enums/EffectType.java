@@ -10,5 +10,6 @@ public enum EffectType {
     END_ADVENTURE,
     START_DIALOGUE,
     END_DIALOGUE,
-    APPEND_INPUT
+    APPEND_INPUT,
+    CLEAR_INPUT
 }

@@ -119,7 +119,8 @@ export class ActionModalComponent {
     'HIDE_SCENE_ITEM',
     'END_ADVENTURE',
     'START_DIALOGUE',
-    'APPEND_INPUT'
+    'APPEND_INPUT',
+    'CLEAR_INPUT'
   ];
 
   constructor() {
