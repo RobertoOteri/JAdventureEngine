@@ -38,7 +38,7 @@ export class GameRadialMenuComponent {
   y = input<number>(0);
   item = input<Item | null>(null);
 
-  actionSelected = output<{ actionCode: string; actionType: ActionType }>();
+  actionSelected = output<{ itemCode: string; actionType: ActionType }>();
   close = output<void>();
 
   hoveredAction = signal<ActionType | null>(null);
@@ -115,10 +115,11 @@ export class GameRadialMenuComponent {
   }
 
   private triggerSelectedAction(type: ActionType): void {
-    const action = this.item()?.actions?.find((a) => a.type === type);
+    const item = this.item();
+    const action = item?.actions?.find((a) => a.type === type);
 
-    if (action?.code) {
-      this.actionSelected.emit({ actionCode: action.code, actionType: action.type });
+    if (item && action?.code) {
+      this.actionSelected.emit({ itemCode: item.code, actionType: action.type });
     } else if (type) {
       console.warn('Azione senza codice, impossibile eseguirla:', type);
     }

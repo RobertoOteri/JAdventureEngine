@@ -14,11 +14,4 @@ public interface GameSaveMapper {
     GameSaveDto toDto(GameSave entity);
 
     List<GameSaveDto> toDtoList(List<GameSave> entities);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "code", source = "dto.code")
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "graphicAdventure", ignore = true)
-    @Mapping(target = "gameState", source = "dto.gameState")
-    GameSave toEntity(GameSaveDto dto);
 }

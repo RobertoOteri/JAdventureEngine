@@ -679,7 +679,10 @@ export const en: Translations = {
         useWithTargetRequired: 'A USE_WITH action requires targetItemCode',
         duringDialogue: "You can't perform actions during a dialogue",
         appendInputValueRequired: 'For «Append to code» enter the character to append',
-        appendInputTargetInvalid: 'Item {0} has no action with «Input equals»'
+        appendInputTargetInvalid: 'Item {0} has no action with «Input equals»',
+        itemNotReachable: 'Item {0} is not reachable',
+        notFoundForItem: 'No {0} action for item {1}',
+        useWithNotFound: 'These items cannot be used together'
       },
       game: {
         stateMissing: 'Game state missing',
@@ -689,7 +692,8 @@ export const en: Translations = {
       save: {
         notFound: 'Save not found: {0}',
         noneForAdventure: 'No save found for adventure: {0}',
-        autosaveNotFound: 'No autosave found for this adventure'
+        autosaveNotFound: 'No autosave found for this adventure',
+        invalidName: 'Invalid save name'
       },
       dialogue: {
         nodeNotFound: 'Dialogue node not found: {0}',

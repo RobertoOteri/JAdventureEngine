@@ -34,6 +34,22 @@ public class GamePlayController {
         return ResponseEntity.ok(save);
     }
 
+    @PostMapping("/adventure/{adventureId}/pause")
+    public ResponseEntity<Void> pauseGame(@PathVariable("adventureId") Long adventureId) {
+        log.info("Received POST request to pause the game for adventure {}", adventureId);
+        gamePlayService.pauseGame(adventureId);
+        log.info("Game for adventure {} paused", adventureId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/adventure/{adventureId}/resume")
+    public ResponseEntity<Void> resumeGame(@PathVariable("adventureId") Long adventureId) {
+        log.info("Received POST request to resume the game for adventure {}", adventureId);
+        gamePlayService.resumeGame(adventureId);
+        log.info("Game for adventure {} resumed", adventureId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/load/{saveCode}")
     public ResponseEntity<GameSaveDto> loadGame(@PathVariable("saveCode") String saveCode) {
         log.info("Received GET request to load game save {}", saveCode);

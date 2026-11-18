@@ -49,4 +49,12 @@ public class DialogueNodeController {
         log.info("Dialogue option {} processed successfully", request.getChoiceId());
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/close/{adventureId}")
+    public ResponseEntity<Void> close(@PathVariable Long adventureId) {
+        log.info("Received POST request to close the dialogue of adventure {}", adventureId);
+        dialogueGameService.closeDialogue(adventureId);
+        log.info("Dialogue of adventure {} closed", adventureId);
+        return ResponseEntity.noContent().build();
+    }
 }

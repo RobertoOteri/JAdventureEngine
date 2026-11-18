@@ -31,7 +31,7 @@ export class GameViewportComponent {
   keypadDisplay = input<KeypadDisplayState | null>(null);
 
   itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
-  singleActionTriggered = output<{ actionCode: string; actionType: ActionType }>();
+  singleActionTriggered = output<{ itemCode: string; actionType: ActionType }>();
   canvasClicked = output<void>();
   hotspotHover = output<{ name: string; code: string } | null>();
   hotspotDrop = output<string>();
@@ -55,7 +55,7 @@ export class GameViewportComponent {
 
     if (actions.length === 1 && actions[0].type !== 'USE_WITH' && actions[0].code) {
       this.singleActionTriggered.emit({
-        actionCode: actions[0].code,
+        itemCode: item.code,
         actionType: actions[0].type
       });
     } else {

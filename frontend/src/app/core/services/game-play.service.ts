@@ -22,4 +22,12 @@ export class GamePlayService {
   loadGame(saveCode: string): Observable<GameSaveDto> {
     return this.http.get<GameSaveDto>(`${this.apiUrl}/load/${saveCode}`, {});
   }
+
+  pauseGame(adventureId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/adventure/${adventureId}/pause`, {});
+  }
+
+  resumeGame(adventureId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/adventure/${adventureId}/resume`, {});
+  }
 }

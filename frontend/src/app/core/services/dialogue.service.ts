@@ -22,4 +22,8 @@ export class DialogueService {
     return this.http.post<GameActionResultDto>(`${this.baseUrl}/choose`, request);
   }
 
+  close(adventureId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/close/${adventureId}`, {});
+  }
+
 }

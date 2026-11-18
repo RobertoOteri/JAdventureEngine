@@ -15,14 +15,13 @@ public class GameActionDto {
     @NotNull(message = "validation.adventure.id.required")
     private Long adventureId;
 
-    @NotNull(message = "validation.gameState.required")
-    private GameStateDto gameState;
-
-    @NotBlank(message = "validation.action.code.required")
-    private String actionCode;
+    @NotBlank(message = "validation.item.code.required")
+    private String itemCode;
 
     @NotNull(message = "validation.action.type.required")
     private ActionType actionType;
+
+    private String targetItemCode;
 
     private String input;
 }

@@ -3,6 +3,7 @@ package com.jadventure.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -54,4 +55,10 @@ public class GameState {
 
     @Column(name = "is_completed", nullable = false)
     private boolean completed = false;
+
+    @Column(name = "current_dialogue_node_code")
+    private String currentDialogueNodeCode;
+
+    @Column(name = "last_activity_at")
+    private LocalDateTime lastActivityAt;
 }

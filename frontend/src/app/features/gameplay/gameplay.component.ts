@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
-import { Action, ActionType, GraphicAdventureDto, TYPED_INPUT_FLAG } from '../../core/models';
+import { ActionType, GraphicAdventureDto, TYPED_INPUT_FLAG } from '../../core/models';
 import { normalizeTextBox } from '../../core/models/textbox.model';
 import { KeypadDisplayState } from './components/game-viewport/game-viewport.component';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -187,28 +187,19 @@ export class GameplayComponent implements OnInit, OnDestroy {
     this.isLaunchModalOpen.set(false);
   }
 
-  onExecuteAction(actionData: { actionCode: string; actionType: ActionType }): void {
-    const sources = [...(this.store.currentScene()?.items ?? []), ...this.store.inventory()];
-    let foundAction: Action | undefined;
-
-    for (const item of sources) {
-      foundAction = item.actions?.find((a) => a.code === actionData.actionCode);
-      if (foundAction) {
-        break;
-      }
-    }
+  onExecuteAction(actionData: { itemCode: string; actionType: ActionType }): void {
+    const item = this.store.currentScene()?.items?.find((i) => i.code === actionData.itemCode);
+    const foundAction = item?.actions?.find((a) => a.type === actionData.actionType);
 
     const inputPrecondition = foundAction?.preconditions?.find((p) => p.type === 'INPUT_EQUALS');
-    const ownerCode = this.store.currentScene()?.items?.find((item) =>
-      item.actions?.some((a) => a.code === actionData.actionCode)
-    )?.code;
+    const ownerCode = item?.code;
 
     // Sugli oggetti usati con un tastierino la combinazione la compongono i tasti: niente casella di testo.
     const isKeypadTarget = !!ownerCode && this.store.keypadTargetCodes().has(ownerCode);
 
     if (inputPrecondition && !isKeypadTarget) {
       this.store.openInputOverlay(
-        actionData.actionCode,
+        actionData.itemCode,
         actionData.actionType,
         inputPrecondition.textBox
       );
@@ -223,7 +214,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
   }
 
   onExitToLobby(): void {
-    this.store.syncAutoSave();
+    this.store.pauseGame();
     this.store.resetStore();
     void this.router.navigate(['/adventures']);
   }
@@ -234,7 +225,7 @@ export class GameplayComponent implements OnInit, OnDestroy {
 
   onOpenReviews(): void {
     const id = this.store.adventureId();
-    this.store.syncAutoSave();
+    this.store.pauseGame();
     this.store.resetStore();
     void this.router.navigate(id ? ['/adventures', id] : ['/adventures']);
   }

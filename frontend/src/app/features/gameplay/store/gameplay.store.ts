@@ -1,7 +1,7 @@
 import { inject, computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, exhaustMap, pipe, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, EMPTY, exhaustMap, Observable, of, pipe, shareReplay, switchMap, tap } from 'rxjs';
 import { GamePlayService } from '../../../core/services/game-play.service';
 import { GameSaveService } from '../../../core/services/game-save.service';
 import { ActionService } from '../../../core/services/action.service';
@@ -37,7 +37,7 @@ export interface DraggedItemState {
 }
 
 export interface InputOverlayState {
-  actionCode: string;
+  itemCode: string;
   actionType: ActionType;
   box: TextBox;
   value: string;
@@ -174,13 +174,13 @@ export const GameplayStore = signalStore(
     };
 
     const openInputOverlay = (
-      actionCode: string,
+      itemCode: string,
       actionType: ActionType,
       box?: TextBox | null
     ): void => {
       patchState(store, {
         inputOverlay: {
-          actionCode,
+          itemCode,
           actionType,
           box: normalizeTextBox(box),
           value: ''
@@ -266,29 +266,34 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const syncAutoSave = rxMethod<void>(
+    let pendingDialogueClose: Observable<unknown> = of(null);
+
+    const syncTimer = rxMethod<{ adventureId: number; paused: boolean }>(
       pipe(
-        switchMap(() => {
-          const advId = store.adventureId();
-          const currentState = store.gameState();
-          if (!advId || !currentState) {
-            return [];
-          }
-          return saveService.updateAutoSave(advId, currentState).pipe(
-            tap({
-              error: (err) => console.error('Errore sincronizzazione autosave:', err)
+        concatMap(({adventureId, paused}) =>
+          (paused ? gameService.pauseGame(adventureId) : gameService.resumeGame(adventureId)).pipe(
+            catchError((err) => {
+              console.error('Errore sincronizzazione timer:', err);
+              return EMPTY;
             })
-          );
-        })
+          )
+        )
       )
     );
 
+    const pauseGame = (): void => {
+      const advId = store.adventureId();
+      if (advId && store.gameState()) {
+        syncTimer({adventureId: advId, paused: true});
+      }
+    };
+
     const setPauseMenuOpen = (isOpen: boolean): void => {
-      if (isOpen) {
-        syncAutoSave();
+      const advId = store.adventureId();
+      if (advId && store.gameState()) {
+        syncTimer({adventureId: advId, paused: isOpen});
       }
       patchState(store, {isPauseMenuOpen: isOpen});
-      const advId = store.adventureId();
       if (isOpen && advId) {
         fetchSaves(advId);
       }
@@ -439,9 +444,15 @@ export const GameplayStore = signalStore(
       )
     );
 
-    const executeAction = rxMethod<{ actionCode: string; actionType: ActionType; input?: string }>(
+    const executeAction = rxMethod<{
+      itemCode: string;
+      actionType: ActionType;
+      targetItemCode?: string;
+      input?: string;
+      notFoundMessage?: string;
+    }>(
       pipe(
-        exhaustMap(({actionCode, actionType, input}) => {
+        exhaustMap(({itemCode, actionType, targetItemCode, input, notFoundMessage}) => {
           const adventureId = store.adventureId();
           const gameState = store.gameState();
 
@@ -455,13 +466,14 @@ export const GameplayStore = signalStore(
 
           const payload: GameActionDto = {
             adventureId,
-            gameState,
-            actionCode,
+            itemCode,
             actionType,
+            targetItemCode,
             input
           };
 
-          return actionService.executeAction(payload).pipe(
+          return pendingDialogueClose.pipe(
+            switchMap(() => actionService.executeAction(payload)),
             tap({
               next: (result: GameActionResultDto) => {
                 const completed = !!result.state?.completed;
@@ -494,11 +506,15 @@ export const GameplayStore = signalStore(
                 }
               },
               error: (err: any) => {
-                console.error('Errore durante l\'esecuzione dell\'azione:', err);
-                const msg =
-                  err?.error?.feedbackMessage ||
-                  apiErrorMessage(err, i18n) ||
-                  i18n.t('gameplay.feedback.actionNotAllowed');
+                const noCombination = !!notFoundMessage && err?.error?.code === 'error.action.useWithNotFound';
+                if (!noCombination) {
+                  console.error('Errore durante l\'esecuzione dell\'azione:', err);
+                }
+                const msg = noCombination
+                  ? notFoundMessage
+                  : err?.error?.feedbackMessage ||
+                    apiErrorMessage(err, i18n) ||
+                    i18n.t('gameplay.feedback.actionNotAllowed');
                 setFeedbackMessage(msg);
                 closeRadialMenu();
 
@@ -506,7 +522,8 @@ export const GameplayStore = signalStore(
                   setInputValue('');
                 }
               }
-            })
+            }),
+            catchError(() => EMPTY)
           );
         })
       )
@@ -523,7 +540,7 @@ export const GameplayStore = signalStore(
             return EMPTY;
           }
 
-          return dialogueService.choose({adventureId, gameState, choiceId}).pipe(
+          return dialogueService.choose({adventureId, choiceId}).pipe(
             tap((result: GameActionResultDto) => {
               if (result.state) {
                 const completed = !!result.state.completed;
@@ -549,10 +566,21 @@ export const GameplayStore = signalStore(
 
     const closeDialogue = (): void => {
       const state = store.gameState();
+      const advId = store.adventureId();
       patchState(store, {
         activeDialogue: null,
         gameState: state ? {...state, currentDialogueNodeCode: null} : state
       });
+      if (advId && state) {
+        pendingDialogueClose = dialogueService.close(advId).pipe(
+          catchError((err) => {
+            console.error('Errore durante la chiusura del dialogo:', err);
+            return of(null);
+          }),
+          shareReplay(1)
+        );
+        pendingDialogueClose.subscribe();
+      }
     };
 
     const submitInput = (): void => {
@@ -561,7 +589,7 @@ export const GameplayStore = signalStore(
         return;
       }
       executeAction({
-        actionCode: overlay.actionCode,
+        itemCode: overlay.itemCode,
         actionType: overlay.actionType,
         input: overlay.value
       });
@@ -572,29 +600,14 @@ export const GameplayStore = signalStore(
       if (!drag.isDragging || !drag.item) return;
 
       const sourceCode = drag.item.code;
-      const sourceItem = drag.item;
       cancelDrag();
 
-      const scene = store.gameState()?.currentScene;
-      const targetHotspot = scene?.items?.find((i) => i.code === targetItemCode);
-
-      let action = sourceItem?.actions?.find(
-        (a) => a.type === 'USE_WITH' && a.targetItemCode === targetItemCode
-      );
-
-      if (!action) {
-        action = targetHotspot?.actions?.find(
-          (a) => a.type === 'USE_WITH' && a.targetItemCode === sourceCode
-        );
-      }
-
-      const actionIdentifier = action?.code || (action?.id ? String(action.id) : null);
-
-      if (action && actionIdentifier) {
-        executeAction({actionCode: actionIdentifier, actionType: 'USE_WITH'});
-      } else {
-        setFeedbackMessage(i18n.t('gameplay.feedback.noEffect'));
-      }
+      executeAction({
+        itemCode: sourceCode,
+        actionType: 'USE_WITH',
+        targetItemCode,
+        notFoundMessage: i18n.t('gameplay.feedback.noEffect')
+      });
     };
 
     const dropOnInventoryTarget = (targetItemCode: string): void => {
@@ -604,33 +617,25 @@ export const GameplayStore = signalStore(
       const sourceCode = drag.item.code;
       cancelDrag();
 
-      const inventory = store.gameState()?.inventory ?? [];
-      const sourceItem = inventory.find((i) => i.code === sourceCode);
-      const targetItem = inventory.find((i) => i.code === targetItemCode);
-
-      const action =
-        sourceItem?.actions?.find((a) => a.type === 'USE_WITH' && a.targetItemCode === targetItemCode) ||
-        targetItem?.actions?.find((a) => a.type === 'USE_WITH' && a.targetItemCode === sourceCode);
-
-      if (action?.code) {
-        executeAction({actionCode: action.code, actionType: 'USE_WITH'});
-      } else {
-        setFeedbackMessage(i18n.t('gameplay.feedback.cannotCombine'));
-      }
+      executeAction({
+        itemCode: sourceCode,
+        actionType: 'USE_WITH',
+        targetItemCode,
+        notFoundMessage: i18n.t('gameplay.feedback.cannotCombine')
+      });
     };
 
     const saveCurrentGame = rxMethod<string | undefined>(
       pipe(
         switchMap((saveName) => {
           const advId = store.adventureId();
-          const currentState = store.gameState();
 
           if (!advId) {
             console.error('Nessuna avventura attiva da salvare');
             return [];
           }
 
-          return saveService.createSave(advId, currentState, saveName).pipe(
+          return saveService.createSave(advId, saveName).pipe(
             tap({
               next: () => {
                 notifications.success(i18n.t('gameplay.feedback.saved'));
@@ -693,7 +698,7 @@ export const GameplayStore = signalStore(
       chooseDialogueOption,
       closeDialogue,
       saveCurrentGame,
-      syncAutoSave,
+      pauseGame,
       incrementPlayTime,
       shiftPickedItem,
       resetStore

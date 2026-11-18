@@ -2,7 +2,6 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.game.GameSaveDto;
-import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
@@ -44,8 +43,6 @@ public class GamePlayService {
             throw new ResourceNotFoundException("error.adventure.noStartScene");
         }
 
-        SceneDto initialScene = sceneService.getSceneByCode(adventureId, initialSceneCode);
-
         Set<String> visibleItems = sceneService.getScenesByAdventure(adventureId).stream()
                 .filter(scene -> scene.getItems() != null)
                 .flatMap(scene -> scene.getItems().stream())
@@ -53,39 +50,42 @@ public class GamePlayService {
                 .map(ItemDto::getCode)
                 .collect(Collectors.toSet());
 
-        GameStateDto initialState = GameStateDto.builder()
-                .currentScene(initialScene)
-                .visibleItemCodes(visibleItems)
-                .build();
+        gameSaveService.createAutoSave(adventureId, initialSceneCode, visibleItems);
 
-        GameSaveDto saveDto = gameSaveService.createSave(adventureId, "Salvataggio automatico", initialState);
-
-        GameSave saveEntity = gameSaveService.findSaveByUser(saveDto.getCode());
-        saveEntity.setAutoSave(true);
-
-        GameSaveDto newGame = loadGame(saveDto.getCode());
+        GameSaveDto newGame = continueGame(adventureId);
         log.info("Executed startNewGame: user {} started adventure {} from scene {} with save {}",
                 user.getUsername(), adventureId, initialSceneCode, newGame.getCode());
         return newGame;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public GameSaveDto continueGame(Long adventureId) {
         log.info("Executing continueGame with adventureId: {}", adventureId);
-        User user = authService.getCurrentUser();
-        GameSave lastSave = gameSaveService.findLatestSave(user.getUsername(), adventureId);
-        GameSaveDto save = buildGameSaveDto(lastSave);
-        log.info("Executed continueGame: user {} resumed adventure {} from save {}", user.getUsername(), adventureId, save.getCode());
+        GameSaveDto save = buildGameSaveDto(gameSaveService.resumeAutoSave(adventureId));
+        log.info("Executed continueGame: adventure {} resumed from autosave {}", adventureId, save.getCode());
         return save;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public GameSaveDto loadGame(String saveCode) {
         log.info("Executing loadGame with saveCode: {}", saveCode);
-        GameSave save = gameSaveService.findSaveByUser(saveCode);
-        GameSaveDto saveDto = buildGameSaveDto(save);
-        log.info("Executed loadGame: returning save {} of adventure {}", saveDto.getCode(), save.getGraphicAdventure().getId());
-        return saveDto;
+        GameSaveDto save = buildGameSaveDto(gameSaveService.restoreSave(saveCode));
+        log.info("Executed loadGame: save {} restored into autosave {}", saveCode, save.getCode());
+        return save;
+    }
+
+    @Transactional
+    public void pauseGame(Long adventureId) {
+        log.info("Executing pauseGame with adventureId: {}", adventureId);
+        gameSaveService.pauseTimer(adventureId);
+        log.info("Executed pauseGame for adventure {}", adventureId);
+    }
+
+    @Transactional
+    public void resumeGame(Long adventureId) {
+        log.info("Executing resumeGame with adventureId: {}", adventureId);
+        gameSaveService.resumeTimer(adventureId);
+        log.info("Executed resumeGame for adventure {}", adventureId);
     }
 
     @Transactional(readOnly = true)

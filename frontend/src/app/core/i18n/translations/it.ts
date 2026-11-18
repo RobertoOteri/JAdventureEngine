@@ -678,7 +678,10 @@ export const it = {
         useWithTargetRequired: "Per l'azione USE_WITH è obbligatorio specificare targetItemCode",
         duringDialogue: 'Non puoi compiere azioni durante un dialogo',
         appendInputValueRequired: 'Per «Aggiungi al codice» indica il carattere da aggiungere',
-        appendInputTargetInvalid: "L'oggetto {0} non ha un'azione con «Testo inserito uguale a»"
+        appendInputTargetInvalid: "L'oggetto {0} non ha un'azione con «Testo inserito uguale a»",
+        itemNotReachable: "L'oggetto {0} non è raggiungibile",
+        notFoundForItem: "Nessuna azione {0} per l'oggetto {1}",
+        useWithNotFound: 'Questi oggetti non si possono usare insieme'
       },
       game: {
         stateMissing: 'Stato di gioco mancante',
@@ -688,7 +691,8 @@ export const it = {
       save: {
         notFound: 'Salvataggio non trovato: {0}',
         noneForAdventure: "Nessun salvataggio trovato per l'avventura: {0}",
-        autosaveNotFound: 'Autosave non trovato per questa avventura'
+        autosaveNotFound: 'Autosave non trovato per questa avventura',
+        invalidName: 'Nome del salvataggio non valido'
       },
       dialogue: {
         nodeNotFound: 'Nodo di dialogo non trovato: {0}',

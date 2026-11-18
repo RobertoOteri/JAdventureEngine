@@ -9,6 +9,7 @@ import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
 import com.jadventure.backend.model.Action;
+import com.jadventure.backend.model.enums.ActionType;
 import com.jadventure.backend.repository.ActionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -35,43 +36,27 @@ public class ActionService {
 
     @Transactional
     public GameActionResultDto executeAction(GameActionDto gameActionDto) {
-        log.info("Executing executeAction with actionCode: {}, actionType: {}, adventureId: {}",
-                gameActionDto.getActionCode(), gameActionDto.getActionType(), gameActionDto.getAdventureId());
+        log.info("Executing executeAction with itemCode: {}, actionType: {}, targetItemCode: {}, adventureId: {}",
+                gameActionDto.getItemCode(), gameActionDto.getActionType(), gameActionDto.getTargetItemCode(), gameActionDto.getAdventureId());
         Long adventureId = gameActionDto.getAdventureId();
-        GameStateDto stateDto = gameActionDto.getGameState();
-
-        if (adventureId == null || stateDto == null || stateDto.getCurrentScene() == null) {
-            log.error("Cannot execute action {}: game state or adventure id is missing", gameActionDto.getActionCode());
-            throw new InvalidOperationException("error.game.stateOrAdventureMissing");
-        }
+        GameStateDto stateDto = gameSaveService.loadActiveState(adventureId);
 
         if (stateDto.isCompleted()) {
-            log.error("Cannot execute action {}: the game of adventure {} has already ended", gameActionDto.getActionCode(), adventureId);
+            log.error("Cannot execute action on item {}: the game of adventure {} has already ended", gameActionDto.getItemCode(), adventureId);
             throw new InvalidOperationException("error.game.alreadyEnded");
         }
 
         if (stateDto.getCurrentDialogueNodeCode() != null) {
-            log.error("Cannot execute action {}: dialogue {} is in progress", gameActionDto.getActionCode(), stateDto.getCurrentDialogueNodeCode());
+            log.error("Cannot execute action on item {}: dialogue {} is in progress", gameActionDto.getItemCode(), stateDto.getCurrentDialogueNodeCode());
             throw new InvalidOperationException("error.action.duringDialogue");
         }
 
-        Action actionEntity = actionRepository.findByCodeAndItemGraphicAdventureId(gameActionDto.getActionCode(), adventureId)
-                .orElseThrow(() -> {
-                    log.error("Action with code {} not found in adventure {}", gameActionDto.getActionCode(), adventureId);
-                    return new ResourceNotFoundException("error.action.notFoundByCode", gameActionDto.getActionCode());
-                });
-
-        ActionDto action = actionMapper.toDto(actionEntity);
-
-        if (action.getType() != gameActionDto.getActionType()) {
-            log.error("Action type mismatch for action {}: expected {}, received {}",
-                    action.getCode(), action.getType(), gameActionDto.getActionType());
-            throw new InvalidOperationException("error.action.typeMismatch", action.getType(), gameActionDto.getActionType());
-        }
+        ActionDto action = actionMapper.toDto(findPlayableAction(adventureId, stateDto, gameActionDto));
 
         Optional<String> failureMessage = preconditionService.validatePreconditions(stateDto, action, gameActionDto.getInput());
 
         if (failureMessage.isPresent()) {
+            gameSaveService.updateAutoSave(adventureId, stateDto);
             GameActionResultDto failedResult = GameActionResultDto.builder()
                     .success(false)
                     .feedbackMessage(failureMessage.get())
@@ -102,6 +87,51 @@ public class ActionService {
         log.info("Executed executeAction for action {}: success: true, currentScene: {}, dialogueOpened: {}, completed: {}",
                 action.getCode(), stateDto.getCurrentScene(), dialogue != null, stateDto.isCompleted());
         return result;
+    }
+
+    private Action findPlayableAction(Long adventureId, GameStateDto state, GameActionDto request) {
+        String itemCode = request.getItemCode();
+        ActionType type = request.getActionType();
+
+        if (type != ActionType.USE_WITH) {
+            if (!isVisibleInScene(state, itemCode)) {
+                log.error("Item {} is not visible in scene {}", itemCode, state.getCurrentScene().getCode());
+                throw new InvalidOperationException("error.action.itemNotReachable", itemCode);
+            }
+            return actionRepository.findFirstByItemCodeAndTypeAndItemGraphicAdventureId(itemCode, type, adventureId)
+                    .orElseThrow(() -> {
+                        log.error("Action {} not found for item {} in adventure {}", type, itemCode, adventureId);
+                        return new ResourceNotFoundException("error.action.notFoundForItem", type, itemCode);
+                    });
+        }
+
+        String targetCode = request.getTargetItemCode();
+        if (!isInInventory(state, itemCode)
+                || !StringUtils.hasText(targetCode)
+                || !(isInInventory(state, targetCode) || isVisibleInScene(state, targetCode))) {
+            log.error("Cannot use item {} with {}: one of them is not reachable", itemCode, targetCode);
+            throw new InvalidOperationException("error.action.itemNotReachable", itemCode);
+        }
+
+        return actionRepository
+                .findFirstByItemCodeAndTypeAndTargetItemCodeAndItemGraphicAdventureId(itemCode, type, targetCode, adventureId)
+                .or(() -> actionRepository
+                        .findFirstByItemCodeAndTypeAndTargetItemCodeAndItemGraphicAdventureId(targetCode, type, itemCode, adventureId))
+                .orElseThrow(() -> {
+                    log.info("No USE_WITH action between {} and {} in adventure {}", itemCode, targetCode, adventureId);
+                    return new InvalidOperationException("error.action.useWithNotFound");
+                });
+    }
+
+    private boolean isInInventory(GameStateDto state, String itemCode) {
+        return state.getInventory() != null && state.getInventory().stream()
+                .anyMatch(item -> item.getCode().equals(itemCode));
+    }
+
+    private boolean isVisibleInScene(GameStateDto state, String itemCode) {
+        return state.getVisibleItemCodes() != null && state.getVisibleItemCodes().contains(itemCode)
+                && state.getCurrentScene().getItems() != null
+                && state.getCurrentScene().getItems().stream().anyMatch(item -> item.getCode().equals(itemCode));
     }
 
     @Transactional(readOnly = true)

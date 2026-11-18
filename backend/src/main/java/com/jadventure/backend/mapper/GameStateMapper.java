@@ -10,8 +10,4 @@ public interface GameStateMapper {
 
     @Mapping(target = "currentScene.code", source = "currentSceneCode")
     GameStateDto toDto(GameState entity);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "currentSceneCode", source = "currentScene.code")
-    GameState toEntity(GameStateDto dto);
 }

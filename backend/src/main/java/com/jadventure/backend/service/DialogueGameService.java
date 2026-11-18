@@ -70,7 +70,7 @@ public class DialogueGameService {
     public GameActionResultDto chooseOption(DialogueChoiceRequestDto request) {
         log.info("Executing chooseOption with adventureId: {}, choiceId: {}", request.getAdventureId(), request.getChoiceId());
         Long adventureId = request.getAdventureId();
-        GameStateDto state = request.getGameState();
+        GameStateDto state = gameSaveService.loadActiveState(adventureId);
 
         if (state.getCurrentScene() == null || state.getCurrentDialogueNodeCode() == null) {
             log.error("Cannot choose option {}: no active dialogue", request.getChoiceId());
@@ -109,6 +109,21 @@ public class DialogueGameService {
         log.info("Executed chooseOption for choice {}: nextNode: {}, completed: {}",
                 request.getChoiceId(), nextNode != null ? nextNode.getCode() : null, state.isCompleted());
         return result;
+    }
+
+    @Transactional
+    public void closeDialogue(Long adventureId) {
+        log.info("Executing closeDialogue with adventureId: {}", adventureId);
+        GameStateDto state = gameSaveService.loadActiveState(adventureId);
+
+        if (state.isCompleted() || state.getCurrentDialogueNodeCode() == null) {
+            log.info("Executed closeDialogue: no active dialogue on adventure {}", adventureId);
+            return;
+        }
+
+        state.setCurrentDialogueNodeCode(null);
+        gameSaveService.updateAutoSave(adventureId, state);
+        log.info("Executed closeDialogue: dialogue closed on adventure {}", adventureId);
     }
 
     private DialogueNodeDto loadNode(Long adventureId, String code) {
