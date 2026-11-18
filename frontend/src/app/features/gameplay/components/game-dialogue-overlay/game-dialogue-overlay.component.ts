@@ -11,7 +11,7 @@ import {
   signal
 } from '@angular/core';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
-import { DialogueChoice, DialogueNode } from '../../../../core/models';
+import { GameDialogueChoice, GameDialogue } from '../../../../core/models';
 
 const TYPING_SPEED_MS = 18;
 
@@ -26,7 +26,7 @@ export class GameDialogueOverlayComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  readonly node = input.required<DialogueNode>();
+  readonly node = input.required<GameDialogue>();
 
   readonly choiceSelected = output<number>();
   readonly close = output<void>();
@@ -34,7 +34,7 @@ export class GameDialogueOverlayComponent {
   readonly displayedText = signal<string>('');
   readonly isTypingComplete = signal<boolean>(false);
   readonly selectedIndex = signal<number>(0);
-  private readonly typedNode = signal<DialogueNode | null>(null);
+  private readonly typedNode = signal<GameDialogue | null>(null);
 
   readonly isNodeReady = computed(() => this.isTypingComplete() && this.typedNode() === this.node());
 
@@ -136,7 +136,7 @@ export class GameDialogueOverlayComponent {
     }
   }
 
-  private emitChoice(choice: DialogueChoice): void {
+  private emitChoice(choice: GameDialogueChoice): void {
     if (choice.id != null) {
       this.choiceSelected.emit(choice.id);
     }
@@ -158,7 +158,7 @@ export class GameDialogueOverlayComponent {
     }
   }
 
-  onChoose(choice: DialogueChoice, event: MouseEvent): void {
+  onChoose(choice: GameDialogueChoice, event: MouseEvent): void {
     event.stopPropagation();
     this.emitChoice(choice);
   }

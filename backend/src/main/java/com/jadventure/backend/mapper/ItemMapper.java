@@ -1,5 +1,6 @@
 package com.jadventure.backend.mapper;
 
+import com.jadventure.backend.dto.game.GameItemDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.model.Hotspot;
 import com.jadventure.backend.model.Item;
@@ -13,6 +14,8 @@ public interface ItemMapper {
     ItemDto toDto(Item entity);
 
     List<ItemDto> toDtoList(List<Item> entities);
+
+    GameItemDto toGameDto(ItemDto dto);
 
     @Mapping(target = "graphicAdventure", ignore = true)
     @Mapping(target = "actions", ignore = true)

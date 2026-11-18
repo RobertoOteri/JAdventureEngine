@@ -1,6 +1,7 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.action.ActionDto;
+import com.jadventure.backend.dto.game.GameItemActionDto;
 import com.jadventure.backend.model.Action;
 import org.mapstruct.*;
 
@@ -17,6 +18,9 @@ public interface ActionMapper {
     ActionDto toDto(Action entity);
 
     List<ActionDto> toDtoList(List<Action> entities);
+
+    @Mapping(target = "inputBox", ignore = true)
+    GameItemActionDto toGameDto(ActionDto dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "code", ignore = true)

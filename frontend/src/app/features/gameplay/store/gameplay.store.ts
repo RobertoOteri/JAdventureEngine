@@ -8,13 +8,13 @@ import { ActionService } from '../../../core/services/action.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { DialogueService } from '../../../core/services/dialogue.service';
 import {
-  GameStateDto,
+  GameViewDto,
   GameActionDto,
   GameSaveDto,
-  Item,
+  GameItem,
   ActionType,
   GameActionResultDto,
-  DialogueNode
+  GameDialogue
 } from '../../../core/models';
 import { TextBox, normalizeTextBox } from '../../../core/models/textbox.model';
 import {apiErrorMessage} from '../../../core/utils/http-error.util';
@@ -24,12 +24,12 @@ export interface RadialMenuState {
   isOpen: boolean;
   x: number;
   y: number;
-  item: Item | null;
+  item: GameItem | null;
 }
 
 export interface DraggedItemState {
   isDragging: boolean;
-  item: Item | null;
+  item: GameItem | null;
   x: number;
   y: number;
   targetHoveredName: string | null;
@@ -46,7 +46,7 @@ export interface InputOverlayState {
 export interface GameplayState {
   adventureId: number | null;
   currentSaveCode: string | null;
-  gameState: GameStateDto | null;
+  gameState: GameViewDto | null;
   savesList: GameSaveDto[];
   areSavesLoaded: boolean;
   isLoading: boolean;
@@ -55,10 +55,10 @@ export interface GameplayState {
   isInventoryOpen: boolean;
   isPauseMenuOpen: boolean;
   inputOverlay: InputOverlayState | null;
-  activeDialogue: DialogueNode | null;
+  activeDialogue: GameDialogue | null;
   radialMenu: RadialMenuState;
   draggedItem: DraggedItemState;
-  pickedItems: Item[];
+  pickedItems: GameItem[];
 }
 
 const initialRadialState: RadialMenuState = {
@@ -95,7 +95,7 @@ const initialState: GameplayState = {
   pickedItems: []
 };
 
-const newInventoryItems = (previous: GameStateDto | null, next: GameStateDto): Item[] => {
+const newInventoryItems = (previous: GameViewDto | null, next: GameViewDto): GameItem[] => {
   const previousCodes = new Set((previous?.inventory ?? []).map((item) => item.code));
   return (next.inventory ?? []).filter((item) => !previousCodes.has(item.code));
 };
@@ -105,26 +105,10 @@ export const GameplayStore = signalStore(
 
   withComputed((store) => ({
     currentScene: computed(() => store.gameState()?.currentScene ?? null),
-    inventory: computed<Item[]>(() => store.gameState()?.inventory ?? []),
+    inventory: computed<GameItem[]>(() => store.gameState()?.inventory ?? []),
     inventoryCount: computed(() => store.gameState()?.inventory?.length ?? 0),
     bagCount: computed(() => Math.max(0, (store.gameState()?.inventory?.length ?? 0) - store.pickedItems().length)),
-    visibleItemCodes: computed<string[]>(() => store.gameState()?.visibleItemCodes ?? []),
-
-    /** Codici degli oggetti della scena verso cui puntano dei tasti (effetto APPEND_INPUT). */
-    keypadTargetCodes: computed<Set<string>>(() => {
-      const codes = new Set<string>();
-      for (const item of store.gameState()?.currentScene?.items ?? []) {
-        for (const action of item.actions ?? []) {
-          for (const effect of action.effects ?? []) {
-            if (effect.type === 'APPEND_INPUT' && effect.targetValue) {
-              codes.add(effect.targetValue);
-            }
-          }
-        }
-      }
-      return codes;
-    }),
-    adventureFlags: computed(() => store.gameState()?.adventureFlags ?? {}),
+    typedInput: computed(() => store.gameState()?.typedInput ?? ''),
     isCompleted: computed(() => store.gameState()?.completed ?? false),
     currentSceneBackgroundUrl: computed(() => {
       return store.gameState()?.currentScene?.backgroundImageUrl ?? '';
@@ -162,7 +146,7 @@ export const GameplayStore = signalStore(
       patchState(store, {radialMenu: initialRadialState});
     };
 
-    const openRadialMenu = (item: Item, x: number, y: number): void => {
+    const openRadialMenu = (item: GameItem, x: number, y: number): void => {
       patchState(store, {
         radialMenu: {
           isOpen: true,
@@ -214,7 +198,7 @@ export const GameplayStore = signalStore(
       patchState(store, {adventureId: id, savesList: [], areSavesLoaded: false});
     };
 
-    const startDragItem = (item: Item, x: number, y: number): void => {
+    const startDragItem = (item: GameItem, x: number, y: number): void => {
       patchState(store, {
         draggedItem: {
           isDragging: true,
@@ -567,10 +551,7 @@ export const GameplayStore = signalStore(
     const closeDialogue = (): void => {
       const state = store.gameState();
       const advId = store.adventureId();
-      patchState(store, {
-        activeDialogue: null,
-        gameState: state ? {...state, currentDialogueNodeCode: null} : state
-      });
+      patchState(store, {activeDialogue: null});
       if (advId && state) {
         pendingDialogueClose = dialogueService.close(advId).pipe(
           catchError((err) => {

@@ -1,6 +1,6 @@
 import { Component, HostListener, computed, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Item } from '../../../../core/models';
+import { GameItem } from '../../../../core/models';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 
 const MIN_SLOTS = 8;
@@ -15,12 +15,12 @@ const DRAG_THRESHOLD_PX = 6;
 })
 export class GameInventoryModalComponent {
   open = input<boolean>(true);
-  items = input<Item[]>([]);
+  items = input<GameItem[]>([]);
   isDragging = input<boolean>(false);
   draggedItemCode = input<string | null>(null);
 
   close = output<void>();
-  itemDragStart = output<{ item: Item; x: number; y: number }>();
+  itemDragStart = output<{ item: GameItem; x: number; y: number }>();
   slotHover = output<{ name: string; code: string } | null>();
   slotDrop = output<string>();
 
@@ -38,10 +38,10 @@ export class GameInventoryModalComponent {
     });
   }
 
-  private pendingDrag: { item: Item; x: number; y: number } | null = null;
+  private pendingDrag: { item: GameItem; x: number; y: number } | null = null;
   private dragStarted = false;
 
-  readonly slots = computed<(Item | null)[]>(() => {
+  readonly slots = computed<(GameItem | null)[]>(() => {
     const items = this.items();
     const empty = Math.max(0, MIN_SLOTS - items.length);
     return [...items, ...Array.from({ length: empty }, () => null)];
@@ -57,12 +57,12 @@ export class GameInventoryModalComponent {
 
   readonly focusedItem = computed(() => this.hoveredItem() ?? this.selectedItem());
 
-  toggleSelect(item: Item): void {
+  toggleSelect(item: GameItem): void {
     if (this.isDragging() || this.dragStarted) return;
     this.selectedCode.update((code) => (code === item.code ? null : item.code));
   }
 
-  onSlotMouseDown(event: MouseEvent, item: Item): void {
+  onSlotMouseDown(event: MouseEvent, item: GameItem): void {
     if (event.button !== 0) return;
     this.dragStarted = false;
     this.isPeekingExpanded.set(false);
@@ -87,7 +87,7 @@ export class GameInventoryModalComponent {
     this.pendingDrag = null;
   }
 
-  onSlotMouseEnter(item: Item): void {
+  onSlotMouseEnter(item: GameItem): void {
     this.hoveredCode.set(item.code);
     if (this.isDragging() && item.code !== this.draggedItemCode()) {
       this.slotHover.emit({ name: item.name, code: item.code });
@@ -101,7 +101,7 @@ export class GameInventoryModalComponent {
     }
   }
 
-  onSlotMouseUp(item: Item): void {
+  onSlotMouseUp(item: GameItem): void {
     if (this.isDragging() && item.code !== this.draggedItemCode()) {
       this.isPeekingExpanded.set(false);
       this.slotDrop.emit(item.code);

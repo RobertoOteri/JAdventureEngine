@@ -1,5 +1,6 @@
 package com.jadventure.backend.mapper;
 
+import com.jadventure.backend.dto.game.GameSceneDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.model.Scene;
 import org.mapstruct.BeanMapping;
@@ -16,6 +17,10 @@ public interface SceneMapper {
     SceneDto toDto(Scene entity);
 
     List<SceneDto> toDtoList(List<Scene> entities);
+
+    @Mapping(target = "keypadBox", ignore = true)
+    @Mapping(target = "items", ignore = true)
+    GameSceneDto toGameDto(SceneDto dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "graphicAdventure", ignore = true)

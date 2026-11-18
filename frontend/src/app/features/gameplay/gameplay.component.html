@@ -13,7 +13,6 @@
     <app-game-viewport
       [scene]="store.currentScene()"
       [backgroundUrl]="store.currentSceneBackgroundUrl()"
-      [visibleItemCodes]="store.visibleItemCodes()"
       [feedbackMessage]="store.feedbackMessage()"
       [playTimeSeconds]="store.gameState()?.playTime || 0"
       [isDragging]="store.draggedItem.isDragging()"

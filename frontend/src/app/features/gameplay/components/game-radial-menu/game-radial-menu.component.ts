@@ -1,6 +1,6 @@
 import { Component, computed, HostListener, inject,  input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Action, ActionType, Item } from '../../../../core/models';
+import { ActionType, GameItem, GameItemAction } from '../../../../core/models';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { TranslationKey } from '../../../../core/i18n/i18n.types';
 
@@ -36,7 +36,7 @@ export class GameRadialMenuComponent {
 
   x = input<number>(0);
   y = input<number>(0);
-  item = input<Item | null>(null);
+  item = input<GameItem | null>(null);
 
   actionSelected = output<{ itemCode: string; actionType: ActionType }>();
   close = output<void>();
@@ -104,7 +104,7 @@ export class GameRadialMenuComponent {
     }
   }
 
-  onActionClicked(event: MouseEvent, action: Action): void {
+  onActionClicked(event: MouseEvent, action: GameItemAction): void {
     event.stopPropagation();
     this.triggerSelectedAction(action.type);
   }
@@ -118,7 +118,7 @@ export class GameRadialMenuComponent {
     const item = this.item();
     const action = item?.actions?.find((a) => a.type === type);
 
-    if (item && action?.code) {
+    if (item && action) {
       this.actionSelected.emit({ itemCode: item.code, actionType: action.type });
     } else if (type) {
       console.warn('Azione senza codice, impossibile eseguirla:', type);

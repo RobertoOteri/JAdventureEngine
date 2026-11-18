@@ -2,10 +2,11 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.adventure.GraphicAdventureDto;
 import com.jadventure.backend.dto.game.GameSaveDto;
+import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.dto.item.ItemDto;
-import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.GameSaveMapper;
+import com.jadventure.backend.mapper.GameStateMapper;
 import com.jadventure.backend.model.GameSave;
 import com.jadventure.backend.model.GameState;
 import com.jadventure.backend.model.User;
@@ -28,6 +29,7 @@ public class GamePlayService {
     private final AuthService authService;
     private final SceneService sceneService;
     private final GameSaveMapper gameSaveMapper;
+    private final GameStateMapper gameStateMapper;
 
     @Transactional
     public GameSaveDto startNewGame(Long adventureId) {
@@ -94,12 +96,11 @@ public class GamePlayService {
         Long adventureId = save.getGraphicAdventure().getId();
         GameState state = save.getGameState();
 
-        GameSaveDto dto = gameSaveMapper.toDto(save);
+        GameStateDto stateDto = gameStateMapper.toDto(state);
+        stateDto.setCurrentScene(sceneService.getSceneByCode(adventureId, state.getCurrentSceneCode()));
 
-        if (dto.getGameState() != null && state != null) {
-            SceneDto sceneDto = sceneService.getSceneByCode(adventureId, state.getCurrentSceneCode());
-            dto.getGameState().setCurrentScene(sceneDto);
-        }
+        GameSaveDto dto = gameSaveMapper.toDto(save);
+        dto.setGameState(gameSaveService.toView(stateDto));
 
         log.debug("Executed buildGameSaveDto: save {} built with currentScene: {}",
                 dto.getCode(), state != null ? state.getCurrentSceneCode() : null);

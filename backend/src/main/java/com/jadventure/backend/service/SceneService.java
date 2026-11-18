@@ -1,5 +1,11 @@
 package com.jadventure.backend.service;
 
+import com.jadventure.backend.dto.action.ActionDto;
+import com.jadventure.backend.dto.action.GameEffectDto;
+import com.jadventure.backend.dto.action.PreconditionDto;
+import com.jadventure.backend.dto.action.TextBoxDto;
+import com.jadventure.backend.dto.game.GameItemDto;
+import com.jadventure.backend.dto.game.GameSceneDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.dto.scene.SceneDto;
 import com.jadventure.backend.exception.ConflictException;
@@ -10,6 +16,8 @@ import com.jadventure.backend.mapper.SceneMapper;
 import com.jadventure.backend.model.GraphicAdventure;
 import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.Scene;
+import com.jadventure.backend.model.enums.EffectType;
+import com.jadventure.backend.model.enums.PreconditionType;
 import com.jadventure.backend.repository.SceneRepository;
 import com.jadventure.backend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -137,5 +150,52 @@ public class SceneService {
         ItemDto created = itemMapper.toDto(item);
         log.info("Executed addItem: item {} created with code {} in scene {}", created.getId(), created.getCode(), sceneId);
         return created;
+    }
+
+    public GameSceneDto toGameScene(SceneDto scene, Set<String> visibleItemCodes) {
+        log.debug("Executing toGameScene with sceneCode: {}", scene.getCode());
+        Set<String> keypadTargets = scene.getItems().stream()
+                .flatMap(item -> item.getActions().stream())
+                .flatMap(action -> action.getEffects().stream())
+                .filter(effect -> effect.getType() == EffectType.APPEND_INPUT)
+                .map(GameEffectDto::getTargetValue)
+                .collect(Collectors.toSet());
+
+        GameSceneDto gameScene = sceneMapper.toGameDto(scene);
+        gameScene.setKeypadBox(scene.getItems().stream()
+                .filter(item -> keypadTargets.contains(item.getCode()))
+                .flatMap(item -> findInputPrecondition(item.getActions()).stream())
+                .map(PreconditionDto::getTextBox)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null));
+        gameScene.setItems(scene.getItems().stream()
+                .filter(item -> visibleItemCodes.contains(item.getCode()))
+                .map(item -> toGameItem(item, keypadTargets.contains(item.getCode())))
+                .toList());
+        log.debug("Executed toGameScene: scene {} with {} visible items", scene.getCode(), gameScene.getItems().size());
+        return gameScene;
+    }
+
+    private GameItemDto toGameItem(ItemDto item, boolean keypadTarget) {
+        GameItemDto gameItem = itemMapper.toGameDto(item);
+        if (!keypadTarget) {
+            IntStream.range(0, item.getActions().size()).forEach(i ->
+                    gameItem.getActions().get(i).setInputBox(findInputBox(item.getActions().get(i))));
+        }
+        return gameItem;
+    }
+
+    private TextBoxDto findInputBox(ActionDto action) {
+        return findInputPrecondition(List.of(action))
+                .map(precondition -> precondition.getTextBox() != null ? precondition.getTextBox() : new TextBoxDto())
+                .orElse(null);
+    }
+
+    private Optional<PreconditionDto> findInputPrecondition(List<ActionDto> actions) {
+        return actions.stream()
+                .flatMap(action -> action.getPreconditions().stream())
+                .filter(precondition -> precondition.getType() == PreconditionType.INPUT_EQUALS)
+                .findFirst();
     }
 }

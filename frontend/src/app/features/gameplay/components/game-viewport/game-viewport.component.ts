@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Scene, Item, ActionType } from '../../../../core/models';
+import { GameScene, GameItem, ActionType } from '../../../../core/models';
 import { GameTimerComponent } from '../game-timer/game-timer.component';
 import { GameInputOverlayComponent } from '../game-input-overlay/game-input-overlay.component';
 import { InputOverlayState } from '../../store/gameplay.store';
@@ -21,16 +21,15 @@ export interface KeypadDisplayState {
   styleUrl: './game-viewport.component.css'
 })
 export class GameViewportComponent {
-  scene = input<Scene | null>(null);
+  scene = input<GameScene | null>(null);
   backgroundUrl = input<string>('');
-  visibleItemCodes = input<string[]>([]);
   feedbackMessage = input<string | null>(null);
   playTimeSeconds = input<number>(0);
   isDragging = input<boolean>(false);
   inputOverlay = input<InputOverlayState | null>(null);
   keypadDisplay = input<KeypadDisplayState | null>(null);
 
-  itemClicked = output<{ item: Item; mouseX: number; mouseY: number }>();
+  itemClicked = output<{ item: GameItem; mouseX: number; mouseY: number }>();
   singleActionTriggered = output<{ itemCode: string; actionType: ActionType }>();
   canvasClicked = output<void>();
   hotspotHover = output<{ name: string; code: string } | null>();
@@ -43,17 +42,13 @@ export class GameViewportComponent {
     return `${(box.fontSize / TEXTBOX_GRID) * 100}cqw`;
   }
 
-  isItemVisible(item: Item): boolean {
-    return (this.visibleItemCodes() ?? []).includes(item.code);
-  }
-
-  onHotspotMouseDown(event: MouseEvent, item: Item): void {
+  onHotspotMouseDown(event: MouseEvent, item: GameItem): void {
     event.preventDefault();
     event.stopPropagation();
 
     const actions = item.actions ?? [];
 
-    if (actions.length === 1 && actions[0].type !== 'USE_WITH' && actions[0].code) {
+    if (actions.length === 1 && actions[0].type !== 'USE_WITH') {
       this.singleActionTriggered.emit({
         itemCode: item.code,
         actionType: actions[0].type
@@ -67,7 +62,7 @@ export class GameViewportComponent {
     }
   }
 
-  onHotspotEnter(item: Item): void {
+  onHotspotEnter(item: GameItem): void {
     if (this.isDragging()) {
       this.hotspotHover.emit({ name: item.name, code: item.code });
     }
@@ -79,26 +74,26 @@ export class GameViewportComponent {
     }
   }
 
-  onHotspotMouseUp(item: Item): void {
+  onHotspotMouseUp(item: GameItem): void {
     if (this.isDragging()) {
       this.hotspotDrop.emit(item.code);
     }
   }
 
-  getHotspotPosX(item: Item): number {
+  getHotspotPosX(item: GameItem): number {
     return item.hotspot?.posX ?? 0;
   }
 
-  getHotspotPosY(item: Item): number {
+  getHotspotPosY(item: GameItem): number {
     return item.hotspot?.posY ?? 0;
   }
 
-  getHotspotWidth(item: Item): number {
+  getHotspotWidth(item: GameItem): number {
     const w = item.hotspot?.width;
     return w && w > 0 ? w : 120;
   }
 
-  getHotspotHeight(item: Item): number {
+  getHotspotHeight(item: GameItem): number {
     const h = item.hotspot?.height;
     return h && h > 0 ? h : 120;
   }

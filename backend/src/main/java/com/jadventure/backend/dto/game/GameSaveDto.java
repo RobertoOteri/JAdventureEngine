@@ -15,5 +15,5 @@ public class GameSaveDto {
     private String name;
     private Long adventureId;
     private LocalDateTime savedAt;
-    private GameStateDto gameState;
+    private GameViewDto gameState;
 }

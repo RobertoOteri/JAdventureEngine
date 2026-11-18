@@ -9,7 +9,7 @@
 
       <div class="scene-sprites-layer">
         @for (item of currentScene.items; track item.code) {
-          @if (item.imageUrl && isItemVisible(item) && item.hotspot) {
+          @if (item.imageUrl && item.hotspot) {
             <img
               [src]="item.imageUrl"
               [alt]="item.name"
@@ -25,7 +25,7 @@
 
       <svg class="scene-hotspot-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
         @for (item of currentScene.items; track item.code) {
-          @if (isItemVisible(item) && item.hotspot?.points) {
+          @if (item.hotspot?.points) {
             <polygon
               [attr.points]="item.hotspot!.points"
               class="hotspot-polygon"

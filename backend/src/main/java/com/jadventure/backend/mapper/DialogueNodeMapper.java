@@ -1,6 +1,7 @@
 package com.jadventure.backend.mapper;
 
 import com.jadventure.backend.dto.dialogue.DialogueNodeDto;
+import com.jadventure.backend.dto.game.GameDialogueDto;
 import com.jadventure.backend.model.DialogueChoice;
 import com.jadventure.backend.model.DialogueNode;
 import org.mapstruct.BeanMapping;
@@ -21,6 +22,8 @@ public interface DialogueNodeMapper {
     DialogueNodeDto toDto(DialogueNode entity);
 
     List<DialogueNodeDto> toDtoList(List<DialogueNode> entities);
+
+    GameDialogueDto toGameDto(DialogueNodeDto dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "item", ignore = true)

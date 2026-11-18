@@ -1,5 +1,5 @@
 import { Component, OnDestroy, effect, input, output, signal } from '@angular/core';
-import { Item } from '../../../../core/models';
+import { GameItem } from '../../../../core/models';
 
 type PickupPhase = 'enter' | 'hold' | 'leave';
 
@@ -10,12 +10,12 @@ type PickupPhase = 'enter' | 'hold' | 'leave';
   styleUrl: './game-item-pickup.component.css'
 })
 export class GameItemPickupComponent implements OnDestroy {
-  item = input<Item | null>(null);
+  item = input<GameItem | null>(null);
 
   arrived = output<void>();
   done = output<void>();
 
-  readonly shown = signal<Item | null>(null);
+  readonly shown = signal<GameItem | null>(null);
   readonly phase = signal<PickupPhase>('enter');
   private timers: ReturnType<typeof setTimeout>[] = [];
 

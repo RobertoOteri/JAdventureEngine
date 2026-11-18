@@ -103,8 +103,8 @@ public class DialogueGameService {
 
         GameActionResultDto result = GameActionResultDto.builder()
                 .success(true)
-                .state(state)
-                .dialogue(nextNode)
+                .state(gameSaveService.toView(state))
+                .dialogue(nodeMapper.toGameDto(nextNode))
                 .build();
         log.info("Executed chooseOption for choice {}: nextNode: {}, completed: {}",
                 request.getChoiceId(), nextNode != null ? nextNode.getCode() : null, state.isCompleted());

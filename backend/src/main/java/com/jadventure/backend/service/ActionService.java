@@ -8,6 +8,7 @@ import com.jadventure.backend.dto.game.GameStateDto;
 import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
 import com.jadventure.backend.mapper.ActionMapper;
+import com.jadventure.backend.mapper.DialogueNodeMapper;
 import com.jadventure.backend.model.Action;
 import com.jadventure.backend.model.enums.ActionType;
 import com.jadventure.backend.repository.ActionRepository;
@@ -33,6 +34,7 @@ public class ActionService {
     private final GameSaveService gameSaveService;
     private final DialogueGameService dialogueGameService;
     private final AuthService authService;
+    private final DialogueNodeMapper dialogueNodeMapper;
 
     @Transactional
     public GameActionResultDto executeAction(GameActionDto gameActionDto) {
@@ -60,7 +62,7 @@ public class ActionService {
             GameActionResultDto failedResult = GameActionResultDto.builder()
                     .success(false)
                     .feedbackMessage(failureMessage.get())
-                    .state(stateDto)
+                    .state(gameSaveService.toView(stateDto))
                     .build();
             log.info("Executed executeAction for action {}: preconditions not satisfied, success: false", action.getCode());
             return failedResult;
@@ -81,8 +83,8 @@ public class ActionService {
         GameActionResultDto result = GameActionResultDto.builder()
                 .success(true)
                 .feedbackMessage(successMessage)
-                .state(stateDto)
-                .dialogue(dialogue)
+                .state(gameSaveService.toView(stateDto))
+                .dialogue(dialogueNodeMapper.toGameDto(dialogue))
                 .build();
         log.info("Executed executeAction for action {}: success: true, currentScene: {}, dialogueOpened: {}, completed: {}",
                 action.getCode(), stateDto.getCurrentScene(), dialogue != null, stateDto.isCompleted());

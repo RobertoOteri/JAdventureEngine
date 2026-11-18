@@ -1,6 +1,5 @@
 import { ActionType } from './action.model';
-import { GameStateDto } from './game-state.model';
-import { DialogueNode } from './dialogue-node.model';
+import { GameDialogue, GameViewDto } from './game-state.model';
 
 export interface GameActionDto {
   adventureId: number;
@@ -13,8 +12,8 @@ export interface GameActionDto {
 export interface GameActionResultDto {
   success: boolean;
   feedbackMessage: string;
-  state?: GameStateDto;
-  dialogue?: DialogueNode | null;
+  state?: GameViewDto;
+  dialogue?: GameDialogue | null;
 }
 
 export interface DialogueChoiceRequestDto {

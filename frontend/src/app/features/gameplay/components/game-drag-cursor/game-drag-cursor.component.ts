@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Item } from '../../../../core/models';
+import { GameItem } from '../../../../core/models';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 
 const ORB_OFFSET_X = 32;
@@ -18,7 +18,7 @@ export class GameDragCursorComponent {
 
   x = input.required<number>();
   y = input.required<number>();
-  item = input<Item | null>(null);
+  item = input<GameItem | null>(null);
   targetName = input<string | null>(null);
 
   readonly sentence = computed(() => {

@@ -2,6 +2,7 @@ package com.jadventure.backend.service;
 
 import com.jadventure.backend.dto.game.GameSaveDto;
 import com.jadventure.backend.dto.game.GameStateDto;
+import com.jadventure.backend.dto.game.GameViewDto;
 import com.jadventure.backend.dto.item.ItemDto;
 import com.jadventure.backend.exception.InvalidOperationException;
 import com.jadventure.backend.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import com.jadventure.backend.model.Item;
 import com.jadventure.backend.model.User;
 import com.jadventure.backend.repository.GameSaveRepository;
 import com.jadventure.backend.repository.ItemRepository;
+import com.jadventure.backend.service.effect.AppendInputEffectHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -92,7 +94,7 @@ public class GameSaveService {
                 .gameState(copy)
                 .build();
 
-        GameSaveDto created = gameSaveMapper.toDto(gameSaveRepository.save(save));
+        GameSaveDto created = toDto(gameSaveRepository.save(save));
         log.info("Executed createSave: save {} created for user {} on adventure {}", created.getCode(), user.getUsername(), adventureId);
         return created;
     }
@@ -211,13 +213,20 @@ public class GameSaveService {
                 user.getUsername(), adventureId, gameStateDto.getCurrentScene().getCode(), gameStateDto.isCompleted());
     }
 
+    public GameViewDto toView(GameStateDto state) {
+        GameViewDto view = gameStateMapper.toViewDto(state);
+        view.setCurrentScene(sceneService.toGameScene(state.getCurrentScene(), state.getVisibleItemCodes()));
+        view.setTypedInput(state.getAdventureFlags().get(AppendInputEffectHandler.TYPED_INPUT_FLAG));
+        return view;
+    }
+
     @Transactional(readOnly = true)
     public List<GameSaveDto> getSavesForAdventure(Long adventureId) {
         log.info("Executing getSavesForAdventure with adventureId: {}", adventureId);
         User user = authService.getCurrentUser();
         List<GameSave> saves = gameSaveRepository
                 .findAllByUserUsernameAndGraphicAdventureIdOrderBySavedAtDesc(user.getUsername(), adventureId);
-        List<GameSaveDto> saveDtos = gameSaveMapper.toDtoList(saves);
+        List<GameSaveDto> saveDtos = saves.stream().map(this::toDto).toList();
         log.info("Executed getSavesForAdventure: found {} saves for user {} on adventure {}", saveDtos.size(), user.getUsername(), adventureId);
         return saveDtos;
     }
@@ -225,7 +234,7 @@ public class GameSaveService {
     @Transactional(readOnly = true)
     public GameSaveDto getSaveByCode(String saveCode) {
         log.info("Executing getSaveByCode with saveCode: {}", saveCode);
-        GameSaveDto save = gameSaveMapper.toDto(findSaveByUser(saveCode));
+        GameSaveDto save = toDto(findSaveByUser(saveCode));
         log.info("Executed getSaveByCode: returning save {}", save.getCode());
         return save;
     }
@@ -255,6 +264,12 @@ public class GameSaveService {
     public boolean hasPlayed(String username, String adventureCode) {
         log.debug("Executing hasPlayed with username: {}, adventureCode: {}", username, adventureCode);
         return gameSaveRepository.existsByUserUsernameAndGraphicAdventureCode(username, adventureCode);
+    }
+
+    private GameSaveDto toDto(GameSave save) {
+        GameSaveDto dto = gameSaveMapper.toDto(save);
+        dto.setGameState(toView(gameStateMapper.toDto(save.getGameState())));
+        return dto;
     }
 
     private GameSave findAutoSave(String username, Long adventureId) {

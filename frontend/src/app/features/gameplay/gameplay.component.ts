@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameplayStore } from './store/gameplay.store';
 import { AdventureService } from '../../core/services/adventure.service';
-import { ActionType, GraphicAdventureDto, TYPED_INPUT_FLAG } from '../../core/models';
+import { ActionType, GraphicAdventureDto } from '../../core/models';
 import { normalizeTextBox } from '../../core/models/textbox.model';
 import { KeypadDisplayState } from './components/game-viewport/game-viewport.component';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -50,30 +50,15 @@ export class GameplayComponent implements OnInit, OnDestroy {
 
   readonly store = inject(GameplayStore);
 
-  /**
-   * Display del tastierino: se nella scena c'è un oggetto con INPUT_EQUALS a cui puntano dei tasti,
-   * mostra nella sua TextBox quello che il giocatore ha composto finora.
-   */
   readonly keypadDisplay = computed<KeypadDisplayState | null>(() => {
-    const targets = this.store.keypadTargetCodes();
-    if (!targets.size) {
+    const keypadBox = this.store.currentScene()?.keypadBox;
+    if (!keypadBox) {
       return null;
     }
-    for (const item of this.store.currentScene()?.items ?? []) {
-      if (!targets.has(item.code)) {
-        continue;
-      }
-      const textBox = item.actions
-        ?.flatMap((action) => action.preconditions ?? [])
-        .find((precondition) => precondition.type === 'INPUT_EQUALS')?.textBox;
-      if (textBox) {
-        return {
-          box: normalizeTextBox(textBox),
-          value: this.store.adventureFlags()[TYPED_INPUT_FLAG] ?? ''
-        };
-      }
-    }
-    return null;
+    return {
+      box: normalizeTextBox(keypadBox),
+      value: this.store.typedInput()
+    };
   });
 
   readonly adventureDetails = signal<GraphicAdventureDto | null>(null);
@@ -189,19 +174,13 @@ export class GameplayComponent implements OnInit, OnDestroy {
 
   onExecuteAction(actionData: { itemCode: string; actionType: ActionType }): void {
     const item = this.store.currentScene()?.items?.find((i) => i.code === actionData.itemCode);
-    const foundAction = item?.actions?.find((a) => a.type === actionData.actionType);
+    const inputBox = item?.actions?.find((a) => a.type === actionData.actionType)?.inputBox;
 
-    const inputPrecondition = foundAction?.preconditions?.find((p) => p.type === 'INPUT_EQUALS');
-    const ownerCode = item?.code;
-
-    // Sugli oggetti usati con un tastierino la combinazione la compongono i tasti: niente casella di testo.
-    const isKeypadTarget = !!ownerCode && this.store.keypadTargetCodes().has(ownerCode);
-
-    if (inputPrecondition && !isKeypadTarget) {
+    if (inputBox) {
       this.store.openInputOverlay(
         actionData.itemCode,
         actionData.actionType,
-        inputPrecondition.textBox
+        inputBox
       );
       return;
     }
