@@ -38,5 +38,14 @@
                 <AppenderRef ref="FileAppender"/>
             </Root>
         </SpringProfile>
+
+        <SpringProfile name="prod">
+            <Logger name="com.jadventure.backend" level="info" additivity="false">
+                <AppenderRef ref="ConsoleAppender"/>
+            </Logger>
+            <Root level="warn">
+                <AppenderRef ref="ConsoleAppender"/>
+            </Root>
+        </SpringProfile>
     </Loggers>
 </Configuration>

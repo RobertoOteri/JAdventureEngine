@@ -35,19 +35,24 @@ public class AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final LoginAttemptService loginAttemptService;
 
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         log.info("Executing login");
         String identifier = request.getIdentifier().trim();
+        loginAttemptService.validateNotBlocked(identifier);
 
         User user = userRepository.findByUsernameOrEmail(identifier, normalizeEmail(identifier))
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
                 .orElseThrow(() -> {
                     log.error("Login failed: invalid credentials");
+                    loginAttemptService.registerFailure(identifier);
                     return new BadCredentialsException("error.auth.invalidCredentials");
                 });
+
+        loginAttemptService.registerSuccess(identifier);
 
         AuthResponse response = new AuthResponse(jwtService.generateToken(user.getUsername()), user.getUsername());
         log.info("Executed login: user {} authenticated", user.getUsername());

@@ -634,7 +634,8 @@ export const en: Translations = {
         internal: 'An internal server error occurred',
         badRequest: 'Invalid request',
         conflict: 'Unable to complete the operation',
-        duplicate: 'An element with this data already exists'
+        duplicate: 'An element with this data already exists',
+        notFound: 'Resource not found'
       },
       validation: {
         generic: 'Invalid data'
@@ -645,7 +646,8 @@ export const en: Translations = {
         emailTaken: "The email '{0}' is already linked to an account",
         notAuthenticated: 'Operation not allowed: user not authenticated',
         notOwner: 'Access denied: you are not the owner of this resource',
-        forbidden: 'Access denied'
+        forbidden: 'Access denied',
+        tooManyAttempts: 'Too many failed login attempts. Try again in {0} minutes'
       },
       user: {
         authenticatedNotFound: 'Authenticated user not found: {0}',
@@ -706,7 +708,8 @@ export const en: Translations = {
         imageRequired: 'Please select an image',
         missingExtension: 'The uploaded file has no valid extension',
         unsupportedFormat: 'Unsupported file format. Allowed extensions: {0}',
-        invalidPath: 'The code may only contain letters, numbers, hyphens and underscores'
+        invalidPath: 'The code may only contain letters, numbers, hyphens and underscores',
+        tooLarge: 'The image is too large (maximum 20 MB)'
       },
       review: {
         ownAdventure: 'You cannot review your own adventure',

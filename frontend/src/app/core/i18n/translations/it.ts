@@ -633,7 +633,8 @@ export const it = {
         internal: 'Si è verificato un errore interno del server',
         badRequest: 'Richiesta non valida',
         conflict: "Impossibile completare l'operazione",
-        duplicate: 'Esiste già un elemento con questi dati'
+        duplicate: 'Esiste già un elemento con questi dati',
+        notFound: 'Risorsa non trovata'
       },
       validation: {
         generic: 'Dati non validi'
@@ -644,7 +645,8 @@ export const it = {
         emailTaken: "L'email '{0}' è già associata a un account",
         notAuthenticated: 'Operazione non consentita: utente non autenticato',
         notOwner: 'Accesso negato: non sei il proprietario di questa risorsa',
-        forbidden: 'Accesso negato'
+        forbidden: 'Accesso negato',
+        tooManyAttempts: 'Troppi tentativi di accesso falliti. Riprova tra {0} minuti'
       },
       user: {
         authenticatedNotFound: 'Utente autenticato non trovato: {0}',
@@ -705,7 +707,8 @@ export const it = {
         imageRequired: "Seleziona un'immagine",
         missingExtension: "Il file caricato non ha un'estensione valida",
         unsupportedFormat: 'Formato file non supportato. Estensioni consentite: {0}',
-        invalidPath: 'Il codice può contenere solo lettere, numeri, trattini e underscore'
+        invalidPath: 'Il codice può contenere solo lettere, numeri, trattini e underscore',
+        tooLarge: "L'immagine è troppo grande (massimo 20 MB)"
       },
       review: {
         ownAdventure: 'Non puoi recensire una tua avventura',
