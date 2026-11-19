@@ -120,8 +120,6 @@ export class GameRadialMenuComponent {
 
     if (item && action) {
       this.actionSelected.emit({ itemCode: item.code, actionType: action.type });
-    } else if (type) {
-      console.warn('Azione senza codice, impossibile eseguirla:', type);
     }
     this.close.emit();
   }

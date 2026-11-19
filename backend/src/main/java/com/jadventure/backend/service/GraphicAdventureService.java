@@ -203,7 +203,7 @@ public class GraphicAdventureService {
             adventure.setInitialSceneCode(scene.getCode());
         }
 
-        graphicAdventureRepository.saveAndFlush(adventure);
+        graphicAdventureRepository.flush();
 
         SceneDto created = sceneMapper.toDto(scene);
         log.info("Executed addScene: scene {} created with code {} in adventure {}", created.getId(), created.getCode(), adventureId);
@@ -229,7 +229,7 @@ public class GraphicAdventureService {
         }
 
         adventure.getItems().add(item);
-        graphicAdventureRepository.saveAndFlush(adventure);
+        graphicAdventureRepository.flush();
 
         ItemDto created = itemMapper.toDto(item);
         log.info("Executed addItem: item {} created with code {} in adventure {}", created.getId(), created.getCode(), adventureId);

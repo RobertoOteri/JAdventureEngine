@@ -31,7 +31,7 @@ export class UserService {
     }
     this.http.get<UserProfile>(this.apiUrl).subscribe({
       next: (user) => this.userSignal.set(user),
-      error: (err) => console.error('Errore caricamento profilo:', err)
+      error: () => undefined
     });
   }
 

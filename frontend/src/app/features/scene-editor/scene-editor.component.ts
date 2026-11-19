@@ -191,7 +191,6 @@ export class SceneEditorComponent implements OnInit, OnDestroy {
     const targetItemId = selected?.id;
 
     if (isEdit && !targetItemId) {
-      console.error("Impossibile aggiornare l'oggetto: ID mancante.");
       return;
     }
 

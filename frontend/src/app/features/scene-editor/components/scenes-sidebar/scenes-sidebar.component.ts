@@ -135,8 +135,6 @@ export class ScenesSidebarComponent {
     const advId = this.getAdventureId();
     if (advId) {
       void this.router.navigate(['/adventures', advId, 'scenes', 'new']);
-    } else {
-      console.error('Nessun adventureId trovato per la navigazione');
     }
   }
 
@@ -144,7 +142,6 @@ export class ScenesSidebarComponent {
     event.stopPropagation();
 
     if (!scene.id) {
-      console.error('ID scena mancante per eliminazione.');
       return;
     }
 

@@ -62,10 +62,9 @@ export class LeaderboardComponent implements OnInit {
         this.entries.set(data);
         this.loading.set(false);
       },
-      error: (err) => {
+      error: () => {
         this.errorMessage.set('leaderboard.loadError');
         this.loading.set(false);
-        console.error('Errore caricamento leaderboard:', err);
       }
     });
   }

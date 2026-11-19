@@ -63,8 +63,7 @@ export class SceneCreateComponent implements OnInit {
             });
           }
         },
-        error: (err) => {
-          console.error('Errore nel caricamento dei dati avventura:', err);
+        error: () => {
           this.errorMessage.set(this.i18n.t('sceneEditor.sceneForm.loadError'));
         }
       });

@@ -75,8 +75,7 @@ export class MyAdventuresComponent implements OnInit {
         this.adventures.set(data);
         this.isLoading.set(false);
       },
-      error: (err: unknown) => {
-        console.error('Errore caricamento avventure personali:', err);
+      error: () => {
         this.errorMessage.set('myAdventures.loadError');
         this.isLoading.set(false);
       }
@@ -98,7 +97,6 @@ export class MyAdventuresComponent implements OnInit {
 
   onEditAdventure(adv: GraphicAdventureDto): void {
     if (!adv.id) {
-      console.error('ID avventura mancante per la modifica.');
       return;
     }
     const sceneCode = adv.initialSceneCode || 'new';
@@ -107,7 +105,6 @@ export class MyAdventuresComponent implements OnInit {
 
   async onDeleteAdventure(adv: GraphicAdventureDto): Promise<void> {
     if (!adv.id) {
-      console.error('ID avventura mancante per l\'eliminazione.');
       return;
     }
 

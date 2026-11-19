@@ -256,10 +256,7 @@ export const GameplayStore = signalStore(
       pipe(
         concatMap(({adventureId, paused}) =>
           (paused ? gameService.pauseGame(adventureId) : gameService.resumeGame(adventureId)).pipe(
-            catchError((err) => {
-              console.error('Errore sincronizzazione timer:', err);
-              return EMPTY;
-            })
+            catchError(() => EMPTY)
           )
         )
       )
@@ -441,7 +438,6 @@ export const GameplayStore = signalStore(
           const gameState = store.gameState();
 
           if (!adventureId || !gameState) {
-            console.error('Nessuna partita attiva nello store');
             setFeedbackMessage(i18n.t('gameplay.feedback.invalidSession'));
             closeRadialMenu();
             closeInputOverlay();
@@ -491,9 +487,6 @@ export const GameplayStore = signalStore(
               },
               error: (err: any) => {
                 const noCombination = !!notFoundMessage && err?.error?.code === 'error.action.useWithNotFound';
-                if (!noCombination) {
-                  console.error('Errore durante l\'esecuzione dell\'azione:', err);
-                }
                 const msg = noCombination
                   ? notFoundMessage
                   : err?.error?.feedbackMessage ||
@@ -539,7 +532,6 @@ export const GameplayStore = signalStore(
               }
             }),
             catchError((err: any) => {
-              console.error('Errore durante la scelta del dialogo:', err);
               setFeedbackMessage(apiErrorMessage(err, i18n) || i18n.t('gameplay.feedback.dialogueError'));
               return EMPTY;
             })
@@ -554,10 +546,7 @@ export const GameplayStore = signalStore(
       patchState(store, {activeDialogue: null});
       if (advId && state) {
         pendingDialogueClose = dialogueService.close(advId).pipe(
-          catchError((err) => {
-            console.error('Errore durante la chiusura del dialogo:', err);
-            return of(null);
-          }),
+          catchError(() => of(null)),
           shareReplay(1)
         );
         pendingDialogueClose.subscribe();
@@ -612,7 +601,6 @@ export const GameplayStore = signalStore(
           const advId = store.adventureId();
 
           if (!advId) {
-            console.error('Nessuna avventura attiva da salvare');
             return [];
           }
 

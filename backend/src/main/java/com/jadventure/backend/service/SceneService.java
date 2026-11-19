@@ -145,7 +145,7 @@ public class SceneService {
         }
 
         scene.getItems().add(item);
-        sceneRepository.saveAndFlush(scene);
+        sceneRepository.flush();
 
         ItemDto created = itemMapper.toDto(item);
         log.info("Executed addItem: item {} created with code {} in scene {}", created.getId(), created.getCode(), sceneId);
