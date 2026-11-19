@@ -2,12 +2,12 @@
   @if (scene(); as currentScene) {
     <div class="viewport-frame">
       @if (backgroundUrl()) {
-        <img [src]="backgroundUrl()" [alt]="'gameplay.viewport.backgroundAlt' | t" class="scene-background" />
+        <img [src]="backgroundUrl()" [alt]="'gameplay.viewport.backgroundAlt' | t" class="scene-background" (load)="onBackgroundLoaded(backgroundUrl())" (error)="onBackgroundLoaded(backgroundUrl())" />
       }
 
       <app-game-timer [playTimeSeconds]="playTimeSeconds()" />
 
-      <div class="scene-sprites-layer">
+      <div class="scene-sprites-layer" [class.sprites-hidden]="!backgroundReady()">
         @for (item of currentScene.items; track item.code) {
           @if (item.imageUrl && item.hotspot) {
             <img

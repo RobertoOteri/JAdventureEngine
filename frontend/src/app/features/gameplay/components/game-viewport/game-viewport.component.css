@@ -46,6 +46,10 @@
   pointer-events: none;
 }
 
+.scene-sprites-layer.sprites-hidden {
+  visibility: hidden;
+}
+
 .item-sprite {
   position: absolute;
   pointer-events: none;

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameScene, GameItem, ActionType } from '../../../../core/models';
 import { GameTimerComponent } from '../game-timer/game-timer.component';
@@ -37,6 +37,16 @@ export class GameViewportComponent {
   inputValueChange = output<string>();
   inputSubmitted = output<void>();
   inputDismissed = output<void>();
+
+  private readonly loadedBackgroundUrl = signal<string | null>(null);
+
+  readonly backgroundReady = computed(() =>
+    !this.backgroundUrl() || this.loadedBackgroundUrl() === this.backgroundUrl()
+  );
+
+  onBackgroundLoaded(url: string): void {
+    this.loadedBackgroundUrl.set(url);
+  }
 
   keypadFontSize(box: TextBox): string {
     return `${(box.fontSize / TEXTBOX_GRID) * 100}cqw`;
