@@ -107,7 +107,7 @@ public class GraphicAdventureService {
 
         if (coverImage != null && !coverImage.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER, code, adventure.getVersionNumber());
-            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
+            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage, FileStorageUtil.MAX_SIZE_ADVENTURE_COVER));
         }
 
         GraphicAdventureDto created = graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
@@ -135,7 +135,7 @@ public class GraphicAdventureService {
         if (coverImage != null && !coverImage.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_ADVENTURE_COVER,
                     adventure.getCode(), adventure.getVersionNumber());
-            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage));
+            adventure.setCoverImageUrl(fileStorageUtil.storeFile(path, coverImage, FileStorageUtil.MAX_SIZE_ADVENTURE_COVER));
         }
 
         GraphicAdventureDto updated = graphicAdventureMapper.toDto(graphicAdventureRepository.save(adventure));
@@ -193,7 +193,7 @@ public class GraphicAdventureService {
 
         String path = String.format(FileStorageUtil.PATH_SCENE_BACKGROUND,
                 adventure.getCode(), adventure.getVersionNumber(), sceneDto.getCode());
-        String backgroundImageUrl = fileStorageUtil.storeFile(path, backgroundImage);
+        String backgroundImageUrl = fileStorageUtil.storeFile(path, backgroundImage, FileStorageUtil.MAX_SIZE_SCENE_BACKGROUND);
 
         scene.setBackgroundImageUrl(backgroundImageUrl);
         scene.setGraphicAdventure(adventure);
@@ -225,7 +225,7 @@ public class GraphicAdventureService {
         if (image != null && !image.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
                     adventure.getCode(), adventure.getVersionNumber(), itemDto.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, image));
+            item.setImageUrl(fileStorageUtil.storeFile(path, image, FileStorageUtil.MAX_SIZE_ITEM_IMAGE));
         }
 
         adventure.getItems().add(item);

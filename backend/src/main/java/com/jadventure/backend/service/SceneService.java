@@ -141,7 +141,7 @@ public class SceneService {
         if (image != null && !image.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
                     adventure.getCode(), adventure.getVersionNumber(), itemDto.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, image));
+            item.setImageUrl(fileStorageUtil.storeFile(path, image, FileStorageUtil.MAX_SIZE_ITEM_IMAGE));
         }
 
         scene.getItems().add(item);

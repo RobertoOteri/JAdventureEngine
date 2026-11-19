@@ -89,7 +89,7 @@ public class ItemService {
         if (image != null && !image.isEmpty()) {
             String path = String.format(FileStorageUtil.PATH_ITEM_IMAGE,
                     adventure.getCode(), adventure.getVersionNumber(), item.getCode());
-            item.setImageUrl(fileStorageUtil.storeFile(path, image));
+            item.setImageUrl(fileStorageUtil.storeFile(path, image, FileStorageUtil.MAX_SIZE_ITEM_IMAGE));
         }
 
         ItemDto updated = itemMapper.toDto(itemRepository.save(item));

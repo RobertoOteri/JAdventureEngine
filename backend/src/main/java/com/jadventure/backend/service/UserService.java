@@ -69,7 +69,7 @@ public class UserService {
 
         User user = authService.getCurrentUser();
         String path = String.format(FileStorageUtil.PATH_USER_AVATAR, user.getUsername(), System.currentTimeMillis());
-        user.setAvatarUrl(fileStorageUtil.storeFile(path, avatar));
+        user.setAvatarUrl(fileStorageUtil.storeFile(path, avatar, FileStorageUtil.MAX_SIZE_USER_AVATAR));
 
         UserDto updated = toDtoWithStats(user);
         log.info("Executed updateAvatar: avatar of user {} stored at {}", updated.getUsername(), updated.getAvatarUrl());
