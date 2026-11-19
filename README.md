@@ -1,59 +1,123 @@
-# GraphicAdventureEngine
+# JAdventureEngine
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.7.
+Web app per **creare e giocare avventure grafiche punta-e-clicca** direttamente dal browser.
 
-## Development server
+🌐 **Sito online:** [jadventureengine.it](https://jadventureengine.it)
 
-To start a local development server, run:
+Progetto di tesi di laurea in Ingegneria Informatica – Università Roma Tre.
 
-```bash
-ng serve
+---
+
+## Funzionalità
+
+### Gioco
+- Scene con sfondo e oggetti interattivi, con hotspot poligonali
+- Menu radiale delle azioni: **guarda, apri, prendi, muovi, usa, parla, usa con**
+- Inventario, con trascinamento degli oggetti per combinarli tra loro o con la scena
+- Dialoghi a scelta multipla con i personaggi
+- Enigmi con inserimento di testo e tastierini numerici cliccabili
+- Salvataggi manuali e salvataggio automatico, con ripresa della partita
+- Timer di gioco, finali multipli e classifica per tempo di completamento
+- Stato della partita gestito interamente dal server: il client invia solo le azioni del giocatore
+
+### Editor
+- Creazione di avventure, scene e oggetti con caricamento delle immagini
+- Disegno degli hotspot direttamente sulla scena
+- Configurazione delle azioni con **precondizioni** (possesso di oggetti, flag, testo inserito) ed **effetti** (cambio scena, oggetti aggiunti/rimossi o mostrati/nascosti, flag, dialoghi, fine avventura, tastierino)
+- Editor dei dialoghi ad albero, con scelte condizionate
+- **Pubblicazione e versioning**: i giocatori vedono solo le versioni pubblicate, mentre l'autore continua a lavorare su una bozza
+
+### Community
+- Libreria delle avventure con ricerca, filtri e ordinamenti
+- Preferiti, recensioni con valutazione a stelle, profili pubblici degli autori
+- Interfaccia in **italiano e inglese**
+
+---
+
+## Tecnologie
+
+| | |
+|---|---|
+| **Backend** | Java 21, Spring Boot 3, Spring Security (JWT), Spring Data JPA / Hibernate, Flyway, MapStruct, Lombok |
+| **Database** | PostgreSQL |
+| **Frontend** | Angular 22, NgRx Signals, TypeScript, Bootstrap Icons |
+| **Deploy** | AWS EC2 (Ubuntu), nginx come reverse proxy, HTTPS con Let's Encrypt |
+
+---
+
+## Architettura
+
+```
+Browser ──HTTPS──▶ nginx ──┬── /           → frontend Angular (file statici)
+                           ├── /uploads/   → immagini (servite in WebP quando supportato)
+                           └── /api/       → backend Spring Boot ──▶ PostgreSQL
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Il backend espone un'API REST stateless autenticata con JWT. Il frontend è una single page application che comunica con il backend tramite `/api`.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Struttura del repository
 
-```bash
-ng generate component component-name
+```
+backend/    Spring Boot (controller, service, repository, model, DTO, mapper)
+            └── src/main/resources/db/migration   migrazioni Flyway del database
+frontend/   Angular (features: adventures, gameplay, scene-editor, dialogue-editor, profile, ...)
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+## Avvio in locale
+
+### Requisiti
+- Java 21
+- Node.js e npm
+- PostgreSQL
+
+### Database
+Crea un database vuoto chiamato `adventure_db`. Le tabelle vengono create automaticamente da Flyway al primo avvio del backend.
+
+### Backend
+La configurazione di sviluppo si trova in `backend/src/main/resources/application-dev.properties`: indirizzo, utente e password del database, chiave JWT e origine CORS. Il profilo `dev` è attivo di default.
 
 ```bash
-ng generate --help
+cd backend
+./mvnw spring-boot:run
 ```
 
-## Building
+Il backend parte su `http://localhost:8080`.
 
-To build the project run:
-
+### Frontend
 ```bash
-ng build
+cd frontend
+npm install
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Apri `http://localhost:4200`. In sviluppo le chiamate a `/api` e `/uploads` vengono inoltrate al backend tramite il proxy di Angular.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Produzione
 
+In produzione il backend usa il profilo `prod` e legge la configurazione da variabili d'ambiente:
+
+| Variabile | Descrizione |
+|---|---|
+| `SPRING_PROFILES_ACTIVE` | `prod` |
+| `DB_URL` | URL JDBC del database |
+| `DB_USERNAME` / `DB_PASSWORD` | credenziali del database |
+| `JWT_SECRET` | chiave di firma dei token |
+| `CORS_ALLOWED_ORIGINS` | origini consentite, separate da virgola |
+
+Build:
 ```bash
-ng test
+mvn clean package -DskipTests      # backend → backend/target/backend-1.0.0-SNAPSHOT.jar
+cd frontend && npm run build        # frontend → frontend/dist/frontend/browser
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## Autore
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+**Roberto Oteri** – [GitHub](https://github.com/RobertoOteri)

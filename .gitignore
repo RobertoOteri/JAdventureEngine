@@ -19,8 +19,6 @@ dist/
 # Package files
 *.jar
 
-*.json
-
 # Maven
 target/
 dist/
